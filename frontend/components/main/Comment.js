@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, FlatList, Button, TextInput } from 'react-native'
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput, Image, Alert } from 'react-native'
+
+import { AntDesign } from "@expo/vector-icons";
+import { useNavigation } from '@react-navigation/native';
+
+import moment from 'moment';
 
 import firebase from 'firebase'
 require('firebase/firestore')
@@ -64,38 +69,78 @@ function Comment(props) {
             .collection('comments')
             .add({
                 creator: firebase.auth().currentUser.uid,
-                text
+                text,
+                creation: firebase.firestore.FieldValue.serverTimestamp(),
+                likes: 0,
             })
+            .then(() => {
+                console.log('Comment Added!');
+                Alert.alert(
+                  'Comment published!',
+                  'Your comment has been published successfully!',
+                );
+                setComments(null);
+              })
+              .catch((error) => {
+                console.log('Something went wrong with adding comment to firestore.', error);
+              });
     }
 
+    const navigation =useNavigation();
+
     return (
-        <View>
+        <View style={styles.container}>
+            <View style={styles.topPostContainer}>
+                <TouchableOpacity onPress={() => navigation.goBack()}>
+                <AntDesign name="close" size={30} color="#2e64e5"/>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => onCommentSend()} style={styles.shareButton}>
+                    <Text style={styles.shareText}>Share</Text>
+                </TouchableOpacity>
+            </View>
+            <View style={styles.middlePostContainer}>
+                <Image source={require('../../assets/profilePhoto.png')} style={styles.profilePhotoPostContainer} />
+                <TextInput
+                placeholder="Share your commment..."
+                style={styles.placeholderText}
+                multiline
+                numberOfLines={4}
+                onChangeText={(text) => setText(text)}
+                />
+            </View>
+            
             <FlatList
+                style={styles.feed}
                 numColumns={1}
                 horizontal={false}
                 data={comments}
                 renderItem={({ item }) => (
                     <View>
                         {item.user !== undefined ?
-                            <Text>
-                                {item.user.name}
-                            </Text>
+                            <View style={styles.feedItem}>
+                                <TouchableOpacity
+                                    onPress={() => props.navigation.navigate("Profile", {uid: item.id})}>
+                                    <Image source={require('../../assets/profilePhoto.png')} style={styles.profilePhotoPostContainer} />
+                                </TouchableOpacity>
+                                <View style={styles.postRightContainer}>
+                                    <View style={styles.postHeaderContainer}>
+                                        <Text style={styles.profileNameFeedText}>{item.user.name}</Text>
+                                    </View>
+                                    <View style={styles.postContentContainer}>
+                                        <Text style={styles.captionText}>{item.text}</Text>
+                                    </View>
+                                </View>
+
+                            </View>
+                            
                             : null}
-                        <Text>{item.text}</Text>
                     </View>
+
+                    
+
+                    
                 )}
             />
-
-            <View>
-                <TextInput
-                    placeholder='comment...'
-                    onChangeText={(text) => setText(text)} />
-                <Button
-                    onPress={() => onCommentSend()}
-                    title="Send"
-                />
-            </View>
-
         </View>
     )
 }
@@ -107,3 +152,97 @@ const mapStateToProps = (store) => ({
 const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUsersData }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchProps)(Comment);
+
+const styles = StyleSheet.create({
+    container: {
+      justifyContent: 'center',
+      flex: 1,
+    },
+  profilePhotoPostContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 40,
+  },
+  topPostContainer: {
+    flexDirection: 'row',
+    justifyContent: "space-between",
+    marginTop: "5%",
+    paddingHorizontal: 5,
+  },
+  middlePostContainer: {
+    flexDirection: 'row',
+    width: "90%",
+    paddingTop: 5,
+    paddingBottom: 5,
+  },
+  shareText: {
+    color: "#ffffff",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  shareButton: {
+    backgroundColor: "#2e64e5",
+    borderRadius: 30,
+  },
+  placeholderText: {
+    alignSelf: 'center',
+    paddingHorizontal: 10,
+  },
+feedItem:{
+    padding:6,
+    marginVertical:2,
+    marginHorizontal:2,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e1e2e6",
+    flexDirection: 'row',
+    flex: 1,
+},
+profileNameFeedText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginHorizontal: 2.5,
+},
+captionText: {
+    marginHorizontal: 10,
+
+},
+postTimeContainer: {
+    fontSize: 10,
+},
+postContentContainer: {
+    flex: 1,
+    width: "90%",
+},
+postHeaderContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: "80%",
+    paddingBottom: 4,
+},
+profilePhotoPostContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 40,
+},
+postFooterContainer: {
+    flexDirection: 'row',
+    paddingTop: 4,
+    justifyContent: 'space-between',
+    width: "60%",
+    paddingTop: 5,
+    marginLeft: "5%",
+
+},
+postRightContainer: {
+    width: "100%",
+},
+feed: {
+    backgroundColor: "#ffffff",
+    flex: 1,
+    marginTop: 14,
+},
+
+  
+  });

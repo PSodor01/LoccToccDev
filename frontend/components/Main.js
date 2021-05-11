@@ -9,6 +9,7 @@ import { fetchUser, fetchUserPosts, fetchUserFollowing, clearData } from '../red
 import FeedScreen from './main/Feed'
 import ProfileScreen from './main/Profile'
 import SearchScreen from './main/Search'
+import NotificationsScreen from './main/Notifications'
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -25,43 +26,61 @@ export class Main extends Component {
     }
     render() {
         return (
-            <Tab.Navigator initialRouteName="Feed" labeled={false}>
-                <Tab.Screen name="Feed" component={FeedScreen}
+            <Tab.Navigator initialRouteName="Feed" activeColor="#fff">
+                <Tab.Screen 
+                    name="Feed" 
+                    component={FeedScreen}
                     options={{
+                        tabBarLabel: 'Home',
+                        tabBarColor: '#009387',
                         tabBarIcon: ({ color, size }) => (
                             <MaterialCommunityIcons name="home" color={color} size={26} />
                         ),
                     }} />
-                <Tab.Screen name="Search" component={SearchScreen} navigation={this.props.navigation}
+                <Tab.Screen 
+                    name="Search" 
+                    component={SearchScreen} 
+                    navigation={this.props.navigation}
                     options={{
+                        tabBarLabel: 'Explore',
+                        tabBarColor: '#009387',
                         tabBarIcon: ({ color, size }) => (
                             <MaterialCommunityIcons name="magnify" color={color} size={26} />
                         ),
                     }} />
-                <Tab.Screen name="AddContainer" component={EmptyScreen}
+                <Tab.Screen 
+                    name="Notifications" 
+                    component={NotificationsScreen} 
                     listeners={({ navigation }) => ({
                         tabPress: event => {
                             event.preventDefault();
-                            navigation.navigate("Add")
-                        }
-                    })}
+                            navigation.navigate("Notifications", {uid: firebase.auth().currentUser.uid})
+                        }})}
                     options={{
+                        tabBarLabel: 'Notifications',
+                        tabBarColor: '#009387',
                         tabBarIcon: ({ color, size }) => (
-                            <MaterialCommunityIcons name="plus-box" color={color} size={26} />
+                            <MaterialCommunityIcons name="heart" color={color} size={26} />
                         ),
-                    }} />
-                <Tab.Screen name="Profile" component={ProfileScreen} 
-                listeners={({ navigation }) => ({
-                    tabPress: event => {
-                        event.preventDefault();
-                        navigation.navigate("Profile", {uid: firebase.auth().currentUser.uid})
-                    }})}
+                    }}
+                    />
+                <Tab.Screen 
+                    name="Profile" 
+                    component={ProfileScreen} 
+                    listeners={({ navigation }) => ({
+                        tabPress: event => {
+                            event.preventDefault();
+                            navigation.navigate("Profile", {uid: firebase.auth().currentUser.uid})
+                        }})}
                     options={{
+                        tabBarLabel: 'Profile',
+                        tabBarColor: '#009387',
                         tabBarIcon: ({ color, size }) => (
-                            <MaterialCommunityIcons name="account-circle" color={color} size={26} />
+                            <MaterialCommunityIcons name="account" color={color} size={26} />
                         ),
                     }} />
             </Tab.Navigator>
+            
         )
     }
 }

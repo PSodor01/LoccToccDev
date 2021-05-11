@@ -1,15 +1,113 @@
 import React from 'react'
-import { Text, View, Button } from 'react-native'
+import { Text, View, Image, StyleSheet, TouchableOpacity } from 'react-native'
 
 export default function Landing({ navigation }) {
     return (
-        <View style={{ flex: 1, justifyContent: 'center' }}>
-            <Button
-                title="Register"
-                onPress={() => navigation.navigate("Register")} />
-            <Button
-                title="Login"
-                onPress={() => navigation.navigate("Login")} />
-        </View>
+        <View style={styles.mainContainer}>
+            <View style={styles.circleContainer}>
+                <View style={styles.leftCircle}></View>
+                <View style={styles.rightCircle}></View>
+            </View>
+            <View>
+                <Image
+                    style={styles.logo}
+                    source={require("../../assets/LoccToccLogo.png")}
+                />
+            </View>
+
+
+            <View style={{ flex: 1.5, justifyContent: 'center' }}>
+                <TouchableOpacity 
+                    onPress={() => navigation.navigate("Register")} 
+                    style={styles.appButtonContainer}>
+                        <Text style={styles.appButtonText}> Register </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                    onPress={() => navigation.navigate("Login")} 
+                    style={styles.appButtonContainer}>
+                        <Text style={styles.appButtonText}> Login </Text>
+                </TouchableOpacity>
+                <View style={styles.disclaimerContainer}>
+                        <Text style={styles.disclaimerText}>
+                            If you or someone you know has a gambling problem
+                        </Text>
+                        <Text style={styles.disclaimerText}>
+                            and wants help, call 1-800-GAMBLER
+                        </Text>
+                    </View>
+            </View>
+        </View>        
+        
     )
 }
+
+const styles = StyleSheet.create({
+    mainContainer: {
+        flex: 1,
+        backgroundColor: "#ffffff",
+    },
+    appButtonContainer: {
+        backgroundColor: "#009387",
+        borderRadius: 6,
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        width: "75%",
+        alignSelf: "center",
+        marginBottom: '5%',
+    },
+    appButtonText: {
+        color: "#ffffff",
+        fontSize: 25,
+        alignSelf: "center",
+    },
+    headerText: {
+        color: "#fff",
+        marginTop: 50,
+        fontSize: 30,
+        fontWeight: "bold",
+    },
+    logo: {
+        width: 200,
+        height: 200,
+        borderRadius: 40,
+        alignSelf: 'center',
+        marginTop: 16,
+        overflow: 'hidden',
+        marginBottom: 10,
+    },
+    leftCircle: {
+        backgroundColor: "#0066cc",
+        width: 200,
+        height: 200,
+        borderRadius: 200,
+        left: -50,
+        right: -50,
+        top: -50,
+    },
+    rightCircle: {
+        backgroundColor: "#009387",
+        width: 400,
+        height: 400,
+        borderRadius: 200,
+        left: 100,
+        right: 200,
+        top: -400,
+    },
+    circleContainer: {
+        flex: 1,
+        top: -50,
+    },
+    disclaimerContainer: {
+        flex: 1,
+        alignSelf: 'center',
+    },
+    disclaimerText: {
+        fontSize: 10,
+        alignSelf: 'center',
+        width: "70%",
+    }
+    
+})
+
+

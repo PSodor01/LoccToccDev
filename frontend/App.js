@@ -1,7 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { Component } from 'react';
 
-import { View, Text } from 'react-native'
+import { View, Image, StyleSheet, Text, TouchableOpacity, Alert } from 'react-native'
+import { FontAwesome5 } from "@expo/vector-icons";
 
 import * as firebase from 'firebase'
 
@@ -14,14 +15,14 @@ const store = createStore(rootReducer, applyMiddleware(thunk))
 
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAGV2HfQSQtFCjD9xbu4RDUiTewa7is8O8",
-  authDomain: "instagram-dev-8b9c4.firebaseapp.com",
-  databaseURL: "https://instagram-dev-8b9c4.firebaseio.com",
-  projectId: "instagram-dev-8b9c4",
-  storageBucket: "instagram-dev-8b9c4.appspot.com",
-  messagingSenderId: "386631361638",
-  appId: "1:386631361638:web:d25aa4b5ec7911c57679a7",
-  measurementId: "G-GQYEJ3XWBV"
+  apiKey: "AIzaSyAmXTsXkPI-J6mineXVOY9wa0y-B7R_GDw",
+  authDomain: "locctoccdev.firebaseapp.com",
+  databaseURL: "https://locctoccdev-default-rtdb.firebaseio.com",
+  projectId: "locctoccdev",
+  storageBucket: "locctoccdev.appspot.com",
+  messagingSenderId: "736365930098",
+  appId: "1:736365930098:web:a626e007f31172af5684eb",
+  measurementId: "G-4YXWQRXEF1"
 };
 
 if (firebase.apps.length === 0) {
@@ -30,6 +31,7 @@ if (firebase.apps.length === 0) {
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { createDrawerNavigator } from '@react-navigation/drawer';
 
 import LandingScreen from './components/auth/Landing'
 import RegisterScreen from './components/auth/Register'
@@ -38,10 +40,25 @@ import MainScreen from './components/Main'
 import AddScreen from './components/main/Add'
 import SaveScreen from './components/main/Save'
 import CommentScreen from './components/main/Comment'
+import NewPostScreen from './components/main/NewPost'
+import MessagesScreen from './components/main/Messages'
 
 
 const Stack = createStackNavigator();
+const Drawer = createDrawerNavigator();
 
+const onDrawerPress = () => {
+  console.warn( 'Drawer' );
+  Alert.alert(
+      'Placeholder: this button will open the drawer navigator',
+    );
+}
+const onMessagesPress = () => {
+  console.warn( 'Messages' );
+  Alert.alert(
+      'Placeholder: this button will open the messages screen',
+    );
+}
 
 export class App extends Component {
   constructor(props) {
@@ -71,7 +88,10 @@ export class App extends Component {
     if (!loaded) {
       return (
         <View style={{ flex: 1, justifyContent: 'center' }}>
-          <Text>Loading</Text>
+          <Image
+                style={styles.logo}
+                source={require("../frontend/assets/LoccToccLogo.png")}
+          />
         </View>
       )
     }
@@ -90,13 +110,11 @@ export class App extends Component {
 
     return (
       <Provider store={store}>
-        <NavigationContainer >
-          <Stack.Navigator initialRouteName="Main">
-            <Stack.Screen name="Main" component={MainScreen} />
-            <Stack.Screen name="Add" component={AddScreen} navigation={this.props.navigation}/>
-            <Stack.Screen name="Save" component={SaveScreen} navigation={this.props.navigation}/>
-            <Stack.Screen name="Comment" component={CommentScreen} navigation={this.props.navigation}/>
-          </Stack.Navigator>
+        <NavigationContainer>
+          <Drawer.Navigator initialRouteName="Main">
+            <Drawer.Screen name="Messages" component={MessagesScreen} />
+          </Drawer.Navigator>
+          
         </NavigationContainer>
       </Provider>
     )
@@ -104,3 +122,26 @@ export class App extends Component {
 }
 
 export default App
+
+
+const styles = StyleSheet.create({
+  logo: {
+      width: 200,
+      height: 200,
+      borderRadius: 40,
+      alignSelf: 'center',
+      marginTop: 16,
+      overflow: 'hidden',
+      marginBottom: 10,
+  },
+  headerName: {
+    alignSelf: 'center',
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 20,
+
+}, 
+  
+  
+})
+
