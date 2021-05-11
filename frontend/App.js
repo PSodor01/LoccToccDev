@@ -31,7 +31,6 @@ if (firebase.apps.length === 0) {
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { createDrawerNavigator } from '@react-navigation/drawer';
 
 import LandingScreen from './components/auth/Landing'
 import RegisterScreen from './components/auth/Register'
@@ -41,11 +40,9 @@ import AddScreen from './components/main/Add'
 import SaveScreen from './components/main/Save'
 import CommentScreen from './components/main/Comment'
 import NewPostScreen from './components/main/NewPost'
-import MessagesScreen from './components/main/Messages'
 
 
 const Stack = createStackNavigator();
-const Drawer = createDrawerNavigator();
 
 const onDrawerPress = () => {
   console.warn( 'Drawer' );
@@ -110,11 +107,45 @@ export class App extends Component {
 
     return (
       <Provider store={store}>
-        <NavigationContainer>
-          <Drawer.Navigator initialRouteName="Main">
-            <Drawer.Screen name="Messages" component={MessagesScreen} />
-          </Drawer.Navigator>
-          
+        <NavigationContainer >
+          <Stack.Navigator 
+              initialRouteName="Main"
+              screenOptions={{
+                headerStyle: {
+                  backgroundColor: "#009387",
+                },
+                headerTintColor: '#fff',
+                headerTitleStyle: {
+                  fontWeight: 'bold'
+                }
+              }}
+              >
+            <Stack.Screen name="Main" component={MainScreen} 
+              options={{
+                headerTitle: () => (
+                  <Text style={styles.headerName}>LOCC TOCC</Text>
+                ),
+                headerLeft: () => (
+                  <TouchableOpacity 
+                    style={{ alignItems: "flex-end", marginLeft:16 }}
+                    onPress={onDrawerPress}>
+                    <FontAwesome5 name="bars" size={24} color="#fff" />
+                  </TouchableOpacity>
+                ),
+                headerRight: () => (
+                  <TouchableOpacity 
+                    style={{ alignItems: "flex-end", marginRight:16 }}
+                    onPress={onMessagesPress}>
+                    <FontAwesome5 name="envelope" size={24} color="#fff" />
+                  </TouchableOpacity>
+                )
+              }}
+               />
+            <Stack.Screen name="Add" component={AddScreen} navigation={this.props.navigation}/>
+            <Stack.Screen name="Save" component={SaveScreen} navigation={this.props.navigation}/>
+            <Stack.Screen name="Comment" component={CommentScreen} navigation={this.props.navigation}/>
+            <Stack.Screen name="NewPost" component={NewPostScreen} navigation={this.props.navigation}/>
+          </Stack.Navigator>
         </NavigationContainer>
       </Provider>
     )

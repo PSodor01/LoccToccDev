@@ -2,7 +2,7 @@ import * as React from 'react';
 export const ToggleButtonGroupContext = /*#__PURE__*/React.createContext(null);
 /**
  * Toggle group allows to control a group of toggle buttons.</br>
- * It doesn't change the appearance of the toggle buttons. If you want to group them in a row, check out <a href="react-native-paper/toggle-button-row.html">`ToggleButton.Row`</a>.
+ * It doesn't change the appearance of the toggle buttons. If you want to group them in a row, check out <a href="toggle-button-row.html">`ToggleButton.Row`</a>.
  *
  * <div class="screenshots">
  *   <figure>
@@ -44,5 +44,7 @@ const ToggleButtonGroup = ({
 }, children);
 
 ToggleButtonGroup.displayName = 'ToggleButton.Group';
-export default ToggleButtonGroup;
+export default ToggleButtonGroup; // @component-docs ignore-next-line
+
+export { ToggleButtonGroup };
 //# sourceMappingURL=ToggleButtonGroup.js.map
