@@ -4,11 +4,11 @@ type Props = {
   /**
    * Function to execute on selection change.
    */
-  onValueChange: (value: string) => void;
+  onValueChange: (value: string) => void | null;
   /**
    * Value of the currently selected toggle button.
    */
-  value: string;
+  value: string | null;
   /**
    * React elements containing toggle buttons.
    */
@@ -16,8 +16,8 @@ type Props = {
 };
 
 type ToggleButtonContextType = {
-  value: string;
-  onValueChange: (item: string) => void;
+  value: string | null;
+  onValueChange: (item: string) => void | null;
 };
 
 export const ToggleButtonGroupContext = React.createContext<
@@ -26,7 +26,7 @@ export const ToggleButtonGroupContext = React.createContext<
 
 /**
  * Toggle group allows to control a group of toggle buttons.</br>
- * It doesn't change the appearance of the toggle buttons. If you want to group them in a row, check out <a href="react-native-paper/toggle-button-row.html">`ToggleButton.Row`</a>.
+ * It doesn't change the appearance of the toggle buttons. If you want to group them in a row, check out <a href="toggle-button-row.html">`ToggleButton.Row`</a>.
  *
  * <div class="screenshots">
  *   <figure>
@@ -69,3 +69,6 @@ const ToggleButtonGroup = ({ value, onValueChange, children }: Props) => (
 ToggleButtonGroup.displayName = 'ToggleButton.Group';
 
 export default ToggleButtonGroup;
+
+// @component-docs ignore-next-line
+export { ToggleButtonGroup };

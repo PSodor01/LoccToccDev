@@ -59,6 +59,7 @@ function Comment(props) {
         }
     }, [props.route.params.postId, props.users])
 
+    const commentCount = comments + 1;
 
     const onCommentSend = () => {
         firebase.firestore()
@@ -84,9 +85,26 @@ function Comment(props) {
               .catch((error) => {
                 console.log('Something went wrong with adding comment to firestore.', error);
               });
+        
     }
 
-    const navigation =useNavigation();
+    const onCommentCount = () => {
+        firebase.firestore()
+        .collection('posts')
+            .doc(props.route.params.uid)
+            .collection('userPosts')
+            .doc(props.route.params.postId)
+        .update({
+            comments: firebase.firestore.FieldValue.increment(1)
+        })
+      }
+
+
+    
+
+    
+
+    const navigation = useNavigation();
 
     return (
         <View style={styles.container}>
@@ -94,7 +112,7 @@ function Comment(props) {
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                 <AntDesign name="close" size={30} color="#2e64e5"/>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => onCommentSend()} style={styles.shareButton}>
+                <TouchableOpacity onPress={() => {onCommentSend(); onCommentCount();}} style={styles.shareButton}>
                     <Text style={styles.shareText}>Share</Text>
                 </TouchableOpacity>
             </View>

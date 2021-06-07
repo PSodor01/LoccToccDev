@@ -31,6 +31,9 @@ if (firebase.apps.length === 0) {
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+
+import { DrawerContent } from './components/Drawer'
 
 import LandingScreen from './components/auth/Landing'
 import RegisterScreen from './components/auth/Register'
@@ -40,22 +43,79 @@ import AddScreen from './components/main/Add'
 import SaveScreen from './components/main/Save'
 import CommentScreen from './components/main/Comment'
 import NewPostScreen from './components/main/NewPost'
+import EditProfileScreen from './components/main/EditProfile'
+import MessagesScreen from './components/main/Messages'
+import Feed from './components/main/Feed'
+import Search from './components/main/Search'
+import NotificationsScreen from './components/main/Notifications'
+import Profile from './components/main/Profile'
+import ChatScreen from './components/main/Chat'
+import AboutUsScreen from './components/main/AboutUs'
+import PartyRulesScreen from './components/main/PartyRules'
+import Odds from './components/main/Odds'
+
+import MessagesButton from './components/MessagesButton'
 
 
 const Stack = createStackNavigator();
+const Drawer = createDrawerNavigator();
+const MainStack = createStackNavigator();
 
-const onDrawerPress = () => {
-  console.warn( 'Drawer' );
-  Alert.alert(
-      'Placeholder: this button will open the drawer navigator',
-    );
-}
-const onMessagesPress = () => {
-  console.warn( 'Messages' );
-  Alert.alert(
-      'Placeholder: this button will open the messages screen',
-    );
-}
+const MainStackScreen = ({navigation, props}) => (
+  <MainStack.Navigator 
+      initialRouteName="Main"
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: "#009387",
+        },
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+          fontWeight: 'bold'
+        }
+      }}
+      >
+    <MainStack.Screen name="Main" component={MainScreen} 
+      options={{
+        headerTitle: () => (
+          <Text style={styles.headerName}>locctocc</Text>
+        ),
+        headerLeft: () => (
+          <TouchableOpacity 
+            style={{ alignItems: "flex-end", marginLeft:16 }}
+            onPress={() => navigation.openDrawer()}
+            >
+            <FontAwesome5 name="bars" size={24} color="#fff" />
+          </TouchableOpacity>
+        ),
+        headerRight: () => (
+          <MessagesButton /> 
+        )
+      }}
+        />
+
+      <MainStack.Screen name="Feed" component={Feed} />
+      <MainStack.Screen name="Search" component={Search}/>
+      <MainStack.Screen name="Notifications" component={NotificationsScreen} />
+      <MainStack.Screen name="Profile" component={Profile} />
+      <MainStack.Screen name="Add" component={AddScreen} />
+      <MainStack.Screen name="Save" component={SaveScreen} />
+      <MainStack.Screen name="Comment" component={CommentScreen} />
+      <MainStack.Screen name="NewPost" component={NewPostScreen} />
+      <MainStack.Screen name="EditProfile" component={EditProfileScreen} 
+        options={{headerTitle: "Edit Profile"}} />
+      <MainStack.Screen name="Messages" component={MessagesScreen} />
+      <MainStack.Screen name="Chat" component={ChatScreen} />
+      <MainStack.Screen name="PartyRules" component={PartyRulesScreen}
+        options={{headerTitle: "Party Rules"}} />
+      <MainStack.Screen name="AboutUs" component={AboutUsScreen}
+        options={{headerTitle: "About Us"}} />
+      <MainStack.Screen name="Odds" component={Odds} />
+    
+    
+    
+  </MainStack.Navigator>
+)
+
 
 export class App extends Component {
   constructor(props) {
@@ -108,7 +168,10 @@ export class App extends Component {
     return (
       <Provider store={store}>
         <NavigationContainer >
-          <Stack.Navigator 
+          <Drawer.Navigator drawerContent={props => <DrawerContent {...props} />}>
+            <Drawer.Screen name="Main" component={MainStackScreen} />
+          </Drawer.Navigator>
+          {/*<Stack.Navigator 
               initialRouteName="Main"
               screenOptions={{
                 headerStyle: {
@@ -133,19 +196,25 @@ export class App extends Component {
                   </TouchableOpacity>
                 ),
                 headerRight: () => (
-                  <TouchableOpacity 
-                    style={{ alignItems: "flex-end", marginRight:16 }}
-                    onPress={onMessagesPress}>
-                    <FontAwesome5 name="envelope" size={24} color="#fff" />
-                  </TouchableOpacity>
+                  <MessagesButton /> 
                 )
               }}
                />
+            
+            <Stack.Screen name="Feed" component={Feed} navigation={this.props.navigation}/>
+            <Stack.Screen name="Search" component={Search} navigation={this.props.navigation}/>
+            <Stack.Screen name="Notifications" component={NotificationsScreen} navigation={this.props.navigation}/>
+            <Stack.Screen name="Profile" component={Profile} navigation={this.props.navigation}/>
             <Stack.Screen name="Add" component={AddScreen} navigation={this.props.navigation}/>
             <Stack.Screen name="Save" component={SaveScreen} navigation={this.props.navigation}/>
             <Stack.Screen name="Comment" component={CommentScreen} navigation={this.props.navigation}/>
             <Stack.Screen name="NewPost" component={NewPostScreen} navigation={this.props.navigation}/>
-          </Stack.Navigator>
+            <Stack.Screen name="EditProfile" component={EditProfileScreen} navigation={this.props.navigation}/>
+            <Stack.Screen name="Messages" component={MessagesScreen} navigation={this.props.navigation}/>
+            <Stack.Screen name="Chat" component={ChatScreen} navigation={this.props.navigation}/>
+            
+          </Stack.Navigator>*/}
+          
         </NavigationContainer>
       </Provider>
     )
@@ -170,6 +239,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     fontSize: 20,
+    fontStyle: 'italic'
 
 }, 
   

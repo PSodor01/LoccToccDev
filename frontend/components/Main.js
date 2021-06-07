@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import firebase from 'firebase'
 import { connect } from 'react-redux'
@@ -10,12 +11,69 @@ import FeedScreen from './main/Feed'
 import ProfileScreen from './main/Profile'
 import SearchScreen from './main/Search'
 import NotificationsScreen from './main/Notifications'
+import MessagesScreen from './main/Messages'
+import ChatScreen from './main/Chat'
+import EditProfileScreen from './main/EditProfile'
+import Odds from './main/Odds'
+
+const Stack = createStackNavigator();
+
+
+const MessageStack = ({navigation}) => (
+    <Stack.Navigator>
+      <Stack.Screen name="Messages" component={MessagesScreen} />
+      <Stack.Screen
+        name="Chat"
+        component={ChatScreen}
+        options={({route}) => ({
+          title: route.params.userName,
+          headerBackTitleVisible: false,
+        })}
+      />
+    </Stack.Navigator>
+  );
+
+  const ProfileStack = ({navigation}) => (
+    <Stack.Navigator>
+        <Stack.Screen 
+            name="Profile" 
+            component={Profile}
+            options={{
+                headerShown: false,
+            }} />
+        <Stack.Screen
+        name="EditProfile"
+        component={EditProfileScreen}
+        options={{ 
+            headerTitle: 'Edit Profile',
+            headerBackTitleVisible: false,
+            headerTitleAlign: 'center',
+            headerStyle: {
+                backgroundColor: '#fff',
+                shadowColor: '#fff',
+                elevation: 0,
+            },
+        }}
+    />
+  </Stack.Navigator>
+  )
+  
 
 const Tab = createMaterialBottomTabNavigator();
 
 const EmptyScreen = () => {
     return (null)
 }
+
+const getTabBarVisibility = (route) => {
+    const routeName = route.mapStateToProps
+    ? route.state.routes[route.state.index].name
+    : '';
+    if(routeName === 'Chat') {
+        return false;
+    }
+    return true;
+};
 
 export class Main extends Component {
     componentDidMount() {
@@ -30,6 +88,16 @@ export class Main extends Component {
                 <Tab.Screen 
                     name="Feed" 
                     component={FeedScreen}
+                    options={{
+                        tabBarLabel: 'Home',
+                        tabBarColor: '#009387',
+                        tabBarIcon: ({ color, size }) => (
+                            <MaterialCommunityIcons name="home" color={color} size={26} />
+                        ),
+                    }} />
+                <Tab.Screen 
+                    name="Odds" 
+                    component={Odds}
                     options={{
                         tabBarLabel: 'Home',
                         tabBarColor: '#009387',
@@ -79,6 +147,9 @@ export class Main extends Component {
                             <MaterialCommunityIcons name="account" color={color} size={26} />
                         ),
                     }} />
+                
+                    
+                
             </Tab.Navigator>
             
         )

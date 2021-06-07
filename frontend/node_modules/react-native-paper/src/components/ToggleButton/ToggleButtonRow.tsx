@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { StyleSheet, View, StyleProp, ViewStyle } from 'react-native';
+import ToggleButtonGroup from './ToggleButtonGroup';
 import ToggleButton from './ToggleButton';
 
 type Props = {
@@ -51,12 +52,12 @@ const ToggleButtonRow = ({ value, onValueChange, children, style }: Props) => {
   const count = React.Children.count(children);
 
   return (
-    <ToggleButton.Group value={value} onValueChange={onValueChange}>
+    <ToggleButtonGroup value={value} onValueChange={onValueChange}>
       <View style={[styles.row, style]}>
         {React.Children.map(children, (child, i) => {
-          // @ts-ignore
+          // @ts-expect-error: TypeScript complains about child.type but it doesn't matter
           if (child && child.type === ToggleButton) {
-            // @ts-ignore
+            // @ts-expect-error: We're sure that child is a React Element
             return React.cloneElement(child, {
               style: [
                 styles.button,
@@ -65,7 +66,7 @@ const ToggleButtonRow = ({ value, onValueChange, children, style }: Props) => {
                   : i === count - 1
                   ? styles.last
                   : styles.middle,
-                // @ts-ignore
+                // @ts-expect-error: We're sure that child is a React Element
                 child.props.style,
               ],
             });
@@ -74,7 +75,7 @@ const ToggleButtonRow = ({ value, onValueChange, children, style }: Props) => {
           return child;
         })}
       </View>
-    </ToggleButton.Group>
+    </ToggleButtonGroup>
   );
 };
 
@@ -106,3 +107,6 @@ const styles = StyleSheet.create({
 });
 
 export default ToggleButtonRow;
+
+// @component-docs ignore-next-line
+export { ToggleButtonRow };

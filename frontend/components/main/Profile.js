@@ -1,21 +1,23 @@
 import React, { useState, useEffect } from 'react'
-import { StyleSheet, View, Text, Image, FlatList, Button, TouchableOpacity, Platform, ImageBackground } from 'react-native'
-import { AntDesign } from '@expo/vector-icons'
-import * as Permissions from "expo-permissions";
-import * as ImagePicker from 'expo-image-picker';
+import { StyleSheet, View, Text, Image, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native'
 
-import PostButton from '../PostButton'
-;import moment from 'moment';
+import Icon from 'react-native-vector-icons/Ionicons';
+import Ionicons from 'react-native-vector-icons/Ionicons'
+
+import { useNavigation } from '@react-navigation/native';
+
+import PostButton from '../PostButton';
+import moment from 'moment';
 
 import firebase from 'firebase'
 require('firebase/firestore')
 import { connect } from 'react-redux'
 
+
 function Profile(props) {
     const [userPosts, setUserPosts] = useState([]);
     const [user, setUser] = useState(null);
     const [following, setFollowing] = useState(false);
-    const [profilePhoto, setProfilePhoto] = useState();
 
     useEffect(() => {
         const { currentUser, posts } = props;
@@ -41,7 +43,7 @@ function Profile(props) {
                 .collection("posts")
                 .doc(props.route.params.uid)
                 .collection("userPosts")
-                .orderBy("creation", "desc")
+                .orderBy("creation", "asc")
                 .get()
                 .then((snapshot) => {
                     let posts = snapshot.docs.map(doc => {
@@ -78,101 +80,124 @@ function Profile(props) {
             .delete()
     }
 
-    const onLogout = () => {
-        firebase.auth().signOut();
+    const onLikePress = (userId, postId) => {
+        const userPosts = firebase.firestore()
+            .collection("posts")
+            .doc(userId)
+            .collection("userPosts")
+            .doc(postId);
+        
+        userPosts.collection("likes")
+            .doc(firebase.auth().currentUser.uid)
+            .set({})
+            .then(() => {
+                userPosts.update({
+                    likesCount: firebase.firestore.FieldValue.increment(1)
+                });
+            })
     }
+    
+    const onDislikePress = (userId, postId) => {
+        const userPosts = firebase.firestore()
+            .collection("posts")
+            .doc(userId)
+            .collection("userPosts")
+            .doc(postId);
+
+        userPosts.collection("likes")
+            .doc(firebase.auth().currentUser.uid)
+            .delete()
+            .then(() => {
+                userPosts.update({
+                    likesCount: firebase.firestore.FieldValue.increment(-1)
+                });
+            })
+    }
+
+    const onReportPostPress = () => {
+        console.warn( 'Report Post' );
+        Alert.alert(
+            'This will be the Report Post button',
+          );
+    }
+    const onSharePostPress = () => {
+        console.warn( 'Share Post' );
+        Alert.alert(
+            'This will be the Share Post button',
+          );
+    }
+
+    const navigation = useNavigation();
 
     if (user === null) {
         return <View />
     }
 
-    const getPermission = async () => { 
-        if (Platform.OS !== "web") {
-            const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-
-            return status;
-        }
-    };
-
-    const pickImage = async () => {
-        try {
-            let result = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                allowsEditing: true,
-                aspect: [1, 1],
-                quality: 0.5,
-            })
-
-            if (!result.cancelled) {
-                setProfilePhoto(result.uri)
-            }
-        } catch (error) {
-            console.log("Error @pickImage: ", error);
-        }
-    }
-    const addProfilePhoto = async () => {
-        const status = await getPermission();
-
-        if (status !== "granted") {
-            alert("We need permission to access your camera roll.");
-
-            return;
-        }
-
-        pickImage()
-    };    
-
-    
-
     return (
         <View style={styles.container}>
-            <TouchableOpacity style={styles.profilePhotoContainer} onPress={addProfilePhoto}>
-                {profilePhoto ? (
-                    <Image source={{uri: profilePhoto}} style={styles.profilePhoto} />
-                ): (
-                    <View style={styles.defaultProfilePhoto}>
-                        <AntDesign name ="plus" size={24} color="#ffffff"  />
-                    </View>
-                )}
-                
-            </TouchableOpacity>
-            <View style={styles.profileNameContainer}>
+            <View style={{ alignItems: 'center' }}>
+                <Image 
+                    style={styles.profilePhotoContainer}
+                    source={{uri: user ? user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                />
                 <Text style={styles.profileNameText}>{user.name}</Text>
             </View>
-            {props.route.params.uid !== firebase.auth().currentUser.uid ? (
+            <View style={{ marginLeft: "5%" }}>
+                <View style={{ flexDirection: 'row', paddingTop: 5}}>
+                    <Text style={{ color: "grey" }}>Member since </Text>
+                    <Text style={{ color: "grey" }}>{moment(user.createdAt.toDate()).format("MMM Do YYYY")}</Text>
+                </View>
+                <View style={{ flexDirection: 'row', paddingTop: 5}}>
+                    <Text style={{ fontWeight: 'bold'}}>About me: </Text>
+                    <Text>{user.aboutMe}</Text>
+                </View>
+                <View style={{ flexDirection: 'row', paddingTop: 5}}>
+                    <Text style={{ fontWeight: 'bold'}}>Location: </Text>
+                    <Text>{user.location}</Text>
+                </View>
+            </View>
+            
+
+            <View style={{ paddingTop: "3%" }}>
+                {props.route.params.uid !== firebase.auth().currentUser.uid ? (
                     <View>
                         {following ? (
                             <TouchableOpacity
                                 onPress={() => onUnfollow()}
                                 title="Following"
-                                style={styles.logoutButtonContainer}>
-                                    <Text style={styles.appButtonText}> Following </Text>
+                                style={styles.followingButton}>
+                                    <Text style={styles.following}> Following </Text>
                             </TouchableOpacity>
                         ) :
                             (
                                 <TouchableOpacity
                                     onPress={() => onFollow()}
                                     title="Follow"
-                                    style={styles.logoutButtonContainer}>
-                                        <Text style={styles.appButtonText}> Follow </Text>
+                                    style={styles.followButton}>
+                                        <Text style={styles.follow}> Follow </Text>
                                 </TouchableOpacity>
                             )}
                     </View>
                 ) :
-                    <TouchableOpacity
-                        onPress={() => onLogout()}
-                        title="Logout"
-                        style={styles.logoutButtonContainer}>
-                            <Text style={styles.appButtonText}> Logout </Text>
-                    </TouchableOpacity>}
+                    <View style={styles.middleButtonContainer}>
+                       
+                    </View>
+                    }
+            </View>
+            
+                    
 
-            <View style={styles.followContainer}>
-                <View style={styles.followBox}>
+            <View style={styles.profileStatsContainer}>
+                <View style={styles.profileStatsBox}>
+                    <Text style={styles.followNumber}>{user ? userPosts.length : 0}</Text>
+                    <Text style={styles.followText}>Posts</Text>
+                </View>
+                <View style={styles.profileStatsBox}>
                     <Text style={styles.followNumber}>{user.followers && user.followers.length || 0}</Text>
                     <Text style={styles.followText}>Followers</Text>
                 </View>
-                <View style={styles.followBox}>
-                    <Text style={styles.followNumber}>{user.following && user.following.length || 0}</Text>
+                <View style={styles.profileStatsBox}>
+                    <Text style={styles.followNumber}>{user.following && userfollowing.length || 0}</Text>
                     <Text style={styles.followText}>Following</Text>
                 </View>
             </View>
@@ -186,7 +211,10 @@ function Profile(props) {
                     renderItem={({ item }) => (
                         <View style={styles.feedItem}>
                             <View style={styles.postLeftContainer}>
-                                <Image source={require('../../assets/profilePhoto.png')} style={styles.profilePhotoPostContainer} />
+                            <Image 
+                                style={styles.profilePhotoPostContainer}
+                                source={{uri: user ? user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                            />
                             </View>
                             <View style={styles.postRightContainer}>
                                 <View style={styles.postHeaderContainer}>
@@ -196,8 +224,47 @@ function Profile(props) {
                                 <View style={styles.postContentContainer}>
                                     <Text style={styles.captionText}>{item.caption}</Text>
                                 </View>
+                                <View style={styles.postFooterContainer}>
+                                    { item.currentUserLike ?
+                                        (
+                                            <TouchableOpacity
+                                                style={styles.likeContainer}
+                                                onPress={() => onDislikePress(item.currentUser, item.id)} >
+                                                <Icon name={"ios-heart"} size={25} color={"red"} />
+                                                <Text style={styles.likeNumber}>{item.likesCount}</Text>
+                                            </TouchableOpacity>
+                                        )
+                                        :
+                                        (
+                                            <TouchableOpacity
+                                                style={styles.likeContainer}
+                                                onPress={() => onLikePress(item.currentUser, item.id)}> 
+                                                <Icon name={"ios-heart-empty"}  size={25} color={"pink"}/>
+                                                <Text style={styles.likeNumber}>{item.likesCount}</Text>
+                                            </TouchableOpacity>
+                                        )
+                                    }
+                                    <TouchableOpacity
+                                        style={styles.commentsContainer}
+                                        onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.user.uid })}>
+                                        <Icon name={"ios-chatboxes"} size={25} color={"grey"} marginRight={10} />
+                                        <Text style={styles.likeNumber}>{item.comments}</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={styles.flagContainer}
+                                        onPress={onReportPostPress}>
+                                        <Icon name={"ios-flag"} size={25} color={"grey"} marginRight={10} />
+                                        <Text style={styles.flagText}>Report</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={styles.commentsContainer}
+                                        onPress={onSharePostPress}>
+                                        <Ionicons name={"ios-share"} size={25} color={"grey"} marginRight={10} />
+                                    </TouchableOpacity>
+                                </View>
                             </View>
                         </View>
+                        
                     )}
 
                 />
@@ -216,69 +283,26 @@ const styles = StyleSheet.create({
         backgroundColor: "#fff",
     },
     profileNameContainer: {
-        alignItems: 'center',
         paddingBottom: 10,
     },
     profileNameText: {
         fontWeight: "bold",
-        fontSize: 24,
+        fontSize: 22,
     },
     containerGallery: {
         flex: 1
-    },
-    
-    postContentContainer: {
-        flex: 1,
-    },
-    postHeaderContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: "80%",
-        paddingBottom: 4,
-    },
-    profilePhotoPostContainer: {
-        width: 50,
-        height: 50,
-        borderRadius: 40,
-    },
-    postFooterContainer: {
-        flexDirection: 'row',
-        paddingTop: 4,
-        justifyContent: 'space-between',
-        width: "20%",
-
-    },
-    postRightContainer: {
-        width: "100%",
     },
     profilePhotoContainer: {
         backgroundColor: "#e1e2e6",
         width: 100,
         height: 100,
         borderRadius: 40,
-        alignSelf: 'center',
         marginTop: 16,
         overflow: 'hidden',
         marginBottom: 10,
 
     },
-    defaultProfilePhoto: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        flex: 1,
-    },
-    profilePhoto: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        flex: 1,
-    },
-    profilePhotoPostContainer: {
-        width: 50,
-        height: 50,
-        borderRadius: 40,
-
-    },
-    logoutButtonContainer: {
+    followingButton: {
         borderColor: "#e1e2e6",
         borderWidth: 1,
         borderRadius: 6,
@@ -286,15 +310,54 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         width: "30%",
         alignSelf: "center",
+        marginBottom: "2%",
     },
-    appButtonText: {
+    followButton: {
+        borderColor: "#0033cc",
+        borderWidth: 1,
+        borderRadius: 6,
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        width: "30%",
+        alignSelf: "center",
+        marginBottom: "2%",
+    },
+    following: {
         color: "#666",
-        fontSize: 18,
+        fontSize: 14,
         alignSelf: "center",
     },
-    feed: {
-        backgroundColor: "#ffffff",
-        flex: 1,
+    follow: {
+        color: "#0033cc",
+        fontSize: 14,
+        fontWeight: "bold",
+        alignSelf: "center",
+    },
+    profileStatsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 2,
+        borderTopColor: "#e1e2e6",
+        borderTopWidth: 1,
+        borderBottomColor:"#e1e2e6",
+        borderBottomWidth: 1,
+    },
+    profileStatsBox: {
+        marginHorizontal: 4,
+        alignItems: "center",
+        padding: 5,
+    },
+    followText: {
+        color: "#666",
+        paddingHorizontal: 20,
+    },
+    followNumber: {
+        fontWeight: "bold",
+    },
+    middleButtonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
     },
     feedItem:{
         padding:6,
@@ -307,51 +370,63 @@ const styles = StyleSheet.create({
     profileNameFeedText: {
         fontSize: 16,
         fontWeight: 'bold',
-        marginHorizontal: 2.5,
     },
     captionText: {
-        marginHorizontal: 5,
-        paddingLeft: 5,
-        alignSelf: 'center',
-
-    },
-    topPostContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '95%',
-        marginBottom: 8,
     },
     postTimeContainer: {
         fontSize: 10,
+        marginRight: "5%",
     },
     postContentContainer: {
+        flex: 1,
+        width: "85%",
+        marginLeft: "2%",
+    },
+    postHeaderContainer: {
         flexDirection: 'row',
         flex: 1,
-        width: "90%",
+        width: "85%",
+        paddingBottom: 4,
+        marginLeft: "2%",
+        justifyContent: 'space-between'
     },
-    followContainer: {
+    profilePhotoPostContainer: {
+        backgroundColor: "#e1e2e6",
+        width: 50,
+        height: 50,
+        borderRadius: 40,
+    },
+    postFooterContainer: {
         flexDirection: 'row',
+        paddingTop: 4,
         justifyContent: 'space-between',
-        padding: 10,
-        marginLeft: 50,
-        marginRight: 50,
+        width: "80%",
+        paddingTop: 8,
+        marginLeft: "5%",
+
     },
-    followBox: {
-        borderColor: "#e1e2e6",
-        borderWidth: 1,
-        borderRadius: 6,
-        paddingVertical: 8,
-        marginHorizontal: 8,
-        alignItems: "center",
-        marginBottom: '2%',
-        padding: 5,
+    postRightContainer: {
+        width: "100%",
     },
-    followText: {
-        color: "#666",
-        paddingHorizontal: 20,
+    likeContainer: {
+        flexDirection: 'row',
     },
-    followNumber: {
-        fontWeight: "bold",
+    commentsContainer: {
+        flexDirection: 'row',
+    },
+    flagContainer: {
+        flexDirection: 'row',
+    },
+    likeNumber: {
+        marginLeft: 5,
+        marginTop: 5,
+        color: "grey",
+    },
+    flagText: {
+        marginLeft: 5,
+        marginTop: 5,
+        color: "grey",
+        fontSize: 10,
     },
    
 })

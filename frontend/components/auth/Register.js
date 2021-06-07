@@ -18,21 +18,30 @@ export class Register extends Component {
         this.state = {
             email: '',
             password: '',
-            name: ''
+            name: '',
+            createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
+            aboutMe: '',
+            location: '',
+            userImg: null,
+
         }
 
         this.onSignUp = this.onSignUp.bind(this)
     }
 
     onSignUp() {
-        const { email, password, name } = this.state;
+        const { email, password, name, aboutMe, location, userImg, createdAt } = this.state;
         firebase.auth().createUserWithEmailAndPassword(email, password)
             .then((result) => {
                 firebase.firestore().collection("users")
                     .doc(firebase.auth().currentUser.uid)
                     .set({
                         name,
-                        email
+                        email,
+                        aboutMe,
+                        location,
+                        userImg,
+                        createdAt
                     })
                 console.log(result)
             })
@@ -74,17 +83,20 @@ export class Register extends Component {
                         <TextInput
                             style={styles.textInput}
                             placeholder="Username"
+                            autoCorrect={false}
                             onChangeText={(name) => this.setState({ name })}
                         />
                         <TextInput 
                             style={styles.textInput}
                             placeholder="Email"
+                            autoCorrect={false}
                             onChangeText={(email) => this.setState({ email })}
                             keyboardType="email-address"
                         />
                         <TextInput  
                             style={styles.textInput}
                             placeholder="Password"
+                            autoCorrect={false}
                             secureTextEntry={true}
                             onChangeText={(password) => this.setState({ password })}
                         />

@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Animated, StyleSheet, StyleProp, TextStyle } from 'react-native';
-import color from 'color';
-import { black, white } from '../styles/colors';
+import { white, black } from '../styles/colors';
 import { withTheme } from '../core/theming';
+import getContrastingColor from '../utils/getContrastingColor';
 
 const defaultSize = 20;
 
@@ -10,7 +10,7 @@ type Props = React.ComponentProps<typeof Animated.Text> & {
   /**
    * Whether the badge is visible
    */
-  visible: boolean;
+  visible?: boolean;
   /**
    * Content of the `Badge`.
    */
@@ -65,12 +65,19 @@ const Badge = ({
   const { current: opacity } = React.useRef<Animated.Value>(
     new Animated.Value(visible ? 1 : 0)
   );
+  const isFirstRendering = React.useRef<boolean>(true);
 
   const {
     animation: { scale },
   } = theme;
 
   React.useEffect(() => {
+    // Do not run animation on very first rendering
+    if (isFirstRendering.current) {
+      isFirstRendering.current = false;
+      return;
+    }
+
     Animated.timing(opacity, {
       toValue: visible ? 1 : 0,
       duration: 150 * scale,
@@ -78,14 +85,16 @@ const Badge = ({
     }).start();
   }, [visible, opacity, scale]);
 
-  const { backgroundColor = theme.colors.notification, ...restStyle } =
-    StyleSheet.flatten(style) || {};
-  const textColor = color(backgroundColor).isLight() ? black : white;
+  const {
+    backgroundColor = theme.colors.notification,
+    ...restStyle
+  } = (StyleSheet.flatten(style) || {}) as TextStyle;
+
+  const textColor = getContrastingColor(backgroundColor, white, black);
 
   const borderRadius = size / 2;
 
   return (
-    // @ts-ignore
     <Animated.Text
       numberOfLines={1}
       style={[

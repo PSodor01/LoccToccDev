@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { StyleSheet, View, Text, Image, FlatList, TouchableOpacity, Alert, Dimensions } from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons';
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
 import { useNavigation } from '@react-navigation/native';
 import ScrollableTabView, { DefaultTabBar } from 'react-native-scrollable-tab-view';
@@ -71,6 +72,13 @@ function Feed(props) {
             'This will be the Report Post button',
           );
     }
+    const onSharePostPress = () => {
+        console.warn( 'Share Post' );
+        Alert.alert(
+            'This will be the Share Post button',
+          );
+    }
+
     const navigation = useNavigation();
 
     const trendingGames = [
@@ -237,7 +245,10 @@ function Feed(props) {
                     <View style={styles.feedItem}>
                         <TouchableOpacity
                             onPress={() => props.navigation.navigate("Profile", {uid: item.id})}>
-                            <Image source={require('../../assets/profilePhoto.png')} style={styles.profilePhotoPostContainer} />
+                            <Image 
+                                style={styles.profilePhotoPostContainer}
+                                source={{uri: item.user ? item.user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                            />
                         </TouchableOpacity>
                         <View style={styles.postRightContainer}>
                             <View style={styles.postHeaderContainer}>
@@ -279,8 +290,12 @@ function Feed(props) {
                                     <Icon name={"ios-flag"} size={25} color={"grey"} marginRight={10} />
                                     <Text style={styles.flagText}>Report</Text>
                                 </TouchableOpacity>
-                                </View>
-                                
+                                <TouchableOpacity
+                                    style={styles.commentsContainer}
+                                    onPress={onSharePostPress}>
+                                    <Ionicons name={"ios-share"} size={25} color={"grey"} marginRight={10} />
+                                </TouchableOpacity>
+                            </View>
                         </View>
                     </View>
                 )}
@@ -323,26 +338,28 @@ const styles = StyleSheet.create({
     profileNameFeedText: {
         fontSize: 16,
         fontWeight: 'bold',
-        marginHorizontal: 2.5,
     },
     captionText: {
-        marginHorizontal: 10,
-
     },
     postTimeContainer: {
         fontSize: 10,
+        marginRight: "5%",
     },
     postContentContainer: {
         flex: 1,
-        width: "90%",
+        width: "85%",
+        marginLeft: "2%",
     },
     postHeaderContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: "80%",
+        flex: 1,
+        width: "85%",
         paddingBottom: 4,
+        marginLeft: "2%",
+        justifyContent: 'space-between'
     },
     profilePhotoPostContainer: {
+        backgroundColor: "#e1e2e6",
         width: 50,
         height: 50,
         borderRadius: 40,
@@ -351,8 +368,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         paddingTop: 4,
         justifyContent: 'space-between',
-        width: "60%",
-        paddingTop: 5,
+        width: "80%",
+        paddingTop: 8,
         marginLeft: "5%",
 
     },

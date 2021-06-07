@@ -81,6 +81,7 @@ const CheckboxIOS = ({
       rippleColor={rippleColor}
       onPress={onPress}
       disabled={disabled}
+      // @ts-expect-error We keep old a11y props for backwards compat with old RN versions
       accessibilityTraits={disabled ? ['button', 'disabled'] : 'button'}
       accessibilityComponentType="button"
       accessibilityRole="checkbox"
@@ -114,4 +115,6 @@ const styles = StyleSheet.create({
 export default withTheme(CheckboxIOS);
 
 // @component-docs ignore-next-line
-export { CheckboxIOS };
+const CheckboxIOSWithTheme = withTheme(CheckboxIOS);
+// @component-docs ignore-next-line
+export { CheckboxIOSWithTheme as CheckboxIOS };

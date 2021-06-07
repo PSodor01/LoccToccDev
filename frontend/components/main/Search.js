@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native'
 import Icon from '@expo/vector-icons';
 
-import firebase from 'firebase';
-require('firebase/firestore');
+import firebase from 'firebase'
+require("firebase/firestore")
+require("firebase/firebase-storage")
 
 export default function Search(props) {
     const [users, setUsers] = useState([])
@@ -41,7 +42,10 @@ export default function Search(props) {
                     <View style={styles.feedItem}>
                         <TouchableOpacity style={styles.postLeftContainer}
                             onPress={() => props.navigation.navigate("Profile", {uid: item.id})}>
-                            <Image source={require('../../assets/profilePhoto.png')} style={styles.profilePhotoPostContainer} />
+                            <Image 
+                                style={styles.profilePhotoPostContainer}
+                                source={{uri: item.name ? item.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                            />
                             <Text style={styles.searchResultsText}>{item.name}</Text>
                         </TouchableOpacity>
                         
@@ -102,8 +106,9 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     profilePhotoPostContainer: {
-        width: 40,
-        height: 40,
+        backgroundColor: "#e1e2e6",
+        width: 50,
+        height: 50,
         borderRadius: 40,
     },
     feedItem:{
