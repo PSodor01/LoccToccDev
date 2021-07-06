@@ -32,7 +32,7 @@ export function fetchUserPosts() {
             .collection("posts")
             .doc(firebase.auth().currentUser.uid)
             .collection("userPosts")
-            .orderBy("creation", "asc")
+            .orderBy("creation", "desc")
             .get()
             .then((snapshot) => {
                 let posts = snapshot.docs.map(doc => {
@@ -91,31 +91,28 @@ export function fetchUsersData(uid, getPosts) {
 }
 
 export function fetchUsersFollowingPosts(uid) {
-    return ((dispatch, getState) => {
+    return (dispatch, getState) => {
         firebase.firestore()
             .collection("posts")
             .doc(uid)
             .collection("userPosts")
-            .orderBy("creation", "asc")
+            .orderBy("creation", "desc")
             .get()
             .then((snapshot) => {
-                const uid = snapshot.query.EP.path.segments[1];
-                const user = getState().usersState.users.find(el => el.uid === uid);
-
-
-                let posts = snapshot.docs.map(doc => {
+                console.log({snapshot, uid});
+                const user = getState().usersState.users.find((el) => el.uid === uid);
+                const posts = snapshot.docs.map((doc) => {
                     const data = doc.data();
                     const id = doc.id;
-                    return { id, ...data, user }
-                })
+                    return {id, ...data, user};
+                });
 
                 for(let i = 0; i< posts.length; i++){
                     dispatch(fetchUsersFollowingLikes(uid, posts[i].id))
                 }
                 dispatch({ type: USERS_POSTS_STATE_CHANGE, posts, uid })
-
-            })
-    })
+            }) .catch((err) => console.log(err.message));
+    }
 }
 
 export function fetchUsersFollowingLikes(uid, postId) {
@@ -128,7 +125,7 @@ export function fetchUsersFollowingLikes(uid, postId) {
             .collection("likes")
             .doc(firebase.auth().currentUser.uid)
             .onSnapshot((snapshot) => {
-                const postId = snapshot.ZE.path.segments[3];
+                const postId = snapshot.ref.path.split('/')[3]
 
                 let currentUserLike = false;
                 if(snapshot.exists){

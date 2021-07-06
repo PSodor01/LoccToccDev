@@ -1,10 +1,10 @@
 {
   "devToolsPort": 19002,
-  "expoServerPort": 19000,
-  "packagerPort": 19001,
-  "packagerPid": 4184,
+  "expoServerPort": null,
+  "packagerPort": null,
+  "packagerPid": null,
   "webpackServerPort": null,
-  "expoServerNgrokUrl": "https://44-ysb.psodor01.frontend.exp.direct",
-  "packagerNgrokUrl": "https://packager.44-ysb.psodor01.frontend.exp.direct",
-  "ngrokPid": 4286
+  "expoServerNgrokUrl": null,
+  "packagerNgrokUrl": null,
+  "ngrokPid": null
 }

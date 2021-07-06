@@ -13,10 +13,12 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { fetchUsersData } from '../../redux/actions/index'
 
-function Comment(props) {
+function Comment(props, route) {
     const [comments, setComments] = useState([])
     const [postId, setPostId] = useState("")
     const [text, setText] = useState("")
+
+    const { posterName, postCreation, postCaption } = props.route.params;
 
     useEffect(() => {
 
@@ -108,23 +110,43 @@ function Comment(props) {
 
     return (
         <View style={styles.container}>
-            <View style={styles.topPostContainer}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                <AntDesign name="close" size={30} color="#2e64e5"/>
+            <View style={styles.originalPostContainer}>
+                <TouchableOpacity
+                    onPress={() => props.navigation.navigate("Profile", {})}>
+                    <Image 
+                        style={styles.profilePhotoPostContainer}
+                        source={{ uri: posterName ? props.route.params.posterImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                    />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => {onCommentSend(); onCommentCount();}} style={styles.shareButton}>
-                    <Text style={styles.shareText}>Share</Text>
-                </TouchableOpacity>
+                <View style={styles.postRightContainer}>
+                    <View style={styles.postHeaderContainer}>
+                        <Text style={styles.profileNameFeedText}>{posterName}</Text>
+                        <Text style={styles.postTimeContainer}>{moment(postCreation.toDate()).fromNow()}</Text>
+                    </View>
+                    <View style={styles.postContentContainer}>
+                        <Text style={styles.captionText}>{postCaption}</Text>
+                    </View>
+                </View>
             </View>
-            <View style={styles.middlePostContainer}>
-                <Image source={require('../../assets/profilePhoto.png')} style={styles.profilePhotoPostContainer} />
-                <TextInput
-                placeholder="Share your commment..."
-                style={styles.placeholderText}
-                multiline
-                numberOfLines={4}
-                onChangeText={(text) => setText(text)}
-                />
+            <View style={styles.addCommentContainer}>
+                <View style={styles.addCommentRightContainer}>
+                    <Image style={styles.profilePhotoCommentContainer}
+                        source={{ uri: posterName ?  'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7' : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}/>
+                        <TextInput
+                        placeholder="Type your comment here..."
+                        style={styles.placeholderText}
+                        multiline={true}
+                        numberOfLines={4}
+                        maxLength={1000}
+                        onChangeText={(text) => setText(text)}
+                        />
+                </View>
+                <View style={styles.addCommentButton}>
+                    <TouchableOpacity onPress={() => {onCommentSend(); onCommentCount();}}>
+                        <Text style={styles.shareText}>Post</Text>
+                    </TouchableOpacity>
+                </View>
+                
             </View>
             
             <FlatList
@@ -134,15 +156,19 @@ function Comment(props) {
                 data={comments}
                 renderItem={({ item }) => (
                     <View>
-                        {item.user !== undefined ?
+                        {item.length !== undefined ?
                             <View style={styles.feedItem}>
                                 <TouchableOpacity
                                     onPress={() => props.navigation.navigate("Profile", {uid: item.id})}>
-                                    <Image source={require('../../assets/profilePhoto.png')} style={styles.profilePhotoPostContainer} />
+                                    <Image 
+                                        source={{uri: item.user ? item.user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                                        style={styles.profilePhotoCommentContainer}
+                                         />
                                 </TouchableOpacity>
                                 <View style={styles.postRightContainer}>
                                     <View style={styles.postHeaderContainer}>
                                         <Text style={styles.profileNameFeedText}>{item.user.name}</Text>
+                                        <Text style={styles.postTimeContainer}>{moment(item.creation.toDate()).fromNow()}</Text>
                                     </View>
                                     <View style={styles.postContentContainer}>
                                         <Text style={styles.captionText}>{item.text}</Text>
@@ -153,12 +179,10 @@ function Comment(props) {
                             
                             : null}
                     </View>
-
-                    
-
                     
                 )}
             />
+            
         </View>
     )
 }
@@ -173,76 +197,69 @@ export default connect(mapStateToProps, mapDispatchProps)(Comment);
 
 const styles = StyleSheet.create({
     container: {
-      justifyContent: 'center',
       flex: 1,
+      backgroundColor: "#fff",
     },
   profilePhotoPostContainer: {
+    width: 70,
+    height: 70,
+    borderRadius: 40,
+    backgroundColor: "#e1e2e6",
+  },
+  profilePhotoCommentContainer: {
     width: 50,
     height: 50,
     borderRadius: 40,
+    backgroundColor: "#e1e2e6"
+  },
+  originalPostContainer: {
+    borderBottomWidth: 1,
+    borderBottomColor: "#e1e2e6",
+    flexDirection: 'row',
+    paddingTop: 10,
+    paddingBottom: 4,
+    
   },
   topPostContainer: {
     flexDirection: 'row',
     justifyContent: "space-between",
-    marginTop: "5%",
+    marginBottom: "5%",
     paddingHorizontal: 5,
   },
-  middlePostContainer: {
-    flexDirection: 'row',
-    width: "90%",
-    paddingTop: 5,
-    paddingBottom: 5,
-  },
   shareText: {
-    color: "#ffffff",
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  shareButton: {
-    backgroundColor: "#2e64e5",
-    borderRadius: 30,
+    color: "#e1e2e6",
+    fontSize: 12,
   },
   placeholderText: {
-    alignSelf: 'center',
-    paddingHorizontal: 10,
+      marginLeft: "2%",
+      alignSelf: 'center',
+      paddingHorizontal: 10,
+      width: "90%",
   },
 feedItem:{
-    padding:6,
     marginVertical:2,
     marginHorizontal:2,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e1e2e6",
     flexDirection: 'row',
     flex: 1,
+    paddingTop: 10,
 },
 profileNameFeedText: {
     fontSize: 16,
     fontWeight: 'bold',
-    marginHorizontal: 2.5,
-},
-captionText: {
-    marginHorizontal: 10,
-
 },
 postTimeContainer: {
     fontSize: 10,
 },
 postContentContainer: {
-    flex: 1,
-    width: "90%",
+    width: "95%",
+    marginLeft: "3%",
 },
 postHeaderContainer: {
     flexDirection: 'row',
+    width: "95%",
     justifyContent: 'space-between',
-    width: "80%",
     paddingBottom: 4,
-},
-profilePhotoPostContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 40,
+    marginLeft: "3%",
 },
 postFooterContainer: {
     flexDirection: 'row',
@@ -254,12 +271,35 @@ postFooterContainer: {
 
 },
 postRightContainer: {
-    width: "100%",
+    flex: 1,
 },
 feed: {
     backgroundColor: "#ffffff",
     flex: 1,
     marginTop: 14,
+},
+addCommentContainer: {
+    padding: 4,
+    justifyContent: 'space-between'
+},
+addCommentProfilePhoto: {
+    borderRadius: 40,
+    height: 50,
+    width: 50,
+    backgroundColor: "#e1e2e6",
+},
+addCommentRightContainer: {
+    flexDirection: 'row',
+    paddingTop: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+
+},
+addCommentButton: {
+    marginRight: "2%",
+    justifyContent: 'center',
+    alignItems: 'center',
+
 },
 
   

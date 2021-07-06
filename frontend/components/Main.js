@@ -1,7 +1,11 @@
 import React, { Component } from 'react'
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
+
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
 import firebase from 'firebase'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -15,6 +19,7 @@ import MessagesScreen from './main/Messages'
 import ChatScreen from './main/Chat'
 import EditProfileScreen from './main/EditProfile'
 import Odds from './main/Odds'
+import game from './main/game'
 
 const Stack = createStackNavigator();
 
@@ -84,25 +89,25 @@ export class Main extends Component {
     }
     render() {
         return (
-            <Tab.Navigator initialRouteName="Feed" activeColor="#fff">
-                <Tab.Screen 
-                    name="Feed" 
-                    component={FeedScreen}
-                    options={{
-                        tabBarLabel: 'Home',
-                        tabBarColor: '#009387',
-                        tabBarIcon: ({ color, size }) => (
-                            <MaterialCommunityIcons name="home" color={color} size={26} />
-                        ),
-                    }} />
+            <Tab.Navigator initialRouteName="Odds" activeColor="#fff">
                 <Tab.Screen 
                     name="Odds" 
                     component={Odds}
                     options={{
-                        tabBarLabel: 'Home',
+                        tabBarLabel: 'Games',
                         tabBarColor: '#009387',
                         tabBarIcon: ({ color, size }) => (
-                            <MaterialCommunityIcons name="home" color={color} size={26} />
+                            <FontAwesome5 name="comment-dollar" color={color} size={26} />
+                        ),
+                    }} />
+                <Tab.Screen 
+                    name="Feed" 
+                    component={FeedScreen}
+                    options={{
+                        tabBarLabel: 'My People',
+                        tabBarColor: '#009387',
+                        tabBarIcon: ({ color, size }) => (
+                            <Ionicons name="ios-people" color={color} size={26} />
                         ),
                     }} />
                 <Tab.Screen 

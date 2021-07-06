@@ -6,12 +6,13 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 
 import { useNavigation } from '@react-navigation/native';
 
-import PostButton from '../PostButton';
 import moment from 'moment';
 
 import firebase from 'firebase'
 require('firebase/firestore')
 import { connect } from 'react-redux'
+
+import ShareButton from '../buttons/ShareButton'
 
 
 function Profile(props) {
@@ -134,145 +135,155 @@ function Profile(props) {
     }
 
     return (
-        <View style={styles.container}>
-            <View style={{ alignItems: 'center' }}>
-                <Image 
-                    style={styles.profilePhotoContainer}
-                    source={{uri: user ? user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
-                />
-                <Text style={styles.profileNameText}>{user.name}</Text>
-            </View>
-            <View style={{ marginLeft: "5%" }}>
-                <View style={{ flexDirection: 'row', paddingTop: 5}}>
-                    <Text style={{ color: "grey" }}>Member since </Text>
-                    <Text style={{ color: "grey" }}>{moment(user.createdAt.toDate()).format("MMM Do YYYY")}</Text>
-                </View>
-                <View style={{ flexDirection: 'row', paddingTop: 5}}>
-                    <Text style={{ fontWeight: 'bold'}}>About me: </Text>
-                    <Text>{user.aboutMe}</Text>
-                </View>
-                <View style={{ flexDirection: 'row', paddingTop: 5}}>
-                    <Text style={{ fontWeight: 'bold'}}>Location: </Text>
-                    <Text>{user.location}</Text>
-                </View>
-            </View>
+        <View>
             
-
-            <View style={{ paddingTop: "3%" }}>
-                {props.route.params.uid !== firebase.auth().currentUser.uid ? (
-                    <View>
-                        {following ? (
-                            <TouchableOpacity
-                                onPress={() => onUnfollow()}
-                                title="Following"
-                                style={styles.followingButton}>
-                                    <Text style={styles.following}> Following </Text>
-                            </TouchableOpacity>
-                        ) :
-                            (
-                                <TouchableOpacity
-                                    onPress={() => onFollow()}
-                                    title="Follow"
-                                    style={styles.followButton}>
-                                        <Text style={styles.follow}> Follow </Text>
-                                </TouchableOpacity>
-                            )}
+            <ScrollView>
+                <View style={styles.container}>
+                    <View style={{ alignItems: 'center' }}>
+                        <Image 
+                            style={styles.profilePhotoContainer}
+                            source={{uri: user ? user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                        />
+                        <Text style={styles.profileNameText}>{user.name}</Text>
                     </View>
-                ) :
-                    <View style={styles.middleButtonContainer}>
-                       
+                    <View style={{ marginLeft: "5%" }}>
+                        <View style={{ flexDirection: 'row', paddingTop: 5}}>
+                            <ShareButton />
+                            <Text style={{ color: "grey" }}>Member since </Text>
+                            <Text style={{ color: "grey" }}>{moment(user.createdAt.toDate()).format("MMM Do YYYY")}</Text>
+                        </View>
+                        <View style={{ flexDirection: 'row', paddingTop: 5}}>
+                            <Text style={{ fontWeight: 'bold'}}>About me: </Text>
+                            <Text>{user.aboutMe}</Text>
+                        </View>
+                        <View style={{ flexDirection: 'row', paddingTop: 5}}>
+                            <Text style={{ fontWeight: 'bold'}}>Location: </Text>
+                            <Text>{user.location}</Text>
+                        </View>
                     </View>
-                    }
-            </View>
-            
                     
 
-            <View style={styles.profileStatsContainer}>
-                <View style={styles.profileStatsBox}>
-                    <Text style={styles.followNumber}>{user ? userPosts.length : 0}</Text>
-                    <Text style={styles.followText}>Posts</Text>
-                </View>
-                <View style={styles.profileStatsBox}>
-                    <Text style={styles.followNumber}>{user.followers && user.followers.length || 0}</Text>
-                    <Text style={styles.followText}>Followers</Text>
-                </View>
-                <View style={styles.profileStatsBox}>
-                    <Text style={styles.followNumber}>{user.following && userfollowing.length || 0}</Text>
-                    <Text style={styles.followText}>Following</Text>
-                </View>
-            </View>
-
-            <View style={styles.containerGallery}>
-                <FlatList
-                    style={styles.feed}
-                    numColumns={1}
-                    horizontal={false}
-                    data={userPosts}
-                    renderItem={({ item }) => (
-                        <View style={styles.feedItem}>
-                            <View style={styles.postLeftContainer}>
-                            <Image 
-                                style={styles.profilePhotoPostContainer}
-                                source={{uri: user ? user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
-                            />
+                    <View style={{ paddingTop: "3%" }}>
+                        {props.route.params.uid !== firebase.auth().currentUser.uid ? (
+                            <View>
+                                {following ? (
+                                    <TouchableOpacity
+                                        onPress={() => onUnfollow()}
+                                        title="Following"
+                                        style={styles.followingButton}>
+                                            <Text style={styles.following}> Following </Text>
+                                    </TouchableOpacity>
+                                ) :
+                                    (
+                                        <TouchableOpacity
+                                            onPress={() => onFollow()}
+                                            title="Follow"
+                                            style={styles.followButton}>
+                                                <Text style={styles.follow}> Follow </Text>
+                                        </TouchableOpacity>
+                                    )}
                             </View>
-                            <View style={styles.postRightContainer}>
-                                <View style={styles.postHeaderContainer}>
-                                    <Text style={styles.profileNameFeedText}>{user.name}</Text>
-                                    <Text style={styles.postTimeContainer}>{moment(item.creation.toDate()).fromNow()}</Text>
-                                </View>
-                                <View style={styles.postContentContainer}>
-                                    <Text style={styles.captionText}>{item.caption}</Text>
-                                </View>
-                                <View style={styles.postFooterContainer}>
-                                    { item.currentUserLike ?
-                                        (
-                                            <TouchableOpacity
-                                                style={styles.likeContainer}
-                                                onPress={() => onDislikePress(item.currentUser, item.id)} >
-                                                <Icon name={"ios-heart"} size={25} color={"red"} />
-                                                <Text style={styles.likeNumber}>{item.likesCount}</Text>
-                                            </TouchableOpacity>
-                                        )
-                                        :
-                                        (
-                                            <TouchableOpacity
-                                                style={styles.likeContainer}
-                                                onPress={() => onLikePress(item.currentUser, item.id)}> 
-                                                <Icon name={"ios-heart-empty"}  size={25} color={"pink"}/>
-                                                <Text style={styles.likeNumber}>{item.likesCount}</Text>
-                                            </TouchableOpacity>
-                                        )
-                                    }
-                                    <TouchableOpacity
-                                        style={styles.commentsContainer}
-                                        onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.user.uid })}>
-                                        <Icon name={"ios-chatboxes"} size={25} color={"grey"} marginRight={10} />
-                                        <Text style={styles.likeNumber}>{item.comments}</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        style={styles.flagContainer}
-                                        onPress={onReportPostPress}>
-                                        <Icon name={"ios-flag"} size={25} color={"grey"} marginRight={10} />
-                                        <Text style={styles.flagText}>Report</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        style={styles.commentsContainer}
-                                        onPress={onSharePostPress}>
-                                        <Ionicons name={"ios-share"} size={25} color={"grey"} marginRight={10} />
-                                    </TouchableOpacity>
-                                </View>
+                        ) :
+                            <View style={styles.middleButtonContainer}>
+                            
                             </View>
+                            }
+                    </View>
+                    
+                            
+                    
+                    <View style={styles.profileStatsContainer}>
+                        <View style={styles.profileStatsBox}>
+                            <Text style={styles.followNumber}>{user ? userPosts.length : 0}</Text>
+                            <Text style={styles.followText}>Posts</Text>
                         </View>
+                        <View style={styles.profileStatsBox}>
+                            <Text style={styles.followNumber}>{user.followers && user.followers.length || 0}</Text>
+                            <Text style={styles.followText}>Followers</Text>
+                        </View>
+                        <View style={styles.profileStatsBox}>
+                            <Text style={styles.followNumber}>{user.following && userfollowing.length || 0}</Text>
+                            <Text style={styles.followText}>Following</Text>
+                        </View>
+                    </View>
+
+                    <View style={styles.containerGallery}>
+                        <FlatList
+                            style={styles.feed}
+                            numColumns={1}
+                            horizontal={false}
+                            data={userPosts}
+                            renderItem={({ item }) => (
+                                <View style={styles.feedItem}>
+                                    <View style={styles.postLeftContainer}>
+                                    <Image 
+                                        style={styles.profilePhotoPostContainer}
+                                        source={{uri: user ? user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                                    />
+                                    </View>
+                                    <View style={styles.postRightContainer}>
+                                        <View style={styles.postHeaderContainer}>
+                                            <Text style={styles.profileNameFeedText}>{user.name}</Text>
+                                            <Text style={styles.postTimeContainer}>{moment(item.creation.toDate()).fromNow()}</Text>
+                                        </View>
+                                        <View style={styles.postContentContainer}>
+                                            {item.caption != null ? <Text style={styles.captionText}>{item.caption}</Text> : null}
+                                            {item.downloadURL != null ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
+                                        </View>
+                                        <View style={styles.postFooterContainer}>
+                                            { item.currentUserLike ?
+                                                (
+                                                    <TouchableOpacity
+                                                        style={styles.likeContainer}
+                                                        onPress={() => onDislikePress(item.currentUser, item.id)} >
+                                                        <Icon name={"heart"} size={20} color={"red"} />
+                                                        <Text style={styles.likeNumber}>{item.likesCount}</Text>
+                                                    </TouchableOpacity>
+                                                )
+                                                :
+                                                (
+                                                    <TouchableOpacity
+                                                        style={styles.likeContainer}
+                                                        onPress={() => onLikePress(item.currentUser, item.id)}> 
+                                                        <Icon name={"heart-outline"}  size={20} color={"pink"}/>
+                                                        <Text style={styles.likeNumber}>{item.likesCount}</Text>
+                                                    </TouchableOpacity>
+                                                )
+                                            }
+                                            <TouchableOpacity
+                                                style={styles.commentsContainer}
+                                                onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.user.uid })}>
+                                                <Icon name={"chatbubble-outline"} size={20} color={"grey"} marginRight={10} />
+                                                <Text style={styles.likeNumber}>{item.comments}</Text>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity
+                                                style={styles.flagContainer}
+                                                onPress={onReportPostPress}>
+                                                <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
+                                                <Text style={styles.flagText}>Report</Text>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity
+                                                style={styles.commentsContainer}
+                                                onPress={onSharePostPress}>
+                                                <Ionicons name={"ios-share"} size={20} color={"grey"} marginRight={10} />
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>
+                                </View>
+                                
+                            )}
+
+                        />
                         
-                    )}
+                    </View>
+                    
 
-                />
+                </View>
                 
-            </View>
-            <PostButton />
-
+            </ScrollView>
         </View>
+        
+        
 
     )
 }
@@ -372,6 +383,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     captionText: {
+        paddingBottom: 5,
     },
     postTimeContainer: {
         fontSize: 10,
@@ -381,6 +393,10 @@ const styles = StyleSheet.create({
         flex: 1,
         width: "85%",
         marginLeft: "2%",
+    },
+    postImage: {
+        width: "100%",
+        height: 250,
     },
     postHeaderContainer: {
         flexDirection: 'row',

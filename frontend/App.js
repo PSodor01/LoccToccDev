@@ -51,10 +51,11 @@ import NotificationsScreen from './components/main/Notifications'
 import Profile from './components/main/Profile'
 import ChatScreen from './components/main/Chat'
 import AboutUsScreen from './components/main/AboutUs'
-import PartyRulesScreen from './components/main/PartyRules'
+import HouseGuidelinesScreen from './components/main/HouseGuidelines'
 import Odds from './components/main/Odds'
+import game from './components/main/game'
 
-import MessagesButton from './components/MessagesButton'
+import MessagesButton from './components/buttons/MessagesButton'
 
 
 const Stack = createStackNavigator();
@@ -105,11 +106,12 @@ const MainStackScreen = ({navigation, props}) => (
         options={{headerTitle: "Edit Profile"}} />
       <MainStack.Screen name="Messages" component={MessagesScreen} />
       <MainStack.Screen name="Chat" component={ChatScreen} />
-      <MainStack.Screen name="PartyRules" component={PartyRulesScreen}
-        options={{headerTitle: "Party Rules"}} />
+      <MainStack.Screen name="HouseGuidelines" component={HouseGuidelinesScreen}
+        options={{headerTitle: "House Guidelines"}} />
       <MainStack.Screen name="AboutUs" component={AboutUsScreen}
         options={{headerTitle: "About Us"}} />
       <MainStack.Screen name="Odds" component={Odds} />
+      <MainStack.Screen name="game" component={game} />
     
     
     

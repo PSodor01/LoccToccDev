@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { View, TouchableOpacity, Text, TextInput, StyleSheet, Image, TouchableWithoutFeedback, Keyboard } from 'react-native'
 
+
 import firebase from 'firebase'
 import "firebase/firestore";
 
@@ -18,6 +19,8 @@ export class Register extends Component {
         this.state = {
             email: '',
             password: '',
+            birthday: '',
+            gender: '',
             name: '',
             createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
             aboutMe: '',
@@ -30,7 +33,7 @@ export class Register extends Component {
     }
 
     onSignUp() {
-        const { email, password, name, aboutMe, location, userImg, createdAt } = this.state;
+        const { email, password, birthday, gender, name, aboutMe, location, userImg, createdAt } = this.state;
         firebase.auth().createUserWithEmailAndPassword(email, password)
             .then((result) => {
                 firebase.firestore().collection("users")
@@ -38,6 +41,8 @@ export class Register extends Component {
                     .set({
                         name,
                         email,
+                        birthday,
+                        gender,
                         aboutMe,
                         location,
                         userImg,
@@ -49,6 +54,7 @@ export class Register extends Component {
                 console.log(error)
             })
     }
+
 
     render() {
         return (
@@ -128,7 +134,7 @@ const styles = StyleSheet.create({
         height: 40,
         marginRight: "15%",
         marginLeft: "15%",
-        marginBottom: "5%",
+        marginBottom: "2%",
         paddingHorizontal: 30,
         borderColor: "#009387",
         borderWidth: 1,
@@ -147,7 +153,6 @@ const styles = StyleSheet.create({
         width: "75%",
         alignSelf: "center",
         marginBottom: '5%',
-        marginTop: '5%',
     },
     appButtonText: {
         color: "#666",
@@ -176,7 +181,7 @@ const styles = StyleSheet.create({
     },
     logoContainer: {
         flex: 1,
-        marginBottom: "10%",
+        marginBottom: "5%",
     },
     leftCircle: {
         backgroundColor: "#0066cc",
@@ -197,11 +202,11 @@ const styles = StyleSheet.create({
         top: -400,
     },
     circleContainer: {
-        flex: 1,
+        flex: .5,
         top: -50,
     },
     topContainer: {
-        flex: 1,
+        flex: .75,
     },
     disclaimerContainer: {
         flex: 1,

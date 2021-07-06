@@ -4,6 +4,7 @@ import { Avatar, Title, Caption, Drawer, Text, TouchableRipple, Switch } from 'r
 import { DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 
 import firebase from 'firebase'
@@ -76,13 +77,13 @@ export function DrawerContent(props) {
                                 color={color}
                                 size={size}/>
                             )}
-                            label="Party Rules"
-                            onPress={() => {props.navigation.navigate('PartyRules')}}
+                            label="House Guidelines"
+                            onPress={() => {props.navigation.navigate('HouseGuidelines')}}
                         />
                         <DrawerItem 
                             icon={({color, size}) => (
-                                <Icon 
-                                name="settings-outline"
+                                <Ionicons 
+                                name="settings"
                                 color={color}
                                 size={size}/>
                             )}
