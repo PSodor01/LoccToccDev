@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput, Image, Alert } from 'react-native'
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native'
 
-import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from '@react-navigation/native';
+
+import Icon from 'react-native-vector-icons/Ionicons';
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
 import moment from 'moment';
 
@@ -17,8 +19,25 @@ function Comment(props, route) {
     const [comments, setComments] = useState([])
     const [postId, setPostId] = useState("")
     const [text, setText] = useState("")
+    const [userData, setUserData] = useState(null);
 
-    const { posterName, postCreation, postCaption } = props.route.params;
+    const { posterName, posterImg, postCreation, postCaption } = props.route.params;
+
+    const getUser = async() => {
+        const currentUser = await firebase.firestore()
+        .collection('users')
+        .doc(firebase.auth().currentUser.uid)
+        .get()
+        .then((documentSnapshot) => {
+        if( documentSnapshot.exists ) {
+            setUserData(documentSnapshot.data());
+        }
+        })
+        }  
+    
+    useEffect(() => {
+        getUser();
+    },[]);
 
     useEffect(() => {
 
@@ -46,6 +65,7 @@ function Comment(props, route) {
                 .collection('userPosts')
                 .doc(props.route.params.postId)
                 .collection('comments')
+                .orderBy("creation", "desc")
                 .get()
                 .then((snapshot) => {
                     let comments = snapshot.docs.map(doc => {
@@ -61,50 +81,48 @@ function Comment(props, route) {
         }
     }, [props.route.params.postId, props.users])
 
-    const commentCount = comments + 1;
-
-    const onCommentSend = () => {
-        firebase.firestore()
-            .collection('posts')
-            .doc(props.route.params.uid)
-            .collection('userPosts')
-            .doc(props.route.params.postId)
-            .collection('comments')
-            .add({
-                creator: firebase.auth().currentUser.uid,
-                text,
-                creation: firebase.firestore.FieldValue.serverTimestamp(),
-                likes: 0,
-            })
-            .then(() => {
-                console.log('Comment Added!');
-                Alert.alert(
-                  'Comment published!',
-                  'Your comment has been published successfully!',
-                );
-                setComments(null);
-              })
-              .catch((error) => {
-                console.log('Something went wrong with adding comment to firestore.', error);
-              });
+    const onLikePress = (userId, postId) => {
+        const comments = firebase.firestore()
+            .collection("posts")
+            .doc(userId)
+            .collection("userPosts")
+            .doc(postId)
+            .collection("comments")
         
+            comments.collection("likes")
+            .doc(firebase.auth().currentUser.uid)
+            .set({})
+            .then(() => {
+                comments.update({
+                    likesCount: firebase.firestore.FieldValue.increment(1)
+                });
+            })
+    }
+    const onDislikePress = (userId, postId) => {
+        const comments = firebase.firestore()
+            .collection("posts")
+            .doc(userId)
+            .collection("userPosts")
+            .doc(postId)
+            .collection("comments")
+
+            comments.collection("likes")
+            .doc(firebase.auth().currentUser.uid)
+            .delete()
+            .then(() => {
+                comments.update({
+                    likesCount: firebase.firestore.FieldValue.increment(-1)
+                });
+            })
     }
 
-    const onCommentCount = () => {
-        firebase.firestore()
-        .collection('posts')
-            .doc(props.route.params.uid)
-            .collection('userPosts')
-            .doc(props.route.params.postId)
-        .update({
-            comments: firebase.firestore.FieldValue.increment(1)
-        })
-      }
+    const onReportPostPress = () => {
+        console.warn( 'Report Post' );
+        Alert.alert(
+            'This will be the Report Post button',
+          );
+    }
 
-
-    
-
-    
 
     const navigation = useNavigation();
 
@@ -115,7 +133,7 @@ function Comment(props, route) {
                     onPress={() => props.navigation.navigate("Profile", {})}>
                     <Image 
                         style={styles.profilePhotoPostContainer}
-                        source={{ uri: posterName ? props.route.params.posterImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                        source={{ uri: posterImg ? posterImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
                     />
                 </TouchableOpacity>
                 <View style={styles.postRightContainer}>
@@ -128,61 +146,71 @@ function Comment(props, route) {
                     </View>
                 </View>
             </View>
-            <View style={styles.addCommentContainer}>
-                <View style={styles.addCommentRightContainer}>
-                    <Image style={styles.profilePhotoCommentContainer}
-                        source={{ uri: posterName ?  'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7' : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}/>
-                        <TextInput
-                        placeholder="Type your comment here..."
-                        style={styles.placeholderText}
-                        multiline={true}
-                        numberOfLines={4}
-                        maxLength={1000}
-                        onChangeText={(text) => setText(text)}
-                        />
-                </View>
-                <View style={styles.addCommentButton}>
-                    <TouchableOpacity onPress={() => {onCommentSend(); onCommentCount();}}>
-                        <Text style={styles.shareText}>Post</Text>
-                    </TouchableOpacity>
-                </View>
-                
-            </View>
-            
+            <TouchableOpacity
+                onPress={() => navigation.navigate("NewComment", { posterName: posterName, postId: postId, uid: props.route.params.uid })}>
+                <Text style={styles.newCommentButton}>Got a comment?</Text>
+            </TouchableOpacity>
             <FlatList
-                style={styles.feed}
                 numColumns={1}
                 horizontal={false}
                 data={comments}
                 renderItem={({ item }) => (
                     <View>
-                        {item.length !== undefined ?
+                        {item.user !== undefined ?
                             <View style={styles.feedItem}>
                                 <TouchableOpacity
-                                    onPress={() => props.navigation.navigate("Profile", {uid: item.id})}>
-                                    <Image 
-                                        source={{uri: item.user ? item.user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
-                                        style={styles.profilePhotoCommentContainer}
-                                         />
-                                </TouchableOpacity>
-                                <View style={styles.postRightContainer}>
-                                    <View style={styles.postHeaderContainer}>
-                                        <Text style={styles.profileNameFeedText}>{item.user.name}</Text>
-                                        <Text style={styles.postTimeContainer}>{moment(item.creation.toDate()).fromNow()}</Text>
-                                    </View>
-                                    <View style={styles.postContentContainer}>
-                                        <Text style={styles.captionText}>{item.text}</Text>
-                                    </View>
+                                onPress={() => props.navigation.navigate("Profile", {})}>
+                                <Image 
+                                    style={styles.profilePhotoCommentContainer}
+                                    source={{uri: item.user ? item.user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                                />
+                            </TouchableOpacity>
+                            <View style={styles.postRightContainer}>
+                                <View style={styles.postHeaderContainer}>
+                                    <Text style={styles.profileNameFeedText}>{item.user.name}</Text>
+                                    <Text style={styles.postTimeContainer}>{moment(item.creation.toDate()).fromNow()}</Text>
                                 </View>
+                                <View style={styles.postContentContainer}>
+                                    {item.text != null ? <Text style={styles.captionText}>{item.text}</Text> : null}
+                                    {item.downloadURL != null ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
+                                </View>
+                                <View style={styles.postFooterContainer}>
+                                    { item.currentUserLike ?
+                                        (
+                                            <TouchableOpacity
+                                                style={styles.likeContainer}
+                                                onPress={() => onDislikePress(item.user.uid, item.id)} >
+                                                <Ionicons name={"heart"} size={20} color={"red"} />
+                                                <Text style={styles.likeNumber}>{item.likesCount}</Text>
+                                            </TouchableOpacity>
+                                        )
+                                        :
+                                        (
+                                            <TouchableOpacity
+                                                style={styles.likeContainer}
+                                                onPress={() => onLikePress(item.user.uid, item.id)}> 
+                                                <Ionicons name={"heart-outline"}  size={20} color={"pink"}/>
+                                                <Text style={styles.likeNumber}>{item.likesCount}</Text>
+                                            </TouchableOpacity>
+                                        )
+                                    }
+                                    <TouchableOpacity
+                                        style={styles.flagContainer}
+                                        onPress={onReportPostPress}>
+                                        <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                                
 
                             </View>
                             
                             : null}
                     </View>
                     
+                    
                 )}
             />
-            
         </View>
     )
 }
@@ -227,8 +255,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
   },
   shareText: {
-    color: "#e1e2e6",
-    fontSize: 12,
+    fontSize: 16,
   },
   placeholderText: {
       marginLeft: "2%",
@@ -236,12 +263,13 @@ const styles = StyleSheet.create({
       paddingHorizontal: 10,
       width: "90%",
   },
-feedItem:{
-    marginVertical:2,
-    marginHorizontal:2,
+  feedItem:{
+    padding:6,
+    marginVertical:5,
+    marginHorizontal:5,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e1e2e6",
     flexDirection: 'row',
-    flex: 1,
-    paddingTop: 10,
 },
 profileNameFeedText: {
     fontSize: 16,
@@ -273,11 +301,7 @@ postFooterContainer: {
 postRightContainer: {
     flex: 1,
 },
-feed: {
-    backgroundColor: "#ffffff",
-    flex: 1,
-    marginTop: 14,
-},
+
 addCommentContainer: {
     padding: 4,
     justifyContent: 'space-between'
@@ -295,11 +319,40 @@ addCommentRightContainer: {
     alignItems: 'center',
 
 },
-addCommentButton: {
-    marginRight: "2%",
-    justifyContent: 'center',
-    alignItems: 'center',
-
+newCommentButton: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginLeft: "2%",
+    backgroundColor: "#009387",
+    color: "#fff",
+    width: 150
+},
+likeContainer: {
+    flexDirection: 'row',
+},
+commentsContainer: {
+    flexDirection: 'row',
+},
+flagContainer: {
+    flexDirection: 'row',
+},
+likeNumber: {
+    marginLeft: 5,
+    marginTop: 5,
+    color: "grey",
+},
+flagText: {
+    marginLeft: 5,
+    marginTop: 5,
+    color: "grey",
+    fontSize: 10,
+},
+postImage: {
+    width: "100%",
+    height: 250,
+},
+captionText: {
+    paddingBottom: 5,
 },
 
   

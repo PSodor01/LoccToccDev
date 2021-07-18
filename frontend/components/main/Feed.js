@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { StyleSheet, View, Text, Image, FlatList, TouchableOpacity, Alert, Dimensions } from 'react-native'
+import { StyleSheet, View, Text, Image, FlatList, TouchableOpacity, Alert } from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons';
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import AntDesign from 'react-native-vector-icons/AntDesign'
 
 import { useNavigation } from '@react-navigation/native';
 import moment from 'moment';
+
+import ShareButton from '../buttons/ShareButton'
 
 import firebase from 'firebase'
 require('firebase/firestore')
@@ -64,12 +65,7 @@ function Feed(props) {
             'This will be the Report Post button',
           );
     }
-    const onSharePostPress = () => {
-        console.warn( 'Share Post' );
-        Alert.alert(
-            'This will be the Share Post button',
-          );
-    }
+    
 
     const navigation = useNavigation();
 
@@ -120,7 +116,7 @@ function Feed(props) {
                                 }
                                 <TouchableOpacity
                                     style={styles.commentsContainer}
-                                    onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.user.uid, posterName: item.user.name, postCreation: item.creation, postCaption: item.caption })}>
+                                    onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.user.uid, posterId: item.user.uid, posterName: item.user.name, postCreation: item.creation, postCaption: item.caption, posterImg: item.user.userImg })}>
                                     <Ionicons name={"chatbubble-outline"} size={20} color={"grey"} marginRight={10} />
                                     <Text style={styles.likeNumber}>{item.comments}</Text>
                                 </TouchableOpacity>
@@ -128,13 +124,8 @@ function Feed(props) {
                                     style={styles.flagContainer}
                                     onPress={onReportPostPress}>
                                     <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
-                                    <Text style={styles.flagText}>Report</Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={styles.commentsContainer}
-                                    onPress={onSharePostPress}>
-                                    <Ionicons name={"ios-share"} size={20} color={"grey"} marginRight={10} />
-                                </TouchableOpacity>
+                                <ShareButton />
                             </View>
                         </View>
                     </View>

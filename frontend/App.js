@@ -39,10 +39,9 @@ import LandingScreen from './components/auth/Landing'
 import RegisterScreen from './components/auth/Register'
 import LoginScreen from './components/auth/Login'
 import MainScreen from './components/Main'
-import AddScreen from './components/main/Add'
-import SaveScreen from './components/main/Save'
 import CommentScreen from './components/main/Comment'
 import NewPostScreen from './components/main/NewPost'
+import NewCommentScreen from './components/main/NewComment'
 import EditProfileScreen from './components/main/EditProfile'
 import MessagesScreen from './components/main/Messages'
 import Feed from './components/main/Feed'
@@ -98,20 +97,120 @@ const MainStackScreen = ({navigation, props}) => (
       <MainStack.Screen name="Search" component={Search}/>
       <MainStack.Screen name="Notifications" component={NotificationsScreen} />
       <MainStack.Screen name="Profile" component={Profile} />
-      <MainStack.Screen name="Add" component={AddScreen} />
-      <MainStack.Screen name="Save" component={SaveScreen} />
-      <MainStack.Screen name="Comment" component={CommentScreen} />
-      <MainStack.Screen name="NewPost" component={NewPostScreen} />
+      <MainStack.Screen name="Comment" component={CommentScreen} 
+        options={{
+          headerTitle: () => (
+            <Text style={styles.headerName}>locctocc</Text>
+          ),
+          headerLeft: () => (
+            <TouchableOpacity 
+            style={{ alignItems: "flex-end", marginLeft:16 }}
+            onPress={() => navigation.goBack()}
+            >
+            <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+          </TouchableOpacity>
+          ),
+          headerRight: () => (
+            <MessagesButton /> 
+          )
+        }}
+      />
+      <MainStack.Screen name="NewComment" component={NewCommentScreen} 
+        options={{
+          headerTitle: () => (
+            <Text style={styles.headerName}>locctocc</Text>
+          ),
+          headerLeft: () => (
+            <TouchableOpacity 
+            style={{ alignItems: "flex-end", marginLeft:16 }}
+            onPress={() => navigation.goBack()}
+            >
+            <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+          </TouchableOpacity>
+          ),
+          headerRight: () => (
+            <MessagesButton /> 
+          )
+        }}
+      />
+      <MainStack.Screen name="NewPost" component={NewPostScreen} 
+        options={{
+          headerTitle: () => (
+            <Text style={styles.headerName}>locctocc</Text>
+          ),
+          headerLeft: () => (
+            <TouchableOpacity 
+            style={{ alignItems: "flex-end", marginLeft:16 }}
+            onPress={() => navigation.goBack()}
+            >
+            <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+          </TouchableOpacity>
+          ),
+          headerRight: () => (
+            <MessagesButton /> 
+          )
+        }}
+      />
       <MainStack.Screen name="EditProfile" component={EditProfileScreen} 
         options={{headerTitle: "Edit Profile"}} />
-      <MainStack.Screen name="Messages" component={MessagesScreen} />
+      <MainStack.Screen name="Messages" component={MessagesScreen}
+        options={{
+            headerTitle: () => (
+              <Text style={styles.headerName}>locctocc</Text>
+            ),
+            headerLeft: () => (
+              <TouchableOpacity 
+              style={{ alignItems: "flex-end", marginLeft:16 }}
+              onPress={() => navigation.goBack()}
+              >
+              <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+            </TouchableOpacity>
+            ),
+            headerRight: () => (
+              <MessagesButton /> 
+            )
+          }} />
       <MainStack.Screen name="Chat" component={ChatScreen} />
       <MainStack.Screen name="HouseGuidelines" component={HouseGuidelinesScreen}
         options={{headerTitle: "House Guidelines"}} />
       <MainStack.Screen name="AboutUs" component={AboutUsScreen}
         options={{headerTitle: "About Us"}} />
-      <MainStack.Screen name="Odds" component={Odds} />
-      <MainStack.Screen name="game" component={game} />
+      <MainStack.Screen name="Odds" component={Odds}
+        options={{
+          headerTitle: () => (
+            <Text style={styles.headerName}>locctocc</Text>
+          ),
+          headerLeft: () => (
+            <TouchableOpacity 
+            style={{ alignItems: "flex-end", marginLeft:16 }}
+            onPress={() => navigation.goBack()}
+            >
+            <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+          </TouchableOpacity>
+          ),
+          headerRight: () => (
+            <MessagesButton /> 
+          )
+        }}
+       />
+      <MainStack.Screen name="game" component={game}
+        options={{
+          headerTitle: () => (
+            <Text style={styles.headerName}>locctocc</Text>
+          ),
+          headerLeft: () => (
+            <TouchableOpacity 
+            style={{ alignItems: "flex-end", marginLeft:16 }}
+            onPress={() => navigation.goBack()}
+            >
+            <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+          </TouchableOpacity>
+          ),
+          headerRight: () => (
+            <MessagesButton /> 
+          )
+        }}
+          />
     
     
     
@@ -207,8 +306,6 @@ export class App extends Component {
             <Stack.Screen name="Search" component={Search} navigation={this.props.navigation}/>
             <Stack.Screen name="Notifications" component={NotificationsScreen} navigation={this.props.navigation}/>
             <Stack.Screen name="Profile" component={Profile} navigation={this.props.navigation}/>
-            <Stack.Screen name="Add" component={AddScreen} navigation={this.props.navigation}/>
-            <Stack.Screen name="Save" component={SaveScreen} navigation={this.props.navigation}/>
             <Stack.Screen name="Comment" component={CommentScreen} navigation={this.props.navigation}/>
             <Stack.Screen name="NewPost" component={NewPostScreen} navigation={this.props.navigation}/>
             <Stack.Screen name="EditProfile" component={EditProfileScreen} navigation={this.props.navigation}/>

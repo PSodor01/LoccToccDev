@@ -2,18 +2,16 @@ import React, { useState, useEffect } from 'react'
 import { StyleSheet, View, Text, Image, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native'
 
 import Icon from 'react-native-vector-icons/Ionicons';
-import Ionicons from 'react-native-vector-icons/Ionicons'
 
 import { useNavigation } from '@react-navigation/native';
 
 import moment from 'moment';
 
+import ShareButton from '../buttons/ShareButton'
+
 import firebase from 'firebase'
 require('firebase/firestore')
 import { connect } from 'react-redux'
-
-import ShareButton from '../buttons/ShareButton'
-
 
 function Profile(props) {
     const [userPosts, setUserPosts] = useState([]);
@@ -121,12 +119,6 @@ function Profile(props) {
             'This will be the Report Post button',
           );
     }
-    const onSharePostPress = () => {
-        console.warn( 'Share Post' );
-        Alert.alert(
-            'This will be the Share Post button',
-          );
-    }
 
     const navigation = useNavigation();
 
@@ -148,7 +140,6 @@ function Profile(props) {
                     </View>
                     <View style={{ marginLeft: "5%" }}>
                         <View style={{ flexDirection: 'row', paddingTop: 5}}>
-                            <ShareButton />
                             <Text style={{ color: "grey" }}>Member since </Text>
                             <Text style={{ color: "grey" }}>{moment(user.createdAt.toDate()).format("MMM Do YYYY")}</Text>
                         </View>
@@ -260,13 +251,8 @@ function Profile(props) {
                                                 style={styles.flagContainer}
                                                 onPress={onReportPostPress}>
                                                 <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
-                                                <Text style={styles.flagText}>Report</Text>
                                             </TouchableOpacity>
-                                            <TouchableOpacity
-                                                style={styles.commentsContainer}
-                                                onPress={onSharePostPress}>
-                                                <Ionicons name={"ios-share"} size={20} color={"grey"} marginRight={10} />
-                                            </TouchableOpacity>
+                                            <ShareButton />
                                         </View>
                                     </View>
                                 </View>

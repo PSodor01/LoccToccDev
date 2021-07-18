@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Platform, StyleSheet, Alert, ActivityIndicator, TextInput, TouchableOpacity, Image, TouchableWithoutFeedback, Keyboard,} from 'react-native';
+import { View, Text, Platform, StyleSheet, Alert, ActivityIndicator, TextInput, TouchableOpacity, Image, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, Animated} from 'react-native';
+
 import { AntDesign } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+
 import { useNavigation } from '@react-navigation/native';
 
 import * as ImagePicker from 'expo-image-picker';
@@ -9,7 +12,7 @@ import firebase from 'firebase'
 require("firebase/firestore")
 require("firebase/firebase-storage")
 
-const AddPostScreen = ({ route }) => {
+const AddPostScreen = ({ route, props }) => {
 
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -81,7 +84,9 @@ const AddPostScreen = ({ route }) => {
         }).then(() => {
           console.log('Post Added!');
           setPost(null);
-        })
+        }).then((function () {
+          navigation.goBack()
+      }))
     }
 
     const uploadImage = async () => {
@@ -131,49 +136,57 @@ const AddPostScreen = ({ route }) => {
     )
 
   return (
-      <View style={styles.container}>
-        <Image 
-              style={styles.profilePhotoPostContainer}
-              source={{uri: userData ? userData.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
-        />
-        <TextInput
-            placeholder="Think you know your stuff? Share your lock"
-            style={styles.InputField}
-            multiline
-            numberOfLines={4}
-            value={post}
-            onChangeText={(content) => setPost(content)}
-        />
-        <View>
-            <TouchableOpacity onPress={() => { uploadImage() }} style={styles.SubmitBtn}>
-            
-              <Text style={styles.SubmitBtnText}>Post 2</Text>
-            </TouchableOpacity>
-          </View>
-        
-        <View style={styles.InputWrapper}>
-          {image != null ? <Image source={{uri: image}} style={styles.AddImage}/> : null}
+      <DismissKeyboard>
+        <KeyboardAvoidingView style={styles.container}>
+          <Text style={styles.gameText}>{awayTeam} vs {homeTeam}</Text>
+          <View style={styles.typePostContainer}>
+            <Image 
+                  style={styles.profilePhotoPostContainer}
+                  source={{uri: userData ? userData.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+            />
+            <TextInput
+                placeholder="Know your stuff? Share your lock..."
+                numberOfLines={4}
+                value={post}
+                onChangeText={(content) => setPost(content)}
+                autoFocus={true}
+            />
 
-          
-          {uploading ? (
-            <View style={styles.StatusWrapper}>
-              <Text>{transferred} % Completed!</Text>
-              <ActivityIndicator size="large" color="#0000ff" />
-            </View>
-          ) : (
-            <View></View>
+          </View>
+          <View style={styles.addCommentButton}>
+              <View style={styles.galleryContainer}>
+                <TouchableOpacity onPress={() => {}}>
+                  <MaterialCommunityIcons name="gif" size={24} justifyContent='center'/>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => {pickImage()}}>
+                    <AntDesign name="camera" size={24} justifyContent='center'/>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.postButtonContainer}>
+                <TouchableOpacity onPress={() => {uploadImage()}}>
+                    <Text style={styles.shareText}>Post</Text>
+                </TouchableOpacity>
+              </View>
+                
+          </View>
+          <View style={styles.InputWrapper}>
+            {image != null ? <Image source={{uri: image}} style={styles.AddImage}/> : null}
+
             
-          )}
-        </View>
-        <View>
-          <TouchableOpacity
-            onPress={pickImage}
-            style={styles.shareButton}>
-            <Text>Pick Image</Text>
-          </TouchableOpacity>
-        </View>
-        
-      </View>
+            {uploading ? (
+              <View style={styles.StatusWrapper}>
+                <Text>{transferred} % Completed!</Text>
+                <ActivityIndicator size="large" color="#0000ff" />
+              </View>
+            ) : (
+              <View></View>
+              
+            )}
+          </View>
+          
+        </KeyboardAvoidingView>
+      </DismissKeyboard>
+      
     
   );
 };
@@ -182,80 +195,62 @@ export default AddPostScreen;
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
-    justifyContent: 'center',
     flex: 1,
+  },
+  typePostContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    margin: "2%",
   },
   InputWrapper: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
     width: "100%",
   },
-  InputField: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    fontSize: 24,
-    textAlign: 'center',
-    width: '90%',
-    marginBottom: 15
-},
 AddImage: {
-    width: '100%',
-    height: 250,
-    marginBottom: 15,
+    width: "80%",
+    height: "70%",
+    marginTop: "5%",
 },
-
 StatusWrapper: {
   justifyContent: 'center',
   alignItems: 'center',
-},
-
-SubmitBtn: {
-  flexDirection: 'row',
-  justifyContent: 'center',
-  backgroundColor: '#2e64e515',
-  borderRadius: 5,
-  padding: 10,
-},
-
-SubmitBtnText: {
-  fontSize: 18,
-  fontWeight: 'bold',
-  color: '#2e64e5',
 },
 profilePhotoPostContainer: {
   backgroundColor: "#e1e2e6",
   width: 50,
   height: 50,
   borderRadius: 40,
-},
-topPostContainer: {
-  flexDirection: 'row',
-  width: "90%",
-  justifyContent: "space-between",
-  marginTop: "5%",
-},
-middlePostContainer: {
-  flexDirection: 'row',
-  width: "90%",
-  paddingTop: 10,
+  marginRight: "2%",
 },
 shareText: {
-  color: "#ffffff",
-  paddingHorizontal: 20,
-  paddingVertical: 10,
-  fontWeight: "bold",
-  fontSize: 16,
+  fontSize: 20,
+  fontWeight: "bold"
 },
-shareButton: {
-  backgroundColor: "#2e64e5",
-  borderRadius: 30,
+gameText: { 
+  fontWeight: 'bold',
+  marginLeft: "2%",
+  color: "grey"
 },
-placeholderText: {
-  alignSelf: 'center',
-  paddingHorizontal: 10,
-  width: "90%",
-}
+addCommentButton: {
+  flexDirection: 'row',
+  borderBottomColor: "#CACFD2",
+  borderBottomWidth: 1,
+  borderTopColor: "#CACFD2",
+  borderTopWidth: 1,
+  justifyContent: 'space-between',
+  paddingHorizontal: 50,
+  backgroundColor: "#CACFD2",
+},
+galleryContainer: {
+  flexDirection: 'row',
+  marginLeft: "5%",
+  flex: 1,
+  justifyContent: 'space-between',
+  marginRight: "45%",
+},
+postButtonContainer: {
+  paddingRight: "10%",
+},
 
 });

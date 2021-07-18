@@ -56,23 +56,22 @@ export default class App extends React.Component {
                                 <TouchableOpacity
                                     style={styles.gameButton}
                                     onPress={() => this.props.navigation.navigate('game', {gameId: item.id, site: item.sites[1].site_nice, date: item.commence_time, homeTeam: item.teams[1], awayTeam: item.teams[0], homeMoneyline: item.sites[1].odds.spreads.odds[1], awayMoneyline: item.sites[1].odds.spreads.odds[0], homeSpread: item.sites[1].odds.spreads.points[1], awaySpread: item.sites[1].odds.spreads.points[0] })}>
-                                    <Text>{moment(item.commence_time).format("MMM Do YYYY")}</Text>
+                                    <Text>{moment(item.commence_time).format("MMM Do")}</Text>
                                     <View style={styles.gameInfoContainer}>
                                         <View style={styles.gameItem}>
                                             <Text style={styles.gameHeaderText}>Team</Text>
-                                            <Text>{item.teams[1]}</Text>
                                             <Text>{item.teams[0]}</Text>
-                                            
+                                            <Text>{item.teams[1]}</Text>
                                         </View>
                                         <View style={styles.gameItem}>
                                             <Text style={styles.gameHeaderText}>Moneyline</Text>
-                                            <Text style={styles.oddsText}>{item.sites[1].odds.spreads.odds[1]}</Text>
                                             <Text style={styles.oddsText}>{item.sites[1].odds.spreads.odds[0]}</Text>
+                                            <Text style={styles.oddsText}>{item.sites[1].odds.spreads.odds[1]}</Text>
                                         </View>
                                         <View style={styles.gameItem}>
                                             <Text style={styles.gameHeaderText}>Spread</Text>
-                                            <Text style={styles.oddsText}>{item.sites[1].odds.spreads.points[1]}</Text>
                                             <Text style={styles.oddsText}>{item.sites[1].odds.spreads.points[0]}</Text>
+                                            <Text style={styles.oddsText}>{item.sites[1].odds.spreads.points[1]}</Text>
                                         </View>
                                         <View style={styles.gameItem}>
                                             <Text style={styles.gameHeaderText}>Total</Text>
