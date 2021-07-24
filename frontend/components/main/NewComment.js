@@ -184,8 +184,6 @@ function NewCommentScreen(props, route) {
                         source={{uri: userData ? userData.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}/>
                         <TextInput
                         placeholder="Type your comment here..."
-                        style={styles.placeholderText}
-                        multiline={true}
                         numberOfLines={4}
                         maxLength={1000}
                         onChangeText={(text) => setText(text)}

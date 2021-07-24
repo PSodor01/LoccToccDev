@@ -20,6 +20,7 @@ import ChatScreen from './main/Chat'
 import EditProfileScreen from './main/EditProfile'
 import Odds from './main/Odds'
 import game from './main/game'
+import GifButton from './buttons/GifButton'
 
 const Stack = createStackNavigator();
 
@@ -97,7 +98,7 @@ export class Main extends Component {
                         tabBarLabel: 'Games',
                         tabBarColor: '#009387',
                         tabBarIcon: ({ color, size }) => (
-                            <FontAwesome5 name="comment-dollar" color={color} size={26} />
+                            <FontAwesome5 name="comment-dollar" color={color} size={24} />
                         ),
                     }} />
                 <Tab.Screen 
@@ -116,6 +117,17 @@ export class Main extends Component {
                     navigation={this.props.navigation}
                     options={{
                         tabBarLabel: 'Explore',
+                        tabBarColor: '#009387',
+                        tabBarIcon: ({ color, size }) => (
+                            <MaterialCommunityIcons name="magnify" color={color} size={26} />
+                        ),
+                    }} />
+                 <Tab.Screen 
+                    name="GifButton" 
+                    component={GifButton} 
+                    navigation={this.props.navigation}
+                    options={{
+                        tabBarLabel: 'gif',
                         tabBarColor: '#009387',
                         tabBarIcon: ({ color, size }) => (
                             <MaterialCommunityIcons name="magnify" color={color} size={26} />

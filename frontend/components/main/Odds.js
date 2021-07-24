@@ -18,7 +18,7 @@ export default class App extends React.Component {
     }
 
     componentDidMount() {
-        const url = "https://api.the-odds-api.com/v3/odds/?apiKey=32537244e2372228d57f009ba53a1d46&sport=basketball&region=us&mkt=spreads&oddsFormat=american&dateFormat=iso"
+        const url = "https://api.the-odds-api.com/v3/odds/?apiKey=32537244e2372228d57f009ba53a1d46&sport=baseball_mlb&region=us&mkt=spreads&oddsFormat=american&dateFormat=iso"
         fetch(url, {
             method: 'GET'
         }).then((response) => response.json())

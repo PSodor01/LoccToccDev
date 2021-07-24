@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Platform, StyleSheet, Alert, ActivityIndicator, TextInput, TouchableOpacity, Image, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, Animated} from 'react-native';
+import { View, Text, Platform, FlatList, StyleSheet, ActivityIndicator, TextInput, TouchableOpacity, Image, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView} from 'react-native';
 
-import { AntDesign } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 
 import { useNavigation } from '@react-navigation/native';
 
 import * as ImagePicker from 'expo-image-picker';
+
+import Animated from 'react-native-reanimated';
+import BottomSheet from 'reanimated-bottom-sheet';
 
 import firebase from 'firebase'
 require("firebase/firestore")
@@ -19,6 +23,8 @@ const AddPostScreen = ({ route, props }) => {
   const [transferred, setTransferred] = useState(0);
   const [post, setPost] = useState(null);
   const [userData, setUserData] = useState(null);
+  const [gifs, setGifs] = useState([]);
+  const [term, updateTerm] = useState('');
 
   const { gameId, homeTeam, awayTeam, homeMoneyline, awayMoneyline, homeSpread, awaySpread } = route.params;
 
@@ -66,7 +72,21 @@ const AddPostScreen = ({ route, props }) => {
     }
   };
 
-  
+  const pickGif = (url) => {
+    let result =  (url);
+    console.log(result);
+
+    if (!result.cancelled) {
+      setImage(result);
+      this.bs.current.snapTo(1);
+    }
+  };
+
+  const removeImage = () => {
+      setImage(null);
+  }
+
+    
 
   const savePostData = (downloadURL) => {
 
@@ -125,8 +145,6 @@ const AddPostScreen = ({ route, props }) => {
         task.on("state_changed", taskProgress, taskError, taskCompleted);
       }
 
-
-
   const navigation = useNavigation();
 
   const DismissKeyboard = ({ children }) => (
@@ -135,57 +153,139 @@ const AddPostScreen = ({ route, props }) => {
     </TouchableWithoutFeedback>
     )
 
+  async function fetchGifs() {
+  
+    try {
+        const API_KEY = '17HE4ZOjp4kGtW49q3cnlJzkvDNZBJzh';
+        const BASE_URL = 'http://api.giphy.com/v1/gifs/search';
+        const resJson = await fetch(`${BASE_URL}?api_key=${API_KEY}&q=${term}`);
+        const res = await resJson.json();
+        setGifs(res.data);
+        } catch (error) {
+            console.warn(error);
+        }
+    } /// add facebook fresco
+    
+    function onEdit(newTerm) {
+        updateTerm(newTerm);
+        fetchGifs();
+    }
+
+    
+
+
+    renderInner = () => (
+        <View style={styles.panel}>
+            <FlatList
+                data={gifs}
+                renderItem={({item}) => ( 
+                    <View style={styles.containerImage}>
+                        <TouchableOpacity onPress={()=>{pickGif(item.images.original.url)}}>
+                            <Image
+                            style={styles.image}
+                            source={{uri: item.images.original.url}}
+                            numColumns={1}
+                            />
+                        </TouchableOpacity>
+                    </View>
+                      
+                )}
+            />
+          <TouchableOpacity
+            style={styles.panelButton}
+            onPress={() => this.bs.current.snapTo(1)}>
+            <Text style={styles.panelButtonTitle}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    
+      renderHeader = () => (
+        <View style={styles.header}>
+          <View style={styles.panelHeader}>
+            <View style={styles.panelHandle} />
+            <View style={styles.searchSection}>
+                <FontAwesome5 name="search-dollar" color="grey" size={20} alignItems='center' />
+                <TextInput
+                    placeholder="Search Giphy"
+                    style={styles.textInput}
+                    onChangeText={(text) => onEdit(text)}
+                />
+            </View>
+          </View>
+        </View>
+      );
+
+    bs = React.createRef();
+    fall = new Animated.Value(1);
+
   return (
-      <DismissKeyboard>
         <KeyboardAvoidingView style={styles.container}>
-          <Text style={styles.gameText}>{awayTeam} vs {homeTeam}</Text>
-          <View style={styles.typePostContainer}>
-            <Image 
-                  style={styles.profilePhotoPostContainer}
-                  source={{uri: userData ? userData.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
-            />
-            <TextInput
-                placeholder="Know your stuff? Share your lock..."
-                numberOfLines={4}
-                value={post}
-                onChangeText={(content) => setPost(content)}
-                autoFocus={true}
-            />
+          <BottomSheet 
+              ref={this.bs}
+              snapPoints={[450, -5]}
+              renderContent={this.renderInner}
+              renderHeader={this.renderHeader}
+              initialSnap={1}
+              callbackNode={this.fall}
+              enabledGestureInteraction={true}       
+          />
+          <Animated.View style={{margin: 20, 
+          opacity: Animated.add(0.1, Animated.multiply(this.fall, 1.0)),
+          }}>
+            <Text style={styles.gameText}>{awayTeam} vs {homeTeam}</Text>
+            <View style={styles.typePostContainer}>
+              <Image 
+                    style={styles.profilePhotoPostContainer}
+                    source={{uri: userData ? userData.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+              />
+              <TextInput
+                  placeholder="Know your stuff? Share your lock..."
+                  numberOfLines={4}
+                  value={post}
+                  onChangeText={(content) => setPost(content)}
+              />
 
-          </View>
-          <View style={styles.addCommentButton}>
-              <View style={styles.galleryContainer}>
-                <TouchableOpacity onPress={() => {}}>
-                  <MaterialCommunityIcons name="gif" size={24} justifyContent='center'/>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => {pickImage()}}>
-                    <AntDesign name="camera" size={24} justifyContent='center'/>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.postButtonContainer}>
-                <TouchableOpacity onPress={() => {uploadImage()}}>
-                    <Text style={styles.shareText}>Post</Text>
-                </TouchableOpacity>
-              </View>
-                
-          </View>
-          <View style={styles.InputWrapper}>
-            {image != null ? <Image source={{uri: image}} style={styles.AddImage}/> : null}
-
+            </View>
+            <View style={styles.addCommentButton}>
+                <View style={styles.galleryContainer}>
+                  <TouchableOpacity onPress={() => this.bs.current.snapTo(0)}>
+                      <MaterialCommunityIcons name="gif" size={24} justifyContent='center' alignItems='center' color="#86898B"/>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => {pickImage()}}>
+                      <MaterialCommunityIcons name="camera" size={24} justifyContent='center' alignItems='center'  color="#86898B"/>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.postButtonContainer}>
+                  <TouchableOpacity onPress={() => {uploadImage()}} style={styles.postButton}>
+                      <Text style={styles.shareText}>POST</Text>
+                  </TouchableOpacity>
+                </View>
+                  
+            </View>
+            <View style={styles.xButton}>
+              {image != null ? 
+                  <TouchableOpacity onPress={() => {removeImage()}}>
+                    <Feather name="x-circle" size={24} color ="red" />
+                  </TouchableOpacity> : null}
+            </View>
             
-            {uploading ? (
-              <View style={styles.StatusWrapper}>
-                <Text>{transferred} % Completed!</Text>
-                <ActivityIndicator size="large" color="#0000ff" />
-              </View>
-            ) : (
-              <View></View>
+            <View style={styles.InputWrapper}>
               
-            )}
-          </View>
-          
+              {image != null ? <Image source={{uri: image}} style={styles.AddImage}/> : null}
+
+              
+              {uploading ? (
+                <View style={styles.StatusWrapper}>
+                  <Text>{transferred} % Completed!</Text>
+                  <ActivityIndicator size="large" color="#0000ff" />
+                </View>
+              ) : (
+                <View></View>
+                
+              )}
+            </View>
+          </Animated.View>
         </KeyboardAvoidingView>
-      </DismissKeyboard>
       
     
   );
@@ -196,21 +296,21 @@ export default AddPostScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#fff',
   },
   typePostContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
     margin: "2%",
   },
   InputWrapper: {
-    flex: 1,
-    alignItems: 'center',
     width: "100%",
+    alignItems: 'center',
   },
 AddImage: {
     width: "80%",
     height: "70%",
     marginTop: "5%",
+    alignItems: 'center',
 },
 StatusWrapper: {
   justifyContent: 'center',
@@ -224,8 +324,10 @@ profilePhotoPostContainer: {
   marginRight: "2%",
 },
 shareText: {
-  fontSize: 20,
-  fontWeight: "bold"
+  fontSize: 16,
+  fontWeight: "bold",
+  color: "#fff",
+  alignSelf: 'center',
 },
 gameText: { 
   fontWeight: 'bold',
@@ -239,18 +341,108 @@ addCommentButton: {
   borderTopColor: "#CACFD2",
   borderTopWidth: 1,
   justifyContent: 'space-between',
-  paddingHorizontal: 50,
-  backgroundColor: "#CACFD2",
+  paddingLeft: 40,
+  paddingRight: 10,
+  paddingVertical: 8,
 },
 galleryContainer: {
   flexDirection: 'row',
   marginLeft: "5%",
   flex: 1,
   justifyContent: 'space-between',
-  marginRight: "45%",
+  marginRight: "35%",
 },
 postButtonContainer: {
   paddingRight: "10%",
+  
 },
+postButton: {
+  alignSelf: 'center',
+  backgroundColor: '#33A8FF',
+  borderRadius: 6,
+  alignSelf: 'center',
+  paddingVertical: 2,
+  paddingHorizontal: 6,
+},
+container: {
+  flex: 1,
+  backgroundColor: '#fff',
+},
+textInput: {
+  height: 30,
+  width: "75%",
+  marginBottom: "5%",
+  paddingHorizontal: 20,
+  backgroundColor: "#ffffff",
+  borderRadius: 20,
+  borderWidth: 1,
+  borderColor: "#e5e7e9"
+
+},
+panel: {
+  padding: 20,
+  backgroundColor: '#FFFFFF',
+  paddingTop: 20,
+  width: '100%',
+},
+header: {
+  backgroundColor: '#FFFFFF',
+  shadowColor: '#333333',
+  shadowOffset: {width: -1, height: -3},
+  shadowRadius: 2,
+  shadowOpacity: 0.4,
+  paddingTop: 20,
+  borderTopLeftRadius: 20,
+  borderTopRightRadius: 20,
+},
+panelHeader: {
+  alignItems: 'center',
+},
+panelHandle: {
+  width: 40,
+  height: 8,
+  borderRadius: 4,
+  backgroundColor: '#00000040',
+  marginBottom: 10,
+},
+panelTitle: {
+  fontSize: 27,
+  height: 35,
+},
+panelSubtitle: {
+  fontSize: 14,
+  color: 'gray',
+  height: 30,
+  marginBottom: 10,
+},
+panelButton: {
+  padding: 13,
+  borderRadius: 10,
+  backgroundColor: '#2e64e5',
+  alignItems: 'center',
+  marginVertical: 7,
+},
+panelButtonTitle: {
+  fontSize: 17,
+  fontWeight: 'bold',
+  color: 'white',
+},
+image: {
+  width: 200,
+  height: 150,
+  marginBottom: 5,
+  borderRadius: 10,
+},
+searchSection: {
+  flex: 1,
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+  backgroundColor: '#fff',
+},
+xButton: {
+  alignItems: 'flex-end',
+  paddingTop: 2,
+}
 
 });

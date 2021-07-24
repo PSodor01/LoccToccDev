@@ -8,8 +8,6 @@ import * as ImagePicker from 'expo-image-picker';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Feather from 'react-native-vector-icons/Feather';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import firebase from 'firebase'
 require("firebase/firestore")

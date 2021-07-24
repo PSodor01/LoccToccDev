@@ -55,6 +55,7 @@ import Odds from './components/main/Odds'
 import game from './components/main/game'
 
 import MessagesButton from './components/buttons/MessagesButton'
+import GifButton from './components/buttons/GifButton'
 
 
 const Stack = createStackNavigator();
@@ -77,7 +78,10 @@ const MainStackScreen = ({navigation, props}) => (
     <MainStack.Screen name="Main" component={MainScreen} 
       options={{
         headerTitle: () => (
-          <Text style={styles.headerName}>locctocc</Text>
+          <View style={{ flexDirection: 'row'}}>
+              <Text style={styles.headerName}>locctocc </Text>
+              <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
+          </View>
         ),
         headerLeft: () => (
           <TouchableOpacity 
@@ -100,7 +104,10 @@ const MainStackScreen = ({navigation, props}) => (
       <MainStack.Screen name="Comment" component={CommentScreen} 
         options={{
           headerTitle: () => (
-            <Text style={styles.headerName}>locctocc</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+                <Text style={styles.headerName}>locctocc </Text>
+                <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
+            </View>
           ),
           headerLeft: () => (
             <TouchableOpacity 
@@ -118,7 +125,10 @@ const MainStackScreen = ({navigation, props}) => (
       <MainStack.Screen name="NewComment" component={NewCommentScreen} 
         options={{
           headerTitle: () => (
-            <Text style={styles.headerName}>locctocc</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+                <Text style={styles.headerName}>locctocc </Text>
+                <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
+            </View>
           ),
           headerLeft: () => (
             <TouchableOpacity 
@@ -136,7 +146,10 @@ const MainStackScreen = ({navigation, props}) => (
       <MainStack.Screen name="NewPost" component={NewPostScreen} 
         options={{
           headerTitle: () => (
-            <Text style={styles.headerName}>locctocc</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+                <Text style={styles.headerName}>locctocc </Text>
+                <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
+            </View>
           ),
           headerLeft: () => (
             <TouchableOpacity 
@@ -156,7 +169,10 @@ const MainStackScreen = ({navigation, props}) => (
       <MainStack.Screen name="Messages" component={MessagesScreen}
         options={{
             headerTitle: () => (
-              <Text style={styles.headerName}>locctocc</Text>
+              <View style={{ flexDirection: 'row', marginRight: '2%'}}>
+                <Text style={styles.headerName}>locctocc </Text>
+                <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
+            </View>
             ),
             headerLeft: () => (
               <TouchableOpacity 
@@ -171,6 +187,7 @@ const MainStackScreen = ({navigation, props}) => (
             )
           }} />
       <MainStack.Screen name="Chat" component={ChatScreen} />
+      <MainStack.Screen name="GifButton" component={GifButton} />
       <MainStack.Screen name="HouseGuidelines" component={HouseGuidelinesScreen}
         options={{headerTitle: "House Guidelines"}} />
       <MainStack.Screen name="AboutUs" component={AboutUsScreen}
@@ -178,7 +195,11 @@ const MainStackScreen = ({navigation, props}) => (
       <MainStack.Screen name="Odds" component={Odds}
         options={{
           headerTitle: () => (
-            <Text style={styles.headerName}>locctocc</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+                <Text style={styles.headerName}>locctocc </Text>
+                <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
+            </View>
+            
           ),
           headerLeft: () => (
             <TouchableOpacity 
@@ -196,7 +217,10 @@ const MainStackScreen = ({navigation, props}) => (
       <MainStack.Screen name="game" component={game}
         options={{
           headerTitle: () => (
-            <Text style={styles.headerName}>locctocc</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+                <Text style={styles.headerName}>locctocc </Text>
+                <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
+            </View>
           ),
           headerLeft: () => (
             <TouchableOpacity 
