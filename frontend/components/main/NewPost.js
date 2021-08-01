@@ -86,8 +86,6 @@ const AddPostScreen = ({ route, props }) => {
       setImage(null);
   }
 
-    
-
   const savePostData = (downloadURL) => {
 
     firebase.firestore()
@@ -171,9 +169,6 @@ const AddPostScreen = ({ route, props }) => {
         fetchGifs();
     }
 
-    
-
-
     renderInner = () => (
         <View style={styles.panel}>
             <FlatList
@@ -222,14 +217,14 @@ const AddPostScreen = ({ route, props }) => {
         <KeyboardAvoidingView style={styles.container}>
           <BottomSheet 
               ref={this.bs}
-              snapPoints={[450, -5]}
+              snapPoints={[550, -5]}
               renderContent={this.renderInner}
               renderHeader={this.renderHeader}
               initialSnap={1}
               callbackNode={this.fall}
               enabledGestureInteraction={true}       
           />
-          <Animated.View style={{margin: 20, 
+          <Animated.View style={{margin: 15, 
           opacity: Animated.add(0.1, Animated.multiply(this.fall, 1.0)),
           }}>
             <Text style={styles.gameText}>{awayTeam} vs {homeTeam}</Text>
@@ -241,6 +236,7 @@ const AddPostScreen = ({ route, props }) => {
               <TextInput
                   placeholder="Know your stuff? Share your lock..."
                   numberOfLines={4}
+                  maxLength={1000}
                   value={post}
                   onChangeText={(content) => setPost(content)}
               />
@@ -260,7 +256,6 @@ const AddPostScreen = ({ route, props }) => {
                       <Text style={styles.shareText}>POST</Text>
                   </TouchableOpacity>
                 </View>
-                  
             </View>
             <View style={styles.xButton}>
               {image != null ? 
@@ -361,8 +356,8 @@ postButton: {
   backgroundColor: '#33A8FF',
   borderRadius: 6,
   alignSelf: 'center',
-  paddingVertical: 2,
-  paddingHorizontal: 6,
+  paddingVertical: 3,
+  paddingHorizontal: 8,
 },
 container: {
   flex: 1,

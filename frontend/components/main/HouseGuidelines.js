@@ -5,6 +5,8 @@ export default function HouseGuidlinesScreen() {
     return (
         <View style={styles.container}>
             <Text>Site Rules Screen</Text>
+            <Text>no unit shaming</Text>
+            <Text>no politics</Text>
         </View>
     )
 }

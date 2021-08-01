@@ -51,11 +51,11 @@ import Profile from './components/main/Profile'
 import ChatScreen from './components/main/Chat'
 import AboutUsScreen from './components/main/AboutUs'
 import HouseGuidelinesScreen from './components/main/HouseGuidelines'
+import ContactUsScreen from './components/main/ContactUs'
 import Odds from './components/main/Odds'
 import game from './components/main/game'
 
 import MessagesButton from './components/buttons/MessagesButton'
-import GifButton from './components/buttons/GifButton'
 
 
 const Stack = createStackNavigator();
@@ -100,7 +100,26 @@ const MainStackScreen = ({navigation, props}) => (
       <MainStack.Screen name="Feed" component={Feed} />
       <MainStack.Screen name="Search" component={Search}/>
       <MainStack.Screen name="Notifications" component={NotificationsScreen} />
-      <MainStack.Screen name="Profile" component={Profile} />
+      <MainStack.Screen name="Profile" component={Profile}
+        options={{
+          headerTitle: () => (
+            <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+                <Text style={styles.headerName}>locctocc </Text>
+                <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
+            </View>
+          ),
+          headerLeft: () => (
+            <TouchableOpacity 
+            style={{ alignItems: "flex-end", marginLeft:16 }}
+            onPress={() => navigation.goBack()}
+            >
+            <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+          </TouchableOpacity>
+          ),
+          headerRight: () => (
+            <MessagesButton /> 
+          )
+        }} />
       <MainStack.Screen name="Comment" component={CommentScreen} 
         options={{
           headerTitle: () => (
@@ -187,9 +206,30 @@ const MainStackScreen = ({navigation, props}) => (
             )
           }} />
       <MainStack.Screen name="Chat" component={ChatScreen} />
-      <MainStack.Screen name="GifButton" component={GifButton} />
       <MainStack.Screen name="HouseGuidelines" component={HouseGuidelinesScreen}
-        options={{headerTitle: "House Guidelines"}} />
+        options={{
+            headerTitle: "House Guidelines",
+            headerLeft: () => (
+              <TouchableOpacity 
+              style={{ alignItems: "flex-end", marginLeft:16 }}
+              onPress={() => navigation.goBack()}
+              >
+              <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+            </TouchableOpacity>
+            )
+          }} />
+      <MainStack.Screen name="ContactUs" component={ContactUsScreen}
+        options={{
+            headerTitle: "Contact Us",
+            headerLeft: () => (
+              <TouchableOpacity 
+              style={{ alignItems: "flex-end", marginLeft:16 }}
+              onPress={() => navigation.goBack()}
+              >
+              <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+            </TouchableOpacity>
+            )
+          }} />
       <MainStack.Screen name="AboutUs" component={AboutUsScreen}
         options={{headerTitle: "About Us"}} />
       <MainStack.Screen name="Odds" component={Odds}
@@ -235,15 +275,12 @@ const MainStackScreen = ({navigation, props}) => (
           )
         }}
           />
-    
-    
-    
   </MainStack.Navigator>
 )
 
 
 export class App extends Component {
-  constructor(props) {
+  constructor(props, navigation) {
     super()
     this.state = {
       loaded: false,
@@ -282,8 +319,9 @@ export class App extends Component {
       return (
         <NavigationContainer>
           <Stack.Navigator initialRouteName="Landing">
-            <Stack.Screen name="Landing" component={LandingScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="Register" component={RegisterScreen} />
+            <Stack.Screen name="Landing" component={LandingScreen} options={{ headerShown: false }}/>
+            <Stack.Screen name="Register" component={RegisterScreen}
+            />
             <Stack.Screen name="Login" component={LoginScreen} />
           </Stack.Navigator>
         </NavigationContainer>

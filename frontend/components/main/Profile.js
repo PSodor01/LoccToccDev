@@ -4,6 +4,7 @@ import { StyleSheet, View, Text, Image, FlatList, TouchableOpacity, Alert, Scrol
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import { useNavigation } from '@react-navigation/native';
+import email from 'react-native-email'
 
 import moment from 'moment';
 
@@ -69,6 +70,7 @@ function Profile(props) {
             .collection("userFollowing")
             .doc(props.route.params.uid)
             .set({})
+            
     }
     const onUnfollow = () => {
         firebase.firestore()
@@ -77,6 +79,7 @@ function Profile(props) {
             .collection("userFollowing")
             .doc(props.route.params.uid)
             .delete()
+            
     }
 
     const onLikePress = (userId, postId) => {
@@ -113,11 +116,13 @@ function Profile(props) {
             })
     }
 
-    const onReportPostPress = () => {
-        console.warn( 'Report Post' );
-        Alert.alert(
-            'This will be the Report Post button',
-          );
+    const handleReportPostEmail = () => {
+        const to = ['ReportPost@locctocc.com'] // string or array of email addresses
+        email(to, {
+            // Optional additional arguments
+            subject: 'LoccTocc Report Post',
+            body: ''
+        }).catch(console.error)
     }
 
     const navigation = useNavigation();
@@ -128,7 +133,6 @@ function Profile(props) {
 
     return (
         <View>
-            
             <ScrollView>
                 <View style={styles.container}>
                     <View style={{ alignItems: 'center' }}>
@@ -243,13 +247,13 @@ function Profile(props) {
                                             }
                                             <TouchableOpacity
                                                 style={styles.commentsContainer}
-                                                onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.user.uid })}>
+                                                onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: user.id, posterId: user.id, posterName: user.name, postCreation: item.creation, postCaption: item.caption, posterImg: user.userImg, postImg: item.downloadURL })}>
                                                 <Icon name={"chatbubble-outline"} size={20} color={"grey"} marginRight={10} />
                                                 <Text style={styles.likeNumber}>{item.comments}</Text>
                                             </TouchableOpacity>
                                             <TouchableOpacity
                                                 style={styles.flagContainer}
-                                                onPress={onReportPostPress}>
+                                                onPress={handleReportPostEmail}>
                                                 <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
                                             </TouchableOpacity>
                                             <ShareButton />

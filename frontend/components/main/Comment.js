@@ -2,11 +2,14 @@ import React, { useState, useEffect } from 'react'
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native'
 
 import { useNavigation } from '@react-navigation/native';
+import email from 'react-native-email'
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
 import moment from 'moment';
+
+import ShareButton from '../buttons/ShareButton'
 
 import firebase from 'firebase'
 require('firebase/firestore')
@@ -21,7 +24,7 @@ function Comment(props, route) {
     const [text, setText] = useState("")
     const [userData, setUserData] = useState(null);
 
-    const { posterName, posterImg, postCreation, postCaption } = props.route.params;
+    const { posterId, posterName, posterImg, postCreation, postCaption, postImg } = props.route.params;
 
     const getUser = async() => {
         const currentUser = await firebase.firestore()
@@ -116,11 +119,13 @@ function Comment(props, route) {
             })
     }
 
-    const onReportPostPress = () => {
-        console.warn( 'Report Post' );
-        Alert.alert(
-            'This will be the Report Post button',
-          );
+    const handleReportPostEmail = () => {
+        const to = ['ReportPost@locctocc.com'] // string or array of email addresses
+        email(to, {
+            // Optional additional arguments
+            subject: 'LoccTocc Report Post',
+            body: ''
+        }).catch(console.error)
     }
 
 
@@ -128,28 +133,31 @@ function Comment(props, route) {
 
     return (
         <View style={styles.container}>
-            <View style={styles.originalPostContainer}>
-                <TouchableOpacity
-                    onPress={() => props.navigation.navigate("Profile", {})}>
-                    <Image 
-                        style={styles.profilePhotoPostContainer}
-                        source={{ uri: posterImg ? posterImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
-                    />
-                </TouchableOpacity>
-                <View style={styles.postRightContainer}>
-                    <View style={styles.postHeaderContainer}>
-                        <Text style={styles.profileNameFeedText}>{posterName}</Text>
-                        <Text style={styles.postTimeContainer}>{moment(postCreation.toDate()).fromNow()}</Text>
-                    </View>
-                    <View style={styles.postContentContainer}>
-                        <Text style={styles.captionText}>{postCaption}</Text>
+                <View style={styles.originalPostContainer}>
+                    <TouchableOpacity
+                        onPress={() => props.navigation.navigate("Profile", {uid: posterId})}>
+                        <Image 
+                            style={styles.profilePhotoPostContainer}
+                            source={{ uri: posterImg ? posterImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                        />
+                    </TouchableOpacity>
+                    <View style={styles.postRightContainer}>
+                        <View style={styles.postHeaderContainer}>
+                            <Text style={styles.profileNameFeedText}>{posterName}</Text>
+                            <Text style={styles.postTimeContainer}>{moment(postCreation.toDate()).fromNow()}</Text>
+                        </View>
+                        <View style={styles.postContentContainer}>
+                            {postCaption != null ? <Text style={styles.captionText}>{postCaption}</Text> : null}
+                            {postImg != null ? <Image source={{uri: postImg}} style={styles.postImage}/> : null}
+                        </View>
+                        <View style={styles.postButtonContainer}>
+                            <TouchableOpacity onPress={() => navigation.navigate("NewComment", { posterName: posterName, postId: postId, uid: props.route.params.uid })} style={styles.postButton}>
+                                <Text style={styles.shareText}>Reply</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
-            </View>
-            <TouchableOpacity
-                onPress={() => navigation.navigate("NewComment", { posterName: posterName, postId: postId, uid: props.route.params.uid })}>
-                <Text style={styles.newCommentButton}>Got a comment?</Text>
-            </TouchableOpacity>
+            
             <FlatList
                 numColumns={1}
                 horizontal={false}
@@ -159,7 +167,7 @@ function Comment(props, route) {
                         {item.user !== undefined ?
                             <View style={styles.feedItem}>
                                 <TouchableOpacity
-                                onPress={() => props.navigation.navigate("Profile", {})}>
+                                onPress={() => props.navigation.navigate("Profile", {uid: item.user.uid})}>
                                 <Image 
                                     style={styles.profilePhotoCommentContainer}
                                     source={{uri: item.user ? item.user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
@@ -196,9 +204,10 @@ function Comment(props, route) {
                                     }
                                     <TouchableOpacity
                                         style={styles.flagContainer}
-                                        onPress={onReportPostPress}>
+                                        onPress={handleReportPostEmail}>
                                         <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
                                     </TouchableOpacity>
+                                    <ShareButton />
                                 </View>
                             </View>
                                 
@@ -256,6 +265,9 @@ const styles = StyleSheet.create({
   },
   shareText: {
     fontSize: 16,
+    fontWeight: "bold",
+    color: "#fff",
+    alignSelf: 'center',
   },
   placeholderText: {
       marginLeft: "2%",
@@ -293,10 +305,10 @@ postFooterContainer: {
     flexDirection: 'row',
     paddingTop: 4,
     justifyContent: 'space-between',
-    width: "60%",
+    width: "80%",
     paddingTop: 5,
     marginLeft: "5%",
-
+    paddingBottom: 2,
 },
 postRightContainer: {
     flex: 1,
@@ -353,6 +365,18 @@ postImage: {
 },
 captionText: {
     paddingBottom: 5,
+},
+postButtonContainer: {
+    paddingRight: "5%",
+    paddingTop: 5,
+},
+postButton: {
+    alignSelf: 'center',
+    backgroundColor: '#33A8FF',
+    borderRadius: 6,
+    alignSelf: 'flex-end',
+    paddingVertical: 3,
+    paddingHorizontal: 8,
 },
 
   

@@ -4,10 +4,12 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
 import { useNavigation } from '@react-navigation/native';
+import email from 'react-native-email'
+
 import moment from 'moment';
 
 import ShareButton from '../buttons/ShareButton'
-
+    
 import firebase from 'firebase'
 require('firebase/firestore')
 import { connect } from 'react-redux'
@@ -59,11 +61,13 @@ function Feed(props) {
             })
     }
 
-    const onReportPostPress = () => {
-        console.warn( 'Report Post' );
-        Alert.alert(
-            'This will be the Report Post button',
-          );
+    const handleReportPostEmail = () => {
+        const to = ['ReportPost@locctocc.com'] // string or array of email addresses
+        email(to, {
+            // Optional additional arguments
+            subject: 'LoccTocc Report Post',
+            body: ''
+        }).catch(console.error)
     }
     
 
@@ -79,7 +83,7 @@ function Feed(props) {
                 renderItem={({ item }) => (
                     <View style={styles.feedItem}>
                         <TouchableOpacity
-                            onPress={() => props.navigation.navigate("Profile", {})}>
+                            onPress={() => props.navigation.navigate("Profile", {uid: item.user.uid})}>
                             <Image 
                                 style={styles.profilePhotoPostContainer}
                                 source={{uri: item.user ? item.user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
@@ -116,13 +120,13 @@ function Feed(props) {
                                 }
                                 <TouchableOpacity
                                     style={styles.commentsContainer}
-                                    onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.user.uid, posterId: item.user.uid, posterName: item.user.name, postCreation: item.creation, postCaption: item.caption, posterImg: item.user.userImg })}>
+                                    onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.user.uid, posterId: item.user.uid, posterName: item.user.name, postCreation: item.creation, postCaption: item.caption, posterImg: item.user.userImg, postImg: item.downloadURL })}>
                                     <Ionicons name={"chatbubble-outline"} size={20} color={"grey"} marginRight={10} />
                                     <Text style={styles.likeNumber}>{item.comments}</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={styles.flagContainer}
-                                    onPress={onReportPostPress}>
+                                    onPress={handleReportPostEmail}>
                                     <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
                                 </TouchableOpacity>
                                 <ShareButton />

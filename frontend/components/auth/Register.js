@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { View, TouchableOpacity, Text, TextInput, StyleSheet, Image, TouchableWithoutFeedback, Keyboard } from 'react-native'
 
+import { FontAwesome5 } from "@expo/vector-icons";
 
 import firebase from 'firebase'
 import "firebase/firestore";
@@ -60,32 +61,23 @@ export class Register extends Component {
         return (
             <DismissKeyboard>
                 <View style={styles.mainContainer}>
-                    <View style={styles.topContainer}>
-                        <View style={styles.circleContainer}>
-                            <View style={styles.leftCircle}></View>
-                            <View style={styles.rightCircle}></View>
+                    <View style={styles.appTextContainer}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center'}}>
+                            <Text style={styles.headerName}>locctocc </Text>
+                            <FontAwesome5 name="comment-dollar" color="#009387" size={26} />
                         </View>
-                        <View style={styles.logoContainer}>
-                            <Image
-                                style={styles.logo}
-                                source={require("../../assets/LoccToccLogo.png")}
-                            />
-                        </View>
-                        <View style={styles.appTextContainer}>
-                            <Text style={{
-                                fontSize: 30,
-                                color: "black",
-                            }}> New here?
-                            </Text>
-                            <Text style={{
-                                fontSize: 18,
-                                color: "black",
-                            }}> Join the family
-                            </Text>
-                        </View>
+                        <Text style={{
+                            fontSize: 20,
+                            color: "#009387",
+                        }}> New here?
+                        </Text>
+                        <Text style={{
+                            fontSize: 16,
+                            color: "#009387",
+                        }}> Join the family
+                        </Text>
                     </View>
                     <View style={styles.textInputContainer}>
-                        
                         <TextInput
                             style={styles.textInput}
                             placeholder="Username"
@@ -105,6 +97,20 @@ export class Register extends Component {
                             autoCorrect={false}
                             secureTextEntry={true}
                             onChangeText={(password) => this.setState({ password })}
+                        />
+                        <TextInput  
+                            style={styles.textInput}
+                            placeholder="Gender"
+                            autoCorrect={false}
+                            secureTextEntry={true}
+                            onChangeText={(gender) => this.setState({ gender })}
+                        />
+                        <TextInput  
+                            style={styles.textInput}
+                            placeholder="Birthday"
+                            autoCorrect={false}
+                            secureTextEntry={true}
+                            onChangeText={(birthday) => this.setState({ birthday })}
                         />
                         <TouchableOpacity
                             onPress={() => this.onSignUp()}
@@ -134,7 +140,7 @@ const styles = StyleSheet.create({
         height: 40,
         marginRight: "15%",
         marginLeft: "15%",
-        marginBottom: "2%",
+        marginBottom: "3%",
         paddingHorizontal: 30,
         borderColor: "#009387",
         borderWidth: 1,
@@ -143,6 +149,7 @@ const styles = StyleSheet.create({
     },
     textInputContainer: {
         flex: 1,
+        paddingTop: 40,
     },
     appButtonContainer: {
         borderColor: "#009387",
@@ -152,6 +159,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         width: "75%",
         alignSelf: "center",
+        marginTop: "5%",
         marginBottom: '5%',
     },
     appButtonText: {
@@ -166,7 +174,7 @@ const styles = StyleSheet.create({
     },
     appTextContainer: {
         alignItems: "center",
-        flex: 1,
+        marginTop: "5%",
     },
     mainContainer: {
         flex: 1,
@@ -179,14 +187,10 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         overflow: 'hidden',
     },
-    logoContainer: {
-        flex: 1,
-        marginBottom: "5%",
-    },
     leftCircle: {
         backgroundColor: "#0066cc",
-        width: 200,
-        height: 200,
+        width: 250,
+        height: 250,
         borderRadius: 200,
         left: -50,
         right: -50,
@@ -202,11 +206,11 @@ const styles = StyleSheet.create({
         top: -400,
     },
     circleContainer: {
-        flex: .5,
-        top: -50,
+        flex: .25,
+        top: -75,
     },
     topContainer: {
-        flex: .75,
+        flex: 1,
     },
     disclaimerContainer: {
         flex: 1,
@@ -216,7 +220,15 @@ const styles = StyleSheet.create({
         fontSize: 10,
         alignSelf: 'center',
         width: "70%",
-    }
+    },
+    headerName: {
+        alignSelf: 'center',
+        color: "#009387",
+        fontWeight: "bold",
+        fontSize: 28,
+        fontStyle: 'italic'
+    
+    }, 
     
 })
 

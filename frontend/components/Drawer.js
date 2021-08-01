@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 
+
 import firebase from 'firebase'
 
 export function DrawerContent(props) {
@@ -93,12 +94,12 @@ export function DrawerContent(props) {
                         <DrawerItem 
                             icon={({color, size}) => (
                                 <Icon 
-                                name="account-check-outline"
+                                name="phone-lock-outline"
                                 color={color}
                                 size={size}/>
                             )}
-                            label="Support"
-                            onPress={() => {}}
+                            label="Contact Us"
+                            onPress={() => {props.navigation.navigate('ContactUs')}}
                         />
                     
                     </Drawer.Section>

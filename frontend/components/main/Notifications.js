@@ -1,11 +1,19 @@
-import React from 'react';
-import { Text, View } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 
-export default function NotificationsScreen() {
+const Notifications = () => {
+        
     return (
         <View>
             <Text>Notifications</Text>
         </View>
+            
     )
 }
+
+export default Notifications
+
+const styles = StyleSheet.create({
+    
+});
+
 
