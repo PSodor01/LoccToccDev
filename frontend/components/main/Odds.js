@@ -1,114 +1,239 @@
-import React from 'react';
-import { Text, View, StyleSheet, ActivityIndicator, FlatList, TouchableOpacity, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Text, View, StyleSheet, ActivityIndicator, Dimensions, FlatList, TouchableOpacity } from 'react-native';
 
 import moment from 'moment'
+
+import { useNavigation } from '@react-navigation/native';
 
 import firebase from 'firebase'
 require("firebase/firestore")
 require("firebase/firebase-storage")
 
-export default class App extends React.Component {
+function Odds(props) {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            isLoading: true,
-            dataSource: [],
+    const [games, setGames] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [sport, setSport] = useState('americanfootball_nfl');
+    const [datalist, setDatalist] = useState(games);
+
+    const setSportFilter = sport => {
+        if (sport !== 'All') {
+            setDatalist([...games.filter( e => e.sport === sport)])
+        } else {
+            setDatalist(games)
         }
+        setSport(sport)
     }
 
-    componentDidMount() {
-        const url = "https://api.the-odds-api.com/v3/odds/?apiKey=32537244e2372228d57f009ba53a1d46&sport=baseball_mlb&region=us&mkt=spreads&oddsFormat=american&dateFormat=iso"
-        fetch(url, {
-            method: 'GET'
-        }).then((response) => response.json())
-        .then((responseJson) => {
-            console.log("res after api call ==>", responseJson)
-                this.setState({
-                    isLoading: false,
-                    dataSource: responseJson.data,
-                }, function(){
-
+    const fetchGameData = async () => {
+        try {
+            const list = [];
+            
+            await firebase.firestore()
+                .collection('games')
+                .orderBy('gameDate', 'desc')
+                .get()
+                .then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        const {
+                            gameId,
+                            sport,
+                            gameDate,
+                            awayTeam,
+                            homeTeam,
+                            awaySpread,
+                            homeSpread,
+                            awaySpreadOdds,
+                            homeSpreadOdds,
+                            awayMoneyline,
+                            homeMoneyline,
+                            over,
+                            overOdds,
+                            under,
+                            underOdds,
+                        } = doc.data();
+                        list.push({
+                            gameId,
+                            sport,
+                            gameDate,
+                            awayTeam,
+                            homeTeam,
+                            awaySpread,
+                            homeSpread,
+                            awaySpreadOdds,
+                            homeSpreadOdds,
+                            awayMoneyline,
+                            homeMoneyline,
+                            over,
+                            overOdds,
+                            under,
+                            underOdds,
+                        });
+                    })
                 })
-        })
-        .catch(error=>console.log(error))
+
+                setGames(list);
+                
+        } catch (e) {
+            console.log(e)
+        }
     }
 
-    
+    useEffect(() => {
+        fetchGameData();
+    })
 
-    //https://api.the-odds-api.com/v3/odds/?apiKey=32537244e2372228d57f009ba53a1d46&sport=basketball&region=us&mkt=totals&oddsFormat=american
+    const listTab = [
+        {
+            sport: 'americanfootball_nfl'
+        },
+        {
+            sport: 'MLB'
+        },
+    ]
 
-    render() {
-
-        
-            return (
-                <View style={styles.container}>
-                    <Text style={{fontSize: 24, marginBottom: '5%', fontWeight: 'bold'}}>Upcoming Games</Text>
-                    
-                    <FlatList 
-                        data={this.state.dataSource}
-                        keyExtractor={({id}, index) => id}
-                        renderItem={({item}) => 
+    const renderItem = ({item, index}) => {
+        return (
+            <View key={index}>
+                <View style={styles.gameContainer}>
+                    <TouchableOpacity
+                        style={styles.gameButton}
+                        onPress={() => props.navigation.navigate('game', {gameId: item.gameId, gameDate: item.gameDate, homeTeam: item.homeTeam, awayTeam: item.awayTeam, homeSpread: item.homeSpread, awaySpread: item.awaySpread, homeSpreadOdds: item.homeSpreadOdds, awaySpreadOdds: item.awaySpreadOdds, awayMoneyline: item.awayMoneyline, homeMoneyline: item.homeMoneyline, over: item.over, overOdds: item.overOdds, under: item.under, underOdds: item.underOdds })}>
                         <View>
-                            <Text>{item.id}</Text>
-                            <Text>{item.sites[1].site_nice}</Text>
-                            <View style={styles.gameContainer}>
-                                <TouchableOpacity
-                                    style={styles.gameButton}
-                                    onPress={() => this.props.navigation.navigate('game', {gameId: item.id, site: item.sites[1].site_nice, date: item.commence_time, homeTeam: item.teams[1], awayTeam: item.teams[0], homeMoneyline: item.sites[1].odds.spreads.odds[1], awayMoneyline: item.sites[1].odds.spreads.odds[0], homeSpread: item.sites[1].odds.spreads.points[1], awaySpread: item.sites[1].odds.spreads.points[0] })}>
-                                    <Text>{moment(item.commence_time).format("MMM Do")}</Text>
-                                    <View style={styles.gameInfoContainer}>
-                                        <View style={styles.gameItem}>
-                                            <Text style={styles.gameHeaderText}>Team</Text>
-                                            <Text>{item.teams[0]}</Text>
-                                            <Text>{item.teams[1]}</Text>
-                                        </View>
-                                        <View style={styles.gameItem}>
-                                            <Text style={styles.gameHeaderText}>Moneyline</Text>
-                                            <Text style={styles.oddsText}>{item.sites[1].odds.spreads.odds[0]}</Text>
-                                            <Text style={styles.oddsText}>{item.sites[1].odds.spreads.odds[1]}</Text>
-                                        </View>
-                                        <View style={styles.gameItem}>
-                                            <Text style={styles.gameHeaderText}>Spread</Text>
-                                            <Text style={styles.oddsText}>{item.sites[1].odds.spreads.points[0]}</Text>
-                                            <Text style={styles.oddsText}>{item.sites[1].odds.spreads.points[1]}</Text>
-                                        </View>
-                                        <View style={styles.gameItem}>
-                                            <Text style={styles.gameHeaderText}>Total</Text>
-                                            <Text style={styles.oddsText}>{}</Text>
-                                        </View>
-                                    </View>
+                            <Text>{moment(item.gameDate).format("LT")}</Text>
+                            <View style={styles.awayGameInfoContainer}>
+                                <View style={styles.teamItem}>
+                                    <Text style={styles.teamText}>{item.awayTeam}</Text>
+                                </View>
+                                <View style={styles.moneylineItem}>
+                                    {item.awayMoneyline > 0 ? 
+                                        <Text style={styles.spreadText}>+{item.awayMoneyline}</Text> 
+                                        : <Text style={styles.spreadText}>{item.awayMoneyline}</Text>
+                                    }
+                                </View>
+                                <View style={styles.spreadItem}>
+                                    {item.awaySpread > 0 ? 
+                                        <Text style={styles.spreadText}>+{item.awaySpread}</Text> 
+                                        : <Text style={styles.spreadText}>{item.awaySpread}</Text>
+                                    }
+                                    {item.awaySpreadOdds > 0 ? 
+                                        <Text style={styles.oddsTopRowText}>+{item.awaySpreadOdds}</Text> 
+                                        : <Text style={styles.oddsTopRowText}>{item.awaySpreadOdds}</Text>
+                                    }
+                                </View>
+                                <View style={styles.totalItem}>
+                                    <Text style={styles.spreadText}>O {item.over}</Text>
+                                    {item.overOdds > 0 ? 
+                                        <Text style={styles.oddsTopRowText}>+{item.overOdds}</Text> 
+                                        : <Text style={styles.oddsTopRowText}>{item.overOdds}</Text>
+                                    }
+                                </View>
+                            </View>
+                            <View style={styles.homeGameInfoContainer}>
+                                <View style={styles.teamItem}>
+                                    <Text style={styles.teamText}>{item.homeTeam}</Text>
+                                </View>
+                                <View style={styles.moneylineItem}>
+                                    {item.homeMoneyline > 0 ? 
+                                        <Text style={styles.spreadText}>+{item.homeMoneyline}</Text> 
+                                        : <Text style={styles.spreadText}>{item.homeMoneyline}</Text>
+                                    }
+                                </View>
+                                <View style={styles.spreadItem}>
+                                    {item.homeSpread > 0 ? 
+                                        <Text style={styles.spreadText}>+{item.homeSpread}</Text> 
+                                        : <Text style={styles.spreadText}>{item.homeSpread}</Text>
+                                    }
+                                    {item.homeSpreadOdds > 0 ?
+                                        <Text style={styles.oddsBottomRowText}>+{item.homeSpreadOdds}</Text>
+                                        : <Text style={styles.oddsBottomRowText}>{item.homeSpreadOdds}</Text>
+                                    }
                                     
-                                </TouchableOpacity>
-                            
-                            
+                                </View>
+                                <View style={styles.totalItem}>
+                                    <Text style={styles.spreadText}>U {item.under}</Text> 
+                                    {item.underOdds > 0 ?
+                                        <Text style={styles.oddsBottomRowText}>+{item.underOdds}</Text>
+                                        : <Text style={styles.oddsBottomRowText}>{item.underOdds}</Text>
+                                    }
+                                </View>
+                            </View>
                         </View>
-                        </View>
-                        
-                        
-                        }
-                        
-
-                    />
+                    </TouchableOpacity>
                 </View>
-            )
-        }
+            </View>
+        )
+    }
+
+
+
+    return (
+        <View style={styles.container}>
+            <View style={styles.listTab}>
+                {
+                    listTab.map(e => (
+                        <TouchableOpacity 
+                            style={[styles.btnTab, sport === e.sport && styles.btnTabActive]}
+                            onPress={() => setSportFilter(e.sport)}>
+                            {e.sport == "americanfootball_nfl" ?
+                                <Text style={styles.textTab, sport === e.sport && styles.textTabActive}>
+                                NFL
+                                </Text>
+                                : <Text style={styles.textTab, sport === e.sport && styles.textTabActive}>
+                                    {e.sport}
+                                </Text>
+                            }
+                        </TouchableOpacity>
+                    ))
+                }
+            </View>            
+            <View style={styles.gameHeaderContainer}>
+                <View style={styles.teamHeader}>
+                    <Text style={styles.gameHeaderText}>Team</Text>
+                </View>
+                <View style={styles.moneylineHeader}>
+                    <Text style={styles.gameHeaderText}>ML</Text>
+                </View>
+                <View style={styles.spreadHeader}>
+                    <Text style={styles.gameHeaderText}>Spread</Text>
+                </View>
+                <View style={styles.totalHeader}>
+                    <Text style={styles.gameHeaderText}>Total</Text>
+                </View>
+            </View>
+
+            <FlatList 
+                data={datalist}
+                keyExtractor={(e, i) => i.toString()}
+                style={styles.feed}
+                horizontal={false}
+                renderItem={renderItem} 
+
+                />
+                
+            
+        </View>
+    )
     
 }
 
 const styles = StyleSheet.create({
+    
+    feed: {
+        flex: 1,
+    },
     container: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingTop: 10,
-        backgroundColor: "#ffffff",
+        paddingTop: 6,
+        backgroundColor: "#e1e2e6",
     },
     gameContainer: {
-        padding:6,
-        marginVertical:10,
-        marginRight: "2%",
-        marginLeft: "2%",
+        padding: 6,
+        marginVertical:4,
+        marginRight: "1%",
+        marginLeft: "1%",
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
@@ -116,26 +241,109 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         shadowColor: "#ccc",
         shadowOpacity: 0.5,
-        shadowRadius: 3,
+        shadowRadius: 2,
         backgroundColor: "#ffffff",
 
     },
-    gameButton: {
-    },
-    gameInfoContainer: {
+    awayGameInfoContainer: { 
         flexDirection: 'row',
+        borderBottomColor: "#e1e2e6",
+        borderBottomWidth: 1,
     },
-    gameItem:{
-        padding:4,
-        marginHorizontal:5,
+    homeGameInfoContainer: { 
+        flexDirection: 'row',
     },
     gameHeaderText: {
         fontWeight: "bold",
+        paddingBottom: 5,
     },
-    oddsText: {
+    spreadText: {
         textAlign: 'right',
+    },
+    oddsTopRowText: {
+        textAlign: 'right',
+        color: 'grey',
+        paddingBottom: 5,
+        fontSize: 12,
+    },
+    oddsBottomRowText: {
+        textAlign: 'right',
+        color: 'grey',
+        fontSize: 12,
+    },
+    teamItem: {
+        width: 160,
+        borderRightColor: "#e1e2e6",
+        borderRightWidth: 1,
+        justifyContent: 'center',
+    },
+    spreadItem: {
+        width: 60,
+        borderRightColor: "#e1e2e6",
+        borderRightWidth: 1,
+        alignItems: 'center',
+        paddingTop: 2,
+        justifyContent: 'center',
+    },
+    moneylineItem: {
+        width: 60,
+        borderRightColor: "#e1e2e6",
+        borderRightWidth: 1,
+        alignItems: 'center',
+        paddingTop: 2,
+        justifyContent: 'center',
+    },
+    totalItem: {
+        width: 60,
+        alignItems: 'center',
+        paddingTop: 2,
+        justifyContent: 'center',
+    },
+    gameHeaderContainer: {
+        flexDirection: 'row',
+    },
+    teamHeader: {
+        width: 160,
+    },
+    spreadHeader: {
+        width: 60,
+        alignItems: 'center',
+    },
+    moneylineHeader: {
+        width: 60,
+        alignItems: 'center',
+    },
+    totalHeader: {
+        width: 60,
+        alignItems: 'center',
+    },
+    teamText: {
+    },
+    listTab: {
+        flexDirection: 'row',
+        alignSelf: 'center',
+        marginBottom: 20,
+    },
+    btnTab: {
+        width: Dimensions.get('window').width /4,
+        flexDirection: 'row',
+        backgroundColor: "#ffffff",
+        borderRadius: 15,
+        padding: 6,
+        justifyContent: 'center',
+        marginRight: 10,
+    },
+    textTab: {
+        fontSize: 16
+    },
+    btnTabActive: {
+        backgroundColor: 'grey'
+    },
+    textTabActive: {
+        color: '#fff',
+
     }
     
     
 })
-
+export default Odds
