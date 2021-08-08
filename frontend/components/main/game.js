@@ -1,136 +1,342 @@
 import React, { Component, useState, useEffect } from 'react';
-import { Text, View, StyleSheet, ActivityIndicator, FlatList, TouchableOpacity, Image } from 'react-native';
+import { Text, View, StyleSheet, Dimensions, ActivityIndicator, FlatList, TouchableOpacity, Image } from 'react-native';
+
+import Icon from 'react-native-vector-icons/Ionicons';
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
 import moment from 'moment'
 
 import { useNavigation } from '@react-navigation/native';
 
+import ShareButton from '../buttons/ShareButton'
+
 import firebase from 'firebase'
 require("firebase/firestore")
 require("firebase/firebase-storage")
 
-const game = ({ route, props }) => {
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import { fetchUsersData } from '../../redux/actions/index'
 
-        const {gameId, site, date, homeTeam, awayTeam, homeMoneyline, awayMoneyline, homeSpread, awaySpread} = route.params;
+function game(props, route) {
 
-        const onLikePress = (userId, postId) => {
-            const userPosts = firebase.firestore()
-                .collection("games")
-                .doc(userId)
-                .collection("userPosts")
-                .doc(postId);
+    const [posts, setPosts] = useState([]);
+
+    const {gameId, gameDate, homeTeam, awayTeam, homeMoneyline, awayMoneyline, homeSpread, awaySpread, homeSpreadOdds, awaySpreadOdds, over, overOdds, under, underOdds} = props.route.params;
+
+    const fetchGamePosts = async () => {
+        try {
+            const list = [];
             
-            userPosts.collection("likes")
-                .doc(firebase.auth().currentUser.uid)
-                .set({})
-                .then(() => {
-                    userPosts.update({
-                        likesCount: firebase.firestore.FieldValue.increment(1)
-                    });
-                })
-        }
-        const onDislikePress = (userId, postId) => {
-            const userPosts = firebase.firestore()
-                .collection("games")
-                .doc(userId)
+            await firebase.firestore()
+                .collection('games')
+                .doc(gameId)
                 .collection("userPosts")
-                .doc(postId);
-    
-            userPosts.collection("likes")
-                .doc(firebase.auth().currentUser.uid)
-                .delete()
-                .then(() => {
-                    userPosts.update({
-                        likesCount: firebase.firestore.FieldValue.increment(-1)
-                    });
+                .orderBy('creation', 'desc')
+                .get()
+                .then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        const {
+                            caption,
+                            creation,
+                            comments,
+                            downloadURL,
+                            likes,
+                        } = doc.data();
+                        list.push({
+                            caption,
+                            creation,
+                            comments,
+                            downloadURL,
+                            likes,
+                        });
+                    })
                 })
-        }
-    
-        const onReportPostPress = () => {
-            console.warn( 'Report Post' );
-            Alert.alert(
-                'This will be the Report Post button',
-              );
-        }
-        const onSharePostPress = () => {
-            console.warn( 'Share Post' );
-            Alert.alert(
-                'This will be the Share Post button',
-              );
-        }
 
-        const navigation = useNavigation();
+                setPosts(list);
+                
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    useEffect(() => {
+        fetchGamePosts();
+    })
+    
+
+    const onLikePress = (userId, postId) => {
+        const userPosts = firebase.firestore()
+            .collection("games")
+            .doc(userId)
+            .collection("userPosts")
+            .doc(postId);
         
-        return (
+        userPosts.collection("likes")
+            .doc(firebase.auth().currentUser.uid)
+            .set({})
+            .then(() => {
+                userPosts.update({
+                    likesCount: firebase.firestore.FieldValue.increment(1)
+                });
+            })
+    }
+    const onDislikePress = (userId, postId) => {
+        const userPosts = firebase.firestore()
+            .collection("games")
+            .doc(userId)
+            .collection("userPosts")
+            .doc(postId);
+
+        userPosts.collection("likes")
+            .doc(firebase.auth().currentUser.uid)
+            .delete()
+            .then(() => {
+                userPosts.update({
+                    likesCount: firebase.firestore.FieldValue.increment(-1)
+                });
+            })
+    }
+
+    const handleReportPostEmail = () => {
+        const to = ['ReportPost@locctocc.com'] // string or array of email addresses
+        email(to, {
+            // Optional additional arguments
+            subject: 'LoccTocc Report Post',
+            body: ''
+        }).catch(console.error)
+    }
+
+    const navigation = useNavigation();
+    
+    return (
+        <View style={styles.container}>
             <View style={styles.gameContainer}>
-                <Text style={styles.textStyle}>{site}</Text>
-                <Text style={styles.textStyle}>{gameId}</Text>
-                    <View style={{ flexDirection: 'row' }}>
-                        <View style={styles.gameItem}>
-                            <Text style={styles.textStyle}>{moment(date).format("MMM Do YYYY")}</Text>
-                            <Text style={styles.gameHeaderText}>Team</Text>
-                            <Text style={styles.textStyle}>{awayTeam}</Text>
-                            <Text style={styles.textStyle}>{homeTeam}</Text>
-                            
+                <View>
+                    <Text>{moment(gameDate).format("LT")}</Text> 
+                    <View style={styles.awayGameInfoContainer}>
+                        <View style={styles.teamItem}>
+                            <Text style={styles.teamText}>{awayTeam}</Text>
                         </View>
-                        <View style={styles.gameItem}>
-                            <Text style={styles.gameHeaderText}>Moneyline</Text>
-                            <Text style={styles.textStyle}>{awayMoneyline}</Text>
-                            <Text style={styles.textStyle}>{homeMoneyline}</Text>
+                        <View style={styles.moneylineItem}>
+                            {awayMoneyline > 0 ? 
+                                <Text style={styles.spreadText}>+{awayMoneyline}</Text> 
+                                : <Text style={styles.spreadText}>{awayMoneyline}</Text>
+                            }
                         </View>
-                        <View style={styles.gameItem}>
-                            <Text style={styles.gameHeaderText}>Spread</Text>
-                            <Text style={styles.textStyle}>{awaySpread}</Text>
-                            <Text style={styles.textStyle}>{homeSpread}</Text>
+                        <View style={styles.spreadItem}>
+                            {awaySpread > 0 ? 
+                                <Text style={styles.spreadText}>+{awaySpread}</Text> 
+                                : <Text style={styles.spreadText}>{awaySpread}</Text>
+                            }
+                            {awaySpreadOdds > 0 ? 
+                                <Text style={styles.oddsTopRowText}>+{awaySpreadOdds}</Text> 
+                                : <Text style={styles.oddsTopRowText}>{awaySpreadOdds}</Text>
+                            }
                         </View>
-                        <View style={styles.gameItem}>
-                            <Text style={styles.gameHeaderText}>Total</Text>
-                            <Text style={styles.textStyle}>{}</Text>
+                        <View style={styles.totalItem}>
+                            <Text style={styles.spreadText}>O {over}</Text>
+                            {overOdds > 0 ? 
+                                <Text style={styles.oddsTopRowText}>+{overOdds}</Text> 
+                                : <Text style={styles.oddsTopRowText}>{overOdds}</Text>
+                            }
                         </View>
                     </View>
-                    <TouchableOpacity
-                        onPress={() => navigation.navigate('NewPost', { gameId: gameId, homeTeam: homeTeam, awayTeam: awayTeam, homeMoneyline: homeMoneyline, awayMoneyline: awayMoneyline, homeSpread: homeSpread, awaySpread: awaySpread })}>
-                        <Text>Create Post</Text>
-                    </TouchableOpacity>
-                    
+                    <View style={styles.homeGameInfoContainer}>
+                        <View style={styles.teamItem}>
+                            <Text style={styles.teamText}>{homeTeam}</Text>
+                        </View>
+                        <View style={styles.moneylineItem}>
+                            {homeMoneyline > 0 ? 
+                                <Text style={styles.spreadText}>+{homeMoneyline}</Text> 
+                                : <Text style={styles.spreadText}>{homeMoneyline}</Text>
+                            }
+                        </View>
+                        <View style={styles.spreadItem}>
+                            {homeSpread > 0 ? 
+                                <Text style={styles.spreadText}>+{homeSpread}</Text> 
+                                : <Text style={styles.spreadText}>{homeSpread}</Text>
+                            }
+                            {homeSpreadOdds > 0 ?
+                                <Text style={styles.oddsBottomRowText}>+{homeSpreadOdds}</Text>
+                                : <Text style={styles.oddsBottomRowText}>{homeSpreadOdds}</Text>
+                            }
+                            
+                        </View>
+                        <View style={styles.totalItem}>
+                            <Text style={styles.spreadText}>U {under}</Text> 
+                            {underOdds > 0 ?
+                                <Text style={styles.oddsBottomRowText}>+{underOdds}</Text>
+                                : <Text style={styles.oddsBottomRowText}>{underOdds}</Text>
+                            }
+                        </View>
+                    </View>
+                </View>                    
             </View>
+            <TouchableOpacity
+                onPress={() => props.navigation.navigate('NewPost', { gameId: gameId, homeTeam: homeTeam, awayTeam: awayTeam })}
+                style={styles.postButton}>
+                <Text style={styles.shareText}>Create Post</Text>
+            </TouchableOpacity>
+            <FlatList
+                style={styles.feed}
+                numColumns={1}
+                horizontal={false}
+                data={posts}
+                renderItem={({ item }) => (
+                    <View style={styles.feedItem}>
+                        <Text>{item.caption}</Text>
+                    </View>
+                )}
+
+            />
+        </View>
+            
         )
 }
 
-export default game;
+const mapStateToProps = (store) => ({
+    users: store.usersState.users
+})
+const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUsersData }, dispatch);
+
+export default connect(mapStateToProps, mapDispatchProps)(game);
 
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
         alignItems: 'center',
-        paddingTop: 50,
-        backgroundColor: "#ffffff",
+        paddingTop: 6,
+        backgroundColor: "#e1e2e6",
     },
     gameContainer: {
-        padding:6,
-        marginVertical:10,
+        padding: 6,
+        marginVertical:4,
+        marginRight: "1%",
+        marginLeft: "1%",
+        alignItems: 'center',
+        justifyContent: 'center',
         borderWidth: 1,
         borderColor: "rgba(0,0,0,0.1)",
         borderRadius: 10,
         shadowColor: "#ccc",
         shadowOpacity: 0.5,
-        shadowRadius: 3,
-        backgroundColor: "#fff",
+        shadowRadius: 2,
+        backgroundColor: "#ffffff",
+
     },
-    gameButton: {
+    awayGameInfoContainer: { 
         flexDirection: 'row',
+        borderBottomColor: "#e1e2e6",
+        borderBottomWidth: 1,
     },
-    gameItem:{
-        padding:4,
-        marginHorizontal:5,
+    homeGameInfoContainer: { 
+        flexDirection: 'row',
     },
     gameHeaderText: {
         fontWeight: "bold",
+        paddingBottom: 5,
     },
-    gameFooter: {
+    spreadText: {
+        textAlign: 'right',
+    },
+    oddsTopRowText: {
+        textAlign: 'right',
+        color: 'grey',
+        paddingBottom: 5,
+        fontSize: 12,
+    },
+    oddsBottomRowText: {
+        textAlign: 'right',
+        color: 'grey',
+        fontSize: 12,
+    },
+    teamItem: {
+        width: 160,
+        borderRightColor: "#e1e2e6",
+        borderRightWidth: 1,
+        justifyContent: 'center',
+    },
+    spreadItem: {
+        width: 60,
+        borderRightColor: "#e1e2e6",
+        borderRightWidth: 1,
+        alignItems: 'center',
+        paddingTop: 2,
+        justifyContent: 'center',
+    },
+    moneylineItem: {
+        width: 60,
+        borderRightColor: "#e1e2e6",
+        borderRightWidth: 1,
+        alignItems: 'center',
+        paddingTop: 2,
+        justifyContent: 'center',
+    },
+    totalItem: {
+        width: 60,
+        alignItems: 'center',
+        paddingTop: 2,
+        justifyContent: 'center',
+    },
+    gameHeaderContainer: {
         flexDirection: 'row',
+    },
+    teamHeader: {
+        width: 160,
+    },
+    spreadHeader: {
+        width: 60,
+        alignItems: 'center',
+    },
+    moneylineHeader: {
+        width: 60,
+        alignItems: 'center',
+    },
+    totalHeader: {
+        width: 60,
+        alignItems: 'center',
+    },
+    teamText: {
+    },
+    listTab: {
+        flexDirection: 'row',
+        alignSelf: 'center',
+        marginBottom: 20,
+    },
+    btnTab: {
+        width: Dimensions.get('window').width /4,
+        flexDirection: 'row',
+        backgroundColor: "#ffffff",
+        borderRadius: 15,
+        padding: 6,
+        justifyContent: 'center',
+        marginRight: 10,
+    },
+    textTab: {
+        fontSize: 16
+    },
+    btnTabActive: {
+        backgroundColor: 'grey'
+    },
+    textTabActive: {
+        color: '#fff',
+
+    },
+    postButton: {
+        alignSelf: 'center',
+        backgroundColor: '#33A8FF',
+        borderRadius: 6,
+        alignSelf: 'center',
+        paddingVertical: 3,
+        paddingHorizontal: 8,
+    },
+    shareText: {
+        fontSize: 16,
+        fontWeight: "bold",
+        color: "#fff",
+        alignSelf: 'center',
     },
     feed: {
         backgroundColor: "#ffffff",
@@ -149,8 +355,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
-    captionText: {
-    },
     postTimeContainer: {
         fontSize: 10,
         marginRight: "5%",
@@ -159,6 +363,13 @@ const styles = StyleSheet.create({
         flex: 1,
         width: "85%",
         marginLeft: "2%",
+    },
+    postImage: {
+        width: "100%",
+        height: 250,
+    },
+    captionText: {
+        paddingBottom: 5,
     },
     postHeaderContainer: {
         flexDirection: 'row',
@@ -206,6 +417,7 @@ const styles = StyleSheet.create({
         color: "grey",
         fontSize: 10,
     },
+
     
 })
 

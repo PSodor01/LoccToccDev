@@ -26,7 +26,7 @@ const AddPostScreen = ({ route, props }) => {
   const [gifs, setGifs] = useState([]);
   const [term, updateTerm] = useState('');
 
-  const { gameId, homeTeam, awayTeam, homeMoneyline, awayMoneyline, homeSpread, awaySpread } = route.params;
+  const { gameId, homeTeam, awayTeam } = route.params;
 
   const getUser = async() => {
     const currentUser = await firebase.firestore()
@@ -35,7 +35,6 @@ const AddPostScreen = ({ route, props }) => {
     .get()
     .then((documentSnapshot) => {
     if( documentSnapshot.exists ) {
-        console.log('User Data', documentSnapshot.data());
         setUserData(documentSnapshot.data());
     }
     })
@@ -97,7 +96,6 @@ const AddPostScreen = ({ route, props }) => {
           creation: firebase.firestore.FieldValue.serverTimestamp(),
           likes: 0,
           comments: 0,
-          gameId: gameId,
           downloadURL
         }).then(() => {
           console.log('Post Added!');
@@ -106,6 +104,26 @@ const AddPostScreen = ({ route, props }) => {
           navigation.goBack()
       }))
     }
+
+    const saveGamePost = (downloadURL) => {
+
+      firebase.firestore()
+          .collection('games')
+          .doc(gameId)
+          .collection("userPosts")
+          .add({
+            caption: post,
+            creation: firebase.firestore.FieldValue.serverTimestamp(),
+            likes: 0,
+            comments: 0,
+            downloadURL
+          }).then(() => {
+            console.log('Post Added!');
+            setPost(null);
+          }).then((function () {
+            navigation.goBack()
+        }))
+      }
 
     const uploadImage = async () => {
       if( image == null ) {
@@ -132,6 +150,7 @@ const AddPostScreen = ({ route, props }) => {
         const taskCompleted = () => {
             task.snapshot.ref.getDownloadURL().then((snapshot) => {
                 savePostData(snapshot);
+                saveGamePost(snapshot);
                 console.log(snapshot)
             })
         }

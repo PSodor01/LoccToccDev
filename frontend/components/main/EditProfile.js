@@ -91,7 +91,6 @@ const EditProfileScreen = () => {
             .put(blob);
 
        
-    
         // Set transferred state
         task.on('state_changed', (taskSnapshot) => {
           console.log(
