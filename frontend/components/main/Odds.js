@@ -8,6 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import firebase from 'firebase'
 require("firebase/firestore")
 require("firebase/firebase-storage")
+import { connect } from 'react-redux'
 
 function Odds(props) {
 
@@ -21,67 +22,17 @@ function Odds(props) {
             setDatalist([...games.filter( e => e.sport === sport)])
         } else {
             setDatalist(games)
+            console.log(games)
         }
         setSport(sport)
     }
 
-    const fetchGameData = async () => {
-        try {
-            const list = [];
-            
-            await firebase.firestore()
-                .collection('games')
-                .orderBy('gameDate', 'desc')
-                .get()
-                .then((querySnapshot) => {
-                    querySnapshot.forEach((doc) => {
-                        const {
-                            gameId,
-                            sport,
-                            gameDate,
-                            awayTeam,
-                            homeTeam,
-                            awaySpread,
-                            homeSpread,
-                            awaySpreadOdds,
-                            homeSpreadOdds,
-                            awayMoneyline,
-                            homeMoneyline,
-                            over,
-                            overOdds,
-                            under,
-                            underOdds,
-                        } = doc.data();
-                        list.push({
-                            gameId,
-                            sport,
-                            gameDate,
-                            awayTeam,
-                            homeTeam,
-                            awaySpread,
-                            homeSpread,
-                            awaySpreadOdds,
-                            homeSpreadOdds,
-                            awayMoneyline,
-                            homeMoneyline,
-                            over,
-                            overOdds,
-                            under,
-                            underOdds,
-                        });
-                    })
-                })
-
-                setGames(list);
-                
-        } catch (e) {
-            console.log(e)
-        }
-    }
-
     useEffect(() => {
-        fetchGameData();
-    })
+        const { games } = props;
+            setGames(games);
+            console.log(games)
+    }, [])
+
 
     const listTab = [
         {
@@ -203,8 +154,7 @@ function Odds(props) {
             </View>
 
             <FlatList 
-                data={datalist}
-                keyExtractor={(e, i) => i.toString()}
+                data={games}
                 style={styles.feed}
                 horizontal={false}
                 renderItem={renderItem} 
@@ -346,4 +296,10 @@ const styles = StyleSheet.create({
     
     
 })
-export default Odds
+
+const mapStateToProps = (store) => ({
+    games: store.gamesState.games,
+})
+
+
+export default connect(mapStateToProps, null)(Odds);

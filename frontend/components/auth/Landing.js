@@ -1,6 +1,8 @@
 import React from 'react'
 import { Text, View, Image, StyleSheet, TouchableOpacity } from 'react-native'
 
+import { FontAwesome5 } from "@expo/vector-icons";
+
 export default function Landing({ navigation }) {
     return (
         <View style={styles.mainContainer}>
@@ -8,13 +10,18 @@ export default function Landing({ navigation }) {
                 <View style={styles.leftCircle}></View>
                 <View style={styles.rightCircle}></View>
             </View>
-            <View>
-                <Image
-                    style={styles.logo}
-                    source={require("../../assets/LoccToccLogo.png")}
-                />
+            <View style={{ alignItems: 'center', paddingBottom: 120,}}>
+                <View style={{ justifyContent: 'center', flexDirection: 'row', paddingTop: 20 }}>
+                    <Text style={styles.loadingLogo}>locctocc </Text>
+                    <FontAwesome5 name="comment-dollar" color="#009387" size={30} />
+                </View>
+                <Text style={{
+                    fontSize: 18,
+                    color: "#009387",
+                }}> Community for sports bettors
+                </Text>
             </View>
-
+            
 
             <View style={{ flex: 1.5, justifyContent: 'center' }}>
                 <TouchableOpacity 
@@ -106,7 +113,14 @@ const styles = StyleSheet.create({
         fontSize: 10,
         alignSelf: 'center',
         width: "70%",
-    }
+    },
+    loadingLogo: {
+        color: "#009387",
+        fontWeight: "bold",
+        fontSize: 30,
+        fontStyle: 'italic'
+        
+    }, 
     
 })
 

@@ -4,12 +4,11 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
-import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import firebase from 'firebase'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { fetchUser, fetchUserPosts, fetchUserFollowing, clearData } from '../redux/actions/index'
+import { fetchUser, fetchUserPosts, fetchUserFollowing, fetchGames, clearData } from '../redux/actions/index'
 
 import FeedScreen from './main/Feed'
 import ProfileScreen from './main/Profile'
@@ -17,7 +16,6 @@ import SearchScreen from './main/Search'
 import NotificationsScreen from './main/Notifications'
 import MessagesScreen from './main/Messages'
 import ChatScreen from './main/Chat'
-import EditProfileScreen from './main/EditProfile'
 import Odds from './main/Odds'
 import game from './main/game'
 
@@ -38,31 +36,6 @@ const MessageStack = ({navigation}) => (
     </Stack.Navigator>
   );
 
-  const ProfileStack = ({navigation}) => (
-    <Stack.Navigator>
-        <Stack.Screen 
-            name="Profile" 
-            component={Profile}
-            options={{
-                headerShown: false,
-            }} />
-        <Stack.Screen
-        name="EditProfile"
-        component={EditProfileScreen}
-        options={{ 
-            headerTitle: 'Edit Profile',
-            headerBackTitleVisible: false,
-            headerTitleAlign: 'center',
-            headerStyle: {
-                backgroundColor: '#fff',
-                shadowColor: '#fff',
-                elevation: 0,
-            },
-        }}
-    />
-  </Stack.Navigator>
-  )
-  
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -86,6 +59,7 @@ export class Main extends Component {
         this.props.fetchUser();
         this.props.fetchUserPosts();
         this.props.fetchUserFollowing();
+        this.props.fetchGames();
     }
     render() {
         return (
@@ -162,8 +136,9 @@ export class Main extends Component {
 }
 
 const mapStateToProps = (store) => ({
-    currentUser: store.userState.currentUser
+    currentUser: store.userState.currentUser,
+    games: store.gamesState.games
 })
-const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUser, fetchUserPosts, fetchUserFollowing, clearData }, dispatch);
+const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUser, fetchUserPosts, fetchUserFollowing, fetchGames, clearData }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchProps)(Main);

@@ -2,6 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import React, { Component } from 'react';
 
 import { View, Image, StyleSheet, Text, TouchableOpacity, Alert } from 'react-native'
+
 import { FontAwesome5 } from "@expo/vector-icons";
 
 import * as firebase from 'firebase'
@@ -61,6 +62,7 @@ import MessagesButton from './components/buttons/MessagesButton'
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 const MainStack = createStackNavigator();
+
 
 const MainStackScreen = ({navigation, props}) => (
   <MainStack.Navigator 
@@ -306,78 +308,37 @@ export class App extends Component {
     const { loggedIn, loaded } = this.state;
     if (!loaded) {
       return (
-        <View style={{ flex: 1, justifyContent: 'center' }}>
-          <Image
-                style={styles.logo}
-                source={require("../frontend/assets/LoccToccLogo.png")}
-          />
+        <View style={{ flex: 1, justifyContent: 'center', flexDirection: 'row', alignItems: 'space-between' }}>
+            <Text style={styles.loadingLogo}>locctocc </Text>
+            <FontAwesome5 name="comment-dollar" color="#009387" size={26} />
         </View>
       )
     }
 
     if (!loggedIn) {
       return (
-        <NavigationContainer>
-          <Stack.Navigator initialRouteName="Landing">
-            <Stack.Screen name="Landing" component={LandingScreen} options={{ headerShown: false }}/>
-            <Stack.Screen name="Register" component={RegisterScreen}
-            />
-            <Stack.Screen name="Login" component={LoginScreen} />
-          </Stack.Navigator>
-        </NavigationContainer>
+          <NavigationContainer>
+            <Stack.Navigator initialRouteName="Landing">
+              <Stack.Screen name="Landing" component={LandingScreen} options={{ headerShown: false }}/>
+              <Stack.Screen name="Register" component={RegisterScreen}
+              />
+              <Stack.Screen name="Login" component={LoginScreen} 
+                options={{ headerShown: false }}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
+        
       );
     }
 
     return (
-      <Provider store={store}>
-        <NavigationContainer >
-          <Drawer.Navigator drawerContent={props => <DrawerContent {...props} />}>
-            <Drawer.Screen name="Main" component={MainStackScreen} />
-          </Drawer.Navigator>
-          {/*<Stack.Navigator 
-              initialRouteName="Main"
-              screenOptions={{
-                headerStyle: {
-                  backgroundColor: "#009387",
-                },
-                headerTintColor: '#fff',
-                headerTitleStyle: {
-                  fontWeight: 'bold'
-                }
-              }}
-              >
-            <Stack.Screen name="Main" component={MainScreen} 
-              options={{
-                headerTitle: () => (
-                  <Text style={styles.headerName}>LOCC TOCC</Text>
-                ),
-                headerLeft: () => (
-                  <TouchableOpacity 
-                    style={{ alignItems: "flex-end", marginLeft:16 }}
-                    onPress={onDrawerPress}>
-                    <FontAwesome5 name="bars" size={24} color="#fff" />
-                  </TouchableOpacity>
-                ),
-                headerRight: () => (
-                  <MessagesButton /> 
-                )
-              }}
-               />
-            
-            <Stack.Screen name="Feed" component={Feed} navigation={this.props.navigation}/>
-            <Stack.Screen name="Search" component={Search} navigation={this.props.navigation}/>
-            <Stack.Screen name="Notifications" component={NotificationsScreen} navigation={this.props.navigation}/>
-            <Stack.Screen name="Profile" component={Profile} navigation={this.props.navigation}/>
-            <Stack.Screen name="Comment" component={CommentScreen} navigation={this.props.navigation}/>
-            <Stack.Screen name="NewPost" component={NewPostScreen} navigation={this.props.navigation}/>
-            <Stack.Screen name="EditProfile" component={EditProfileScreen} navigation={this.props.navigation}/>
-            <Stack.Screen name="Messages" component={MessagesScreen} navigation={this.props.navigation}/>
-            <Stack.Screen name="Chat" component={ChatScreen} navigation={this.props.navigation}/>
-            
-          </Stack.Navigator>*/}
-          
-        </NavigationContainer>
-      </Provider>
+        <Provider store={store}>
+          <NavigationContainer>
+            <Drawer.Navigator drawerContent={props => <DrawerContent {...props} />}>
+              <Drawer.Screen name="Main" component={MainStackScreen} />
+            </Drawer.Navigator>
+          </NavigationContainer>
+        </Provider>
     )
   }
 }
@@ -401,8 +362,15 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 20,
     fontStyle: 'italic'
-
-}, 
+  }, 
+  loadingLogo: {
+    alignSelf: 'center',
+    color: "#009387",
+    fontWeight: "bold",
+    fontSize: 20,
+    fontStyle: 'italic'
+    
+  }, 
   
   
 })

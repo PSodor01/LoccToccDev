@@ -1,6 +1,9 @@
 import React, { Component } from 'react'
 import { View, StyleSheet, Text, TextInput, TouchableOpacity, Image, TouchableWithoutFeedback, Keyboard } from 'react-native'
 
+import * as Animatable from 'react-native-animatable'
+import { FontAwesome5 } from "@expo/vector-icons";
+
 import firebase from 'firebase'
 
 const DismissKeyboard = ({ children }) => (
@@ -10,7 +13,10 @@ const DismissKeyboard = ({ children }) => (
 
 )
 
+
 export class Login extends Component {
+    
+    
     constructor(props) {
         super(props);
 
@@ -41,22 +47,28 @@ export class Login extends Component {
                         <View style={styles.circleContainer}>
                             <View style={styles.leftCircle}></View>
                             <View style={styles.rightCircle}></View>
+                            
                         </View>
-                        <View style={styles.logoContainer}>
-                            <Image
-                                style={styles.logo}
-                                source={require("../../assets/LoccToccLogo.png")}
-                            />
+                        <TouchableOpacity 
+                            style={{ alignItems: "flex-start", marginLeft:16, top: -50 }}
+                            onPress={() => navigation.navigate('')}
+                            >
+                            <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+                        </TouchableOpacity>
+                        <View style={{ justifyContent: 'center', flexDirection: 'row', paddingTop: 50, paddingBottom: 20,}}>
+                            <Text style={styles.loadingLogo}>locctocc </Text>
+                            <FontAwesome5 name="comment-dollar" color="#009387" size={30} />
                         </View>
                         <View style={styles.appTextContainer}>
                             <Text style={{
-                                fontSize: 30,
-                                color: "black",
+                                fontSize: 26,
+                                fontWeight: 'bold',
+                                color: "#009387",
                             }}> Welcome back.
                             </Text>
                             <Text style={{
                                 fontSize: 18,
-                                color: "black",
+                                color: "#009387",
                             }}> Here we go again
                             </Text>
                         </View>
@@ -135,7 +147,7 @@ const styles = StyleSheet.create({
     },
     appTextContainer: {
         alignItems: "center",
-        flex: 1,
+        paddingBottom: 40,
     },
     mainContainer: {
         flex: 1,
@@ -185,7 +197,14 @@ const styles = StyleSheet.create({
         fontSize: 10,
         alignSelf: 'center',
         width: "70%",
-    }
+    },
+    loadingLogo: {
+        color: "#009387",
+        fontWeight: "bold",
+        fontSize: 30,
+        fontStyle: 'italic'
+        
+    }, 
     
 })
 
