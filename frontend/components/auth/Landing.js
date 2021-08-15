@@ -16,7 +16,7 @@ export default function Landing({ navigation }) {
                     <FontAwesome5 name="comment-dollar" color="#009387" size={30} />
                 </View>
                 <Text style={{
-                    fontSize: 18,
+                    fontSize: 16,
                     color: "#009387",
                 }}> Community for sports bettors
                 </Text>

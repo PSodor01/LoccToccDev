@@ -11,59 +11,70 @@ import { useNavigation } from '@react-navigation/native';
 import ShareButton from '../buttons/ShareButton'
 
 import firebase from 'firebase'
-require("firebase/firestore")
-require("firebase/firebase-storage")
-
+require('firebase/firestore')
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { fetchUsersData } from '../../redux/actions/index'
 
-function game(props, route) {
+function game(props) {
 
-    const [posts, setPosts] = useState([]);
+    const [gamePosts, setGamePosts] = useState([]);
+    const [postId, setPostId] = useState("")
+    const [userData, setUserData] = useState(null);
 
     const {gameId, gameDate, homeTeam, awayTeam, homeMoneyline, awayMoneyline, homeSpread, awaySpread, homeSpreadOdds, awaySpreadOdds, over, overOdds, under, underOdds} = props.route.params;
 
-    const fetchGamePosts = async () => {
-        try {
-            const list = [];
-            
-            await firebase.firestore()
-                .collection('games')
-                .doc(gameId)
-                .collection("userPosts")
-                .orderBy('creation', 'desc')
-                .get()
-                .then((querySnapshot) => {
-                    querySnapshot.forEach((doc) => {
-                        const {
-                            caption,
-                            creation,
-                            comments,
-                            downloadURL,
-                            likes,
-                        } = doc.data();
-                        list.push({
-                            caption,
-                            creation,
-                            comments,
-                            downloadURL,
-                            likes,
-                        });
-                    })
-                })
-
-                setPosts(list);
-                
-        } catch (e) {
-            console.log(e)
-        }
-    }
 
     useEffect(() => {
-        fetchGamePosts();
-    })
+
+        function matchUserToGamePost(gamePosts) {
+            for (let i = 0; i < gamePosts.length; i++) {
+                if (gamePosts[i].hasOwnProperty('user')) {
+                    continue;
+                }
+
+                const user = props.users.find(x => x.uid === gamePosts[i].creator)
+                if (user == undefined) {
+                    props.fetchUsersData(gamePosts[i].creator, false)
+                } else {
+                    gamePosts[i].user = user
+                }
+            }
+            setGamePosts(gamePosts)
+        }
+
+
+        if (props.route.params.postId !== postId) {
+            firebase.firestore()
+            .collectionGroup("userPosts")
+            .where('gameId', '==', gameId)
+            .get()
+            .then((snapshot) => {
+                
+                let gamePosts = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    return { id, ...data }
+                })
+                    matchUserToGamePost(gamePosts)
+                })
+            setPostId(props.route.params.postId)
+        } else {
+            matchUserToGamePost(gamePosts)
+        }
+    }, [props.route.params.postId, props.users])
     
+    const listTab = [
+        {
+            sport: 'americanfootball_nfl'
+        },
+        {
+            sport: 'MLB'
+        },
+        {
+            sport: 'americanfootball_ncaaf'
+        }
+    ]
 
     const onLikePress = (userId, postId) => {
         const userPosts = firebase.firestore()
@@ -173,20 +184,79 @@ function game(props, route) {
                     </View>
                 </View>                    
             </View>
-            <TouchableOpacity
-                onPress={() => props.navigation.navigate('NewPost', { gameId: gameId, homeTeam: homeTeam, awayTeam: awayTeam })}
-                style={styles.postButton}>
-                <Text style={styles.shareText}>Create Post</Text>
-            </TouchableOpacity>
+            <View style={styles.postButtonContainer}>
+                <TouchableOpacity
+                    onPress={() => props.navigation.navigate('NewPost', { gameId: gameId, homeTeam: homeTeam, awayTeam: awayTeam })}
+                    style={styles.postButton}>
+                    <Text style={styles.shareText}>Share Your Lock</Text>
+                </TouchableOpacity>
+            </View>
             <FlatList
-                style={styles.feed}
                 numColumns={1}
-                horizontal={false}
-                data={posts}
+                data={gamePosts}
                 renderItem={({ item }) => (
-                    <View style={styles.feedItem}>
-                        <Text>{item.caption}</Text>
+                    <View>
+                        {item.user !== undefined ?
+                            <View style={styles.feedItem}>
+                                <TouchableOpacity
+                                onPress={() => props.navigation.navigate("Profile", {uid: item.user.uid})}>
+                                <Image 
+                                    style={styles.profilePhotoCommentContainer}
+                                    source={{uri: item.user ? item.user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                                />
+                            </TouchableOpacity>
+                            <View style={styles.postRightContainer}>
+                                <View style={styles.postHeaderContainer}>
+                                    <Text style={styles.profileNameFeedText}>{item.user.name}</Text>
+                                    <Text style={styles.postTimeContainer}>{moment(item.creation.toDate()).fromNow()}</Text>
+                                </View>
+                                <View style={styles.postContentContainer}>
+                                    {item.caption != null ? <Text style={styles.captionText}>{item.caption}</Text> : null}
+                                    {item.downloadURL != null ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
+                                </View>
+                                <View style={styles.postFooterContainer}>
+                                    { item.currentUserLike ?
+                                        (
+                                            <TouchableOpacity
+                                                style={styles.likeContainer}
+                                                onPress={() => onDislikePress(item.user.uid, item.id)} >
+                                                <Ionicons name={"heart"} size={20} color={"red"} />
+                                                <Text style={styles.likeNumber}>{item.likesCount}</Text>
+                                            </TouchableOpacity>
+                                        )
+                                        :
+                                        (
+                                            <TouchableOpacity
+                                                style={styles.likeContainer}
+                                                onPress={() => onLikePress(item.user.uid, item.id)}> 
+                                                <Ionicons name={"heart-outline"}  size={20} color={"pink"}/>
+                                                <Text style={styles.likeNumber}>{item.likesCount}</Text>
+                                            </TouchableOpacity>
+                                        )
+                                    }
+                                    <TouchableOpacity
+                                        style={styles.commentsContainer}
+                                        onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.user.uid, posterId: item.user.uid, posterName: item.user.name, postCreation: item.creation, postCaption: item.caption, posterImg: item.user.userImg, postImg: item.downloadURL })}>
+                                        <Ionicons name={"chatbubble-outline"} size={20} color={"grey"} marginRight={10} />
+                                        <Text style={styles.likeNumber}>{item.comments}</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={styles.flagContainer}
+                                        onPress={handleReportPostEmail}>
+                                        <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
+                                    </TouchableOpacity>
+                                    <ShareButton />
+                                </View>
+                            </View>
+                                
+
+                            </View>
+                            
+                            : null}
                     </View>
+                                
+
+                            
                 )}
 
             />
@@ -195,20 +265,14 @@ function game(props, route) {
         )
 }
 
-const mapStateToProps = (store) => ({
-    users: store.usersState.users
-})
-const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUsersData }, dispatch);
 
-export default connect(mapStateToProps, mapDispatchProps)(game);
 
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        alignItems: 'center',
         paddingTop: 6,
-        backgroundColor: "#e1e2e6",
+        backgroundColor: "#ffffff",
     },
     gameContainer: {
         padding: 6,
@@ -325,23 +389,23 @@ const styles = StyleSheet.create({
 
     },
     postButton: {
-        alignSelf: 'center',
+        alignSelf: 'flex-end',
         backgroundColor: '#33A8FF',
         borderRadius: 6,
-        alignSelf: 'center',
         paddingVertical: 3,
         paddingHorizontal: 8,
+        marginRight: "5%",
+    },
+    postButtonContainer: {
+        paddingBottom: 5,
+        borderBottomColor: "#CACFD2",
+        borderBottomWidth: 1,
+        alignItems: 'center',
     },
     shareText: {
         fontSize: 16,
         fontWeight: "bold",
         color: "#fff",
-        alignSelf: 'center',
-    },
-    feed: {
-        backgroundColor: "#ffffff",
-        flex: 1,
-        marginTop: 14,
     },
     feedItem:{
         padding:6,
@@ -351,19 +415,6 @@ const styles = StyleSheet.create({
         borderBottomColor: "#e1e2e6",
         flexDirection: 'row',
     },
-    profileNameFeedText: {
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    postTimeContainer: {
-        fontSize: 10,
-        marginRight: "5%",
-    },
-    postContentContainer: {
-        flex: 1,
-        width: "85%",
-        marginLeft: "2%",
-    },
     postImage: {
         width: "100%",
         height: 250,
@@ -371,32 +422,12 @@ const styles = StyleSheet.create({
     captionText: {
         paddingBottom: 5,
     },
-    postHeaderContainer: {
-        flexDirection: 'row',
-        flex: 1,
-        width: "85%",
-        paddingBottom: 4,
-        marginLeft: "2%",
-        justifyContent: 'space-between'
-    },
-    profilePhotoPostContainer: {
-        backgroundColor: "#e1e2e6",
+    profilePhotoCommentContainer: {
         width: 50,
         height: 50,
         borderRadius: 40,
-    },
-    postFooterContainer: {
-        flexDirection: 'row',
-        paddingTop: 4,
-        justifyContent: 'space-between',
-        width: "80%",
-        paddingTop: 8,
-        marginLeft: "5%",
-
-    },
-    postRightContainer: {
-        width: "100%",
-    },
+        backgroundColor: "#e1e2e6"
+      },
     likeContainer: {
         flexDirection: 'row',
     },
@@ -411,13 +442,46 @@ const styles = StyleSheet.create({
         marginTop: 5,
         color: "grey",
     },
-    flagText: {
-        marginLeft: 5,
-        marginTop: 5,
-        color: "grey",
+    profileNameFeedText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    postTimeContainer: {
         fontSize: 10,
     },
+    postContentContainer: {
+        width: "95%",
+        marginLeft: "3%",
+    },
+    postHeaderContainer: {
+        flexDirection: 'row',
+        width: "95%",
+        justifyContent: 'space-between',
+        paddingBottom: 4,
+        marginLeft: "3%",
+    },
+    postFooterContainer: {
+        flexDirection: 'row',
+        paddingTop: 4,
+        justifyContent: 'space-between',
+        width: "80%",
+        paddingTop: 5,
+        marginLeft: "5%",
+        paddingBottom: 2,
+    },
+    postRightContainer: {
+        flex: 1,
+    },
+    
+    
 
     
 })
 
+const mapStateToProps = (store) => ({
+    users: store.usersState.users,
+    currentUser: store.userState.currentUser,
+})
+const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUsersData }, dispatch);
+
+export default connect(mapStateToProps, mapDispatchProps)(game);

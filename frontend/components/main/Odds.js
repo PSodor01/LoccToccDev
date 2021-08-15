@@ -3,12 +3,22 @@ import { Text, View, StyleSheet, ActivityIndicator, Dimensions, FlatList, Toucha
 
 import moment from 'moment'
 
-import { useNavigation } from '@react-navigation/native';
-
 import firebase from 'firebase'
 require("firebase/firestore")
 require("firebase/firebase-storage")
 import { connect } from 'react-redux'
+
+const listTab = [
+        {   
+            sport: 'americanfootball_nfl'
+        },
+        {
+            sport: 'MLB'
+        },
+        {
+            sport: 'americanfootball_ncaaf'
+        }
+    ]
 
 function Odds(props) {
 
@@ -17,31 +27,20 @@ function Odds(props) {
     const [sport, setSport] = useState('americanfootball_nfl');
     const [datalist, setDatalist] = useState(games);
 
+     useEffect(() => {
+        setGames(props.games)
+    }, [props.games])
+
     const setSportFilter = sport => {
         if (sport !== 'All') {
-            setDatalist([...games.filter( e => e.sport === sport)])
+            setDatalist([...games.filter(e => e.sport === sport)])
         } else {
             setDatalist(games)
-            console.log(games)
         }
         setSport(sport)
     }
 
-    useEffect(() => {
-        const { games } = props;
-            setGames(games);
-            console.log(games)
-    }, [])
-
-
-    const listTab = [
-        {
-            sport: 'americanfootball_nfl'
-        },
-        {
-            sport: 'MLB'
-        },
-    ]
+    
 
     const renderItem = ({item, index}) => {
         return (
@@ -117,7 +116,6 @@ function Odds(props) {
     }
 
 
-
     return (
         <View style={styles.container}>
             <View style={styles.listTab}>
@@ -129,6 +127,11 @@ function Odds(props) {
                             {e.sport == "americanfootball_nfl" ?
                                 <Text style={styles.textTab, sport === e.sport && styles.textTabActive}>
                                 NFL
+                                </Text>
+                                : 
+                                e.sport == "americanfootball_ncaaf" ?
+                                <Text style={styles.textTab, sport === e.sport && styles.textTabActive}>
+                                NCAAF
                                 </Text>
                                 : <Text style={styles.textTab, sport === e.sport && styles.textTabActive}>
                                     {e.sport}
@@ -152,11 +155,10 @@ function Odds(props) {
                     <Text style={styles.gameHeaderText}>Total</Text>
                 </View>
             </View>
-
             <FlatList 
-                data={games}
+                data={datalist}
+                keyExtractor={(e, i) => i.toString()}
                 style={styles.feed}
-                horizontal={false}
                 renderItem={renderItem} 
 
                 />

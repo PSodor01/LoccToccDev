@@ -61,21 +61,34 @@ export class Register extends Component {
         return (
             <DismissKeyboard>
                 <View style={styles.mainContainer}>
-                    <View style={styles.appTextContainer}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center'}}>
-                            <Text style={styles.headerName}>locctocc </Text>
-                            <FontAwesome5 name="comment-dollar" color="#009387" size={26} />
+                    <View style={styles.topContainer}>
+                        <View style={styles.circleContainer}>
+                            <View style={styles.leftCircle}></View>
+                            <View style={styles.rightCircle}></View>
                         </View>
-                        <Text style={{
-                            fontSize: 20,
-                            color: "#009387",
-                        }}> New here?
-                        </Text>
-                        <Text style={{
-                            fontSize: 16,
-                            color: "#009387",
-                        }}> Join the family
-                        </Text>
+                        <TouchableOpacity 
+                            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,  alignItems: 'flex-start', marginLeft: 16, marginTop: 50 }}
+                            onPress={() => this.props.navigation.goBack()}
+                            >
+                            <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+                        </TouchableOpacity>
+                        <View style={{ justifyContent: 'center', flexDirection: 'row', paddingTop: 150, paddingBottom: 20,}}>
+                            <Text style={styles.loadingLogo}>locctocc </Text>
+                            <FontAwesome5 name="comment-dollar" color="#009387" size={30} />
+                        </View>
+                        <View style={styles.appTextContainer}>
+                            <Text style={{
+                                fontSize: 26,
+                                fontWeight: 'bold',
+                                color: "#009387",
+                            }}> New here?.
+                            </Text>
+                            <Text style={{
+                                fontSize: 18,
+                                color: "#009387",
+                            }}> Join the family
+                            </Text>
+                        </View>
                     </View>
                     <View style={styles.textInputContainer}>
                         <TextInput
@@ -145,11 +158,9 @@ const styles = StyleSheet.create({
         borderColor: "#009387",
         borderWidth: 1,
         borderRadius: 20,
-
     },
     textInputContainer: {
         flex: 1,
-        paddingTop: 40,
     },
     appButtonContainer: {
         borderColor: "#009387",
@@ -174,7 +185,9 @@ const styles = StyleSheet.create({
     },
     appTextContainer: {
         alignItems: "center",
-        marginTop: "5%",
+        paddingBottom: 20,
+    },
+    topContainer: {
     },
     mainContainer: {
         flex: 1,
@@ -189,8 +202,8 @@ const styles = StyleSheet.create({
     },
     leftCircle: {
         backgroundColor: "#0066cc",
-        width: 250,
-        height: 250,
+        width: 200,
+        height: 200,
         borderRadius: 200,
         left: -50,
         right: -50,
@@ -206,12 +219,16 @@ const styles = StyleSheet.create({
         top: -400,
     },
     circleContainer: {
-        flex: .25,
-        top: -75,
-    },
-    topContainer: {
         flex: 1,
+        top: -50,
     },
+    headerName: {
+        alignSelf: 'center',
+        color: "#009387",
+        fontWeight: "bold",
+        fontSize: 28,
+        fontStyle: 'italic'
+    }, 
     disclaimerContainer: {
         flex: 1,
         alignSelf: 'center',
@@ -221,13 +238,12 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         width: "70%",
     },
-    headerName: {
-        alignSelf: 'center',
+    loadingLogo: {
         color: "#009387",
         fontWeight: "bold",
-        fontSize: 28,
+        fontSize: 30,
         fontStyle: 'italic'
-    
+        
     }, 
     
 })

@@ -47,15 +47,14 @@ export class Login extends Component {
                         <View style={styles.circleContainer}>
                             <View style={styles.leftCircle}></View>
                             <View style={styles.rightCircle}></View>
-                            
                         </View>
                         <TouchableOpacity 
                             style={{ alignItems: "flex-start", marginLeft:16, top: -50 }}
-                            onPress={() => navigation.navigate('')}
+                            onPress={() => this.props.navigation.goBack()}
                             >
                             <FontAwesome5 name="chevron-left" size={24} color="#fff" />
                         </TouchableOpacity>
-                        <View style={{ justifyContent: 'center', flexDirection: 'row', paddingTop: 50, paddingBottom: 20,}}>
+                        <View style={{ justifyContent: 'center', flexDirection: 'row', paddingTop: 40, paddingBottom: 20,}}>
                             <Text style={styles.loadingLogo}>locctocc </Text>
                             <FontAwesome5 name="comment-dollar" color="#009387" size={30} />
                         </View>

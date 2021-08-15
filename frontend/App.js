@@ -1,18 +1,18 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { Component } from 'react';
 
-import { View, Image, StyleSheet, Text, TouchableOpacity, Alert } from 'react-native'
+import { View, ActivityIndicator, StyleSheet, Text, TouchableOpacity, Alert } from 'react-native'
 
 import { FontAwesome5 } from "@expo/vector-icons";
 
 import * as firebase from 'firebase'
+
 
 import { Provider } from 'react-redux'
 import { createStore, applyMiddleware } from 'redux'
 import rootReducer from './redux/reducers'
 import thunk from 'redux-thunk'
 const store = createStore(rootReducer, applyMiddleware(thunk))
-
 
 
 const firebaseConfig = {
@@ -308,10 +308,14 @@ export class App extends Component {
     const { loggedIn, loaded } = this.state;
     if (!loaded) {
       return (
-        <View style={{ flex: 1, justifyContent: 'center', flexDirection: 'row', alignItems: 'space-between' }}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ flexDirection: 'row' }}>
             <Text style={styles.loadingLogo}>locctocc </Text>
             <FontAwesome5 name="comment-dollar" color="#009387" size={26} />
+          </View>
+          <ActivityIndicator/>
         </View>
+        
       )
     }
 
@@ -321,6 +325,7 @@ export class App extends Component {
             <Stack.Navigator initialRouteName="Landing">
               <Stack.Screen name="Landing" component={LandingScreen} options={{ headerShown: false }}/>
               <Stack.Screen name="Register" component={RegisterScreen}
+                options={{ headerShown: false }}
               />
               <Stack.Screen name="Login" component={LoginScreen} 
                 options={{ headerShown: false }}

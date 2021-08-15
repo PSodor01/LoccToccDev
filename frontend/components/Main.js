@@ -17,7 +17,6 @@ import NotificationsScreen from './main/Notifications'
 import MessagesScreen from './main/Messages'
 import ChatScreen from './main/Chat'
 import Odds from './main/Odds'
-import game from './main/game'
 
 const Stack = createStackNavigator();
 
@@ -137,7 +136,7 @@ export class Main extends Component {
 
 const mapStateToProps = (store) => ({
     currentUser: store.userState.currentUser,
-    games: store.gamesState.games
+    games: store.gamesState.games,
 })
 const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUser, fetchUserPosts, fetchUserFollowing, fetchGames, clearData }, dispatch);
 

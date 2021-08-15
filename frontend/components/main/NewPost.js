@@ -93,7 +93,9 @@ const AddPostScreen = ({ route, props }) => {
         .collection("userPosts")
         .add({
           caption: post,
+          gameId: gameId,
           creation: firebase.firestore.FieldValue.serverTimestamp(),
+          creator: firebase.auth().currentUser.uid,
           likes: 0,
           comments: 0,
           downloadURL
@@ -105,25 +107,7 @@ const AddPostScreen = ({ route, props }) => {
       }))
     }
 
-    const saveGamePost = (downloadURL) => {
-
-      firebase.firestore()
-          .collection('games')
-          .doc(gameId)
-          .collection("userPosts")
-          .add({
-            caption: post,
-            creation: firebase.firestore.FieldValue.serverTimestamp(),
-            likes: 0,
-            comments: 0,
-            downloadURL
-          }).then(() => {
-            console.log('Post Added!');
-            setPost(null);
-          }).then((function () {
-            navigation.goBack()
-        }))
-      }
+   
 
     const uploadImage = async () => {
       if( image == null ) {
@@ -150,7 +134,6 @@ const AddPostScreen = ({ route, props }) => {
         const taskCompleted = () => {
             task.snapshot.ref.getDownloadURL().then((snapshot) => {
                 savePostData(snapshot);
-                saveGamePost(snapshot);
                 console.log(snapshot)
             })
         }
