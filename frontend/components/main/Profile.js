@@ -125,6 +125,17 @@ function Profile(props) {
         }).catch(console.error)
     }
 
+    const deletePost = (id) => {
+        firebase.firestore()
+            .collection("posts")
+            .doc(props.route.params.uid)
+            .collection("userPosts")
+            .doc(id)
+            .delete()
+            
+    }
+    
+
     const navigation = useNavigation();
 
     if (user === null) {
@@ -141,6 +152,9 @@ function Profile(props) {
                             source={{uri: user ? user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
                         />
                         <Text style={styles.profileNameText}>{user.name}</Text>
+                        
+
+
                     </View>
                     <View style={{ marginLeft: "5%" }}>
                         <View style={{ flexDirection: 'row', paddingTop: 5}}>
@@ -257,6 +271,14 @@ function Profile(props) {
                                                 <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
                                             </TouchableOpacity>
                                             <ShareButton />
+                                             {props.route.params.uid !== firebase.auth().currentUser.uid ? 
+                                                null
+                                                : <TouchableOpacity
+                                                    style={styles.flagContainer}
+                                                    onPress={() => deletePost(item.id)}>
+                                                    <Icon name={"trash"} size={20} color={"grey"} marginRight={10} />
+                                                </TouchableOpacity>
+                                                }
                                         </View>
                                     </View>
                                 </View>

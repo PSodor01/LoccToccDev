@@ -3,6 +3,8 @@ import { Text, View, StyleSheet, ActivityIndicator, Dimensions, FlatList, Toucha
 
 import moment from 'moment'
 
+import {AdMobBanner, AdMobInterstitial} from 'expo-ads-admob'
+
 import firebase from 'firebase'
 require("firebase/firestore")
 require("firebase/firebase-storage")
@@ -36,10 +38,26 @@ function Odds(props) {
             setDatalist([...games.filter(e => e.sport === sport)])
         } else {
             setDatalist(games)
+
         }
         setSport(sport)
+
+
     }
 
+    const interstitial = async () => {
+        await AdMobInterstitial.setAdUnitID('ca-app-pub-3940256099942544/1033173712'); // Test ID, Replace with your-admob-unit-id
+        try {
+            await AdMobInterstitial.requestAdAsync();
+            await AdMobInterstitial.showAdAsync();
+        } catch(error) {
+            console.log(e)
+        }
+    }
+
+    useEffect(() => {
+        interstitial();
+    }, [])
     
 
     const renderItem = ({item, index}) => {
@@ -48,7 +66,7 @@ function Odds(props) {
                 <View style={styles.gameContainer}>
                     <TouchableOpacity
                         style={styles.gameButton}
-                        onPress={() => props.navigation.navigate('game', {gameId: item.gameId, gameDate: item.gameDate, homeTeam: item.homeTeam, awayTeam: item.awayTeam, homeSpread: item.homeSpread, awaySpread: item.awaySpread, homeSpreadOdds: item.homeSpreadOdds, awaySpreadOdds: item.awaySpreadOdds, awayMoneyline: item.awayMoneyline, homeMoneyline: item.homeMoneyline, over: item.over, overOdds: item.overOdds, under: item.under, underOdds: item.underOdds })}>
+                        onPress={() => props.navigation.navigate('game', {gameId: item.gameId, gameDate: item.gameDate, homeTeam: item.homeTeam, awayTeam: item.awayTeam, homeSpread: item.homeSpread, awaySpread: item.awaySpread, homeSpreadOdds: item.homeSpreadOdds, awaySpreadOdds: item.awaySpreadOdds, awayMoneyline: item.awayMoneyline, homeMoneyline: item.homeMoneyline, over: item.over, overOdds: item.overOdds, under: item.under, underOdds: item.underOdds, awayTeamVote: item.awayTeamVote, homeTeamVote: item.homeTeamVote })}>
                         <View>
                             <Text>{moment(item.gameDate).format("LT")}</Text>
                             <View style={styles.awayGameInfoContainer}>
@@ -161,7 +179,12 @@ function Odds(props) {
                 style={styles.feed}
                 renderItem={renderItem} 
 
-                />
+            />
+            <AdMobBanner
+                bannerSize="banner"
+                adUnitID="ca-app-pub-3940256099942544/6300978111" // Test ID, Replace with your-admob-unit-id
+                servePersonalizedAds // true or false
+            />
                 
             
         </View>
@@ -275,6 +298,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignSelf: 'center',
         marginBottom: 20,
+        paddingTop: 5,
     },
     btnTab: {
         width: Dimensions.get('window').width /4,
@@ -293,7 +317,11 @@ const styles = StyleSheet.create({
     },
     textTabActive: {
         color: '#fff',
-
+    },
+    loadingContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 1,
     }
     
     

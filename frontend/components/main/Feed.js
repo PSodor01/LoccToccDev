@@ -14,6 +14,8 @@ import firebase from 'firebase'
 require('firebase/firestore')
 import { connect } from 'react-redux'
 
+import {AdMobBanner} from 'expo-ads-admob'
+
 function Feed(props) {
     const [posts, setPosts] = useState([]);
 
@@ -75,6 +77,13 @@ function Feed(props) {
 
     return (
         <View style={styles.containerGallery}>
+            <View style={styles.bannerAdContainer}>
+                <AdMobBanner
+                    bannerSize="banner"
+                    adUnitID="ca-app-pub-3940256099942544/6300978111" // Test ID, Replace with your-admob-unit-id
+                    servePersonalizedAds // true or false
+                /> 
+            </View>
             <FlatList
                 style={styles.feed}
                 numColumns={1}
@@ -230,6 +239,10 @@ const styles = StyleSheet.create({
         color: "grey",
         fontSize: 10,
     },
+    bannerAdContainer: {
+        marginTop: "5%",
+        alignItems: 'center',
+    }
    
     
 })

@@ -8,7 +8,7 @@ const PostButton = () => {
     const navigation = useNavigation();
     
     const onPress = () => {
-        navigation.navigate('NewPost')
+        navigation.navigate('NewPost', { gameId: gameId, homeTeam: homeTeam, awayTeam: awayTeam })
     }
 
     return (
@@ -17,7 +17,6 @@ const PostButton = () => {
             style={styles.button}
             onPress={onPress}
         >
-
             <MaterialCommunityIcons name={"plus"} size={30} color="white" />
         </TouchableOpacity>
     )
@@ -27,7 +26,7 @@ export default PostButton
 
 const styles = StyleSheet.create({
     button: {
-        backgroundColor: "#666",
+        backgroundColor: "#009387",
         position: 'absolute',
         bottom: 20,
         right: 20,

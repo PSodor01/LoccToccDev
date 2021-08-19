@@ -1,17 +1,21 @@
 import React, { Component, useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Dimensions, ActivityIndicator, FlatList, TouchableOpacity, Image } from 'react-native';
+import { Text, View, StyleSheet, Dimensions, Alert, ActivityIndicator, FlatList, TouchableOpacity, Image } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import moment from 'moment'
 
 import { useNavigation } from '@react-navigation/native';
 
 import ShareButton from '../buttons/ShareButton'
+import PostButton from '../buttons/PostButton'
 
 import firebase from 'firebase'
-require('firebase/firestore')
+require("firebase/firestore")
+require("firebase/firebase-storage")
+
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { fetchUsersData } from '../../redux/actions/index'
@@ -20,9 +24,8 @@ function game(props) {
 
     const [gamePosts, setGamePosts] = useState([]);
     const [postId, setPostId] = useState("")
-    const [userData, setUserData] = useState(null);
 
-    const {gameId, gameDate, homeTeam, awayTeam, homeMoneyline, awayMoneyline, homeSpread, awaySpread, homeSpreadOdds, awaySpreadOdds, over, overOdds, under, underOdds} = props.route.params;
+    const {gameId, gameDate, homeTeam, awayTeam, homeMoneyline, awayMoneyline, homeSpread, awaySpread, homeSpreadOdds, awaySpreadOdds, over, overOdds, under, underOdds, awayTeamVote, homeTeamVote} = props.route.params;
 
 
     useEffect(() => {
@@ -63,7 +66,7 @@ function game(props) {
             matchUserToGamePost(gamePosts)
         }
     }, [props.route.params.postId, props.users])
-    
+
     const listTab = [
         {
             sport: 'americanfootball_nfl'
@@ -118,6 +121,34 @@ function game(props) {
         }).catch(console.error)
     }
 
+    const homeVote = () => {
+        firebase.firestore()
+            .collection("games")
+            .doc(gameId)
+            .collection("votes")
+            .doc("homeVote")
+            .collection(firebase.auth().currentUser.uid)
+            .add({
+                creator: firebase.auth().currentUser.uid,
+                })
+        
+        
+    }
+
+    const awayVote = () => {
+        firebase.firestore()
+            .collection("games")
+            .doc(gameId)
+            .collection("votes")
+            .doc("awayVote")
+            .collection(firebase.auth().currentUser.uid)
+            .add({
+                creator: firebase.auth().currentUser.uid,
+                })
+        
+        
+    }
+    
     const navigation = useNavigation();
     
     return (
@@ -185,11 +216,17 @@ function game(props) {
                 </View>                    
             </View>
             <View style={styles.postButtonContainer}>
-                <TouchableOpacity
-                    onPress={() => props.navigation.navigate('NewPost', { gameId: gameId, homeTeam: homeTeam, awayTeam: awayTeam })}
-                    style={styles.postButton}>
-                    <Text style={styles.shareText}>Share Your Lock</Text>
+                <Text>Who will cover the spread?</Text>
+                <TouchableOpacity 
+                    onPress={awayVote}>
+                    <Text>{awayTeam}</Text>
                 </TouchableOpacity>
+                <Text>or</Text>
+                <TouchableOpacity 
+                    onPress={homeVote}>
+                    <Text>{homeTeam}</Text>
+                </TouchableOpacity>
+                    
             </View>
             <FlatList
                 numColumns={1}
@@ -260,6 +297,13 @@ function game(props) {
                 )}
 
             />
+            <TouchableOpacity
+                activeOpacity={0.8}
+                style={styles.button}
+                onPress={() => props.navigation.navigate('NewPost', { gameId: gameId, homeTeam: homeTeam, awayTeam: awayTeam })}
+            >
+                <MaterialCommunityIcons name={"plus"} size={30} color="white" />
+            </TouchableOpacity>
         </View>
             
         )
@@ -471,6 +515,18 @@ const styles = StyleSheet.create({
     },
     postRightContainer: {
         flex: 1,
+    },
+    button: {
+        backgroundColor: "#009387",
+        position: 'absolute',
+        bottom: 20,
+        right: 20,
+        width: 60,
+        height: 60,
+        borderRadius: 50,
+        alignItems: 'center',
+        justifyContent: 'center',
+        opacity: .7,
     },
     
     
