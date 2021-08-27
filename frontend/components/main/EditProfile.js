@@ -180,11 +180,6 @@ const EditProfileScreen = () => {
           </View>
           <TouchableOpacity
             style={styles.panelButton}
-            onPress={takePicture}>
-            <Text style={styles.panelButtonTitle}>Take Photo</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.panelButton}
             onPress={pickImage}>
             <Text style={styles.panelButtonTitle}>Choose From Library</Text>
           </TouchableOpacity>
@@ -330,9 +325,9 @@ const styles = StyleSheet.create({
     commandButton: {
       padding: 15,
       borderRadius: 10,
-      backgroundColor: '#FF6347',
       alignItems: 'center',
       marginTop: 10,
+      backgroundColor: "#009387",
     },
     panel: {
       padding: 20,

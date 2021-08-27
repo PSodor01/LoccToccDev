@@ -8,15 +8,14 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import firebase from 'firebase'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { fetchUser, fetchUserPosts, fetchUserFollowing, fetchGames, clearData } from '../redux/actions/index'
+import { fetchUser, fetchUserPosts, fetchUserFollowing, fetchNFLGames, fetchNCAAFGames, fetchMLBGames, clearData } from '../redux/actions/index'
 
 import FeedScreen from './main/Feed'
 import ProfileScreen from './main/Profile'
 import SearchScreen from './main/Search'
 import NotificationsScreen from './main/Notifications'
-import MessagesScreen from './main/Messages'
-import ChatScreen from './main/Chat'
 import Odds from './main/Odds'
+import test from './main/test'
 
 const Stack = createStackNavigator();
 
@@ -58,7 +57,9 @@ export class Main extends Component {
         this.props.fetchUser();
         this.props.fetchUserPosts();
         this.props.fetchUserFollowing();
-        this.props.fetchGames();
+        this.props.fetchNFLGames();
+        this.props.fetchNCAAFGames();
+        this.props.fetchMLBGames();
     }
     render() {
         return (
@@ -82,7 +83,24 @@ export class Main extends Component {
                         tabBarIcon: ({ color, size }) => (
                             <FontAwesome5 name="user-lock" color={color} size={20} />
                         ),
-                    }} />
+                    }}
+                    
+
+                    />
+
+                    <Tab.Screen 
+                        name="test" 
+                        component={test}
+                        options={{
+                            tabBarLabel: 'Test',
+                            tabBarColor: '#009387',
+                            tabBarIcon: ({ color, size }) => (
+                                <FontAwesome5 name="user-lock" color={color} size={20} />
+                            ),
+                        }}
+                        
+
+                        />
                 <Tab.Screen 
                     name="Search" 
                     component={SearchScreen} 
@@ -136,8 +154,10 @@ export class Main extends Component {
 
 const mapStateToProps = (store) => ({
     currentUser: store.userState.currentUser,
-    games: store.gamesState.games,
+    nflGames: store.nflGamesState.nflGames,
+    ncaafGames: store.ncaafGamesState.ncaafGames,
+    mlbGames: store.mlbGamesState.mlbGames
 })
-const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUser, fetchUserPosts, fetchUserFollowing, fetchGames, clearData }, dispatch);
+const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUser, fetchUserPosts, fetchUserFollowing, fetchNFLGames, fetchNCAAFGames, fetchMLBGames, clearData }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchProps)(Main);

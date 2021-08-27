@@ -106,7 +106,7 @@ function NewCommentScreen(props, route) {
             .then(() => {
                 console.log('Comment Added!');
                 Alert.alert(
-                  'Comment published!',
+                  'Comment added!',
                   'Your comment has been published successfully!',
                 );
                 setComments(null);
@@ -156,8 +156,9 @@ function NewCommentScreen(props, route) {
 
       const uploadImage = async () => {
         if( image == null ) {
-          return null;
-        }  
+          const downloadURL = "blank"
+          onCommentSend(downloadURL);
+        }  else { 
         
         const uri = image;
           const childPath = `post/${firebase.auth().currentUser.uid}/${Math.random().toString(36)}`;
@@ -188,7 +189,7 @@ function NewCommentScreen(props, route) {
           }
   
           task.on("state_changed", taskProgress, taskError, taskCompleted);
-        }
+        }}
 
         const navigation = useNavigation();
 

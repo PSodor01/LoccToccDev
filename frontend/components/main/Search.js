@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native'
-import Icon from '@expo/vector-icons';
+
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 
 import firebase from 'firebase'
 require("firebase/firestore")
@@ -27,6 +28,7 @@ export default function Search(props) {
     return (
         <View style={styles.textInputContainer}>
             <View style={styles.appTextContainer}>
+                <FontAwesome5 name="search-dollar" color="grey" size={20} paddingRight={5} />
                 <TextInput
                     style={styles.textInput}
                     placeholder="Find your lock..."
@@ -64,12 +66,11 @@ const styles = StyleSheet.create({
     textInput: {
         height: 30,
         width: "75%",
-        marginBottom: "5%",
         paddingHorizontal: 20,
         backgroundColor: "#ffffff",
         borderRadius: 20,
         borderWidth: .5,
-        borderColor: "#e5e7e9"
+        borderColor: "#CACFD2"
 
     },
     textInputContainer: {
@@ -79,21 +80,11 @@ const styles = StyleSheet.create({
     },
     appTextContainer: {
         alignItems: "center",
+        justifyContent: 'center',
         paddingBottom: 5,
         marginTop: "5%",
-        backgroundColor: "#ffffff"
-    },
-    searchResultsContainer: {
         flexDirection: 'row',
-        flex: 1,
-        width: "90%",
-    },
-    searchContainer: {
-        padding:6,
-        marginVertical:5,
-        marginHorizontal:5,
-        borderBottomWidth: 1,
-        borderBottomColor: "#e1e2e6",
+        padding: 5,
     },
     searchResultsText: {
         fontSize: 16,

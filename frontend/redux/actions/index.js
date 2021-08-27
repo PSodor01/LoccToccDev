@@ -1,4 +1,4 @@
-import { USER_STATE_CHANGE, USER_POSTS_STATE_CHANGE, USER_FOLLOWING_STATE_CHANGE, USERS_DATA_STATE_CHANGE,USERS_POSTS_STATE_CHANGE, USERS_LIKES_STATE_CHANGE, GAMES_STATE_CHANGE,  CLEAR_DATA} from '../constants/index'
+import { USER_STATE_CHANGE, USER_POSTS_STATE_CHANGE, USER_FOLLOWING_STATE_CHANGE, USERS_DATA_STATE_CHANGE,USERS_POSTS_STATE_CHANGE, USERS_LIKES_STATE_CHANGE, NFL_GAMES_STATE_CHANGE, NCAAF_GAMES_STATE_CHANGE, MLB_GAMES_STATE_CHANGE, CLEAR_DATA} from '../constants/index'
 import firebase from 'firebase'
 import { SnapshotViewIOSComponent } from 'react-native'
 require('firebase/firestore')
@@ -32,7 +32,7 @@ export function fetchUserPosts() {
             .collection("posts")
             .doc(firebase.auth().currentUser.uid)
             .collection("userPosts")
-            .orderBy("creation", "desc")
+            .orderBy("creation", "asc")
             .get()
             .then((snapshot) => {
                 let posts = snapshot.docs.map(doc => {
@@ -96,7 +96,7 @@ export function fetchUsersFollowingPosts(uid) {
             .collection("posts")
             .doc(uid)
             .collection("userPosts")
-            .orderBy("creation", "desc")
+            .orderBy("creation", "asc")
             .get()
             .then((snapshot) => {
                 console.log({snapshot, uid});
@@ -137,22 +137,61 @@ export function fetchUsersFollowingLikes(uid, postId) {
     })
 }
 
-export function fetchGames() {
+export function fetchNFLGames() {
     return((dispatch) => {
         firebase.firestore()
-        .collection("games")
-        .orderBy("gameDate", "desc")
+        .collection("nfl")
+        .orderBy("gameDate", "asc")
         .get()
         .then((snapshot) => {
             console.log(snapshot.id)
-            let games = snapshot.docs.map(doc => {
+            let nflGames = snapshot.docs.map(doc => {
                 const data = doc.data();
                 const id = doc.id;
                 return { id, ...data }
             })
-            dispatch({ type: GAMES_STATE_CHANGE, games })
+            dispatch({ type: NFL_GAMES_STATE_CHANGE, nflGames })
         })
     })
 }
 
+export function fetchNCAAFGames() {
+    return((dispatch) => {
+        firebase.firestore()
+        .collection("ncaaf")
+        .orderBy("gameDate", "asc")
+        .get()
+        .then((snapshot) => {
+            console.log(snapshot.id)
+            let ncaafGames = snapshot.docs.map(doc => {
+                const data = doc.data();
+                const id = doc.id;
+                return { id, ...data }
+            })
+            dispatch({ type: NCAAF_GAMES_STATE_CHANGE, ncaafGames })
+        })
+    })
+}
+
+export function fetchMLBGames() {
+    return((dispatch) => {
+        firebase.firestore()
+        .collection("mlb")
+        .orderBy("gameDate", "asc")
+        .get()
+        .then((snapshot) => {
+            console.log(snapshot.id)
+            let mlbGames = snapshot.docs.map(doc => {
+                const data = doc.data();
+                const id = doc.id;
+                return { id, ...data }
+            })
+            dispatch({ type: MLB_GAMES_STATE_CHANGE, mlbGames })
+        })
+    })
+}
+
+
+        
+        
 

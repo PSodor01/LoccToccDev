@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { View, StyleSheet, Text, TextInput, TouchableOpacity, Image, TouchableWithoutFeedback, Keyboard } from 'react-native'
 
-import * as Animatable from 'react-native-animatable'
 import { FontAwesome5 } from "@expo/vector-icons";
 
 import firebase from 'firebase'
@@ -12,7 +11,6 @@ const DismissKeyboard = ({ children }) => (
     </TouchableWithoutFeedback>
 
 )
-
 
 export class Login extends Component {
     
@@ -49,7 +47,7 @@ export class Login extends Component {
                             <View style={styles.rightCircle}></View>
                         </View>
                         <TouchableOpacity 
-                            style={{ alignItems: "flex-start", marginLeft:16, top: -50 }}
+                            style={{ alignItems: "flex-start", marginLeft:16, top: -60 }}
                             onPress={() => this.props.navigation.goBack()}
                             >
                             <FontAwesome5 name="chevron-left" size={24} color="#fff" />
@@ -85,6 +83,12 @@ export class Login extends Component {
                             secureTextEntry={true}
                             onChangeText={(password) => this.setState({ password })}
                         />
+                        <TouchableOpacity 
+                            style={styles.forgotPasswordButton}
+                            onPress={() => this.props.navigation.navigate("ResetPassword")}
+                            >
+                            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+                        </TouchableOpacity>
 
                         <TouchableOpacity
                             onPress={() => this.onSignUp()}
@@ -148,10 +152,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         paddingBottom: 40,
     },
-    mainContainer: {
-        flex: 1,
-        backgroundColor: "#ffffff",
-    },
+    
     logo: {
         width: 125,
         height: 125,
@@ -188,6 +189,10 @@ const styles = StyleSheet.create({
     topContainer: {
         flex: 1,
     },
+    mainContainer: {
+        flex: 1,
+        backgroundColor: "#ffffff",
+    },
     disclaimerContainer: {
         flex: 1,
         alignSelf: 'center',
@@ -202,8 +207,13 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         fontSize: 30,
         fontStyle: 'italic'
-        
     }, 
+    forgotPasswordButton: {
+        alignItems: 'center'
+    },
+    forgotPasswordText: {
+        color: 'blue',
+    }
     
 })
 

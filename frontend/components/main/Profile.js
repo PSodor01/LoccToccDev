@@ -18,10 +18,11 @@ function Profile(props) {
     const [userPosts, setUserPosts] = useState([]);
     const [user, setUser] = useState(null);
     const [following, setFollowing] = useState(false);
-
+    
     useEffect(() => {
         const { currentUser, posts } = props;
 
+    
         if (props.route.params.uid === firebase.auth().currentUser.uid) {
             setUser(currentUser)
             setUserPosts(posts)
@@ -60,11 +61,12 @@ function Profile(props) {
         } else {
             setFollowing(false);
         }
+    
 
     }, [props.route.params.uid, props.following])
 
     const onFollow = () => {
-        firebase.firestore()
+        const userFollowing = firebase.firestore()
             .collection("following")
             .doc(firebase.auth().currentUser.uid)
             .collection("userFollowing")
@@ -79,15 +81,14 @@ function Profile(props) {
             .collection("userFollowing")
             .doc(props.route.params.uid)
             .delete()
-            
     }
 
-    const onLikePress = (userId, postId) => {
+    const onLikePress = (id) => {
         const userPosts = firebase.firestore()
             .collection("posts")
-            .doc(userId)
+            .doc(props.route.params.uid)
             .collection("userPosts")
-            .doc(postId);
+            .doc(id);
         
         userPosts.collection("likes")
             .doc(firebase.auth().currentUser.uid)
@@ -99,12 +100,12 @@ function Profile(props) {
             })
     }
     
-    const onDislikePress = (userId, postId) => {
+    const onDislikePress = (id) => {
         const userPosts = firebase.firestore()
             .collection("posts")
-            .doc(userId)
+            .doc(props.route.params.uid)
             .collection("userPosts")
-            .doc(postId);
+            .doc(id);
 
         userPosts.collection("likes")
             .doc(firebase.auth().currentUser.uid)
@@ -113,6 +114,42 @@ function Profile(props) {
                 userPosts.update({
                     likesCount: firebase.firestore.FieldValue.increment(-1)
                 });
+            })
+    }
+
+    const increaseFollowerCount = () => {
+        firebase.firestore()
+            .collection("users")
+            .doc(props.route.params.uid)
+            .update({
+                followerCount: firebase.firestore.FieldValue.increment(1)
+            })
+    }
+
+    const increaseFollowingCount = () => {
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                followingCount: firebase.firestore.FieldValue.increment(1)
+            })
+    }
+
+    const decreaseFollowerCount = () => {
+        firebase.firestore()
+            .collection("users")
+            .doc(props.route.params.uid)
+            .update({
+                followerCount: firebase.firestore.FieldValue.increment(-1)
+            })
+    }
+
+    const decreaseFollowingCount = () => {
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                followingCount: firebase.firestore.FieldValue.increment(-1)
             })
     }
 
@@ -152,6 +189,7 @@ function Profile(props) {
                             source={{uri: user ? user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
                         />
                         <Text style={styles.profileNameText}>{user.name}</Text>
+                        <Text style={styles.profileNameText}>{props.route.params.uid}</Text>
                         
 
 
@@ -177,7 +215,7 @@ function Profile(props) {
                             <View>
                                 {following ? (
                                     <TouchableOpacity
-                                        onPress={() => onUnfollow()}
+                                        onPress={() => {onUnfollow(); decreaseFollowerCount(); decreaseFollowingCount();}}
                                         title="Following"
                                         style={styles.followingButton}>
                                             <Text style={styles.following}> Following </Text>
@@ -185,7 +223,7 @@ function Profile(props) {
                                 ) :
                                     (
                                         <TouchableOpacity
-                                            onPress={() => onFollow()}
+                                            onPress={() => {onFollow(); increaseFollowerCount(); increaseFollowingCount();}}
                                             title="Follow"
                                             style={styles.followButton}>
                                                 <Text style={styles.follow}> Follow </Text>
@@ -207,11 +245,11 @@ function Profile(props) {
                             <Text style={styles.followText}>Posts</Text>
                         </View>
                         <View style={styles.profileStatsBox}>
-                            <Text style={styles.followNumber}>{user.followers && user.followers.length || 0}</Text>
+                            <Text style={styles.followNumber}>{user.followerCount < 1 ? 0 : user.followerCount}</Text>
                             <Text style={styles.followText}>Followers</Text>
                         </View>
                         <View style={styles.profileStatsBox}>
-                            <Text style={styles.followNumber}>{user.following && userfollowing.length || 0}</Text>
+                            <Text style={styles.followNumber}>{user.followingCount < 1 ? 0 : user.followingCount}</Text>
                             <Text style={styles.followText}>Following</Text>
                         </View>
                     </View>
@@ -237,15 +275,15 @@ function Profile(props) {
                                         </View>
                                         <View style={styles.postContentContainer}>
                                             {item.caption != null ? <Text style={styles.captionText}>{item.caption}</Text> : null}
-                                            {item.downloadURL != null ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
+                                            {item.downloadURL != "blank" ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
                                         </View>
                                         <View style={styles.postFooterContainer}>
                                             { item.currentUserLike ?
                                                 (
                                                     <TouchableOpacity
                                                         style={styles.likeContainer}
-                                                        onPress={() => onDislikePress(item.currentUser, item.id)} >
-                                                        <Icon name={"heart"} size={20} color={"red"} />
+                                                        onPress={() => onDislikePress(item.id)} >
+                                                        <Icon name={"hammer"} size={20} color={"grey"} />
                                                         <Text style={styles.likeNumber}>{item.likesCount}</Text>
                                                     </TouchableOpacity>
                                                 )
@@ -253,15 +291,15 @@ function Profile(props) {
                                                 (
                                                     <TouchableOpacity
                                                         style={styles.likeContainer}
-                                                        onPress={() => onLikePress(item.currentUser, item.id)}> 
-                                                        <Icon name={"heart-outline"}  size={20} color={"pink"}/>
+                                                        onPress={() => onLikePress(item.id)}>  
+                                                        <Icon name={"hammer-outline"}  size={20} color={"grey"}/>
                                                         <Text style={styles.likeNumber}>{item.likesCount}</Text>
                                                     </TouchableOpacity>
                                                 )
                                             }
                                             <TouchableOpacity
                                                 style={styles.commentsContainer}
-                                                onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: user.id, posterId: user.id, posterName: user.name, postCreation: item.creation, postCaption: item.caption, posterImg: user.userImg, postImg: item.downloadURL })}>
+                                                onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.creator, posterId: item.creator, posterName: user.name, postCreation: item.creation, postCaption: item.caption, posterImg: user.userImg, postImg: item.downloadURL })}>
                                                 <Icon name={"chatbubble-outline"} size={20} color={"grey"} marginRight={10} />
                                                 <Text style={styles.likeNumber}>{item.comments}</Text>
                                             </TouchableOpacity>

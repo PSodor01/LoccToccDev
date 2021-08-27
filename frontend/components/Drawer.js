@@ -4,7 +4,6 @@ import { Avatar, Title, Caption, Drawer, Text, TouchableRipple, Switch } from 'r
 import { DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import Ionicons from 'react-native-vector-icons/Ionicons'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 
 
@@ -97,18 +96,8 @@ export function DrawerContent(props) {
                                 color={color}
                                 size={size}/>
                             )}
-                            label="House Guidelines"
+                            label="Community Guidelines"
                             onPress={() => {props.navigation.navigate('HouseGuidelines')}}
-                        />
-                        <DrawerItem 
-                            icon={({color, size}) => (
-                                <Ionicons 
-                                name="settings"
-                                color={color}
-                                size={size}/>
-                            )}
-                            label="Settings"
-                            onPress={() => {}}
                         />
                         <DrawerItem 
                             icon={({color, size}) => (
@@ -122,18 +111,6 @@ export function DrawerContent(props) {
                         />
                     
                     </Drawer.Section>
-                    <Drawer.Section title="Preferences">
-                        <TouchableRipple onPress={() => {toggleTheme()}}>
-                            <View style={styles.preference}>
-                                <Text>Dark Theme</Text>
-                                <View pointerEvents="none">
-                                    <Switch value={isDarkTheme}/>
-                                </View>
-                            </View>
-                        </TouchableRipple>
-                    </Drawer.Section>
-
-
                 </View>
             </DrawerContentScrollView>
             <Drawer.Section style={styles.bottomDrawerSection}>

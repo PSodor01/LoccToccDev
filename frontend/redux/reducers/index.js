@@ -1,12 +1,14 @@
 import { combineReducers } from 'redux'
 import { user } from './user'
 import { users } from './users'
-import { games } from './games'
+import { nflGames, ncaafGames, mlbGames } from './games'
 
 const Reducers = combineReducers({
     userState: user,
     usersState: users,
-    gamesState: games,
+    nflGamesState: nflGames,
+    ncaafGamesState: ncaafGames,
+    mlbGamesState: mlbGames,
 })
 
 export default Reducers

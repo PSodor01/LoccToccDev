@@ -13,6 +13,7 @@ const DismissKeyboard = ({ children }) => (
 
 )
 
+
 export class Register extends Component {
     constructor(props) {
         super(props);
@@ -33,7 +34,7 @@ export class Register extends Component {
         this.onSignUp = this.onSignUp.bind(this)
     }
 
-    onSignUp() {
+    async onSignUp() {
         const { email, password, birthday, gender, name, aboutMe, location, userImg, createdAt } = this.state;
         firebase.auth().createUserWithEmailAndPassword(email, password)
             .then((result) => {
@@ -47,17 +48,20 @@ export class Register extends Component {
                         aboutMe,
                         location,
                         userImg,
-                        createdAt
+                        createdAt,
+                        followerCount: 0,
+                        followingCount: 0,
                     })
                 console.log(result)
+                result.user.sendEmailVerification();
             })
             .catch((error) => {
                 console.log(error)
             })
     }
 
-
     render() {
+
         return (
             <DismissKeyboard>
                 <View style={styles.mainContainer}>
@@ -67,12 +71,12 @@ export class Register extends Component {
                             <View style={styles.rightCircle}></View>
                         </View>
                         <TouchableOpacity 
-                            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,  alignItems: 'flex-start', marginLeft: 16, marginTop: 50 }}
+                            style={{ alignItems: "flex-start", marginLeft:16, marginTop: 50 }}
                             onPress={() => this.props.navigation.goBack()}
                             >
                             <FontAwesome5 name="chevron-left" size={24} color="#fff" />
                         </TouchableOpacity>
-                        <View style={{ justifyContent: 'center', flexDirection: 'row', paddingTop: 150, paddingBottom: 20,}}>
+                        <View style={{ justifyContent: 'center', flexDirection: 'row', paddingTop: 90, paddingBottom: 20,}}>
                             <Text style={styles.loadingLogo}>locctocc </Text>
                             <FontAwesome5 name="comment-dollar" color="#009387" size={30} />
                         </View>
@@ -94,6 +98,7 @@ export class Register extends Component {
                         <TextInput
                             style={styles.textInput}
                             placeholder="Username"
+                            maxLength={30}
                             autoCorrect={false}
                             onChangeText={(name) => this.setState({ name })}
                         />
@@ -107,6 +112,7 @@ export class Register extends Component {
                         <TextInput  
                             style={styles.textInput}
                             placeholder="Password"
+                            maxLength={20}
                             autoCorrect={false}
                             secureTextEntry={true}
                             onChangeText={(password) => this.setState({ password })}

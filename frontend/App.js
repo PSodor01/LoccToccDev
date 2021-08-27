@@ -39,29 +39,33 @@ import { DrawerContent } from './components/Drawer'
 import LandingScreen from './components/auth/Landing'
 import RegisterScreen from './components/auth/Register'
 import LoginScreen from './components/auth/Login'
+import ResetPasswordScreen from './components/auth/ResetPassword'
 import MainScreen from './components/Main'
 import CommentScreen from './components/main/Comment'
 import NewPostScreen from './components/main/NewPost'
 import NewCommentScreen from './components/main/NewComment'
 import EditProfileScreen from './components/main/EditProfile'
-import MessagesScreen from './components/main/Messages'
 import Feed from './components/main/Feed'
 import Search from './components/main/Search'
 import NotificationsScreen from './components/main/Notifications'
 import Profile from './components/main/Profile'
-import ChatScreen from './components/main/Chat'
 import AboutUsScreen from './components/main/AboutUs'
 import HouseGuidelinesScreen from './components/main/HouseGuidelines'
 import ContactUsScreen from './components/main/ContactUs'
 import Odds from './components/main/Odds'
 import game from './components/main/game'
-
+import test from './components/main/test'
 import MessagesButton from './components/buttons/MessagesButton'
 
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 const MainStack = createStackNavigator();
+
+/* for when we add DMs:
+headerRight: () => (
+    <MessagesButton /> 
+  ) */
 
 
 const MainStackScreen = ({navigation, props}) => (
@@ -93,13 +97,25 @@ const MainStackScreen = ({navigation, props}) => (
             <FontAwesome5 name="bars" size={24} color="#fff" />
           </TouchableOpacity>
         ),
-        headerRight: () => (
-          <MessagesButton /> 
-        )
+        
       }}
         />
 
-      <MainStack.Screen name="Feed" component={Feed} />
+      <MainStack.Screen 
+        name="Feed" 
+        component={Feed}
+        listeners={({ navigation, route }) => ({
+            tabPress: e => {
+                if (route.state && route.state.routeNames.length > 0) {
+                    navigation.navigate('Feed')
+                }
+            }
+        })} 
+          />
+        <MainStack.Screen 
+        name="test" 
+        component={test}
+          />
       <MainStack.Screen name="Search" component={Search}/>
       <MainStack.Screen name="Notifications" component={NotificationsScreen} />
       <MainStack.Screen name="Profile" component={Profile}
@@ -118,9 +134,7 @@ const MainStackScreen = ({navigation, props}) => (
             <FontAwesome5 name="chevron-left" size={24} color="#fff" />
           </TouchableOpacity>
           ),
-          headerRight: () => (
-            <MessagesButton /> 
-          )
+          
         }} />
       <MainStack.Screen name="Comment" component={CommentScreen} 
         options={{
@@ -138,9 +152,7 @@ const MainStackScreen = ({navigation, props}) => (
             <FontAwesome5 name="chevron-left" size={24} color="#fff" />
           </TouchableOpacity>
           ),
-          headerRight: () => (
-            <MessagesButton /> 
-          )
+          
         }}
       />
       <MainStack.Screen name="NewComment" component={NewCommentScreen} 
@@ -159,9 +171,7 @@ const MainStackScreen = ({navigation, props}) => (
             <FontAwesome5 name="chevron-left" size={24} color="#fff" />
           </TouchableOpacity>
           ),
-          headerRight: () => (
-            <MessagesButton /> 
-          )
+          
         }}
       />
       <MainStack.Screen name="NewPost" component={NewPostScreen} 
@@ -180,37 +190,24 @@ const MainStackScreen = ({navigation, props}) => (
             <FontAwesome5 name="chevron-left" size={24} color="#fff" />
           </TouchableOpacity>
           ),
-          headerRight: () => (
-            <MessagesButton /> 
-          )
+          
         }}
       />
       <MainStack.Screen name="EditProfile" component={EditProfileScreen} 
-        options={{headerTitle: "Edit Profile"}} />
-      <MainStack.Screen name="Messages" component={MessagesScreen}
         options={{
-            headerTitle: () => (
-              <View style={{ flexDirection: 'row', marginRight: '2%'}}>
-                <Text style={styles.headerName}>locctocc </Text>
-                <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
-            </View>
-            ),
-            headerLeft: () => (
+          headerTitle: "Edit Profile",
+          headerLeft: () => (
               <TouchableOpacity 
               style={{ alignItems: "flex-end", marginLeft:16 }}
               onPress={() => navigation.goBack()}
               >
               <FontAwesome5 name="chevron-left" size={24} color="#fff" />
             </TouchableOpacity>
-            ),
-            headerRight: () => (
-              <MessagesButton /> 
             )
           }} />
-      <MainStack.Screen name="Chat" component={ChatScreen} />
       <MainStack.Screen name="HouseGuidelines" component={HouseGuidelinesScreen}
         options={{
-            headerTitle: "House Guidelines",
+            headerTitle: "Community Guidelines",
             headerLeft: () => (
               <TouchableOpacity 
               style={{ alignItems: "flex-end", marginLeft:16 }}
@@ -233,7 +230,18 @@ const MainStackScreen = ({navigation, props}) => (
             )
           }} />
       <MainStack.Screen name="AboutUs" component={AboutUsScreen}
-        options={{headerTitle: "About Us"}} />
+        options={{
+          headerTitle: "About Us",
+          headerLeft: () => (
+              <TouchableOpacity 
+              style={{ alignItems: "flex-end", marginLeft:16 }}
+              onPress={() => navigation.goBack()}
+              >
+              <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+            </TouchableOpacity>
+            ),
+            }} 
+            />
       <MainStack.Screen name="Odds" component={Odds}
         options={{
           headerTitle: () => (
@@ -251,9 +259,7 @@ const MainStackScreen = ({navigation, props}) => (
             <FontAwesome5 name="chevron-left" size={24} color="#fff" />
           </TouchableOpacity>
           ),
-          headerRight: () => (
-            <MessagesButton /> 
-          )
+          
         }}
        />
       <MainStack.Screen name="game" component={game}
@@ -272,9 +278,7 @@ const MainStackScreen = ({navigation, props}) => (
             <FontAwesome5 name="chevron-left" size={24} color="#fff" />
           </TouchableOpacity>
           ),
-          headerRight: () => (
-            <MessagesButton /> 
-          )
+          
         }}
           />
   </MainStack.Navigator>
@@ -328,6 +332,9 @@ export class App extends Component {
                 options={{ headerShown: false }}
               />
               <Stack.Screen name="Login" component={LoginScreen} 
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} 
                 options={{ headerShown: false }}
               />
             </Stack.Navigator>

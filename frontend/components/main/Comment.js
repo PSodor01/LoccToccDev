@@ -43,7 +43,6 @@ function Comment(props, route) {
     },[]);
 
     useEffect(() => {
-
         function matchUserToComment(comments) {
             for (let i = 0; i < comments.length; i++) {
                 if (comments[i].hasOwnProperty('user')) {
@@ -128,40 +127,49 @@ function Comment(props, route) {
         }).catch(console.error)
     }
 
+    const EmptyListMessage = () => {
+        return (
+          // Flat List Item
+          <Text
+            style={styles.emptyListStyle}
+            >
+            No comments yet, click the Reply button to be the first!
+          </Text>
+        );
+      };
 
     const navigation = useNavigation();
 
     return (
         <View style={styles.container}>
-                <View style={styles.originalPostContainer}>
-                    <TouchableOpacity
-                        onPress={() => props.navigation.navigate("Profile", {uid: posterId})}>
-                        <Image 
-                            style={styles.profilePhotoPostContainer}
-                            source={{ uri: posterImg ? posterImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
-                        />
-                    </TouchableOpacity>
-                    <View style={styles.postRightContainer}>
-                        <View style={styles.postHeaderContainer}>
-                            <Text style={styles.profileNameFeedText}>{posterName}</Text>
-                            <Text style={styles.postTimeContainer}>{moment(postCreation.toDate()).fromNow()}</Text>
-                        </View>
-                        <View style={styles.postContentContainer}>
-                            {postCaption != null ? <Text style={styles.captionText}>{postCaption}</Text> : null}
-                            {postImg != null ? <Image source={{uri: postImg}} style={styles.postImage}/> : null}
-                        </View>
-                        <View style={styles.postButtonContainer}>
-                            <TouchableOpacity onPress={() => navigation.navigate("NewComment", { posterName: posterName, postId: postId, uid: props.route.params.uid })} style={styles.postButton}>
-                                <Text style={styles.shareText}>Reply</Text>
-                            </TouchableOpacity>
-                        </View>
+            <View style={styles.originalPostContainer}>
+                <TouchableOpacity
+                    onPress={() => props.navigation.navigate("Profile", {uid: posterId})}>
+                    <Image 
+                        style={styles.profilePhotoPostContainer}
+                        source={{ uri: posterImg ? posterImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                    />
+                </TouchableOpacity>
+                <View style={styles.postRightContainer}>
+                    <View style={styles.postHeaderContainer}>
+                        <Text style={styles.profileNameFeedText}>{posterName}</Text>
+                        <Text style={styles.postTimeContainer}>{moment(postCreation.toDate()).fromNow()}</Text>
+                    </View>
+                    <View style={styles.postContentContainer}>
+                        {postCaption != null ? <Text style={styles.captionText}>{postCaption}</Text> : null}
+                        {postImg != "blank" ? <Image source={{uri: postImg}} style={styles.postImage}/> : null}
+                    </View>
+                    <View style={styles.postButtonContainer}>
+                        <TouchableOpacity onPress={() => navigation.navigate("NewComment", { posterName: posterName, postId: postId, uid: props.route.params.uid })} style={styles.postButton}>
+                            <Text style={styles.shareText}>Reply</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
+            </View>
             
             <FlatList
-                numColumns={1}
-                horizontal={false}
                 data={comments}
+                ListEmptyComponent={EmptyListMessage}
                 renderItem={({ item }) => (
                     <View>
                         {item.user !== undefined ?
@@ -180,7 +188,7 @@ function Comment(props, route) {
                                 </View>
                                 <View style={styles.postContentContainer}>
                                     {item.text != null ? <Text style={styles.captionText}>{item.text}</Text> : null}
-                                    {item.downloadURL != null ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
+                                    {item.downloadURL != "blank" ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
                                 </View>
                                 <View style={styles.postFooterContainer}>
                                     { item.currentUserLike ?
@@ -188,7 +196,7 @@ function Comment(props, route) {
                                             <TouchableOpacity
                                                 style={styles.likeContainer}
                                                 onPress={() => onDislikePress(item.user.uid, item.id)} >
-                                                <Ionicons name={"heart"} size={20} color={"red"} />
+                                                <Ionicons name={"hammer"} size={20} color={"grey"} />
                                                 <Text style={styles.likeNumber}>{item.likesCount}</Text>
                                             </TouchableOpacity>
                                         )
@@ -197,7 +205,7 @@ function Comment(props, route) {
                                             <TouchableOpacity
                                                 style={styles.likeContainer}
                                                 onPress={() => onLikePress(item.user.uid, item.id)}> 
-                                                <Ionicons name={"heart-outline"}  size={20} color={"pink"}/>
+                                                <Ionicons name={"hammer-outline"}  size={20} color={"grey"}/>
                                                 <Text style={styles.likeNumber}>{item.likesCount}</Text>
                                             </TouchableOpacity>
                                         )
@@ -377,6 +385,12 @@ postButton: {
     alignSelf: 'flex-end',
     paddingVertical: 3,
     paddingHorizontal: 8,
+},
+emptyListStyle: {
+    padding: 10,
+    fontSize: 18,
+    textAlign: 'justify',
+    marginHorizontal: "5%",
 },
 
   

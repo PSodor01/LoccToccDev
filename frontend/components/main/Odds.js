@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, ActivityIndicator, Dimensions, FlatList, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, useWindowDimensions, ActivityIndicator, Dimensions, FlatList, TouchableOpacity } from 'react-native';
+import { TabView, TabBar, SceneMap } from 'react-native-tab-view';
 
 import moment from 'moment'
 
@@ -10,40 +11,21 @@ require("firebase/firestore")
 require("firebase/firebase-storage")
 import { connect } from 'react-redux'
 
-const listTab = [
-        {   
-            sport: 'americanfootball_nfl'
-        },
-        {
-            sport: 'MLB'
-        },
-        {
-            sport: 'americanfootball_ncaaf'
-        }
-    ]
-
 function Odds(props) {
 
     const [games, setGames] = useState([]);
+    const [nflGames, setnflGames] = useState([]);
+    const [ncaafGames, setncaafGames] = useState([]);
+    const [mlbGames, setmlbGames] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [sport, setSport] = useState('americanfootball_nfl');
-    const [datalist, setDatalist] = useState(games);
 
      useEffect(() => {
+        interstitial();
         setGames(props.games)
-    }, [props.games])
-
-    const setSportFilter = sport => {
-        if (sport !== 'All') {
-            setDatalist([...games.filter(e => e.sport === sport)])
-        } else {
-            setDatalist(games)
-
-        }
-        setSport(sport)
-
-
-    }
+        setnflGames(props.nflGames)
+        setncaafGames(props.ncaafGames)
+        setmlbGames(props.mlbGames)
+    }, [props.games, props.nflGames, props.ncaafGames, props.mlbGames])
 
     const interstitial = async () => {
         await AdMobInterstitial.setAdUnitID('ca-app-pub-3940256099942544/1033173712'); // Test ID, Replace with your-admob-unit-id
@@ -51,24 +33,134 @@ function Odds(props) {
             await AdMobInterstitial.requestAdAsync();
             await AdMobInterstitial.showAdAsync();
         } catch(error) {
-            console.log(e)
+            console.log(error)
         }
     }
 
-    useEffect(() => {
-        interstitial();
-    }, [])
+    const FirstRoute = () => (
+        <View style={styles.container}>
+        <View style={styles.gameHeaderContainer}>
+            <View style={styles.teamHeader}>
+                <Text style={styles.gameHeaderText}>Team</Text>
+            </View>
+            <View style={styles.moneylineHeader}>
+                <Text style={styles.gameHeaderText}>ML</Text>
+            </View>
+            <View style={styles.spreadHeader}>
+                <Text style={styles.gameHeaderText}>Spread</Text>
+            </View>
+            <View style={styles.totalHeader}>
+                <Text style={styles.gameHeaderText}>Total</Text>
+            </View>
+        </View>
+        <FlatList 
+            data={nflGames}
+            style={styles.feed}
+            renderItem={renderItem} 
+
+        />
+        <AdMobBanner
+            bannerSize="banner"
+            adUnitID="ca-app-pub-3940256099942544/6300978111" // Test ID, Replace with your-admob-unit-id
+            servePersonalizedAds // true or false
+        />
+    </View>
+    );
     
+    const SecondRoute = () => (
+        <View style={styles.container}>
+        <View style={styles.gameHeaderContainer}>
+            <View style={styles.teamHeader}>
+                <Text style={styles.gameHeaderText}>Team</Text>
+            </View>
+            <View style={styles.moneylineHeader}>
+                <Text style={styles.gameHeaderText}>ML</Text>
+            </View>
+            <View style={styles.spreadHeader}>
+                <Text style={styles.gameHeaderText}>Spread</Text>
+            </View>
+            <View style={styles.totalHeader}>
+                <Text style={styles.gameHeaderText}>Total</Text>
+            </View>
+        </View>
+        <FlatList 
+            data={ncaafGames}
+            style={styles.feed}
+            renderItem={renderItem} 
+
+        />
+        <AdMobBanner
+            bannerSize="banner"
+            adUnitID="ca-app-pub-3940256099942544/6300978111" // Test ID, Replace with your-admob-unit-id
+            servePersonalizedAds // true or false
+        />
+    </View>
+    );
+    
+    const ThirdRoute = () => (
+        <View style={styles.container}>
+            <View style={styles.gameHeaderContainer}>
+                <View style={styles.teamHeader}>
+                    <Text style={styles.gameHeaderText}>Team</Text>
+                </View>
+                <View style={styles.moneylineHeader}>
+                    <Text style={styles.gameHeaderText}>ML</Text>
+                </View>
+                <View style={styles.spreadHeader}>
+                    <Text style={styles.gameHeaderText}>Spread</Text>
+                </View>
+                <View style={styles.totalHeader}>
+                    <Text style={styles.gameHeaderText}>Total</Text>
+                </View>
+            </View>
+            <FlatList 
+                data={mlbGames}
+                style={styles.feed}
+                renderItem={renderItem} 
+
+            />
+            <AdMobBanner
+                bannerSize="banner"
+                adUnitID="ca-app-pub-3940256099942544/6300978111" // Test ID, Replace with your-admob-unit-id
+                servePersonalizedAds // true or false
+            />
+        </View>
+      );
+
+    const layout = useWindowDimensions();
+
+    const [index, setIndex] = React.useState(0);
+    const [routes] = React.useState([
+        { key: 'first', title: 'NFL' },
+        { key: 'second', title: 'NCAAF' },
+        { key: 'third', title: 'MLB' },
+    ]);
+
+    const renderScene = SceneMap({
+        first: FirstRoute,
+        second: SecondRoute,
+        third: ThirdRoute,
+    });
+
+    const renderTabBar = props => (
+        <TabBar
+            {...props}
+        activeColor={'white'}
+        inactiveColor={'black'}
+        
+            style={{backgroundColor:'darkgrey'}}
+        />
+    );
 
     const renderItem = ({item, index}) => {
         return (
-            <View key={index}>
+            <View>
                 <View style={styles.gameContainer}>
                     <TouchableOpacity
                         style={styles.gameButton}
                         onPress={() => props.navigation.navigate('game', {gameId: item.gameId, gameDate: item.gameDate, homeTeam: item.homeTeam, awayTeam: item.awayTeam, homeSpread: item.homeSpread, awaySpread: item.awaySpread, homeSpreadOdds: item.homeSpreadOdds, awaySpreadOdds: item.awaySpreadOdds, awayMoneyline: item.awayMoneyline, homeMoneyline: item.homeMoneyline, over: item.over, overOdds: item.overOdds, under: item.under, underOdds: item.underOdds, awayTeamVote: item.awayTeamVote, homeTeamVote: item.homeTeamVote })}>
                         <View>
-                            <Text>{moment(item.gameDate).format("LT")}</Text>
+                            <Text>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
                             <View style={styles.awayGameInfoContainer}>
                                 <View style={styles.teamItem}>
                                     <Text style={styles.teamText}>{item.awayTeam}</Text>
@@ -135,60 +227,15 @@ function Odds(props) {
 
 
     return (
-        <View style={styles.container}>
-            <View style={styles.listTab}>
-                {
-                    listTab.map(e => (
-                        <TouchableOpacity 
-                            style={[styles.btnTab, sport === e.sport && styles.btnTabActive]}
-                            onPress={() => setSportFilter(e.sport)}>
-                            {e.sport == "americanfootball_nfl" ?
-                                <Text style={styles.textTab, sport === e.sport && styles.textTabActive}>
-                                NFL
-                                </Text>
-                                : 
-                                e.sport == "americanfootball_ncaaf" ?
-                                <Text style={styles.textTab, sport === e.sport && styles.textTabActive}>
-                                NCAAF
-                                </Text>
-                                : <Text style={styles.textTab, sport === e.sport && styles.textTabActive}>
-                                    {e.sport}
-                                </Text>
-                            }
-                        </TouchableOpacity>
-                    ))
-                }
-            </View>            
-            <View style={styles.gameHeaderContainer}>
-                <View style={styles.teamHeader}>
-                    <Text style={styles.gameHeaderText}>Team</Text>
-                </View>
-                <View style={styles.moneylineHeader}>
-                    <Text style={styles.gameHeaderText}>ML</Text>
-                </View>
-                <View style={styles.spreadHeader}>
-                    <Text style={styles.gameHeaderText}>Spread</Text>
-                </View>
-                <View style={styles.totalHeader}>
-                    <Text style={styles.gameHeaderText}>Total</Text>
-                </View>
-            </View>
-            <FlatList 
-                data={datalist}
-                keyExtractor={(e, i) => i.toString()}
-                style={styles.feed}
-                renderItem={renderItem} 
-
-            />
-            <AdMobBanner
-                bannerSize="banner"
-                adUnitID="ca-app-pub-3940256099942544/6300978111" // Test ID, Replace with your-admob-unit-id
-                servePersonalizedAds // true or false
-            />
-                
-            
-        </View>
-    )
+        <TabView
+            navigationState={{ index, routes }}
+            renderScene={renderScene}
+            renderTabBar={renderTabBar}
+            onIndexChange={setIndex}
+            initialLayout={{ width: layout.width }}
+        />
+        
+    );
     
 }
 
@@ -322,13 +369,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         flex: 1,
-    }
+    },
+    
     
     
 })
 
 const mapStateToProps = (store) => ({
-    games: store.gamesState.games,
+    nflGames: store.nflGamesState.nflGames,
+    ncaafGames: store.ncaafGamesState.ncaafGames,
+    mlbGames: store.mlbGamesState.mlbGames,
 })
 
 

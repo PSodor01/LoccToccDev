@@ -10,7 +10,6 @@ import moment from 'moment'
 import { useNavigation } from '@react-navigation/native';
 
 import ShareButton from '../buttons/ShareButton'
-import PostButton from '../buttons/PostButton'
 
 import firebase from 'firebase'
 require("firebase/firestore")
@@ -24,93 +23,75 @@ function game(props) {
 
     const [gamePosts, setGamePosts] = useState([]);
     const [postId, setPostId] = useState("")
-
+    const [loading, setLoading] = useState(true)
+    
     const {gameId, gameDate, homeTeam, awayTeam, homeMoneyline, awayMoneyline, homeSpread, awaySpread, homeSpreadOdds, awaySpreadOdds, over, overOdds, under, underOdds, awayTeamVote, homeTeamVote} = props.route.params;
-
-
+    
     useEffect(() => {
 
-        function matchUserToGamePost(gamePosts) {
-            for (let i = 0; i < gamePosts.length; i++) {
-                if (gamePosts[i].hasOwnProperty('user')) {
-                    continue;
+        navigation.addListener('focus', async () => {
+            function matchUserToGamePost(gamePosts) {
+                for (let i = 0; i < gamePosts.length; i++) {
+                    if (gamePosts[i].hasOwnProperty('user')) {
+                        continue;
+                    }
+    
+                    const user = props.users.find(x => x.uid === gamePosts[i].creator)
+                    if (user == undefined) {
+                        props.fetchUsersData(gamePosts[i].creator, false)
+                    } else {
+                        gamePosts[i].user = user
+                    }
                 }
-
-                const user = props.users.find(x => x.uid === gamePosts[i].creator)
-                if (user == undefined) {
-                    props.fetchUsersData(gamePosts[i].creator, false)
-                } else {
-                    gamePosts[i].user = user
-                }
+                setGamePosts(gamePosts)
+                setLoading(false)
             }
-            setGamePosts(gamePosts)
-        }
+    
+            if (props.route.params.postId !== postId) {
+                firebase.firestore()
+                .collectionGroup("userPosts")
+                .where('gameId', '==', gameId)
+                .get()
+                .then((snapshot) => {
 
-
-        if (props.route.params.postId !== postId) {
-            firebase.firestore()
-            .collectionGroup("userPosts")
-            .where('gameId', '==', gameId)
-            .get()
-            .then((snapshot) => {
-                
-                let gamePosts = snapshot.docs.map(doc => {
-                    const data = doc.data();
-                    const id = doc.id;
-                    return { id, ...data }
-                })
-                    matchUserToGamePost(gamePosts)
-                })
-            setPostId(props.route.params.postId)
-        } else {
-            matchUserToGamePost(gamePosts)
-        }
+                    let gamePosts = snapshot.docs.map(doc => {
+                        const data = doc.data();
+                        const id = doc.id;
+                        return { id, ...data }
+                    })
+                        matchUserToGamePost(gamePosts)
+                    })
+                setPostId(props.route.params.postId)
+            } else {
+                matchUserToGamePost(gamePosts)
+                setLoading(false)
+            }
+        })
     }, [props.route.params.postId, props.users])
 
-    const listTab = [
-        {
-            sport: 'americanfootball_nfl'
-        },
-        {
-            sport: 'MLB'
-        },
-        {
-            sport: 'americanfootball_ncaaf'
-        }
-    ]
-
     const onLikePress = (userId, postId) => {
-        const userPosts = firebase.firestore()
-            .collection("games")
+        firebase.firestore()
+            .collection("posts")
             .doc(userId)
             .collection("userPosts")
-            .doc(postId);
-        
-        userPosts.collection("likes")
+            .doc(postId)
+            .collection("likes")
             .doc(firebase.auth().currentUser.uid)
             .set({})
-            .then(() => {
-                userPosts.update({
-                    likesCount: firebase.firestore.FieldValue.increment(1)
-                });
-            })
     }
+
     const onDislikePress = (userId, postId) => {
-        const userPosts = firebase.firestore()
-            .collection("games")
+        firebase.firestore()
+            .collection("posts")
             .doc(userId)
             .collection("userPosts")
-            .doc(postId);
-
-        userPosts.collection("likes")
+            .doc(postId)
+            .collection("likes")
             .doc(firebase.auth().currentUser.uid)
-            .delete()
-            .then(() => {
-                userPosts.update({
-                    likesCount: firebase.firestore.FieldValue.increment(-1)
-                });
-            })
+            .delete({})
     }
+
+     
 
     const handleReportPostEmail = () => {
         const to = ['ReportPost@locctocc.com'] // string or array of email addresses
@@ -121,6 +102,29 @@ function game(props) {
         }).catch(console.error)
     }
 
+    const EmptyListMessage = () => {
+        return (
+          // Flat List Item
+          <Text
+            style={styles.emptyListStyle}
+            >
+            No posts yet, click the + button below to be the first!
+          </Text>
+        );
+      };
+    /*<View style={styles.postButtonContainer}>
+        <Text>Who will cover the spread?</Text>
+        <TouchableOpacity 
+            onPress={awayVote}>
+            <Text>{awayTeam}</Text>
+        </TouchableOpacity>
+        <Text>or</Text>
+        <TouchableOpacity 
+            onPress={homeVote}>
+            <Text>{homeTeam}</Text>
+        </TouchableOpacity>
+            
+    </View>  
     const homeVote = () => {
         firebase.firestore()
             .collection("games")
@@ -131,8 +135,6 @@ function game(props) {
             .add({
                 creator: firebase.auth().currentUser.uid,
                 })
-        
-        
     }
 
     const awayVote = () => {
@@ -142,12 +144,9 @@ function game(props) {
             .collection("votes")
             .doc("awayVote")
             .collection(firebase.auth().currentUser.uid)
-            .add({
                 creator: firebase.auth().currentUser.uid,
                 })
-        
-        
-    }
+    } */
     
     const navigation = useNavigation();
     
@@ -215,22 +214,10 @@ function game(props) {
                     </View>
                 </View>                    
             </View>
-            <View style={styles.postButtonContainer}>
-                <Text>Who will cover the spread?</Text>
-                <TouchableOpacity 
-                    onPress={awayVote}>
-                    <Text>{awayTeam}</Text>
-                </TouchableOpacity>
-                <Text>or</Text>
-                <TouchableOpacity 
-                    onPress={homeVote}>
-                    <Text>{homeTeam}</Text>
-                </TouchableOpacity>
-                    
-            </View>
+            
             <FlatList
-                numColumns={1}
                 data={gamePosts}
+                ListEmptyComponent={EmptyListMessage}
                 renderItem={({ item }) => (
                     <View>
                         {item.user !== undefined ?
@@ -249,7 +236,7 @@ function game(props) {
                                 </View>
                                 <View style={styles.postContentContainer}>
                                     {item.caption != null ? <Text style={styles.captionText}>{item.caption}</Text> : null}
-                                    {item.downloadURL != null ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
+                                    {item.downloadURL != "blank" ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
                                 </View>
                                 <View style={styles.postFooterContainer}>
                                     { item.currentUserLike ?
@@ -257,7 +244,7 @@ function game(props) {
                                             <TouchableOpacity
                                                 style={styles.likeContainer}
                                                 onPress={() => onDislikePress(item.user.uid, item.id)} >
-                                                <Ionicons name={"heart"} size={20} color={"red"} />
+                                                <Ionicons name={"hammer"} size={20} color={"grey"} />
                                                 <Text style={styles.likeNumber}>{item.likesCount}</Text>
                                             </TouchableOpacity>
                                         )
@@ -266,7 +253,7 @@ function game(props) {
                                             <TouchableOpacity
                                                 style={styles.likeContainer}
                                                 onPress={() => onLikePress(item.user.uid, item.id)}> 
-                                                <Ionicons name={"heart-outline"}  size={20} color={"pink"}/>
+                                                <Ionicons name={"hammer-outline"}  size={20} color={"grey"}/>
                                                 <Text style={styles.likeNumber}>{item.likesCount}</Text>
                                             </TouchableOpacity>
                                         )
@@ -308,9 +295,6 @@ function game(props) {
             
         )
 }
-
-
-
 
 const styles = StyleSheet.create({
     container: {
@@ -406,40 +390,6 @@ const styles = StyleSheet.create({
         width: 60,
         alignItems: 'center',
     },
-    teamText: {
-    },
-    listTab: {
-        flexDirection: 'row',
-        alignSelf: 'center',
-        marginBottom: 20,
-    },
-    btnTab: {
-        width: Dimensions.get('window').width /4,
-        flexDirection: 'row',
-        backgroundColor: "#ffffff",
-        borderRadius: 15,
-        padding: 6,
-        justifyContent: 'center',
-        marginRight: 10,
-    },
-    textTab: {
-        fontSize: 16
-    },
-    btnTabActive: {
-        backgroundColor: 'grey'
-    },
-    textTabActive: {
-        color: '#fff',
-
-    },
-    postButton: {
-        alignSelf: 'flex-end',
-        backgroundColor: '#33A8FF',
-        borderRadius: 6,
-        paddingVertical: 3,
-        paddingHorizontal: 8,
-        marginRight: "5%",
-    },
     postButtonContainer: {
         paddingBottom: 5,
         borderBottomColor: "#CACFD2",
@@ -528,16 +478,22 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         opacity: .7,
     },
-    
-    
-
+    emptyListStyle: {
+        padding: 10,
+        fontSize: 18,
+        textAlign: 'justify',
+        marginHorizontal: "5%",
+      },
     
 })
 
 const mapStateToProps = (store) => ({
     users: store.usersState.users,
     currentUser: store.userState.currentUser,
+    following: store.userState.following,
+    feed: store.usersState.feed,
+    usersFollowingLoaded: store.usersState.usersFollowingLoaded,
 })
 const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUsersData }, dispatch);
 
-export default connect(mapStateToProps, mapDispatchProps)(game);
+export default connect(mapStateToProps,  mapDispatchProps)(game);

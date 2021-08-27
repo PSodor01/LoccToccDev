@@ -4,6 +4,32 @@ const admin = require("firebase-admin");
 const axios = require("axios");
 admin.initializeApp();
 
+const db = admin.firestore()
+
+exports.addLike = functions.firestore.document('/posts/{creatorId}/userPosts/{postId}/likes/{userId}')
+  .onCreate((snap, context) => {
+    return db
+      .collection('posts')
+      .doc(context.params.creatorId)
+      .collection('userPosts')
+      .doc(context.params.postId)
+      .update({
+        likesCount: admin.firestore.FieldValue.increment(1)
+      })
+  })
+
+  exports.removeLike = functions.firestore.document('/posts/{creatorId}/userPosts/{postId}/likes/{userId}')
+  .onDelete((snap, context) => {
+    return db
+      .collection('posts')
+      .doc(context.params.creatorId)
+      .collection('userPosts')
+      .doc(context.params.postId)
+      .update({
+        likesCount: admin.firestore.FieldValue.increment(-1)
+      })
+  })
+
 
 exports.getMLBGameData = functions.pubsub.schedule('every 5 minutes').onRun(async() => {
   try {
@@ -12,7 +38,7 @@ exports.getMLBGameData = functions.pubsub.schedule('every 5 minutes').onRun(asyn
         result.data.forEach(game => {
           const writeResult = admin
             .firestore()
-            .collection("games")
+            .collection("mlb")
             .doc(game.id)
             .set({
               gameId: game.id,
@@ -44,7 +70,7 @@ exports.getNFLGameData = functions.pubsub.schedule('every 5 minutes').onRun(asyn
         result.data.forEach(game => {
           const writeResult = admin
             .firestore()
-            .collection("games")
+            .collection("nfl")
             .doc(game.id)
             .set({
               gameId: game.id,
@@ -76,7 +102,7 @@ exports.getNFLGameData = functions.pubsub.schedule('every 5 minutes').onRun(asyn
           result.data.forEach(game => {
             const writeResult = admin
               .firestore()
-              .collection("games")
+              .collection("ncaaf")
               .doc(game.id)
               .set({
                 gameId: game.id,

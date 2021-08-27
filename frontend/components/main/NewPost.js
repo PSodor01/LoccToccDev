@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Platform, FlatList, StyleSheet, ActivityIndicator, TextInput, TouchableOpacity, Image, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView} from 'react-native';
+import { View, Text, Platform, Alert, FlatList, StyleSheet, ActivityIndicator, TextInput, TouchableOpacity, Image, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView} from 'react-native';
 
 import { Feather } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -96,23 +96,28 @@ const AddPostScreen = ({ route, props }) => {
           gameId: gameId,
           creation: firebase.firestore.FieldValue.serverTimestamp(),
           creator: firebase.auth().currentUser.uid,
-          likes: 0,
+          likesCount: 0,
           comments: 0,
           downloadURL
         }).then(() => {
           console.log('Post Added!');
+          Alert.alert(
+            "Let's go!" ,
+            'Your post has been published successfully!',
+          );
           setPost(null);
         }).then((function () {
           navigation.goBack()
-      }))
+      })).catch((error) => {
+        console.log(error)
+    })
     }
-
-   
 
     const uploadImage = async () => {
       if( image == null ) {
-        return null;
-      }  
+        const downloadURL = "blank"
+        savePostData(downloadURL);
+      }  else {
       
       const uri = image;
         const childPath = `post/${firebase.auth().currentUser.uid}/${Math.random().toString(36)}`;
@@ -143,15 +148,9 @@ const AddPostScreen = ({ route, props }) => {
         }
 
         task.on("state_changed", taskProgress, taskError, taskCompleted);
-      }
+      }}
 
   const navigation = useNavigation();
-
-  const DismissKeyboard = ({ children }) => (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        {children}
-    </TouchableWithoutFeedback>
-    )
 
   async function fetchGifs() {
   
@@ -201,7 +200,7 @@ const AddPostScreen = ({ route, props }) => {
           <View style={styles.panelHeader}>
             <View style={styles.panelHandle} />
             <View style={styles.searchSection}>
-                <FontAwesome5 name="search-dollar" color="grey" size={20} alignItems='center' />
+                <FontAwesome5 name="search-dollar" color="grey" size={20} paddingRight={5} />
                 <TextInput
                     placeholder="Search Giphy"
                     style={styles.textInput}
@@ -368,7 +367,6 @@ container: {
 textInput: {
   height: 30,
   width: "75%",
-  marginBottom: "5%",
   paddingHorizontal: 20,
   backgroundColor: "#ffffff",
   borderRadius: 20,
@@ -381,6 +379,7 @@ panel: {
   backgroundColor: '#FFFFFF',
   paddingTop: 20,
   width: '100%',
+  alignItems: 'center',
 },
 header: {
   backgroundColor: '#FFFFFF',
@@ -425,7 +424,7 @@ panelButtonTitle: {
   color: 'white',
 },
 image: {
-  width: 200,
+  width: 300,
   height: 150,
   marginBottom: 5,
   borderRadius: 10,
@@ -435,11 +434,10 @@ searchSection: {
   flexDirection: 'row',
   justifyContent: 'center',
   alignItems: 'center',
-  backgroundColor: '#fff',
 },
 xButton: {
   alignItems: 'flex-end',
   paddingTop: 2,
 }
 
-});
+})
