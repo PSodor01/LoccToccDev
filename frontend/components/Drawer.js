@@ -1,10 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Linking } from 'react-native';
 import { Avatar, Title, Caption, Drawer, Text, TouchableRipple, Switch } from 'react-native-paper'
 import { DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
 
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import AntDesign from 'react-native-vector-icons/AntDesign'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 
 import firebase from 'firebase'
@@ -114,6 +116,26 @@ export function DrawerContent(props) {
                 </View>
             </DrawerContentScrollView>
             <Drawer.Section style={styles.bottomDrawerSection}>
+                <DrawerItem 
+                    icon={({color, size}) => (
+                        <FontAwesome5 
+                        name="clipboard-list"
+                        color={color}
+                        size={size}/>
+                    )}
+                    label="Terms & Conditions"
+                    onPress={() => Linking.openURL('https://locctocc.flycricket.io/terms.html')}
+                />
+                <DrawerItem 
+                    icon={({color, size}) => (
+                        <FontAwesome
+                        name="pencil-square-o"
+                        color={color}
+                        size={size}/>
+                    )}
+                    label="Privacy Policy"
+                    onPress={() => Linking.openURL('https://locctocc.flycricket.io/privacy.html')}
+                />
                 <DrawerItem 
                     icon={({color, size}) => (
                         <Icon 

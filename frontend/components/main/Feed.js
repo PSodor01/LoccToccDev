@@ -18,17 +18,22 @@ import {AdMobBanner} from 'expo-ads-admob'
 
 function Feed(props) {
     const [posts, setPosts] = useState([]);
+    const [loading, setLoading] = useState(true);
 
      useEffect(() => {
+        fetchData()
+
+    }, [props.usersFollowingLoaded, props.feed])
+
+    const fetchData = () => {
         if (props.usersFollowingLoaded == props.following.length && props.following.length !== 0) {
             props.feed.sort(function (x, y) {
                 return x.creation - y.creation;
             })
-            setPosts(props.feed);
+            setPosts(props.feed)
+            setLoading(false);
         }
-        console.log(posts)
-
-    }, [props.usersFollowingLoaded, props.feed])
+    }
     
     const onLikePress = (userId, postId) => {
         firebase.firestore()
@@ -87,6 +92,8 @@ function Feed(props) {
                 style={styles.feed}
                 data={posts}
                 ListEmptyComponent={EmptyListMessage}
+                onRefresh={() => fetchData()}
+                refreshing={loading}
                 renderItem={({ item }) => (
                     <View style={styles.feedItem}>
                         <TouchableOpacity

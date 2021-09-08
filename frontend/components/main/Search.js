@@ -31,13 +31,11 @@ export default function Search(props) {
                 <FontAwesome5 name="search-dollar" color="grey" size={20} paddingRight={5} />
                 <TextInput
                     style={styles.textInput}
-                    placeholder="Find your lock..."
+                    placeholder="Type to find friends..."
                     onChangeText={(search) => fetchUsers(search)} />
             </View>
 
             <FlatList
-                numColumns={1}
-                horizontal={false}
                 data={users}
                 style={styles.feed}
                 renderItem={({ item }) => (

@@ -20,12 +20,39 @@ function Odds(props) {
     const [loading, setLoading] = useState(true);
 
      useEffect(() => {
-        interstitial();
         setGames(props.games)
-        setnflGames(props.nflGames)
-        setncaafGames(props.ncaafGames)
-        setmlbGames(props.mlbGames)
+        fetchMLBData()
+        fetchNFLData()
+        fetchNCAAFData()
+        
+
+        const theRandomNumber = Math.floor(Math.random() * 3) + 1
+        if (theRandomNumber == 1) {
+            interstitial()
+            console.log(theRandomNumber)
+        } else {
+            null
+        }
+
     }, [props.games, props.nflGames, props.ncaafGames, props.mlbGames])
+
+    const fetchMLBData = () => {
+        setmlbGames(props.mlbGames)
+            setLoading(false);
+        }
+    
+
+    const fetchNFLData = () => {
+        setnflGames(props.nflGames)
+            setLoading(false);
+        }
+    
+
+    const fetchNCAAFData = () => {
+        setncaafGames(props.ncaafGames)
+            setLoading(false);
+        }
+    
 
     const interstitial = async () => {
         await AdMobInterstitial.setAdUnitID('ca-app-pub-3940256099942544/1033173712'); // Test ID, Replace with your-admob-unit-id
@@ -56,7 +83,9 @@ function Odds(props) {
         <FlatList 
             data={nflGames}
             style={styles.feed}
-            renderItem={renderItem} 
+            renderItem={renderItem}
+            onRefresh={() => fetchNFLData()}
+            refreshing={loading}
 
         />
         <AdMobBanner
@@ -86,7 +115,9 @@ function Odds(props) {
         <FlatList 
             data={ncaafGames}
             style={styles.feed}
-            renderItem={renderItem} 
+            renderItem={renderItem}
+            onRefresh={() => fetchNCAAFData()}
+            refreshing={loading}
 
         />
         <AdMobBanner
@@ -116,7 +147,9 @@ function Odds(props) {
             <FlatList 
                 data={mlbGames}
                 style={styles.feed}
-                renderItem={renderItem} 
+                renderItem={renderItem}
+                onRefresh={() => fetchMLBData()}
+                refreshing={loading}
 
             />
             <AdMobBanner

@@ -47,14 +47,12 @@ import NewCommentScreen from './components/main/NewComment'
 import EditProfileScreen from './components/main/EditProfile'
 import Feed from './components/main/Feed'
 import Search from './components/main/Search'
-import NotificationsScreen from './components/main/Notifications'
 import Profile from './components/main/Profile'
 import AboutUsScreen from './components/main/AboutUs'
 import HouseGuidelinesScreen from './components/main/HouseGuidelines'
 import ContactUsScreen from './components/main/ContactUs'
 import Odds from './components/main/Odds'
 import game from './components/main/game'
-import test from './components/main/test'
 import MessagesButton from './components/buttons/MessagesButton'
 
 
@@ -112,12 +110,7 @@ const MainStackScreen = ({navigation, props}) => (
             }
         })} 
           />
-        <MainStack.Screen 
-        name="test" 
-        component={test}
-          />
       <MainStack.Screen name="Search" component={Search}/>
-      <MainStack.Screen name="Notifications" component={NotificationsScreen} />
       <MainStack.Screen name="Profile" component={Profile}
         options={{
           headerTitle: () => (

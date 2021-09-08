@@ -13,9 +13,7 @@ import { fetchUser, fetchUserPosts, fetchUserFollowing, fetchNFLGames, fetchNCAA
 import FeedScreen from './main/Feed'
 import ProfileScreen from './main/Profile'
 import SearchScreen from './main/Search'
-import NotificationsScreen from './main/Notifications'
 import Odds from './main/Odds'
-import test from './main/test'
 
 const Stack = createStackNavigator();
 
@@ -88,19 +86,6 @@ export class Main extends Component {
 
                     />
 
-                    <Tab.Screen 
-                        name="test" 
-                        component={test}
-                        options={{
-                            tabBarLabel: 'Test',
-                            tabBarColor: '#009387',
-                            tabBarIcon: ({ color, size }) => (
-                                <FontAwesome5 name="user-lock" color={color} size={20} />
-                            ),
-                        }}
-                        
-
-                        />
                 <Tab.Screen 
                     name="Search" 
                     component={SearchScreen} 
@@ -112,22 +97,6 @@ export class Main extends Component {
                             <MaterialCommunityIcons name="magnify" color={color} size={26} />
                         ),
                     }} />
-                <Tab.Screen 
-                    name="Notifications" 
-                    component={NotificationsScreen} 
-                    listeners={({ navigation }) => ({
-                        tabPress: event => {
-                            event.preventDefault();
-                            navigation.navigate("Notifications", {uid: firebase.auth().currentUser.uid})
-                        }})}
-                    options={{
-                        tabBarLabel: 'Notifications',
-                        tabBarColor: '#009387',
-                        tabBarIcon: ({ color, size }) => (
-                            <MaterialCommunityIcons name="heart" color={color} size={26} />
-                        ),
-                    }}
-                    />
                 <Tab.Screen 
                     name="Profile" 
                     component={ProfileScreen} 

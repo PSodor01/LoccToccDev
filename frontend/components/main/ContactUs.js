@@ -8,11 +8,8 @@ export default class ContactUsScreen extends React.Component {
     render() {
         return (
             <View style={styles.mainContainer}>
-                <TouchableOpacity onPress={() => {this.bs.current.snapTo(0); this.handleSupportEmail}} style={styles.postButton}>
-                    <Text style={styles.shareText}>Bottom Sheet</Text>
-                </TouchableOpacity> 
                 <View style={styles.container}>
-                    <Text style={styles.titleText}>Having technical difficulties?</Text>
+                    <Text style={styles.titleText}>Technical difficulties?</Text>
                     <Text style={styles.text}>Click the link below to contact our support team. We will address your issue right away.</Text>
                     <TouchableOpacity onPress={this.handleSupportEmail} style={styles.postButton}>
                         <Text style={styles.shareText}>Support</Text>
@@ -87,7 +84,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
       },
       titleText: {
-        fontSize: 24,
+        fontSize: 22,
         fontWeight: "bold",
         paddingTop: 20,
         paddingBottom: 10,

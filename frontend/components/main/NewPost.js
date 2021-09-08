@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Platform, Alert, FlatList, StyleSheet, ActivityIndicator, TextInput, TouchableOpacity, Image, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView} from 'react-native';
+import { View, Text, Platform, Alert, FlatList, StyleSheet, Dimensions, ActivityIndicator, TextInput, TouchableOpacity, Image, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView} from 'react-native';
 
 import { Feather } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -19,7 +19,7 @@ require("firebase/firebase-storage")
 const AddPostScreen = ({ route, props }) => {
 
   const [image, setImage] = useState(null);
-  const [uploading, setUploading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [transferred, setTransferred] = useState(0);
   const [post, setPost] = useState(null);
   const [userData, setUserData] = useState(null);
@@ -106,6 +106,7 @@ const AddPostScreen = ({ route, props }) => {
             'Your post has been published successfully!',
           );
           setPost(null);
+          setLoading(false)
         }).then((function () {
           navigation.goBack()
       })).catch((error) => {
@@ -119,6 +120,7 @@ const AddPostScreen = ({ route, props }) => {
         savePostData(downloadURL);
       }  else {
       
+      setLoading(true)
       const uri = image;
         const childPath = `post/${firebase.auth().currentUser.uid}/${Math.random().toString(36)}`;
         console.log(childPath)
@@ -202,7 +204,7 @@ const AddPostScreen = ({ route, props }) => {
             <View style={styles.searchSection}>
                 <FontAwesome5 name="search-dollar" color="grey" size={20} paddingRight={5} />
                 <TextInput
-                    placeholder="Search Giphy"
+                    placeholder="Search GIPHY"
                     style={styles.textInput}
                     onChangeText={(text) => onEdit(text)}
                 />
@@ -236,7 +238,9 @@ const AddPostScreen = ({ route, props }) => {
               />
               <TextInput
                   placeholder="Know your stuff? Share your lock..."
+                  style={styles.postTextInput}
                   numberOfLines={4}
+                  multiline={true}
                   maxLength={1000}
                   value={post}
                   onChangeText={(content) => setPost(content)}
@@ -258,6 +262,14 @@ const AddPostScreen = ({ route, props }) => {
                   </TouchableOpacity>
                 </View>
             </View>
+            {loading ? (
+                <View style={styles.StatusWrapper}>
+                  <ActivityIndicator size="large"/>
+                </View>
+              ) : (
+                <View></View>
+                
+              )}
             <View style={styles.xButton}>
               {image != null ? 
                   <TouchableOpacity onPress={() => {removeImage()}}>
@@ -266,19 +278,7 @@ const AddPostScreen = ({ route, props }) => {
             </View>
             
             <View style={styles.InputWrapper}>
-              
               {image != null ? <Image source={{uri: image}} style={styles.AddImage}/> : null}
-
-              
-              {uploading ? (
-                <View style={styles.StatusWrapper}>
-                  <Text>{transferred} % Completed!</Text>
-                  <ActivityIndicator size="large" color="#0000ff" />
-                </View>
-              ) : (
-                <View></View>
-                
-              )}
             </View>
           </Animated.View>
         </KeyboardAvoidingView>
@@ -438,6 +438,9 @@ searchSection: {
 xButton: {
   alignItems: 'flex-end',
   paddingTop: 2,
+},
+postTextInput: {
+  width: Dimensions.get('window').width * .80,
 }
 
 })

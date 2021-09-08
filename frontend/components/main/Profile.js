@@ -18,14 +18,20 @@ function Profile(props) {
     const [userPosts, setUserPosts] = useState([]);
     const [user, setUser] = useState(null);
     const [following, setFollowing] = useState(false);
+    const [loading, setLoading] = useState(true);
     
     useEffect(() => {
+        fetchData()
+    }, [props.route.params.uid, props.following])
+
+    const fetchData = () => {
         const { currentUser, posts } = props;
 
     
         if (props.route.params.uid === firebase.auth().currentUser.uid) {
             setUser(currentUser)
             setUserPosts(posts)
+            setLoading(false);
         }
         else {
             firebase.firestore()
@@ -53,6 +59,7 @@ function Profile(props) {
                         return { id, ...data }
                     })
                     setUserPosts(posts)
+                    setLoading(false);
                 })
         }
 
@@ -61,9 +68,7 @@ function Profile(props) {
         } else {
             setFollowing(false);
         }
-    
-
-    }, [props.route.params.uid, props.following])
+    }
 
     const onFollow = () => {
         const userFollowing = firebase.firestore()
@@ -189,10 +194,6 @@ function Profile(props) {
                             source={{uri: user ? user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
                         />
                         <Text style={styles.profileNameText}>{user.name}</Text>
-                        <Text style={styles.profileNameText}>{props.route.params.uid}</Text>
-                        
-
-
                     </View>
                     <View style={{ marginLeft: "5%" }}>
                         <View style={{ flexDirection: 'row', paddingTop: 5}}>
@@ -210,7 +211,7 @@ function Profile(props) {
                     </View>
                     
 
-                    <View style={{ paddingTop: "3%" }}>
+                    <View style={{ paddingTop: "2%" }}>
                         {props.route.params.uid !== firebase.auth().currentUser.uid ? (
                             <View>
                                 {following ? (
@@ -260,6 +261,8 @@ function Profile(props) {
                             numColumns={1}
                             horizontal={false}
                             data={userPosts}
+                            onRefresh={() => fetchData()}
+                            refreshing={loading}
                             renderItem={({ item }) => (
                                 <View style={styles.feedItem}>
                                     <View style={styles.postLeftContainer}>
@@ -278,25 +281,10 @@ function Profile(props) {
                                             {item.downloadURL != "blank" ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
                                         </View>
                                         <View style={styles.postFooterContainer}>
-                                            { item.currentUserLike ?
-                                                (
-                                                    <TouchableOpacity
-                                                        style={styles.likeContainer}
-                                                        onPress={() => onDislikePress(item.id)} >
-                                                        <Icon name={"hammer"} size={20} color={"grey"} />
-                                                        <Text style={styles.likeNumber}>{item.likesCount}</Text>
-                                                    </TouchableOpacity>
-                                                )
-                                                :
-                                                (
-                                                    <TouchableOpacity
-                                                        style={styles.likeContainer}
-                                                        onPress={() => onLikePress(item.id)}>  
-                                                        <Icon name={"hammer-outline"}  size={20} color={"grey"}/>
-                                                        <Text style={styles.likeNumber}>{item.likesCount}</Text>
-                                                    </TouchableOpacity>
-                                                )
-                                            }
+                                            <View style={styles.likeContainer}>
+                                                <Icon name={"hammer-outline"} size={20} color={"grey"} />
+                                                <Text style={styles.likeNumber}>{item.likesCount}</Text>
+                                            </View>
                                             <TouchableOpacity
                                                 style={styles.commentsContainer}
                                                 onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.creator, posterId: item.creator, posterName: user.name, postCreation: item.creation, postCaption: item.caption, posterImg: user.userImg, postImg: item.downloadURL })}>

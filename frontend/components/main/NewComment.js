@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, TouchableOpacity, FlatList, TouchableWithoutFeedback, StyleSheet, TextInput, Image, Alert, Keyboard, KeyboardAvoidingView,} from 'react-native'
+import { View, Text, TouchableOpacity, ActivityIndicator, FlatList, TouchableWithoutFeedback, StyleSheet, TextInput, Image, Alert, Keyboard, KeyboardAvoidingView,} from 'react-native'
 
 import { Feather } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -23,7 +23,7 @@ import { fetchUsersData } from '../../redux/actions/index'
 function NewCommentScreen(props, route) {
     const [comments, setComments] = useState([])
     const [text, setText] = useState("")
-    const [uploading, setUploading] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [image, setImage] = useState(null);
     const [userData, setUserData] = useState(null);
     const [gifs, setGifs] = useState([]);
@@ -106,10 +106,11 @@ function NewCommentScreen(props, route) {
             .then(() => {
                 console.log('Comment Added!');
                 Alert.alert(
-                  'Comment added!',
+                  'Nice!',
                   'Your comment has been published successfully!',
                 );
                 setComments(null);
+                setLoading(false)
               }).then((function () {
                 navigation.goBack()
             }))
@@ -160,6 +161,7 @@ function NewCommentScreen(props, route) {
           onCommentSend(downloadURL);
         }  else { 
         
+        setLoading(true) 
         const uri = image;
           const childPath = `post/${firebase.auth().currentUser.uid}/${Math.random().toString(36)}`;
           console.log(childPath)
@@ -249,7 +251,7 @@ function NewCommentScreen(props, route) {
                   <View style={styles.searchSection}>
                       <FontAwesome5 name="search-dollar" color="grey" size={20} alignItems='center' />
                       <TextInput
-                          placeholder="Search Giphy"
+                          placeholder="Search GIPHY"
                           style={styles.textInput}
                           onChangeText={(text) => onEdit(text)}
                       />
@@ -304,6 +306,14 @@ function NewCommentScreen(props, route) {
                           </TouchableOpacity>
                       </View>
                   </View>
+                  {loading ? (
+                    <View style={styles.StatusWrapper}>
+                      <ActivityIndicator size="large"/>
+                    </View>
+                  ) : (
+                    <View></View>
+                    
+                  )}
                   <View style={styles.xButton}>
                     {image != null ? 
                         <TouchableOpacity onPress={() => {removeImage()}}>
@@ -312,22 +322,9 @@ function NewCommentScreen(props, route) {
                   </View>
                   <View style={styles.InputWrapper}>
                     {image != null ? <Image source={{uri: image}} style={styles.AddImage}/> : null}
-        
-                    
-                    {uploading ? (
-                      <View style={styles.StatusWrapper}>
-                        <Text>{transferred} % Completed!</Text>
-                        <ActivityIndicator size="large" color="#0000ff" />
-                      </View>
-                    ) : (
-                      <View></View>
-                      
-                    )}
                   </View>
                 </Animated.View>
               </KeyboardAvoidingView>
-            
-          
         );
       };
 
@@ -474,7 +471,7 @@ panelButtonTitle: {
   color: 'white',
 },
 image: {
-  width: 200,
+  width: 300,
   height: 150,
   marginBottom: 5,
   borderRadius: 10,

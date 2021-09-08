@@ -23,6 +23,7 @@ function Comment(props, route) {
     const [postId, setPostId] = useState("")
     const [text, setText] = useState("")
     const [userData, setUserData] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     const { posterId, posterName, posterImg, postCreation, postCaption, postImg } = props.route.params;
 
@@ -38,11 +39,13 @@ function Comment(props, route) {
         })
         }  
     
-    useEffect(() => {
-        getUser();
-    },[]);
 
     useEffect(() => {
+        fetchData()
+        getUser()
+    }, [props.route.params.postId, props.users])
+
+    const fetchData = () => {
         function matchUserToComment(comments) {
             for (let i = 0; i < comments.length; i++) {
                 if (comments[i].hasOwnProperty('user')) {
@@ -59,7 +62,6 @@ function Comment(props, route) {
             setComments(comments)
         }
 
-
         if (props.route.params.postId !== postId) {
             firebase.firestore()
                 .collection('posts')
@@ -67,7 +69,7 @@ function Comment(props, route) {
                 .collection('userPosts')
                 .doc(props.route.params.postId)
                 .collection('comments')
-                .orderBy("creation", "desc")
+                .orderBy("creation", "asc")
                 .get()
                 .then((snapshot) => {
                     let comments = snapshot.docs.map(doc => {
@@ -76,47 +78,16 @@ function Comment(props, route) {
                         return { id, ...data }
                     })
                     matchUserToComment(comments)
+                    setLoading(false);
                 })
             setPostId(props.route.params.postId)
+            setLoading(false);
         } else {
             matchUserToComment(comments)
+            setLoading(false);
         }
-    }, [props.route.params.postId, props.users])
-
-    const onLikePress = (userId, postId) => {
-        const comments = firebase.firestore()
-            .collection("posts")
-            .doc(userId)
-            .collection("userPosts")
-            .doc(postId)
-            .collection("comments")
-        
-            comments.collection("likes")
-            .doc(firebase.auth().currentUser.uid)
-            .set({})
-            .then(() => {
-                comments.update({
-                    likesCount: firebase.firestore.FieldValue.increment(1)
-                });
-            })
     }
-    const onDislikePress = (userId, postId) => {
-        const comments = firebase.firestore()
-            .collection("posts")
-            .doc(userId)
-            .collection("userPosts")
-            .doc(postId)
-            .collection("comments")
 
-            comments.collection("likes")
-            .doc(firebase.auth().currentUser.uid)
-            .delete()
-            .then(() => {
-                comments.update({
-                    likesCount: firebase.firestore.FieldValue.increment(-1)
-                });
-            })
-    }
 
     const handleReportPostEmail = () => {
         const to = ['ReportPost@locctocc.com'] // string or array of email addresses
@@ -170,6 +141,8 @@ function Comment(props, route) {
             <FlatList
                 data={comments}
                 ListEmptyComponent={EmptyListMessage}
+                onRefresh={() => fetchData()}
+                refreshing={loading}
                 renderItem={({ item }) => (
                     <View>
                         {item.user !== undefined ?
@@ -191,25 +164,6 @@ function Comment(props, route) {
                                     {item.downloadURL != "blank" ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
                                 </View>
                                 <View style={styles.postFooterContainer}>
-                                    { item.currentUserLike ?
-                                        (
-                                            <TouchableOpacity
-                                                style={styles.likeContainer}
-                                                onPress={() => onDislikePress(item.user.uid, item.id)} >
-                                                <Ionicons name={"hammer"} size={20} color={"grey"} />
-                                                <Text style={styles.likeNumber}>{item.likesCount}</Text>
-                                            </TouchableOpacity>
-                                        )
-                                        :
-                                        (
-                                            <TouchableOpacity
-                                                style={styles.likeContainer}
-                                                onPress={() => onLikePress(item.user.uid, item.id)}> 
-                                                <Ionicons name={"hammer-outline"}  size={20} color={"grey"}/>
-                                                <Text style={styles.likeNumber}>{item.likesCount}</Text>
-                                            </TouchableOpacity>
-                                        )
-                                    }
                                     <TouchableOpacity
                                         style={styles.flagContainer}
                                         onPress={handleReportPostEmail}>
@@ -312,11 +266,11 @@ postHeaderContainer: {
 postFooterContainer: {
     flexDirection: 'row',
     paddingTop: 4,
-    justifyContent: 'space-between',
-    width: "80%",
     paddingTop: 5,
     marginLeft: "5%",
     paddingBottom: 2,
+    justifyContent: 'flex-end',
+    padding: 10,
 },
 postRightContainer: {
     flex: 1,
@@ -355,6 +309,7 @@ commentsContainer: {
 },
 flagContainer: {
     flexDirection: 'row',
+    paddingRight: 20,
 },
 likeNumber: {
     marginLeft: 5,

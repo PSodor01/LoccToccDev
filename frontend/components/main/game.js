@@ -7,6 +7,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import moment from 'moment'
 
+import { AdMobBanner } from 'expo-ads-admob'
+
 import { useNavigation } from '@react-navigation/native';
 
 import ShareButton from '../buttons/ShareButton'
@@ -24,50 +26,86 @@ function game(props) {
     const [gamePosts, setGamePosts] = useState([]);
     const [postId, setPostId] = useState("")
     const [loading, setLoading] = useState(true)
-    
+
     const {gameId, gameDate, homeTeam, awayTeam, homeMoneyline, awayMoneyline, homeSpread, awaySpread, homeSpreadOdds, awaySpreadOdds, over, overOdds, under, underOdds, awayTeamVote, homeTeamVote} = props.route.params;
     
     useEffect(() => {
 
         navigation.addListener('focus', async () => {
-            function matchUserToGamePost(gamePosts) {
-                for (let i = 0; i < gamePosts.length; i++) {
-                    if (gamePosts[i].hasOwnProperty('user')) {
-                        continue;
-                    }
-    
-                    const user = props.users.find(x => x.uid === gamePosts[i].creator)
-                    if (user == undefined) {
-                        props.fetchUsersData(gamePosts[i].creator, false)
-                    } else {
-                        gamePosts[i].user = user
-                    }
-                }
-                setGamePosts(gamePosts)
-                setLoading(false)
-            }
-    
-            if (props.route.params.postId !== postId) {
-                firebase.firestore()
-                .collectionGroup("userPosts")
-                .where('gameId', '==', gameId)
-                .get()
-                .then((snapshot) => {
-
-                    let gamePosts = snapshot.docs.map(doc => {
-                        const data = doc.data();
-                        const id = doc.id;
-                        return { id, ...data }
-                    })
-                        matchUserToGamePost(gamePosts)
-                    })
-                setPostId(props.route.params.postId)
-            } else {
-                matchUserToGamePost(gamePosts)
-                setLoading(false)
-            }
+            fetchData()
         })
-    }, [props.route.params.postId, props.users])
+    }, [props.route.params.postId, props.users, props.usersFollowingLoaded, props.feed])
+
+    const fetchData = () => {
+        function matchUserToGamePost(gamePosts) {
+            for (let i = 0; i < gamePosts.length; i++) {
+                if (gamePosts[i].hasOwnProperty('user')) {
+                    continue;
+                }
+
+                const user = props.users.find(x => x.uid === gamePosts[i].creator)
+                if (user == undefined) {
+                    props.fetchUsersData(gamePosts[i].creator, false)
+                } else {
+                    gamePosts[i].user = user
+                }
+            }
+            setGamePosts(gamePosts)
+            setLoading(false)
+        }
+
+        function setLikeStatus(gamePosts) {
+            for (let i = 0; i < gamePosts.length; i++) {
+                firebase.firestore()
+                .collection('posts')
+                .doc(gamePosts[i].creator)
+                .collection('userPosts')
+                .doc(gamePosts[i].id)
+                .collection('likes')
+                .doc(firebase.auth().currentUser.uid)
+                .get()
+                .then(documentSnapshot => {
+                        
+                    if (documentSnapshot.exists) {
+                        gamePosts[i].currentUserLike = true
+                        console.log(gamePosts)
+                        
+                    } else{
+                        gamePosts[i].currentUserLike = false
+                        console.log(gamePosts)
+                    }
+                }) 
+                .catch((err) => console.log(err.message));                  
+            }
+            setGamePosts(gamePosts)
+        }
+
+        if (props.route.params.postId !== postId) {
+            firebase.firestore()
+            .collectionGroup("userPosts")
+            .where('gameId', '==', gameId)
+            .get()
+            .then((snapshot) => {
+
+                let gamePosts = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    return { id, ...data }
+                })
+                   
+                    matchUserToGamePost(gamePosts)
+                    setLikeStatus(gamePosts)
+                })
+
+        } else {
+            matchUserToGamePost(gamePosts)
+            setLoading(false)
+        }
+        
+    }
+
+
+    
 
     const onLikePress = (userId, postId) => {
         firebase.firestore()
@@ -152,6 +190,7 @@ function game(props) {
     
     return (
         <View style={styles.container}>
+            
             <View style={styles.gameContainer}>
                 <View>
                     <Text>{moment(gameDate).format("LT")}</Text> 
@@ -214,10 +253,11 @@ function game(props) {
                     </View>
                 </View>                    
             </View>
-            
             <FlatList
                 data={gamePosts}
                 ListEmptyComponent={EmptyListMessage}
+                onRefresh={() => fetchData()}
+                refreshing={loading}
                 renderItem={({ item }) => (
                     <View>
                         {item.user !== undefined ?
@@ -232,6 +272,7 @@ function game(props) {
                             <View style={styles.postRightContainer}>
                                 <View style={styles.postHeaderContainer}>
                                     <Text style={styles.profileNameFeedText}>{item.user.name}</Text>
+                                    <Text>{item.currentUserLike}</Text>
                                     <Text style={styles.postTimeContainer}>{moment(item.creation.toDate()).fromNow()}</Text>
                                 </View>
                                 <View style={styles.postContentContainer}>
@@ -278,12 +319,16 @@ function game(props) {
                             
                             : null}
                     </View>
-                                
-
-                            
                 )}
 
             />
+            <View style={styles.adView}>
+                <AdMobBanner
+                    bannerSize="banner"
+                    adUnitID="ca-app-pub-3940256099942544/6300978111" // Test ID, Replace with your-admob-unit-id
+                    servePersonalizedAds // true or false
+                />
+            </View>
             <TouchableOpacity
                 activeOpacity={0.8}
                 style={styles.button}
@@ -484,6 +529,11 @@ const styles = StyleSheet.create({
         textAlign: 'justify',
         marginHorizontal: "5%",
       },
+    adView: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: '1%',
+    }
     
 })
 
