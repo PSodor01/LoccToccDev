@@ -143,7 +143,6 @@ function Feed(props) {
                                     onPress={handleReportPostEmail}>
                                     <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
                                 </TouchableOpacity>
-                                <ShareButton />
                             </View>
                         </View>
                     </View>

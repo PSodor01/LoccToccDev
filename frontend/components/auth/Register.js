@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, Alert, TouchableOpacity, Text, Linking, Button, TextInput, StyleSheet, TouchableWithoutFeedback, Keyboard } from 'react-native'
+import { View, TouchableOpacity, Text, Linking, Button, TextInput, StyleSheet, TouchableWithoutFeedback, Keyboard } from 'react-native'
 
 import { FontAwesome5 } from "@expo/vector-icons";
 
@@ -7,6 +7,8 @@ import { CheckBox } from 'react-native-elements';
 
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { Picker } from '@react-native-community/picker';
+
+import PassMeter from "react-native-passmeter";
 
 import firebase from 'firebase'
 import "firebase/firestore";
@@ -18,7 +20,14 @@ const DismissKeyboard = ({ children }) => (
 
 )
 
+const MAX_LEN = 15,
+  MIN_LEN = 6,
+  PASS_LABELS = ["Too Short", "Weak", "Better", "There we go!", "YES!!"];
+
+
+
 export class Register extends Component {
+
 
     constructor(props) {
         super(props);
@@ -107,10 +116,10 @@ export class Register extends Component {
             <DismissKeyboard>
                 <View style={styles.mainContainer}>
                     <TouchableOpacity 
-                        style= {{marginTop: "10%", marginLeft: '7.5%'}}
+                        style= {{marginTop: "7.5%", marginLeft: '7.5%'}}
                         onPress={() => this.props.navigation.goBack()}
                         >
-                        <FontAwesome5 name="chevron-left" size={24} color="black" />
+                        <FontAwesome5 name="chevron-left" size={24} color="#009387" />
                     </TouchableOpacity>
                     <View style= {{flexDirection: 'row', justifyContent: 'center'}}>
                         <Text style={styles.loadingLogo}>locctocc </Text>
@@ -147,11 +156,22 @@ export class Register extends Component {
                         <TextInput  
                             style={styles.textInput}
                             placeholder="Password"
-                            maxLength={20}
+                            maxLength={15}
                             autoCorrect={false}
                             secureTextEntry={true}
                             onChangeText={(password) => this.setState({ password })}
                         />
+                        {this.state.password ? 
+                        <PassMeter
+                            showLabels
+                            password={this.state.password}
+                            maxLength={MAX_LEN}
+                            minLength={MIN_LEN}
+                            labels={PASS_LABELS}
+                            useNativeDriver={true}
+                        />
+                        : null
+                        }
                         <View style={styles.datePicker}>
                             <Button 
                                 title="Choose Birthday" 

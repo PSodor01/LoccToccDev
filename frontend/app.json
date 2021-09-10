@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "instagram",
-    "slug": "instagram",
+    "name": "locctocc",
+    "slug": "locctocc",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/locctocclogo.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -17,10 +17,10 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
+      "supportsTablet": true,
+      "bundleIdentifier": "com.locctocc.locctocc",
+      "buildNumber": "1.0.0"
     }
+    
   }
 }

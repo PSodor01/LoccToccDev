@@ -30,10 +30,7 @@ function game(props) {
     const {gameId, gameDate, homeTeam, awayTeam, homeMoneyline, awayMoneyline, homeSpread, awaySpread, homeSpreadOdds, awaySpreadOdds, over, overOdds, under, underOdds, awayTeamVote, homeTeamVote} = props.route.params;
     
     useEffect(() => {
-
-        navigation.addListener('focus', async () => {
             fetchData()
-        })
     }, [props.route.params.postId, props.users, props.usersFollowingLoaded, props.feed])
 
     const fetchData = () => {
@@ -84,6 +81,7 @@ function game(props) {
             firebase.firestore()
             .collectionGroup("userPosts")
             .where('gameId', '==', gameId)
+            .orderBy("creation", "desc")
             .get()
             .then((snapshot) => {
 
@@ -310,7 +308,6 @@ function game(props) {
                                         onPress={handleReportPostEmail}>
                                         <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
                                     </TouchableOpacity>
-                                    <ShareButton />
                                 </View>
                             </View>
                                 

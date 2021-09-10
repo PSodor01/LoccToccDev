@@ -111,6 +111,7 @@ const styles = StyleSheet.create({
     postLeftContainer: {
         flexDirection: "row",
     },
+    
    
     
 })

@@ -50,7 +50,7 @@ function Profile(props) {
                 .collection("posts")
                 .doc(props.route.params.uid)
                 .collection("userPosts")
-                .orderBy("creation", "desc")
+                .orderBy("creation", "asc")
                 .get()
                 .then((snapshot) => {
                     let posts = snapshot.docs.map(doc => {
@@ -296,7 +296,6 @@ function Profile(props) {
                                                 onPress={handleReportPostEmail}>
                                                 <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
                                             </TouchableOpacity>
-                                            <ShareButton />
                                              {props.route.params.uid !== firebase.auth().currentUser.uid ? 
                                                 null
                                                 : <TouchableOpacity
@@ -346,7 +345,7 @@ const styles = StyleSheet.create({
         width: 100,
         height: 100,
         borderRadius: 40,
-        marginTop: 16,
+        marginTop: 10,
         overflow: 'hidden',
         marginBottom: 10,
 

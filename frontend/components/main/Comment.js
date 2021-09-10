@@ -169,7 +169,6 @@ function Comment(props, route) {
                                         onPress={handleReportPostEmail}>
                                         <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
                                     </TouchableOpacity>
-                                    <ShareButton />
                                 </View>
                             </View>
                                 

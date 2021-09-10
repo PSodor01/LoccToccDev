@@ -1,5 +1,5 @@
 import React, {useEffect, useContext, useState} from 'react';
-import { Text, View, StyleSheet, TouchableOpacity, TextInput, Image, Alert, ImageBackground } from 'react-native';
+import { Text, View, StyleSheet, ActivityIndicator, TouchableOpacity, TextInput, Image, Alert, ImageBackground } from 'react-native';
 
 import Animated from 'react-native-reanimated';
 import BottomSheet from 'reanimated-bottom-sheet';
@@ -22,7 +22,7 @@ const EditProfileScreen = () => {
     const [image, setImage] = useState(null);
     const [type, setType] = useState(Camera.Constants.Type.back);
     const [userData, setUserData] = useState(null);
-    const [uploading, setUploading] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [transferred, setTransferred] = useState(0);
     
     const getUser = async() => {
@@ -78,7 +78,7 @@ const EditProfileScreen = () => {
         const name = filename.split('.').slice(0, -1).join('.');
         filename = name + Date.now() + '.' + extension;
     
-        setUploading(true);
+        setLoading(true);
         setTransferred(0);
 
         const response = await fetch(uploadUri);
@@ -108,7 +108,7 @@ const EditProfileScreen = () => {
     
           const url = await task.snapshot.ref.getDownloadURL();
     
-          setUploading(false);
+          setLoading(false);
           setImage(null);
     
           // Alert.alert(
@@ -309,6 +309,14 @@ const EditProfileScreen = () => {
                 <TouchableOpacity style={styles.commandButton} onPress={handleUpdate}>
                     <Text style={styles.panelButtonTitle}>Submit</Text>
                 </TouchableOpacity>
+                {loading ? (
+                  <View style={styles.StatusWrapper}>
+                    <ActivityIndicator size="large"/>
+                  </View>
+                ) : (
+                  <View></View>
+                  
+                )}
             </Animated.View>
         </View>
     )
@@ -407,7 +415,10 @@ const styles = StyleSheet.create({
         marginTop: 16,
         overflow: 'hidden',
         marginBottom: 10,
-
+    },
+    StatusWrapper: {
+      justifyContent: 'center',
+      alignItems: 'center',
     },
   });
 
