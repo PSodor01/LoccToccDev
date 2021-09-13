@@ -18,9 +18,16 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.locctocc.locctocc",
-      "buildNumber": "1.0.0"
+      "bundleIdentifier": "com.psodor01.locctocc"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/locctocclogo.png",
+        "backgroundColor": "#FFFFFF"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
     }
-    
   }
 }
