@@ -216,15 +216,23 @@ export class Register extends Component {
                                         Linking.openURL('https://locctocc.flycricket.io/privacy.html');
                                         }}>
                                         Privacy Policy 
-                                    </Text><Text> </Text>
-                                and the{' '}
+                                    </Text><Text></Text>
+                                ,{' '}
                                     <Text
                                         style={styles.hyperlinkStyle}
                                         onPress={() => {
                                         Linking.openURL('https://locctocc.flycricket.io/terms.html');
                                         }}>
                                         Terms & Conditions
-                                    </Text>
+                                    </Text><Text> </Text>
+                                and the{' '}
+                                <Text
+                                    style={styles.hyperlinkStyle}
+                                    onPress={() => {
+                                    Linking.openURL('https://www.termsfeed.com/live/b4eefe2f-ded8-405c-bf83-3e9272e2eb34');
+                                    }}>
+                                    End-User License Agreement
+                                </Text>
                                 </Text>
                         </View>
                         

@@ -66,6 +66,24 @@ function Feed(props) {
         }).catch(console.error)
     }
 
+    const reportPostHandler = () => {
+        Alert.alert(
+            'Report Post',
+            'Please report this post if you feel it obtains objectionable content. Our team will investigate within 24 hours and may remove the content or content creator based on our findings.',
+
+            [
+                { text: 'Report', onPress: () => handleReportPostEmail()},
+                {
+                    text: 'Cancel',
+                    onPress: () => {},
+                    style: 'cancel',
+                },
+            ],
+            { cancelable: true }
+
+        )
+    }
+
     const EmptyListMessage = () => {
         return (
           // Flat List Item
@@ -77,16 +95,18 @@ function Feed(props) {
         );
       };
 
+      /*<AdMobBanner
+            bannerSize="banner"
+            adUnitID="ca-app-pub-3940256099942544/6300978111" // Test ID, Replace with your-admob-unit-id
+            servePersonalizedAds // true or false
+        /> */
+
     const navigation = useNavigation();
 
     return (
         <View style={styles.containerGallery}>
             <View style={styles.bannerAdContainer}>
-                <AdMobBanner
-                    bannerSize="banner"
-                    adUnitID="ca-app-pub-3940256099942544/6300978111" // Test ID, Replace with your-admob-unit-id
-                    servePersonalizedAds // true or false
-                /> 
+                
             </View>
             <FlatList
                 style={styles.feed}
@@ -140,7 +160,7 @@ function Feed(props) {
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={styles.flagContainer}
-                                    onPress={handleReportPostEmail}>
+                                    onPress={reportPostHandler}>
                                     <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
                                 </TouchableOpacity>
                             </View>

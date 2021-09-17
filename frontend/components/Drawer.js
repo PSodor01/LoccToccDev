@@ -108,23 +108,13 @@ export function DrawerContent(props) {
             <Drawer.Section style={styles.bottomDrawerSection}>
                 <DrawerItem 
                     icon={({color, size}) => (
-                        <FontAwesome5 
-                        name="clipboard-list"
+                        <FontAwesome5
+                        name="user-shield"
                         color={color}
                         size={size}/>
                     )}
-                    label="Terms & Conditions"
-                    onPress={() => Linking.openURL('https://locctocc.flycricket.io/terms.html')}
-                />
-                <DrawerItem 
-                    icon={({color, size}) => (
-                        <FontAwesome
-                        name="pencil-square-o"
-                        color={color}
-                        size={size}/>
-                    )}
-                    label="Privacy Policy"
-                    onPress={() => Linking.openURL('https://locctocc.flycricket.io/privacy.html')}
+                    label="Privacy"
+                    onPress={() => {props.navigation.navigate('LegalDocs')}}
                 />
                 <DrawerItem 
                     icon={({color, size}) => (

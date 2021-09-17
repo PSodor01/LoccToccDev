@@ -49,6 +49,7 @@ import Feed from './components/main/Feed'
 import Search from './components/main/Search'
 import Profile from './components/main/Profile'
 import AboutUsScreen from './components/main/AboutUs'
+import LegalDocsScreen from './components/main/LegalDocs'
 import HouseGuidelinesScreen from './components/main/HouseGuidelines'
 import ContactUsScreen from './components/main/ContactUs'
 import Odds from './components/main/Odds'
@@ -228,6 +229,19 @@ const MainStackScreen = ({navigation, props}) => (
           headerLeft: () => (
               <TouchableOpacity 
               style={{ alignItems: "flex-end", marginLeft:16 }}
+              onPress={() => navigation.goBack()}
+              >
+              <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+            </TouchableOpacity>
+            ),
+            }} 
+            />
+      <MainStack.Screen name="LegalDocs" component={LegalDocsScreen}
+        options={{
+          headerTitle: "Privacy",
+          headerLeft: () => (
+              <TouchableOpacity 
+              style={{  alignItems: "flex-end", marginLeft:16 }}
               onPress={() => navigation.goBack()}
               >
               <FontAwesome5 name="chevron-left" size={24} color="#fff" />

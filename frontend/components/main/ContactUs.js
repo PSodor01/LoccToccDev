@@ -2,6 +2,8 @@ import React from 'react'
 import { StyleSheet, TouchableOpacity, View, Text } from 'react-native'
 import email from 'react-native-email'
 
+import Fontisto from 'react-native-vector-icons/Fontisto';
+
 export default class ContactUsScreen extends React.Component {
 
 
@@ -11,23 +13,29 @@ export default class ContactUsScreen extends React.Component {
                 <View style={styles.container}>
                     <Text style={styles.titleText}>Technical difficulties?</Text>
                     <Text style={styles.text}>Click the link below to contact our support team. We will address your issue right away.</Text>
-                    <TouchableOpacity onPress={this.handleSupportEmail} style={styles.postButton}>
-                        <Text style={styles.shareText}>Support</Text>
+                    <TouchableOpacity onPress={this.handleSupportEmail} style={styles.linkButton}>
+                        <Fontisto name={"email"} color={"blue"} size={16}/>
+                        <Text style={styles.linkText}>  Support</Text>
                     </TouchableOpacity> 
+                    <Text></Text>
                 </View>
                 <View style={styles.container}>
                     <Text style={styles.titleText}>Advertising Inquiries</Text>
                     <Text style={styles.text}>Interested in partnering with us?</Text>
-                    <TouchableOpacity onPress={this.handleAdvertisingEmail} style={styles.postButton}>
-                        <Text style={styles.shareText}>Partners</Text>
+                    <TouchableOpacity onPress={this.handleAdvertisingEmail} style={styles.linkButton} >
+                        <Fontisto name={"email"} color={"blue"} size={16}/>
+                        <Text style={styles.linkText}>  Partners</Text>
                     </TouchableOpacity> 
+                    <Text></Text>
                 </View>
                 <View style={styles.container}>
                     <Text style={styles.titleText}>Have feedback?</Text>
                     <Text style={styles.text}>Good, bad or ugly, we'd love to hear from you.</Text>
-                    <TouchableOpacity onPress={this.handleFeedbackEmail} style={styles.postButton}>
-                        <Text style={styles.shareText}>Feedback</Text>
+                    <TouchableOpacity onPress={this.handleFeedbackEmail} style={styles.linkButton}>
+                        <Fontisto name={"email"} color={"blue"} size={16}/>
+                        <Text style={styles.linkText}>  Feedback</Text>
                     </TouchableOpacity> 
+                    <Text></Text>
                 </View>
             </View>
             
@@ -73,29 +81,22 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: "#e1e2e6",
         marginLeft: "2%",
-        flex: 1/3,
     },
-    postButton: {
-        alignSelf: 'flex-start',
-        backgroundColor: '#33A8FF',
-        borderRadius: 6,
-        paddingVertical: 3,
-        paddingHorizontal: 8,
-        marginBottom: 10,
-      },
-      titleText: {
-        fontSize: 22,
-        fontWeight: "bold",
+    linkButton: {
+        flexDirection: 'row',
+        marginLeft: "5%",
+    },
+    titleText: {
+        fontSize: 16,
+        fontWeight: 'bold',
         paddingTop: 20,
         paddingBottom: 10,
-      },
-      shareText: {
-        fontSize: 20,
-        fontWeight: "bold",
-        color: "#fff",
+    },
+    linkText: {
         alignSelf: 'center',
-      },
-      text: {
-          paddingBottom: 10,
-      },
+        color: 'blue',
+    },
+    text: {
+        paddingBottom: 10,
+    },
 })

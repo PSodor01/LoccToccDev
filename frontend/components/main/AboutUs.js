@@ -7,6 +7,8 @@ export default function AboutUsScreen() {
             <View style={styles.container}>
                 <Text></Text>
                 <Text style={styles.header}>Welcome to locctocc</Text>
+                <Text style={styles.betQuestion}>{`The question isn't "what are we going to bet?", the question is "what aren't we going to bet?"`}</Text>
+                <Text></Text>
                 <Text style={styles.textBody}>{`Like to bet on sports but not sure who to take tonight? Or are you on a hot streak and everything you touch hits? Either way you've come to the right place.`}</Text>
                 <Text></Text>
                 <Text style={styles.textBody}>{`locctocc is an interactive community designed for professional and casual sports bettors to collaborate and share ideas.`}</Text>
@@ -39,6 +41,9 @@ const styles = StyleSheet.create({
         marginLeft: "5%",
         marginRight: "5%",
         textAlign: 'justify'
+    },
+    betQuestion: {
+        fontStyle: 'italic'
     }
     
 })

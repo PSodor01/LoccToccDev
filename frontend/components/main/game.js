@@ -13,6 +13,8 @@ import { useNavigation } from '@react-navigation/native';
 
 import ShareButton from '../buttons/ShareButton'
 
+import email from 'react-native-email'
+
 import firebase from 'firebase'
 require("firebase/firestore")
 require("firebase/firebase-storage")
@@ -47,7 +49,6 @@ function game(props) {
                     gamePosts[i].user = user
                 }
             }
-            setGamePosts(gamePosts)
             setLoading(false)
         }
 
@@ -62,19 +63,20 @@ function game(props) {
                 .doc(firebase.auth().currentUser.uid)
                 .get()
                 .then(documentSnapshot => {
-                        
                     if (documentSnapshot.exists) {
-                        gamePosts[i].currentUserLike = true
-                        console.log(gamePosts)
-                        
+                        gamePosts[i].liked = "true"
+                        setGamePosts(gamePosts)
+                        setLoading(false)
                     } else{
-                        gamePosts[i].currentUserLike = false
-                        console.log(gamePosts)
+                        gamePosts[i].liked = "false"
+                        setGamePosts(gamePosts)
+                        setLoading(false)
+
                     }
                 }) 
                 .catch((err) => console.log(err.message));                  
             }
-            setGamePosts(gamePosts)
+            
         }
 
         if (props.route.params.postId !== postId) {
@@ -138,6 +140,24 @@ function game(props) {
         }).catch(console.error)
     }
 
+    const reportPostHandler = () => {
+        Alert.alert(
+            'Report Post',
+            'Please report this post if you feel it obtains objectionable content. Our team will investigate within 24 hours and may remove the content or content creator based on our findings.',
+
+            [
+                { text: 'Report', onPress: () => handleReportPostEmail()},
+                {
+                    text: 'Cancel',
+                    onPress: () => {},
+                    style: 'cancel',
+                },
+            ],
+            { cancelable: true }
+
+        )
+    }
+
     const EmptyListMessage = () => {
         return (
           // Flat List Item
@@ -148,6 +168,11 @@ function game(props) {
           </Text>
         );
       };
+
+      const testButton = (liked) => {
+            console.log(liked)
+        }
+      
     /*<View style={styles.postButtonContainer}>
         <Text>Who will cover the spread?</Text>
         <TouchableOpacity 
@@ -182,7 +207,15 @@ function game(props) {
             .collection(firebase.auth().currentUser.uid)
                 creator: firebase.auth().currentUser.uid,
                 })
-    } */
+    } 
+    
+    <AdMobBanner
+        bannerSize="banner"
+        adUnitID="ca-app-pub-3940256099942544/6300978111" // Test ID, Replace with your-admob-unit-id
+        servePersonalizedAds // true or false
+    />
+    
+    */
     
     const navigation = useNavigation();
     
@@ -268,9 +301,9 @@ function game(props) {
                                 />
                             </TouchableOpacity>
                             <View style={styles.postRightContainer}>
+                                
                                 <View style={styles.postHeaderContainer}>
                                     <Text style={styles.profileNameFeedText}>{item.user.name}</Text>
-                                    <Text>{item.currentUserLike}</Text>
                                     <Text style={styles.postTimeContainer}>{moment(item.creation.toDate()).fromNow()}</Text>
                                 </View>
                                 <View style={styles.postContentContainer}>
@@ -278,25 +311,25 @@ function game(props) {
                                     {item.downloadURL != "blank" ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
                                 </View>
                                 <View style={styles.postFooterContainer}>
-                                    { item.currentUserLike ?
-                                        (
-                                            <TouchableOpacity
-                                                style={styles.likeContainer}
-                                                onPress={() => onDislikePress(item.user.uid, item.id)} >
-                                                <Ionicons name={"hammer"} size={20} color={"grey"} />
-                                                <Text style={styles.likeNumber}>{item.likesCount}</Text>
-                                            </TouchableOpacity>
-                                        )
-                                        :
-                                        (
-                                            <TouchableOpacity
-                                                style={styles.likeContainer}
-                                                onPress={() => onLikePress(item.user.uid, item.id)}> 
-                                                <Ionicons name={"hammer-outline"}  size={20} color={"grey"}/>
-                                                <Text style={styles.likeNumber}>{item.likesCount}</Text>
-                                            </TouchableOpacity>
-                                        )
+                                    { item.liked === "true" ?
+                                        <TouchableOpacity
+                                            style={styles.likeContainer}
+                                            onPress={() => onDislikePress(item.user.uid, item.id)} >
+                                            <Ionicons name={"hammer"} size={20} color={"grey"} />
+                                            <Text style={styles.likeNumber}>{item.likesCount}</Text>
+                                        </TouchableOpacity>
+                                    
+                                    :
+                                        <TouchableOpacity
+                                            style={styles.likeContainer}
+                                            onPress={() => onLikePress(item.user.uid, item.id)}> 
+                                            <Ionicons name={"hammer-outline"}  size={20} color={"grey"}/>
+                                            <Text style={styles.likeNumber}>{item.likesCount}</Text>
+                                        </TouchableOpacity>
                                     }
+                                    <TouchableOpacity onPress={() => testButton(item.liked)}>
+                                        <Text>test</Text>
+                                    </TouchableOpacity>
                                     <TouchableOpacity
                                         style={styles.commentsContainer}
                                         onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.user.uid, posterId: item.user.uid, posterName: item.user.name, postCreation: item.creation, postCaption: item.caption, posterImg: item.user.userImg, postImg: item.downloadURL })}>
@@ -305,7 +338,7 @@ function game(props) {
                                     </TouchableOpacity>
                                     <TouchableOpacity
                                         style={styles.flagContainer}
-                                        onPress={handleReportPostEmail}>
+                                        onPress={reportPostHandler}>
                                         <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
                                     </TouchableOpacity>
                                 </View>
@@ -320,11 +353,7 @@ function game(props) {
 
             />
             <View style={styles.adView}>
-                <AdMobBanner
-                    bannerSize="banner"
-                    adUnitID="ca-app-pub-3940256099942544/6300978111" // Test ID, Replace with your-admob-unit-id
-                    servePersonalizedAds // true or false
-                />
+                
             </View>
             <TouchableOpacity
                 activeOpacity={0.8}

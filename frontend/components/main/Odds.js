@@ -24,16 +24,6 @@ function Odds(props) {
         fetchMLBData()
         fetchNFLData()
         fetchNCAAFData()
-        
-
-        const theRandomNumber = Math.floor(Math.random() * 3) + 1
-        if (theRandomNumber == 1) {
-            interstitial()
-            console.log(theRandomNumber)
-        } else {
-            null
-        }
-
     }, [props.games, props.nflGames, props.ncaafGames, props.mlbGames])
 
     const fetchMLBData = () => {
@@ -41,20 +31,17 @@ function Odds(props) {
             setLoading(false);
         }
     
-
     const fetchNFLData = () => {
         setnflGames(props.nflGames)
             setLoading(false);
         }
     
-
     const fetchNCAAFData = () => {
         setncaafGames(props.ncaafGames)
             setLoading(false);
         }
     
-
-    const interstitial = async () => {
+    /*const interstitial = async () => {
         await AdMobInterstitial.setAdUnitID('ca-app-pub-3940256099942544/1033173712'); // Test ID, Replace with your-admob-unit-id
         try {
             await AdMobInterstitial.requestAdAsync();
@@ -62,7 +49,21 @@ function Odds(props) {
         } catch(error) {
             console.log(error)
         }
-    }
+    } */
+
+    /*<AdMobBanner
+        bannerSize="banner"
+        adUnitID="ca-app-pub-3940256099942544/6300978111" // Test ID, Replace with your-admob-unit-id
+        servePersonalizedAds // true or false
+    /> */
+
+    /*const theRandomNumber = Math.floor(Math.random() * 3) + 1
+        if (theRandomNumber == 4) {
+            interstitial()
+            console.log(theRandomNumber)
+        } else {
+            null
+        } */
 
     const FirstRoute = () => (
         <View style={styles.container}>
@@ -88,11 +89,7 @@ function Odds(props) {
             refreshing={loading}
 
         />
-        <AdMobBanner
-            bannerSize="banner"
-            adUnitID="ca-app-pub-3940256099942544/6300978111" // Test ID, Replace with your-admob-unit-id
-            servePersonalizedAds // true or false
-        />
+        
        
     </View>
     );
@@ -121,11 +118,7 @@ function Odds(props) {
             refreshing={loading}
 
         />
-        <AdMobBanner
-            bannerSize="banner"
-            adUnitID="ca-app-pub-3940256099942544/6300978111" // Test ID, Replace with your-admob-unit-id
-            servePersonalizedAds // true or false
-        />
+        
     </View>
     );
     
@@ -153,11 +146,7 @@ function Odds(props) {
                 refreshing={loading}
 
             />
-            <AdMobBanner
-                bannerSize="banner"
-                adUnitID="ca-app-pub-3940256099942544/6300978111" // Test ID, Replace with your-admob-unit-id
-                servePersonalizedAds // true or false
-            />
+            
         </View>
       );
 

@@ -98,6 +98,24 @@ function Comment(props, route) {
         }).catch(console.error)
     }
 
+    const reportPostHandler = () => {
+        Alert.alert(
+            'Report Post',
+            'Please report this post if you feel it obtains objectionable content. Our team will investigate within 24 hours and may remove the content or content creator based on our findings.',
+
+            [
+                { text: 'Report', onPress: () => handleReportPostEmail()},
+                {
+                    text: 'Cancel',
+                    onPress: () => {},
+                    style: 'cancel',
+                },
+            ],
+            { cancelable: true }
+
+        )
+    }
+
     const EmptyListMessage = () => {
         return (
           // Flat List Item
@@ -166,7 +184,7 @@ function Comment(props, route) {
                                 <View style={styles.postFooterContainer}>
                                     <TouchableOpacity
                                         style={styles.flagContainer}
-                                        onPress={handleReportPostEmail}>
+                                        onPress={reportPostHandler}>
                                         <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
                                     </TouchableOpacity>
                                 </View>

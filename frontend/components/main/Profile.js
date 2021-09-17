@@ -158,6 +158,33 @@ function Profile(props) {
             })
     }
 
+    const handleReportUserEmail = () => {
+        const to = ['ReportPost@locctocc.com'] // string or array of email addresses
+        email(to, {
+            // Optional additional arguments
+            subject: 'LoccTocc Report User',
+            body: ''
+        }).catch(console.error)
+    }
+
+    const reportUserHandler = () => {
+        Alert.alert(
+            'Report Post',
+            'Please report this user if you feel they have violated our guidelines in any way. Our team will investigate within 24 hours and may remove the user based on our findings.',
+
+            [
+                { text: 'Report', onPress: () => handleReportUserEmail()},
+                {
+                    text: 'Cancel',
+                    onPress: () => {},
+                    style: 'cancel',
+                },
+            ],
+            { cancelable: true }
+
+        )
+    }
+
     const handleReportPostEmail = () => {
         const to = ['ReportPost@locctocc.com'] // string or array of email addresses
         email(to, {
@@ -167,6 +194,24 @@ function Profile(props) {
         }).catch(console.error)
     }
 
+    const reportPostHandler = () => {
+        Alert.alert(
+            'Report Post',
+            'Please report this post if you feel it obtains objectionable content. Our team will investigate within 24 hours and may remove the content or content creator based on our findings.',
+
+            [
+                { text: 'Report', onPress: () => handleReportPostEmail()},
+                {
+                    text: 'Cancel',
+                    onPress: () => {},
+                    style: 'cancel',
+                },
+            ],
+            { cancelable: true }
+
+        )
+    }
+
     const deletePost = (id) => {
         firebase.firestore()
             .collection("posts")
@@ -174,7 +219,31 @@ function Profile(props) {
             .collection("userPosts")
             .doc(id)
             .delete()
+            .then(() => {
+                console.log('Post Deleted!');
+                Alert.alert(
+                  'Your post has been deleted!',
+                );
             
+    })
+    }
+
+    const deletePostHandler = (id) => {
+        Alert.alert(
+            'Delete Post',
+            'Are you sure you want to delete this post?',
+
+            [
+                { text: 'Yes', onPress: () => deletePost(id)},
+                {
+                    text: 'Cancel',
+                    onPress: () => {},
+                    style: 'cancel',
+                },
+            ],
+            { cancelable: true }
+
+        )
     }
     
 
@@ -230,6 +299,11 @@ function Profile(props) {
                                                 <Text style={styles.follow}> Follow </Text>
                                         </TouchableOpacity>
                                     )}
+                                    <TouchableOpacity
+                                        style={styles.reportUserButton}
+                                        onPress={reportUserHandler}>
+                                        <Text style={{ color: "red"}}>Report User</Text>
+                                    </TouchableOpacity>
                             </View>
                         ) :
                             <View style={styles.middleButtonContainer}>
@@ -293,14 +367,14 @@ function Profile(props) {
                                             </TouchableOpacity>
                                             <TouchableOpacity
                                                 style={styles.flagContainer}
-                                                onPress={handleReportPostEmail}>
+                                                onPress={reportPostHandler}>
                                                 <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
                                             </TouchableOpacity>
                                              {props.route.params.uid !== firebase.auth().currentUser.uid ? 
                                                 null
                                                 : <TouchableOpacity
                                                     style={styles.flagContainer}
-                                                    onPress={() => deletePost(item.id)}>
+                                                    onPress={() => deletePostHandler(item.id)}>
                                                     <Icon name={"trash"} size={20} color={"grey"} marginRight={10} />
                                                 </TouchableOpacity>
                                                 }
@@ -369,6 +443,17 @@ const styles = StyleSheet.create({
         width: "30%",
         alignSelf: "center",
         marginBottom: "2%",
+    },
+    reportUserButton: {
+        borderColor: "red",
+        borderWidth: 1,
+        borderRadius: 6,
+        paddingVertical: 6,
+        paddingHorizontal: 8,
+        width: "30%",
+        alignSelf: 'center',
+        alignItems: "center",
+        marginBottom: "1%",
     },
     following: {
         color: "#666",
