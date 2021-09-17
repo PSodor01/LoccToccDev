@@ -18,7 +18,7 @@ import {AdMobBanner} from 'expo-ads-admob'
 
 function Feed(props) {
     const [posts, setPosts] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
 
      useEffect(() => {
         fetchData()

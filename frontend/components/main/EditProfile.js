@@ -133,7 +133,7 @@ const EditProfileScreen = () => {
           const cameraStatus = await Camera.requestPermissionsAsync();
           setHasCameraPermission(cameraStatus.status === 'granted');
     
-          const galleryStatus = await ImagePicker.requestCameraRollPermissionsAsync();
+          const galleryStatus = await ImagePicker.requestMediaLibraryPermissionsAsync();
           setHasGalleryPermission(galleryStatus.status === 'granted');
     
     
@@ -165,12 +165,12 @@ const EditProfileScreen = () => {
     
     
     
-      if (hasCameraPermission === null || hasGalleryPermission === false) {
+      /*if (hasCameraPermission === null || hasGalleryPermission === false) {
         return <View />;
       }
       if (hasCameraPermission === false || hasGalleryPermission === false) {
         return <Text>No access to camera</Text>;
-      }
+      } */
     
     renderInner = () => (
         <View style={styles.panel}>
@@ -328,7 +328,7 @@ export default EditProfileScreen;
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#fff',
+      backgroundColor: '#ffffff',
     },
     commandButton: {
       padding: 15,

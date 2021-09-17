@@ -29,7 +29,7 @@ export default function ResetPasswordScreen({ navigation }) {
                 <TouchableOpacity 
                     style={{ alignItems: "flex-start", marginLeft:16, marginTop: "15%" }}
                     onPress={() => {navigation.navigate('Login');}}>
-                    <FontAwesome5 name="chevron-left" size={24} color="black" />
+                    <FontAwesome5 name="chevron-left" size={24} color="#009387" />
                 </TouchableOpacity>
             </View>
             <View style={styles.mainContainer}>

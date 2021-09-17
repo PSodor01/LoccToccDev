@@ -47,10 +47,10 @@ export class Login extends Component {
                             <View style={styles.rightCircle}></View>
                         </View>
                         <TouchableOpacity 
-                            style={{ alignItems: "flex-start", marginLeft: '7.5%', top: -60 }}
+                            style={{ alignItems: "flex-start", marginLeft: '7.5%', top: -50 }}
                             onPress={() => this.props.navigation.goBack()}
                             >
-                            <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+                            <FontAwesome5 name="chevron-left" size={24} color="#009387" />
                         </TouchableOpacity>
                         <View style={{ justifyContent: 'center', flexDirection: 'row', paddingTop: 40, paddingBottom: 20,}}>
                             <Text style={styles.loadingLogo}>locctocc </Text>

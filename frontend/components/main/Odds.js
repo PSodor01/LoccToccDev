@@ -180,7 +180,6 @@ function Odds(props) {
             <View>
                 <View style={styles.gameContainer}>
                     <TouchableOpacity
-                        style={styles.gameButton}
                         onPress={() => props.navigation.navigate('game', {gameId: item.gameId, gameDate: item.gameDate, homeTeam: item.homeTeam, awayTeam: item.awayTeam, homeSpread: item.homeSpread, awaySpread: item.awaySpread, homeSpreadOdds: item.homeSpreadOdds, awaySpreadOdds: item.awaySpreadOdds, awayMoneyline: item.awayMoneyline, homeMoneyline: item.homeMoneyline, over: item.over, overOdds: item.overOdds, under: item.under, underOdds: item.underOdds, awayTeamVote: item.awayTeamVote, homeTeamVote: item.homeTeamVote })}>
                         <View>
                             <Text>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
@@ -277,8 +276,8 @@ const styles = StyleSheet.create({
     gameContainer: {
         padding: 6,
         marginVertical:4,
-        marginRight: "1%",
-        marginLeft: "1%",
+        marginRight: 2,
+        marginLeft: 2,
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
@@ -317,13 +316,13 @@ const styles = StyleSheet.create({
         fontSize: 12,
     },
     teamItem: {
-        width: 160,
+        width: "50%",
         borderRightColor: "#e1e2e6",
         borderRightWidth: 1,
         justifyContent: 'center',
     },
     spreadItem: {
-        width: 60,
+        width: "16.5%",
         borderRightColor: "#e1e2e6",
         borderRightWidth: 1,
         alignItems: 'center',
@@ -331,7 +330,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     moneylineItem: {
-        width: 60,
+        width: "16.5%",
         borderRightColor: "#e1e2e6",
         borderRightWidth: 1,
         alignItems: 'center',
@@ -339,7 +338,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     totalItem: {
-        width: 60,
+        width: "16.5%",
         alignItems: 'center',
         paddingTop: 2,
         justifyContent: 'center',
@@ -348,14 +347,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
     teamHeader: {
-        width: 160,
+        width: "50%",
     },
     spreadHeader: {
-        width: 60,
+        width: "16.5%",
         alignItems: 'center',
     },
     moneylineHeader: {
-        width: 60,
+        width: "16.5%",
         alignItems: 'center',
     },
     totalHeader: {
@@ -371,7 +370,7 @@ const styles = StyleSheet.create({
         paddingTop: 5,
     },
     btnTab: {
-        width: Dimensions.get('window').width /4,
+        width: Dimensions.get('window').width /3,
         flexDirection: 'row',
         backgroundColor: "#ffffff",
         borderRadius: 15,

@@ -24,7 +24,22 @@ const MAX_LEN = 15,
   MIN_LEN = 6,
   PASS_LABELS = ["Too Short", "Weak", "Better", "There we go!", "YES!!"];
 
+/*
+<View style={styles.datePicker}>
+    <Button 
+        title="Choose Birthday" 
+        onPress={this.onPressButton} 
+    />
+    <Text>{this.state.DateDisplay}</Text>
+    <DateTimePickerModal 
+        isVisible={this.state.visibility}
+        onConfirm={this.handleConfirm}
+        onCancel={this.onPressCancel}
+        mode="date"
+    />
 
+</View>
+    */
 
 export class Register extends Component {
 
@@ -172,21 +187,8 @@ export class Register extends Component {
                         />
                         : null
                         }
-                        <View style={styles.datePicker}>
-                            <Button 
-                                title="Choose Birthday" 
-                                onPress={this.onPressButton} 
-                            />
-                            <Text>{this.state.DateDisplay}</Text>
-                            <DateTimePickerModal 
-                                isVisible={this.state.visibility}
-                                onConfirm={this.handleConfirm}
-                                onCancel={this.onPressCancel}
-                                mode="date"
-                            />
-
-                        </View>
-                        <View style={{ paddingTop: 0 }}>
+                        
+                        <View style={{ paddingTop: 10, marginTop: 30 }}>
                             <Picker
                             style={{ justifyContent: 'center', height: 100}}
                             itemStyle={{ fontSize: 14, }}

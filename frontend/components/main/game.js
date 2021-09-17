@@ -416,13 +416,13 @@ const styles = StyleSheet.create({
         fontSize: 12,
     },
     teamItem: {
-        width: 160,
+        width: "50%",
         borderRightColor: "#e1e2e6",
         borderRightWidth: 1,
         justifyContent: 'center',
     },
     spreadItem: {
-        width: 60,
+        width: "16.5%",
         borderRightColor: "#e1e2e6",
         borderRightWidth: 1,
         alignItems: 'center',
@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     moneylineItem: {
-        width: 60,
+        width: "16.5%",
         borderRightColor: "#e1e2e6",
         borderRightWidth: 1,
         alignItems: 'center',
@@ -438,28 +438,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     totalItem: {
-        width: 60,
+        width: "16.5%",
         alignItems: 'center',
         paddingTop: 2,
         justifyContent: 'center',
     },
     gameHeaderContainer: {
         flexDirection: 'row',
-    },
-    teamHeader: {
-        width: 160,
-    },
-    spreadHeader: {
-        width: 60,
-        alignItems: 'center',
-    },
-    moneylineHeader: {
-        width: 60,
-        alignItems: 'center',
-    },
-    totalHeader: {
-        width: 60,
-        alignItems: 'center',
     },
     postButtonContainer: {
         paddingBottom: 5,
