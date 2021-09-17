@@ -1,9 +1,15 @@
 {
-    "build": {
-      "release": {},
-      "development": {
-        "developmentClient": true,
-        "distribution": "internal"
+  "submit": {
+    "release": {
+      "android": {
+        "serviceAccountKeyPath": "../path/to/api-xxx-yy-zzz.json",
+        "track": "internal"
+      },
+      "ios": {
+        "appleId": "paul.sodora@locctocc.com",
+        "ascAppId": "1585460244",
+        "appleTeamId": "Paul Sodora"
       }
     }
   }
+}
