@@ -131,22 +131,22 @@ function game(props) {
 
      
 
-    const handleReportPostEmail = () => {
+    const handleReportPostEmail = (name, caption) => {
         const to = ['ReportPost@locctocc.com'] // string or array of email addresses
         email(to, {
             // Optional additional arguments
             subject: 'LoccTocc Report Post',
-            body: ''
+            body: name && caption
         }).catch(console.error)
     }
 
-    const reportPostHandler = () => {
+    const reportPostHandler = (name, caption) => {
         Alert.alert(
             'Report Post',
-            'Please report this post if you feel it obtains objectionable content. Our team will investigate within 24 hours and may remove the content or content creator based on our findings.',
-
+            'Please report this post if you feel it contains objectionable content. Our team will investigate within 24 hours and may remove the content or content creator based on our findings.',
+            
             [
-                { text: 'Report', onPress: () => handleReportPostEmail()},
+                { text: 'Report', onPress: () => handleReportPostEmail({name, caption})},
                 {
                     text: 'Cancel',
                     onPress: () => {},
@@ -168,10 +168,6 @@ function game(props) {
           </Text>
         );
       };
-
-      const testButton = (liked) => {
-            console.log(liked)
-        }
       
     /*<View style={styles.postButtonContainer}>
         <Text>Who will cover the spread?</Text>
@@ -327,9 +323,6 @@ function game(props) {
                                             <Text style={styles.likeNumber}>{item.likesCount}</Text>
                                         </TouchableOpacity>
                                     }
-                                    <TouchableOpacity onPress={() => testButton(item.liked)}>
-                                        <Text>test</Text>
-                                    </TouchableOpacity>
                                     <TouchableOpacity
                                         style={styles.commentsContainer}
                                         onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.user.uid, posterId: item.user.uid, posterName: item.user.name, postCreation: item.creation, postCaption: item.caption, posterImg: item.user.userImg, postImg: item.downloadURL })}>
@@ -338,7 +331,7 @@ function game(props) {
                                     </TouchableOpacity>
                                     <TouchableOpacity
                                         style={styles.flagContainer}
-                                        onPress={reportPostHandler}>
+                                        onPress={() => reportPostHandler({name: item.user.name, caption: item.caption})}>
                                         <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
                                     </TouchableOpacity>
                                 </View>
