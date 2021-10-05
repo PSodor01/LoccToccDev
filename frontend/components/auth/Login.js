@@ -1,7 +1,10 @@
 import React, { Component } from 'react'
-import { View, StyleSheet, Text, TextInput, TouchableOpacity, Image, TouchableWithoutFeedback, Keyboard } from 'react-native'
+import { View, StyleSheet, Alert, Text, TextInput, TouchableOpacity, Image, TouchableWithoutFeedback, Keyboard } from 'react-native'
 
 import { FontAwesome5 } from "@expo/vector-icons";
+import Fontisto from 'react-native-vector-icons/Fontisto';
+
+import email from 'react-native-email'
 
 import firebase from 'firebase'
 
@@ -32,9 +35,20 @@ export class Login extends Component {
             .then((result) => {
                 console.log(result)
             })
-            .catch((error) => {
-                console.log(error)
-            })
+            .catch(error => {   
+                alert(error.message);
+             })
+           }catch(err){
+              alert(err);
+    }
+
+    handleSupportEmail = () => {
+        const to = ['support@locctocc.com'] // string or array of email addresses
+        email(to, {
+            // Optional additional arguments
+            subject: 'LoccTocc Support Ticket',
+            body: ''
+        }).catch(console.error)
     }
 
     render() {
@@ -89,6 +103,10 @@ export class Login extends Component {
                             >
                             <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
                         </TouchableOpacity>
+                        <TouchableOpacity onPress={this.handleSupportEmail} style={styles.linkButton}>
+                            <Fontisto name={"email"} color={"blue"} />
+                            <Text style={styles.linkText}>  Support</Text>
+                        </TouchableOpacity> 
 
                         <TouchableOpacity
                             onPress={() => this.onSignUp()}
@@ -97,6 +115,7 @@ export class Login extends Component {
                                 <Text style={styles.appButtonText}> Sign In </Text>
                         </TouchableOpacity>
                         <View style={styles.disclaimerContainer}>
+                            
                             <Text style={styles.disclaimerText}>
                                 If you or someone you know has a gambling problem
                             </Text>
@@ -213,7 +232,16 @@ const styles = StyleSheet.create({
     },
     forgotPasswordText: {
         color: 'blue',
-    }
+    },
+    linkButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    linkText: {
+        alignSelf: 'center',
+        color: 'blue',
+    },
     
 })
 

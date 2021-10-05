@@ -8,7 +8,7 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import firebase from 'firebase'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { fetchUser, fetchUserPosts, fetchUserFollowing, fetchNFLGames, fetchNCAAFGames, fetchMLBGames, clearData } from '../redux/actions/index'
+import { fetchUser, fetchUserPosts, fetchUserFollowing, fetchUserBlocking, fetchLikes, fetchNFLGames, fetchNCAAFGames, fetchMLBGames, clearData } from '../redux/actions/index'
 
 import FeedScreen from './main/Feed'
 import ProfileScreen from './main/Profile'
@@ -55,13 +55,15 @@ export class Main extends Component {
         this.props.fetchUser();
         this.props.fetchUserPosts();
         this.props.fetchUserFollowing();
+        this.props.fetchUserBlocking();
+        this.props.fetchLikes();
         this.props.fetchNFLGames();
         this.props.fetchNCAAFGames();
         this.props.fetchMLBGames();
     }
     render() {
         return (
-            <Tab.Navigator initialRouteName="Odds" activeColor="#fff">
+            <Tab.Navigator initialRouteName="Odds" activeColor="#fff" tabBarColor='#009387'>
                 <Tab.Screen 
                     name="Odds" 
                     component={Odds}
@@ -82,8 +84,6 @@ export class Main extends Component {
                             <FontAwesome5 name="user-lock" color={color} size={20} />
                         ),
                     }}
-                    
-
                     />
 
                 <Tab.Screen 
@@ -127,6 +127,6 @@ const mapStateToProps = (store) => ({
     ncaafGames: store.ncaafGamesState.ncaafGames,
     mlbGames: store.mlbGamesState.mlbGames
 })
-const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUser, fetchUserPosts, fetchUserFollowing, fetchNFLGames, fetchNCAAFGames, fetchMLBGames, clearData }, dispatch);
+const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUser, fetchUserPosts, fetchUserFollowing, fetchUserBlocking, fetchLikes, fetchNFLGames, fetchNCAAFGames, fetchMLBGames, clearData }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchProps)(Main);

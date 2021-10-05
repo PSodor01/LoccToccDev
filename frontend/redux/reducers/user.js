@@ -1,9 +1,11 @@
-import { USER_STATE_CHANGE, USER_POSTS_STATE_CHANGE, USER_FOLLOWING_STATE_CHANGE, USERS_LIKES_STATE_CHANGE, CLEAR_DATA } from "../constants"
+import { USER_STATE_CHANGE, USER_POSTS_STATE_CHANGE, USER_FOLLOWING_STATE_CHANGE, LIKES_STATE_CHANGE, USER_BLOCKING_STATE_CHANGE, USERS_LIKES_STATE_CHANGE, CLEAR_DATA } from "../constants"
 
 const initialState = {
     currentUser: null,
     posts: [],
     following: [],
+    blocking: [],
+    liked: [],
 }
 
 export const user = (state = initialState, action) => {
@@ -23,6 +25,16 @@ export const user = (state = initialState, action) => {
             return {
                 ...state,
                 following: action.following
+            }
+        case USER_BLOCKING_STATE_CHANGE:
+            return {
+                ...state,
+                blocking: action.blocking
+            }
+        case LIKES_STATE_CHANGE:
+            return {
+                ...state,
+                liked: action.liked
             }
         case USERS_LIKES_STATE_CHANGE:
             return {

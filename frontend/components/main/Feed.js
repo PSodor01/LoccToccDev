@@ -18,12 +18,12 @@ import {AdMobBanner} from 'expo-ads-admob'
 
 function Feed(props) {
     const [posts, setPosts] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
 
      useEffect(() => {
         fetchData()
 
-    }, [props.usersFollowingLoaded, props.feed])
+    }, [props.blocking, props.usersFollowingLoaded, props.feed])
 
     const fetchData = () => {
         if (props.usersFollowingLoaded == props.following.length && props.following.length !== 0) {
@@ -31,8 +31,23 @@ function Feed(props) {
                 return x.creation - y.creation;
             })
             setPosts(props.feed)
-            setLoading(false);
+            
+
         }
+
+        for (let i = 0; i < props.feed.length; i++) {
+
+            if (props.blocking.indexOf(props.feed[i].creator) > -1) {
+                props.feed[i].blocked = true
+            } else {
+                props.feed[i].blocked = false
+            }
+
+        }
+
+        setLoading(false)
+        console.log(posts)
+        
     }
     
     const onLikePress = (userId, postId) => {
@@ -115,57 +130,70 @@ function Feed(props) {
                 onRefresh={() => fetchData()}
                 refreshing={loading}
                 renderItem={({ item }) => (
-                    <View style={styles.feedItem}>
-                        <TouchableOpacity
-                            onPress={() => props.navigation.navigate("Profile", {uid: item.user.uid})}>
-                            <Image 
-                                style={styles.profilePhotoPostContainer}
-                                source={{uri: item.user ? item.user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
-                            />
-                        </TouchableOpacity>
-                        <View style={styles.postRightContainer}>
-                            <View style={styles.postHeaderContainer}>
-                                <Text style={styles.profileNameFeedText}>{item.user.name}</Text>
-                                <Text style={styles.postTimeContainer}>{moment(item.creation.toDate()).fromNow()}</Text>
-                            </View>
-                            <View style={styles.postContentContainer}>
-                                {item.caption != null ? <Text style={styles.captionText}>{item.caption}</Text> : null}
-                                {item.downloadURL != "blank" ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
-                            </View>
-                            <View style={styles.postFooterContainer}>
-                                { item.currentUserLike ?
-                                    (
-                                        <TouchableOpacity
-                                            style={styles.likeContainer}
-                                            onPress={() => onDislikePress(item.user.uid, item.id)} >
-                                            <Ionicons name={"hammer"} size={20} color={"grey"} />
-                                            <Text style={styles.likeNumber}>{item.likesCount}</Text>
-                                        </TouchableOpacity>
-                                    )
-                                    :
-                                    (
-                                        <TouchableOpacity
-                                            style={styles.likeContainer}
-                                            onPress={() => onLikePress(item.user.uid, item.id)}> 
-                                            <Ionicons name={"hammer-outline"}  size={20} color={"grey"}/>
-                                            <Text style={styles.likeNumber}>{item.likesCount}</Text>
-                                        </TouchableOpacity>
-                                    )
-                                }
+                    <View>
+                        <View >
+                        { item.blocked == true ?
+
+                            null
+                                
+                            : 
+                            <View style={styles.feedItem}>
                                 <TouchableOpacity
-                                    style={styles.commentsContainer}
-                                    onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.user.uid, posterId: item.user.uid, posterName: item.user.name, postCreation: item.creation, postCaption: item.caption, posterImg: item.user.userImg, postImg: item.downloadURL })}>
-                                    <Ionicons name={"chatbubble-outline"} size={20} color={"grey"} marginRight={10} />
-                                    <Text style={styles.likeNumber}>{item.comments}</Text>
+                                    onPress={() => props.navigation.navigate("Profile", {uid: item.user.uid})}>
+                                    <Image 
+                                        style={styles.profilePhotoPostContainer}
+                                        source={{uri: item.user ? item.user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                                    />
                                 </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={styles.flagContainer}
-                                    onPress={reportPostHandler}>
-                                    <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
-                                </TouchableOpacity>
+                                <View style={styles.postRightContainer}>
+                                    <View style={styles.postHeaderContainer}>
+                                        <Text style={styles.profileNameFeedText}>{item.user.name}</Text>
+                                        <Text style={styles.postTimeContainer}>{moment(item.creation.toDate()).fromNow()}</Text>
+                                    </View>
+                                    <View style={styles.postContentContainer}>
+                                        {item.caption != null ? <Text style={styles.captionText}>{item.caption}</Text> : null}
+                                        {item.downloadURL != "blank" ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
+                                    </View>
+                                    <View style={styles.postFooterContainer}>
+                                        { item.currentUserLike ?
+                                            (
+                                                <TouchableOpacity
+                                                    style={styles.likeContainer}
+                                                    onPress={() => onDislikePress(item.user.uid, item.id)} >
+                                                    <Ionicons name={"hammer"} size={20} color={"grey"} />
+                                                    <Text style={styles.likeNumber}>{item.likesCount}</Text>
+                                                </TouchableOpacity>
+                                            )
+                                            :
+                                            (
+                                                <TouchableOpacity
+                                                    style={styles.likeContainer}
+                                                    onPress={() => onLikePress(item.user.uid, item.id)}> 
+                                                    <Ionicons name={"hammer-outline"}  size={20} color={"grey"}/>
+                                                    <Text style={styles.likeNumber}>{item.likesCount}</Text>
+                                                </TouchableOpacity>
+                                            )
+                                        }
+                                        <TouchableOpacity
+                                            style={styles.commentsContainer}
+                                            onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.user.uid, posterId: item.user.uid, posterName: item.user.name, postCreation: item.creation, postCaption: item.caption, posterImg: item.user.userImg, postImg: item.downloadURL })}>
+                                            <Ionicons name={"chatbubble-outline"} size={20} color={"grey"} marginRight={10} />
+                                            <Text style={styles.likeNumber}>{item.comments}</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            style={styles.flagContainer}
+                                            onPress={reportPostHandler}>
+                                            <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
+                                        </TouchableOpacity>
+                                    </View>
+                                </View> 
                             </View>
-                        </View>
+                            }
+                        
+                             
+                        </View>  
                     </View>
+                    
                 )}
 
             />
@@ -281,6 +309,7 @@ const mapStateToProps = (store) => ({
     following: store.userState.following,
     feed: store.usersState.feed,
     usersFollowingLoaded: store.usersState.usersFollowingLoaded,
+    blocking: store.userState.blocking,
 
 
 })

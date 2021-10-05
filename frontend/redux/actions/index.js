@@ -1,4 +1,4 @@
-import { USER_STATE_CHANGE, USER_POSTS_STATE_CHANGE, USER_FOLLOWING_STATE_CHANGE, USERS_DATA_STATE_CHANGE,USERS_POSTS_STATE_CHANGE, USERS_LIKES_STATE_CHANGE, NFL_GAMES_STATE_CHANGE, NCAAF_GAMES_STATE_CHANGE, MLB_GAMES_STATE_CHANGE, CLEAR_DATA} from '../constants/index'
+import { USER_STATE_CHANGE, USER_POSTS_STATE_CHANGE, USER_BLOCKING_STATE_CHANGE, LIKES_STATE_CHANGE, USER_FOLLOWING_STATE_CHANGE, USERS_DATA_STATE_CHANGE,USERS_POSTS_STATE_CHANGE, USERS_LIKES_STATE_CHANGE, NFL_GAMES_STATE_CHANGE, NCAAF_GAMES_STATE_CHANGE, MLB_GAMES_STATE_CHANGE, CLEAR_DATA} from '../constants/index'
 import firebase from 'firebase'
 import { SnapshotViewIOSComponent } from 'react-native'
 require('firebase/firestore')
@@ -20,7 +20,6 @@ export function fetchUser() {
                     dispatch({ type: USER_STATE_CHANGE, currentUser: snapshot.data() })
                 }
                 else {
-                    console.log('does not exist')
                 }
             })
     })
@@ -64,6 +63,42 @@ export function fetchUserFollowing() {
     })
 }
 
+export function fetchUserBlocking() {
+    return ((dispatch) => {
+        firebase.firestore()
+            .collection("blocking")
+            .doc(firebase.auth().currentUser.uid)
+            .collection("userBlocking")
+            .onSnapshot((snapshot) => {
+                let blocking = snapshot.docs.map(doc => {
+                    const id = doc.id;
+                    return id
+                })
+                dispatch({ type: USER_BLOCKING_STATE_CHANGE, blocking });
+                for(let i = 0; i < blocking.length; i++){
+                }
+            })
+    })
+}
+
+export function fetchLikes() {
+    return ((dispatch) => {
+        firebase.firestore()
+            .collection("likes")
+            .doc(firebase.auth().currentUser.uid)
+            .collection("userLikes")
+            .onSnapshot((snapshot) => {
+                let liked = snapshot.docs.map(doc => {
+                    const id = doc.id;
+                    return id
+                })
+                dispatch({ type: LIKES_STATE_CHANGE, liked });
+                for(let i = 0; i < liked.length; i++){
+                }
+            })
+    })
+}
+            
 export function fetchUsersData(uid, getPosts) {
     return ((dispatch, getState) => {
         const found = getState().usersState.users.some(el => el.uid === uid);
@@ -77,14 +112,15 @@ export function fetchUsersData(uid, getPosts) {
                         let user = snapshot.data();
                         user.uid = snapshot.id;
 
-                        dispatch({ type: USERS_DATA_STATE_CHANGE, user });
+                        dispatch({ type: USERS_DATA_STATE_CHANGE, user })
                     }
                     else {
-                        console.log('does not exist')
                     }
                 })
                 if(getPosts){
-                    dispatch(fetchUsersFollowingPosts(uid));
+                    dispatch(fetchUsersFollowingPosts(uid))
+
+                    
                 }
         }
     })
@@ -99,13 +135,14 @@ export function fetchUsersFollowingPosts(uid) {
             .orderBy("creation", "asc")
             .get()
             .then((snapshot) => {
-                console.log({snapshot, uid});
+                const uid = snapshot.query._.C_.path.segments[1]
                 const user = getState().usersState.users.find((el) => el.uid === uid);
                 const posts = snapshot.docs.map((doc) => {
                     const data = doc.data();
                     const id = doc.id;
                     return {id, ...data, user};
                 });
+                
 
                 for(let i = 0; i< posts.length; i++){
                     dispatch(fetchUsersFollowingLikes(uid, posts[i].id))
@@ -144,7 +181,6 @@ export function fetchNFLGames() {
         .orderBy("gameDate", "asc")
         .get()
         .then((snapshot) => {
-            console.log(snapshot.id)
             let nflGames = snapshot.docs.map(doc => {
                 const data = doc.data();
                 const id = doc.id;
@@ -162,7 +198,6 @@ export function fetchNCAAFGames() {
         .orderBy("gameDate", "asc")
         .get()
         .then((snapshot) => {
-            console.log(snapshot.id)
             let ncaafGames = snapshot.docs.map(doc => {
                 const data = doc.data();
                 const id = doc.id;
@@ -180,7 +215,6 @@ export function fetchMLBGames() {
         .orderBy("gameDate", "asc")
         .get()
         .then((snapshot) => {
-            console.log(snapshot.id)
             let mlbGames = snapshot.docs.map(doc => {
                 const data = doc.data();
                 const id = doc.id;

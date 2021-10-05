@@ -18,15 +18,15 @@ function Profile(props) {
     const [userPosts, setUserPosts] = useState([]);
     const [user, setUser] = useState(null);
     const [following, setFollowing] = useState(false);
+    const [blocking, setBlocking] = useState(false);
     const [loading, setLoading] = useState(true);
     
     useEffect(() => {
         fetchData()
-    }, [props.route.params.uid, props.following])
+    }, [props.route.params.uid, props.following, props.blocking])
 
     const fetchData = () => {
         const { currentUser, posts } = props;
-
     
         if (props.route.params.uid === firebase.auth().currentUser.uid) {
             setUser(currentUser)
@@ -50,7 +50,7 @@ function Profile(props) {
                 .collection("posts")
                 .doc(props.route.params.uid)
                 .collection("userPosts")
-                .orderBy("creation", "asc")
+                .orderBy("creation", "desc")
                 .get()
                 .then((snapshot) => {
                     let posts = snapshot.docs.map(doc => {
@@ -68,6 +68,14 @@ function Profile(props) {
         } else {
             setFollowing(false);
         }
+
+        if (props.blocking.indexOf(props.route.params.uid) > -1) {
+            setBlocking(true);
+        } else {
+            setBlocking(false);
+        }
+
+        
     }
 
     const onFollow = () => {
@@ -158,22 +166,81 @@ function Profile(props) {
             })
     }
 
-    const handleReportUserEmail = () => {
-        const to = ['ReportPost@locctocc.com'] // string or array of email addresses
-        email(to, {
-            // Optional additional arguments
-            subject: 'LoccTocc Report User',
-            body: ''
-        }).catch(console.error)
+    const blockUser = () => {
+        const userBlocking = firebase.firestore()
+            .collection("blocking")
+            .doc(firebase.auth().currentUser.uid)
+            .collection("userBlocking")
+            .doc(props.route.params.uid)
+            .set({})
+            .then(() => {
+                Alert.alert(
+                  "User succesfully blocked" 
+                );
+              })
+            
     }
 
-    const reportUserHandler = () => {
+    const unBlockUser = () => {
+        firebase.firestore()
+            .collection("blocking")
+            .doc(firebase.auth().currentUser.uid)
+            .collection("userBlocking")
+            .doc(props.route.params.uid)
+            .delete()
+            
+    }
+
+    const blockUserHandler = () => {
         Alert.alert(
-            'Report Post',
-            'Please report this user if you feel they have violated our guidelines in any way. Our team will investigate within 24 hours and may remove the user based on our findings.',
+            'Block?',
+            'If you block this user you will no longer see their posts on any of your activity feeds.',
 
             [
-                { text: 'Report', onPress: () => handleReportUserEmail()},
+                { text: 'Block', onPress: () => blockUser()},
+                {
+                    text: 'Cancel',
+                    onPress: () => {},
+                    style: 'cancel',
+                },
+            ],
+            { cancelable: true }
+
+        )
+    }
+
+    const blockAndUnfollowHandler = () => {
+        Alert.alert(
+            'Block?',
+            'If you block this user you will no longer see their posts on any of your activity feeds.',
+
+            [
+                { text: 'Block', onPress: () => blockAndUnfollow()},
+                {
+                    text: 'Cancel',
+                    onPress: () => {},
+                    style: 'cancel',
+                },
+            ],
+            { cancelable: true }
+
+        )
+    }
+
+    const blockAndUnfollow = () => {
+        onUnfollow(); 
+        decreaseFollowerCount(); 
+        decreaseFollowingCount();
+        blockUser();
+    }
+
+    const unBlockUserHandler = () => {
+        Alert.alert(
+            'Unblock?',
+            'Are you sure you want to unblock this user?',
+
+            [
+                { text: 'Unblock', onPress: () => unBlockUser()},
                 {
                     text: 'Cancel',
                     onPress: () => {},
@@ -245,7 +312,6 @@ function Profile(props) {
 
         )
     }
-    
 
     const navigation = useNavigation();
 
@@ -254,145 +320,152 @@ function Profile(props) {
     }
 
     return (
-        <View>
-            <ScrollView>
-                <View style={styles.container}>
-                    <View style={{ alignItems: 'center' }}>
-                        <Image 
-                            style={styles.profilePhotoContainer}
-                            source={{uri: user ? user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
-                        />
-                        <Text style={styles.profileNameText}>{user.name}</Text>
-                    </View>
-                    <View style={{ marginLeft: "5%" }}>
-                        <View style={{ flexDirection: 'row', paddingTop: 5}}>
-                            <Text style={{ color: "grey" }}>Member since </Text>
-                            <Text style={{ color: "grey" }}>{moment(user.createdAt.toDate()).format("MMM Do YYYY")}</Text>
-                        </View>
-                        <View style={{ flexDirection: 'row', paddingTop: 5}}>
-                            <Text style={{ fontWeight: 'bold'}}>About me: </Text>
-                            <Text>{user.aboutMe}</Text>
-                        </View>
-                        <View style={{ flexDirection: 'row', paddingTop: 5}}>
-                            <Text style={{ fontWeight: 'bold'}}>Location: </Text>
-                            <Text>{user.location}</Text>
-                        </View>
-                    </View>
-                    
-
-                    <View style={{ paddingTop: "2%" }}>
-                        {props.route.params.uid !== firebase.auth().currentUser.uid ? (
-                            <View>
-                                {following ? (
-                                    <TouchableOpacity
-                                        onPress={() => {onUnfollow(); decreaseFollowerCount(); decreaseFollowingCount();}}
-                                        title="Following"
-                                        style={styles.followingButton}>
-                                            <Text style={styles.following}> Following </Text>
-                                    </TouchableOpacity>
-                                ) :
-                                    (
-                                        <TouchableOpacity
-                                            onPress={() => {onFollow(); increaseFollowerCount(); increaseFollowingCount();}}
-                                            title="Follow"
-                                            style={styles.followButton}>
-                                                <Text style={styles.follow}> Follow </Text>
-                                        </TouchableOpacity>
-                                    )}
-                                    <TouchableOpacity
-                                        style={styles.reportUserButton}
-                                        onPress={reportUserHandler}>
-                                        <Text style={{ color: "red"}}>Report User</Text>
-                                    </TouchableOpacity>
-                            </View>
-                        ) :
-                            <View style={styles.middleButtonContainer}>
-                            
-                            </View>
-                            }
-                    </View>
-                    
-                            
-                    
-                    <View style={styles.profileStatsContainer}>
-                        <View style={styles.profileStatsBox}>
-                            <Text style={styles.followNumber}>{user ? userPosts.length : 0}</Text>
-                            <Text style={styles.followText}>Posts</Text>
-                        </View>
-                        <View style={styles.profileStatsBox}>
-                            <Text style={styles.followNumber}>{user.followerCount < 1 ? 0 : user.followerCount}</Text>
-                            <Text style={styles.followText}>Followers</Text>
-                        </View>
-                        <View style={styles.profileStatsBox}>
-                            <Text style={styles.followNumber}>{user.followingCount < 1 ? 0 : user.followingCount}</Text>
-                            <Text style={styles.followText}>Following</Text>
-                        </View>
-                    </View>
-
-                    <View style={styles.containerGallery}>
-                        <FlatList
-                            style={styles.feed}
-                            numColumns={1}
-                            horizontal={false}
-                            data={userPosts}
-                            onRefresh={() => fetchData()}
-                            refreshing={loading}
-                            renderItem={({ item }) => (
-                                <View style={styles.feedItem}>
-                                    <View style={styles.postLeftContainer}>
-                                    <Image 
-                                        style={styles.profilePhotoPostContainer}
-                                        source={{uri: user ? user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
-                                    />
-                                    </View>
-                                    <View style={styles.postRightContainer}>
-                                        <View style={styles.postHeaderContainer}>
-                                            <Text style={styles.profileNameFeedText}>{user.name}</Text>
-                                            <Text style={styles.postTimeContainer}>{moment(item.creation.toDate()).fromNow()}</Text>
-                                        </View>
-                                        <View style={styles.postContentContainer}>
-                                            {item.caption != null ? <Text style={styles.captionText}>{item.caption}</Text> : null}
-                                            {item.downloadURL != "blank" ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
-                                        </View>
-                                        <View style={styles.postFooterContainer}>
-                                            <View style={styles.likeContainer}>
-                                                <Icon name={"hammer-outline"} size={20} color={"grey"} />
-                                                <Text style={styles.likeNumber}>{item.likesCount}</Text>
-                                            </View>
-                                            <TouchableOpacity
-                                                style={styles.commentsContainer}
-                                                onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.creator, posterId: item.creator, posterName: user.name, postCreation: item.creation, postCaption: item.caption, posterImg: user.userImg, postImg: item.downloadURL })}>
-                                                <Icon name={"chatbubble-outline"} size={20} color={"grey"} marginRight={10} />
-                                                <Text style={styles.likeNumber}>{item.comments}</Text>
-                                            </TouchableOpacity>
-                                            <TouchableOpacity
-                                                style={styles.flagContainer}
-                                                onPress={reportPostHandler}>
-                                                <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
-                                            </TouchableOpacity>
-                                             {props.route.params.uid !== firebase.auth().currentUser.uid ? 
-                                                null
-                                                : <TouchableOpacity
-                                                    style={styles.flagContainer}
-                                                    onPress={() => deletePostHandler(item.id)}>
-                                                    <Icon name={"trash"} size={20} color={"grey"} marginRight={10} />
-                                                </TouchableOpacity>
-                                                }
-                                        </View>
-                                    </View>
-                                </View>
-                                
-                            )}
-
-                        />
-                        
-                    </View>
-                    
-
+        <View style={styles.container}>
+            <View style={{ alignItems: 'center' }}>
+                <Image 
+                    style={styles.profilePhotoContainer}
+                    source={{uri: user ? user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                />
+                <Text style={styles.profileNameText}>{user.name}</Text>
+            </View>
+            <View style={{ marginLeft: "5%" }}>
+                <View style={{ flexDirection: 'row', paddingTop: 5}}>
+                    <Text style={{ color: "grey" }}>Member since </Text>
+                    <Text style={{ color: "grey" }}>{moment(user.createdAt.toDate()).format("MMM Do YYYY")}</Text>
                 </View>
-                
-            </ScrollView>
+                <View style={{ flexDirection: 'row', paddingTop: 5}}>
+                    <Text style={{ fontWeight: 'bold'}}>About me: </Text>
+                    <Text>{user.aboutMe}</Text>
+                </View>
+                <View style={{ flexDirection: 'row', paddingTop: 5}}>
+                    <Text style={{ fontWeight: 'bold'}}>Location: </Text>
+                    <Text>{user.location}</Text>
+                </View>
+            </View>
+            
+
+            <View style={{ paddingTop: "2%" }}>
+                {props.route.params.uid !== firebase.auth().currentUser.uid ? (
+                    <View>
+                        {following ? (
+                            <TouchableOpacity
+                                onPress={() => {onUnfollow(); decreaseFollowerCount(); decreaseFollowingCount();}}
+                                title="Following"
+                                style={styles.followingButton}>
+                                    <Text style={styles.following}> Following </Text>
+                            </TouchableOpacity>
+                        ) : blocking ? (
+                            null
+                        ) :
+                            (
+                                <TouchableOpacity
+                                    onPress={() => {onFollow(); increaseFollowerCount(); increaseFollowingCount();}}
+                                    title="Follow"
+                                    style={styles.followButton}>
+                                        <Text style={styles.follow}> Follow </Text>
+                                </TouchableOpacity>
+                            )}
+                        {following && blocking != true ? (
+                            <TouchableOpacity
+                                style={styles.blockUserButton}
+                                onPress={() => {blockAndUnfollowHandler()}}>
+                                <Text style={{ color: "red"}}>Block</Text>
+                            </TouchableOpacity>  
+                        ) : blocking ? (
+                            <TouchableOpacity
+                                style={styles.unBlockUserButton}
+                                onPress={() => {unBlockUserHandler();}}>
+                                <Text style={{ color: "green"}}>Unblock</Text>
+                            </TouchableOpacity>
+                        ) :
+                            ( <TouchableOpacity
+                                style={styles.blockUserButton}
+                                onPress={() => {blockUser();}}>
+                                <Text style={{ color: "red"}}>Block</Text>
+                            </TouchableOpacity>
+                        )}
+                            
+                            
+                    </View>
+                ) :
+                    <View style={styles.middleButtonContainer}>
+                    
+                    </View>
+                    }
+            </View>
+            <View style={styles.profileStatsContainer}>
+                <View style={styles.profileStatsBox}>
+                    <Text style={styles.followNumber}>{user ? userPosts.length : 0}</Text>
+                    <Text style={styles.followText}>Posts</Text>
+                </View>
+                <View style={styles.profileStatsBox}>
+                    <Text style={styles.followNumber}>{user.followerCount < 1 ? 0 : user.followerCount}</Text>
+                    <Text style={styles.followText}>Followers</Text>
+                </View>
+                <View style={styles.profileStatsBox}>
+                    <Text style={styles.followNumber}>{user.followingCount < 1 ? 0 : user.followingCount}</Text>
+                    <Text style={styles.followText}>Following</Text>
+                </View>
+            </View>
+
+            <View style={styles.containerGallery}>
+                <FlatList
+                    style={styles.feed}
+                    numColumns={1}
+                    horizontal={false}
+                    data={userPosts}
+                    onRefresh={() => fetchData()}
+                    refreshing={loading}
+                    renderItem={({ item }) => (
+                        <View style={styles.feedItem}>
+                            <View style={styles.postLeftContainer}>
+                            <Image 
+                                style={styles.profilePhotoPostContainer}
+                                source={{uri: user ? user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                            />
+                            </View>
+                            <View style={styles.postRightContainer}>
+                                <View style={styles.postHeaderContainer}>
+                                    <Text style={styles.profileNameFeedText}>{user.name}</Text>
+                                    <Text style={styles.postTimeContainer}>{moment(item.creation.toDate()).fromNow()}</Text>
+                                </View>
+                                <View style={styles.postContentContainer}>
+                                    {item.caption != null ? <Text style={styles.captionText}>{item.caption}</Text> : null}
+                                    {item.downloadURL != "blank" ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
+                                </View>
+                                <View style={styles.postFooterContainer}>
+                                    <View style={styles.likeContainer}>
+                                        <Icon name={"hammer-outline"} size={20} color={"grey"} />
+                                        <Text style={styles.likeNumber}>{item.likesCount}</Text>
+                                    </View>
+                                    <TouchableOpacity
+                                        style={styles.commentsContainer}
+                                        onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.creator, posterId: item.creator, posterName: user.name, postCreation: item.creation, postCaption: item.caption, posterImg: user.userImg, postImg: item.downloadURL })}>
+                                        <Icon name={"chatbubble-outline"} size={20} color={"grey"} marginRight={10} />
+                                        <Text style={styles.likeNumber}>{item.comments}</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={styles.flagContainer}
+                                        onPress={reportPostHandler}>
+                                        <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
+                                    </TouchableOpacity>
+                                        {props.route.params.uid !== firebase.auth().currentUser.uid ? 
+                                        null
+                                        : <TouchableOpacity
+                                            style={styles.flagContainer}
+                                            onPress={() => deletePostHandler(item.id)}>
+                                            <Icon name={"trash"} size={20} color={"grey"} marginRight={10} />
+                                        </TouchableOpacity>
+                                        }
+                                </View>
+                            </View>
+                        </View>
+                        
+                    )}
+                />
+            </View>
         </View>
+                
         
         
 
@@ -444,7 +517,7 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         marginBottom: "2%",
     },
-    reportUserButton: {
+    blockUserButton: {
         borderColor: "red",
         borderWidth: 1,
         borderRadius: 6,
@@ -454,6 +527,19 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         alignItems: "center",
         marginBottom: "1%",
+        marginLeft: "1%",
+    },
+    unBlockUserButton: {
+        borderColor: "green",
+        borderWidth: 1,
+        borderRadius: 6,
+        paddingVertical: 6,
+        paddingHorizontal: 8,
+        width: "30%",
+        alignSelf: 'center',
+        alignItems: "center",
+        marginBottom: "1%",
+        marginLeft: "1%",
     },
     following: {
         color: "#666",
@@ -566,11 +652,13 @@ const styles = StyleSheet.create({
         color: "grey",
         fontSize: 10,
     },
+    
    
 })
 const mapStateToProps = (store) => ({
     currentUser: store.userState.currentUser,
     posts: store.userState.posts,
-    following: store.userState.following
+    following: store.userState.following,
+    blocking: store.userState.blocking,
 })
 export default connect(mapStateToProps, null)(Profile);

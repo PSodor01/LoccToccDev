@@ -33,7 +33,7 @@ function game(props) {
     
     useEffect(() => {
             fetchData()
-    }, [props.route.params.postId, props.users, props.usersFollowingLoaded, props.feed])
+    }, [props.blocking, props.liked, props.route.params.postId, props.users, props.usersFollowingLoaded, props.feed])
 
     const fetchData = () => {
         function matchUserToGamePost(gamePosts) {
@@ -48,36 +48,25 @@ function game(props) {
                 } else {
                     gamePosts[i].user = user
                 }
+
+                if (props.blocking.indexOf(gamePosts[i].creator) > -1) {
+                    gamePosts[i].blocked = true
+                } else {
+                    gamePosts[i].blocked = false
+                }
+
+                if (props.liked.indexOf(gamePosts[i].id) > -1) {
+                    gamePosts[i].liked = true
+                } else {
+                    gamePosts[i].liked = false
+                }
+                
             }
+            setGamePosts(gamePosts)
             setLoading(false)
         }
 
-        function setLikeStatus(gamePosts) {
-            for (let i = 0; i < gamePosts.length; i++) {
-                firebase.firestore()
-                .collection('posts')
-                .doc(gamePosts[i].creator)
-                .collection('userPosts')
-                .doc(gamePosts[i].id)
-                .collection('likes')
-                .doc(firebase.auth().currentUser.uid)
-                .get()
-                .then(documentSnapshot => {
-                    if (documentSnapshot.exists) {
-                        gamePosts[i].liked = "true"
-                        setGamePosts(gamePosts)
-                        setLoading(false)
-                    } else{
-                        gamePosts[i].liked = "false"
-                        setGamePosts(gamePosts)
-                        setLoading(false)
-
-                    }
-                }) 
-                .catch((err) => console.log(err.message));                  
-            }
-            
-        }
+        
 
         if (props.route.params.postId !== postId) {
             firebase.firestore()
@@ -92,9 +81,9 @@ function game(props) {
                     const id = doc.id;
                     return { id, ...data }
                 })
-                   
+                    
                     matchUserToGamePost(gamePosts)
-                    setLikeStatus(gamePosts)
+
                 })
 
         } else {
@@ -103,9 +92,6 @@ function game(props) {
         }
         
     }
-
-
-    
 
     const onLikePress = (userId, postId) => {
         firebase.firestore()
@@ -116,6 +102,18 @@ function game(props) {
             .collection("likes")
             .doc(firebase.auth().currentUser.uid)
             .set({})
+    }
+
+    const storeLike = (postId) => {
+        firebase.firestore()
+            .collection("likes")
+            .doc(firebase.auth().currentUser.uid)
+            .collection("userLikes")
+            .doc(postId)
+            .set({})
+            .then(
+                console.log(postId)
+            )
     }
 
     const onDislikePress = (userId, postId) => {
@@ -129,7 +127,14 @@ function game(props) {
             .delete({})
     }
 
-     
+    const deleteLike = (postId) => {
+        firebase.firestore()
+            .collection("likes")
+            .doc(firebase.auth().currentUser.uid)
+            .collection("userLikes")
+            .doc(postId)
+            .delete({})
+    }
 
     const handleReportPostEmail = (name, caption) => {
         const to = ['ReportPost@locctocc.com'] // string or array of email addresses
@@ -211,6 +216,23 @@ function game(props) {
         servePersonalizedAds // true or false
     />
     
+    firebase.firestore()
+        .collection("posts")
+        .doc(gamePosts[i].creator)
+        .collection("userPosts")
+        .doc(gamePosts[i].id)
+        .collection("likes")
+        .doc(firebase.auth().currentUser.uid)
+        .onSnapshot((snapshot) => {
+            if (snapshot.exists) {
+                gamePosts[i].likeTest = true
+                console.log(gamePosts[i].likeTest)
+            }
+            else {
+                gamePosts[i].likeTest = false
+                console.log(gamePosts[i].likeTest)
+            }
+        })
     */
     
     const navigation = useNavigation();
@@ -287,56 +309,62 @@ function game(props) {
                 refreshing={loading}
                 renderItem={({ item }) => (
                     <View>
-                        {item.user !== undefined ?
-                            <View style={styles.feedItem}>
-                                <TouchableOpacity
-                                onPress={() => props.navigation.navigate("Profile", {uid: item.user.uid})}>
-                                <Image 
-                                    style={styles.profilePhotoCommentContainer}
-                                    source={{uri: item.user ? item.user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
-                                />
-                            </TouchableOpacity>
-                            <View style={styles.postRightContainer}>
-                                
-                                <View style={styles.postHeaderContainer}>
-                                    <Text style={styles.profileNameFeedText}>{item.user.name}</Text>
-                                    <Text style={styles.postTimeContainer}>{moment(item.creation.toDate()).fromNow()}</Text>
-                                </View>
-                                <View style={styles.postContentContainer}>
-                                    {item.caption != null ? <Text style={styles.captionText}>{item.caption}</Text> : null}
-                                    {item.downloadURL != "blank" ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
-                                </View>
-                                <View style={styles.postFooterContainer}>
-                                    { item.liked === "true" ?
-                                        <TouchableOpacity
-                                            style={styles.likeContainer}
-                                            onPress={() => onDislikePress(item.user.uid, item.id)} >
-                                            <Ionicons name={"hammer"} size={20} color={"grey"} />
-                                            <Text style={styles.likeNumber}>{item.likesCount}</Text>
-                                        </TouchableOpacity>
-                                    
-                                    :
-                                        <TouchableOpacity
-                                            style={styles.likeContainer}
-                                            onPress={() => onLikePress(item.user.uid, item.id)}> 
-                                            <Ionicons name={"hammer-outline"}  size={20} color={"grey"}/>
-                                            <Text style={styles.likeNumber}>{item.likesCount}</Text>
-                                        </TouchableOpacity>
-                                    }
-                                    <TouchableOpacity
-                                        style={styles.commentsContainer}
-                                        onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.user.uid, posterId: item.user.uid, posterName: item.user.name, postCreation: item.creation, postCaption: item.caption, posterImg: item.user.userImg, postImg: item.downloadURL })}>
-                                        <Ionicons name={"chatbubble-outline"} size={20} color={"grey"} marginRight={10} />
-                                        <Text style={styles.likeNumber}>{item.comments}</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        style={styles.flagContainer}
-                                        onPress={() => reportPostHandler({name: item.user.name, caption: item.caption})}>
-                                        <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
-                                    </TouchableOpacity>
-                                </View>
+                        { item.blocked == true ?
+
+                        null
+                            
+                        :
+
+                        item.user !== undefined ?
+                        <View style={styles.feedItem}>
+                            <TouchableOpacity
+                            onPress={() => props.navigation.navigate("Profile", {uid: item.user.uid})}>
+                            <Image 
+                                style={styles.profilePhotoCommentContainer}
+                                source={{uri: item.user ? item.user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                            />
+                        </TouchableOpacity>
+                        <View style={styles.postRightContainer}>
+                            
+                            <View style={styles.postHeaderContainer}>
+                                <Text style={styles.profileNameFeedText}>{item.user.name}</Text>
+                                <Text style={styles.postTimeContainer}>{moment(item.creation.toDate()).fromNow()}</Text>
                             </View>
+                            <View style={styles.postContentContainer}>
+                                {item.caption != null ? <Text style={styles.captionText}>{item.caption}</Text> : null}
+                                {item.downloadURL != "blank" ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
+                            </View>
+                            <View style={styles.postFooterContainer}>
+                                { item.liked == true ?
+                                    <TouchableOpacity
+                                        style={styles.likeContainer}
+                                        onPress={() => {onDislikePress(item.user.uid, item.id); deleteLike(item.id)}} >
+                                        <Ionicons name={"hammer"} size={20} color={"grey"} />
+                                        <Text style={styles.likeNumber}>{item.likesCount}</Text>
+                                    </TouchableOpacity>
                                 
+                                :
+                                    <TouchableOpacity
+                                        style={styles.likeContainer}
+                                        onPress={() => {onLikePress(item.user.uid, item.id); storeLike(item.id)}}> 
+                                        <Ionicons name={"hammer-outline"}  size={20} color={"grey"}/>
+                                        <Text style={styles.likeNumber}>{item.likesCount}</Text>
+                                    </TouchableOpacity>
+                                }
+                                <TouchableOpacity
+                                    style={styles.commentsContainer}
+                                    onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.user.uid, posterId: item.user.uid, posterName: item.user.name, postCreation: item.creation, postCaption: item.caption, posterImg: item.user.userImg, postImg: item.downloadURL })}>
+                                    <Ionicons name={"chatbubble-outline"} size={20} color={"grey"} marginRight={10} />
+                                    <Text style={styles.likeNumber}>{item.comments}</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={styles.flagContainer}
+                                    onPress={() => reportPostHandler({name: item.user.name, caption: item.caption})}>
+                                    <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                            
 
                             </View>
                             
@@ -545,6 +573,8 @@ const mapStateToProps = (store) => ({
     users: store.usersState.users,
     currentUser: store.userState.currentUser,
     following: store.userState.following,
+    blocking: store.userState.blocking,
+    liked: store.userState.liked,
     feed: store.usersState.feed,
     usersFollowingLoaded: store.usersState.usersFollowingLoaded,
 })

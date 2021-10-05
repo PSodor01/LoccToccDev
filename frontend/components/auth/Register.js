@@ -120,9 +120,10 @@ export class Register extends Component {
                 console.log(result)
                 result.user.sendEmailVerification();
             })
-            .catch((error) => {
-                console.log(error)
-            })
+            .catch(error => {   
+                alert(error.message)
+                console.log(error.message)
+             })
     }
 
     render() {
