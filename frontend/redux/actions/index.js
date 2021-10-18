@@ -1,4 +1,4 @@
-import { USER_STATE_CHANGE, USER_POSTS_STATE_CHANGE, USER_BLOCKING_STATE_CHANGE, LIKES_STATE_CHANGE, USER_FOLLOWING_STATE_CHANGE, USERS_DATA_STATE_CHANGE,USERS_POSTS_STATE_CHANGE, USERS_LIKES_STATE_CHANGE, NFL_GAMES_STATE_CHANGE, NCAAF_GAMES_STATE_CHANGE, MLB_GAMES_STATE_CHANGE, CLEAR_DATA} from '../constants/index'
+import { USER_STATE_CHANGE, USER_POSTS_STATE_CHANGE, USER_BLOCKING_STATE_CHANGE, LIKES_STATE_CHANGE, FADES_STATE_CHANGE, USER_FOLLOWING_STATE_CHANGE, USERS_DATA_STATE_CHANGE,USERS_POSTS_STATE_CHANGE, USERS_LIKES_STATE_CHANGE, NFL_GAMES_STATE_CHANGE, NCAAF_GAMES_STATE_CHANGE, MLB_GAMES_STATE_CHANGE, NBA_GAMES_STATE_CHANGE, CLEAR_DATA} from '../constants/index'
 import firebase from 'firebase'
 import { SnapshotViewIOSComponent } from 'react-native'
 require('firebase/firestore')
@@ -94,6 +94,24 @@ export function fetchLikes() {
                 })
                 dispatch({ type: LIKES_STATE_CHANGE, liked });
                 for(let i = 0; i < liked.length; i++){
+                }
+            })
+    })
+}
+
+export function fetchFades() {
+    return ((dispatch) => {
+        firebase.firestore()
+            .collection("fades")
+            .doc(firebase.auth().currentUser.uid)
+            .collection("userFades")
+            .onSnapshot((snapshot) => {
+                let faded = snapshot.docs.map(doc => {
+                    const id = doc.id;
+                    return id
+                })
+                dispatch({ type: FADES_STATE_CHANGE, faded });
+                for(let i = 0; i < faded.length; i++){
                 }
             })
     })
@@ -221,6 +239,23 @@ export function fetchMLBGames() {
                 return { id, ...data }
             })
             dispatch({ type: MLB_GAMES_STATE_CHANGE, mlbGames })
+        })
+    })
+}
+
+export function fetchNBAGames() {
+    return((dispatch) => {
+        firebase.firestore()
+        .collection("nba")
+        .orderBy("gameDate", "asc")
+        .get()
+        .then((snapshot) => {
+            let nbaGames = snapshot.docs.map(doc => {
+                const data = doc.data();
+                const id = doc.id;
+                return { id, ...data }
+            })
+            dispatch({ type: NBA_GAMES_STATE_CHANGE, nbaGames })
         })
     })
 }

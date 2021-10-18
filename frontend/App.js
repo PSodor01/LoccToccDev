@@ -52,6 +52,10 @@ import AboutUsScreen from './components/main/AboutUs'
 import LegalDocsScreen from './components/main/LegalDocs'
 import HouseGuidelinesScreen from './components/main/HouseGuidelines'
 import ContactUsScreen from './components/main/ContactUs'
+import FollowingScreen from './components/main/FollowingScreen'
+import FollowerScreen from './components/main/FollowerScreen'
+import LikesList from './components/main/LikesList'
+import FadesList from './components/main/FadesList'
 import Odds from './components/main/Odds'
 import game from './components/main/game'
 import MessagesButton from './components/buttons/MessagesButton'
@@ -66,6 +70,8 @@ headerRight: () => (
     <MessagesButton /> 
   ) */
 
+if (Text.defaultProps == null) Text.defaultProps ={};
+Text.defaultProps.allowFontScaling=false;
 
 const MainStackScreen = ({navigation, props}) => (
   <MainStack.Navigator 
@@ -288,6 +294,83 @@ const MainStackScreen = ({navigation, props}) => (
           
         }}
           />
+
+      <MainStack.Screen name="Following" component={FollowingScreen}
+        options={{
+          headerTitle: () => (
+            <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+                <Text style={styles.headerName}>locctocc </Text>
+                <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
+            </View>
+          ),
+          headerLeft: () => (
+            <TouchableOpacity 
+            style={{ alignItems: "flex-end", marginLeft:16 }}
+            onPress={() => navigation.goBack()}
+            >
+            <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+          </TouchableOpacity>
+          ),
+          
+        }}
+          />
+        <MainStack.Screen name="Follower" component={FollowerScreen}
+          options={{
+            headerTitle: () => (
+              <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+                  <Text style={styles.headerName}>locctocc </Text>
+                  <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
+              </View>
+            ),
+            headerLeft: () => (
+              <TouchableOpacity 
+              style={{ alignItems: "flex-end", marginLeft:16 }}
+              onPress={() => navigation.goBack()}
+              >
+              <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+            </TouchableOpacity>
+            ),
+            
+          }}
+          />
+        <MainStack.Screen name="LikesList" component={LikesList}
+          options={{
+            headerTitle: () => (
+              <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+                  <Text style={styles.headerName}>locctocc </Text>
+                  <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
+              </View>
+            ),
+            headerLeft: () => (
+              <TouchableOpacity 
+              style={{ alignItems: "flex-end", marginLeft:16 }}
+              onPress={() => navigation.goBack()}
+              >
+              <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+            </TouchableOpacity>
+            ),
+            
+          }}
+        />
+        <MainStack.Screen name="FadesList" component={FadesList}
+          options={{
+            headerTitle: () => (
+              <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+                  <Text style={styles.headerName}>locctocc </Text>
+                  <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
+              </View>
+            ),
+            headerLeft: () => (
+              <TouchableOpacity 
+              style={{ alignItems: "flex-end", marginLeft:16 }}
+              onPress={() => navigation.goBack()}
+              >
+              <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+            </TouchableOpacity>
+            ),
+            
+          }}
+        />
   </MainStack.Navigator>
 )
 

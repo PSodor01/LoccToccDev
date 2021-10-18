@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { StyleSheet, View, Text, Image, FlatList, TouchableOpacity, Alert } from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons';
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import Foundation from 'react-native-vector-icons/Foundation'
 
 import { useNavigation } from '@react-navigation/native';
 import email from 'react-native-email'
@@ -23,7 +24,7 @@ function Feed(props) {
      useEffect(() => {
         fetchData()
 
-    }, [props.blocking, props.usersFollowingLoaded, props.feed])
+    }, [props.blocking, props.faded, props.usersFollowingLoaded, props.feed])
 
     const fetchData = () => {
         if (props.usersFollowingLoaded == props.following.length && props.following.length !== 0) {
@@ -32,7 +33,6 @@ function Feed(props) {
             })
             setPosts(props.feed)
             
-
         }
 
         for (let i = 0; i < props.feed.length; i++) {
@@ -41,6 +41,12 @@ function Feed(props) {
                 props.feed[i].blocked = true
             } else {
                 props.feed[i].blocked = false
+            }
+
+            if (props.faded.indexOf(props.feed[i].id) > -1) {
+                props.feed[i].faded = true
+            } else {
+                props.feed[i].faded = false
             }
 
         }
@@ -61,6 +67,18 @@ function Feed(props) {
             .set({})
     }
 
+    const storeLike = (postId) => {
+        firebase.firestore()
+            .collection("likes")
+            .doc(firebase.auth().currentUser.uid)
+            .collection("userLikes")
+            .doc(postId)
+            .set({})
+            .then(
+                console.log(postId)
+            )
+    }
+
     const onDislikePress = (userId, postId) => {
         firebase.firestore()
             .collection("posts")
@@ -69,6 +87,58 @@ function Feed(props) {
             .doc(postId)
             .collection("likes")
             .doc(firebase.auth().currentUser.uid)
+            .delete({})
+    }
+
+    const deleteLike = (postId) => {
+        firebase.firestore()
+            .collection("likes")
+            .doc(firebase.auth().currentUser.uid)
+            .collection("userLikes")
+            .doc(postId)
+            .delete({})
+    }
+
+    const onFadePress = (userId, postId) => {
+        firebase.firestore()
+            .collection("posts")
+            .doc(userId)
+            .collection("userPosts")
+            .doc(postId)
+            .collection("fade")
+            .doc(firebase.auth().currentUser.uid)
+            .set({})
+    }
+
+    const storeFade = (postId) => {
+        firebase.firestore()
+            .collection("fades")
+            .doc(firebase.auth().currentUser.uid)
+            .collection("userFades")
+            .doc(postId)
+            .set({})
+            .then(
+                console.log(postId)
+            )
+    }
+
+    const onUnfadePress = (userId, postId) => {
+        firebase.firestore()
+            .collection("posts")
+            .doc(userId)
+            .collection("userPosts")
+            .doc(postId)
+            .collection("fades")
+            .doc(firebase.auth().currentUser.uid)
+            .delete({})
+    }
+
+    const deleteFade = (postId) => {
+        firebase.firestore()
+            .collection("fades")
+            .doc(firebase.auth().currentUser.uid)
+            .collection("userFades")
+            .doc(postId)
             .delete({})
     }
 
@@ -112,7 +182,7 @@ function Feed(props) {
 
       /*<AdMobBanner
             bannerSize="banner"
-            adUnitID="ca-app-pub-3940256099942544/6300978111" // Test ID, Replace with your-admob-unit-id
+            adUnitID="ca-app-pub-8519029912093094/6377243182" // Real ID
             servePersonalizedAds // true or false
         /> */
 
@@ -121,7 +191,11 @@ function Feed(props) {
     return (
         <View style={styles.containerGallery}>
             <View style={styles.bannerAdContainer}>
-                
+                <AdMobBanner
+                    bannerSize="banner"
+                    adUnitID="ca-app-pub-8519029912093094/6377243182" // Real ID
+                    servePersonalizedAds // true or false
+                />
             </View>
             <FlatList
                 style={styles.feed}
@@ -157,22 +231,55 @@ function Feed(props) {
                                     <View style={styles.postFooterContainer}>
                                         { item.currentUserLike ?
                                             (
-                                                <TouchableOpacity
-                                                    style={styles.likeContainer}
-                                                    onPress={() => onDislikePress(item.user.uid, item.id)} >
-                                                    <Ionicons name={"hammer"} size={20} color={"grey"} />
-                                                    <Text style={styles.likeNumber}>{item.likesCount}</Text>
-                                                </TouchableOpacity>
+                                                <View style={styles.likeContainer}>
+                                                    <TouchableOpacity
+                                                        onPress={() => {onDislikePress(item.user.uid, item.id); deleteLike(item.id)}} >
+                                                        <Ionicons name={"hammer"} size={20} color={"black"} />
+                                                    </TouchableOpacity>
+                                                    <TouchableOpacity
+                                                        onPress={() => props.navigation.navigate('LikesList', {userId: item.creator, postId: item.id})} >
+                                                        <Text style={styles.likeNumber}>{item.likesCount}</Text>
+                                                    </TouchableOpacity>
+                                                </View>
                                             )
                                             :
                                             (
-                                                <TouchableOpacity
-                                                    style={styles.likeContainer}
-                                                    onPress={() => onLikePress(item.user.uid, item.id)}> 
-                                                    <Ionicons name={"hammer-outline"}  size={20} color={"grey"}/>
-                                                    <Text style={styles.likeNumber}>{item.likesCount}</Text>
-                                                </TouchableOpacity>
+                                                <View style={styles.likeContainer}>
+                                                    <TouchableOpacity
+                                                        onPress={() => {onLikePress(item.user.uid, item.id); storeLike(item.id)}}> 
+                                                        <Ionicons name={"hammer-outline"}  size={20} color={"grey"}/>
+                                                    </TouchableOpacity>
+                                                    <TouchableOpacity
+                                                        onPress={() => props.navigation.navigate('LikesList', {userId: item.creator, postId: item.id})} >
+                                                        <Text style={styles.likeNumber}>{item.likesCount}</Text>
+                                                    </TouchableOpacity>
+                                                </View>
                                             )
+                                        }
+                                        { item.faded == true ?
+                                        <View style={styles.likeContainer}>
+                                            <TouchableOpacity
+                                                onPress={() => {onUnfadePress(item.user.uid, item.id); deleteFade(item.id)}} >
+                                                <Foundation name={"skull"} size={20} color={"black"} />
+                                            </TouchableOpacity>
+                                            <TouchableOpacity
+                                                onPress={() => props.navigation.navigate('FadesList', {userId: item.creator, postId: item.id})} >
+                                                <Text style={styles.likeNumber}>{item.fadesCount}</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                        
+                                        :
+                                        
+                                        <View style={styles.likeContainer}>
+                                            <TouchableOpacity
+                                                onPress={() => {onFadePress(item.user.uid, item.id); storeFade(item.id)}}> 
+                                                <Foundation name={"skull"}  size={20} color={"#B3B6B7"}/>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity
+                                                onPress={() => props.navigation.navigate('FadesList', {userId: item.creator, postId: item.id})} >
+                                                <Text style={styles.likeNumber}>{item.fadesCount}</Text>
+                                            </TouchableOpacity>
+                                        </View>
                                         }
                                         <TouchableOpacity
                                             style={styles.commentsContainer}
@@ -310,6 +417,7 @@ const mapStateToProps = (store) => ({
     feed: store.usersState.feed,
     usersFollowingLoaded: store.usersState.usersFollowingLoaded,
     blocking: store.userState.blocking,
+    faded: store.userState.faded,
 
 
 })

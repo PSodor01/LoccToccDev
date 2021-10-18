@@ -17,6 +17,7 @@ function Odds(props) {
     const [nflGames, setnflGames] = useState([]);
     const [ncaafGames, setncaafGames] = useState([]);
     const [mlbGames, setmlbGames] = useState([]);
+    const [nbaGames, setnbaGames] = useState([]);
     const [loading, setLoading] = useState(true);
 
      useEffect(() => {
@@ -24,7 +25,8 @@ function Odds(props) {
         fetchMLBData()
         fetchNFLData()
         fetchNCAAFData()
-    }, [props.games, props.nflGames, props.ncaafGames, props.mlbGames])
+        fetchNBAData()
+    }, [props.games, props.nflGames, props.ncaafGames, props.mlbGames, props.nbaGames])
 
     const fetchMLBData = () => {
         setmlbGames(props.mlbGames)
@@ -41,6 +43,11 @@ function Odds(props) {
             setLoading(false);
         }
     
+    const fetchNBAData = () => {
+        setnbaGames(props.nbaGames)
+            setLoading(false);
+        }
+    
     /*const interstitial = async () => {
         await AdMobInterstitial.setAdUnitID('ca-app-pub-3940256099942544/1033173712'); // Test ID, Replace with your-admob-unit-id
         try {
@@ -51,11 +58,7 @@ function Odds(props) {
         }
     } */
 
-    /*<AdMobBanner
-        bannerSize="banner"
-        adUnitID="ca-app-pub-3940256099942544/6300978111" // Test ID, Replace with your-admob-unit-id
-        servePersonalizedAds // true or false
-    /> */
+    /* */
 
     /*const theRandomNumber = Math.floor(Math.random() * 3) + 1
         if (theRandomNumber == 4) {
@@ -89,6 +92,11 @@ function Odds(props) {
             refreshing={loading}
 
         />
+        <AdMobBanner
+            bannerSize="banner"
+            adUnitID="ca-app-pub-8519029912093094/4873811012" // Test ID, Replace with your-admob-unit-id
+            servePersonalizedAds // true or false
+        />
         
        
     </View>
@@ -118,6 +126,11 @@ function Odds(props) {
             refreshing={loading}
 
         />
+        <AdMobBanner
+            bannerSize="banner"
+            adUnitID="ca-app-pub-8519029912093094/4873811012" // Test ID, Replace with your-admob-unit-id
+            servePersonalizedAds // true or false
+        />
         
     </View>
     );
@@ -146,6 +159,44 @@ function Odds(props) {
                 refreshing={loading}
 
             />
+            <AdMobBanner
+                bannerSize="banner"
+                adUnitID="ca-app-pub-8519029912093094/4873811012" // Test ID, Replace with your-admob-unit-id
+                servePersonalizedAds // true or false
+            />
+            
+        </View>
+      );
+
+      const FourthRoute = () => (
+        <View style={styles.container}>
+            <View style={styles.gameHeaderContainer}>
+                <View style={styles.teamHeader}>
+                    <Text style={styles.gameHeaderText}>Team</Text>
+                </View>
+                <View style={styles.moneylineHeader}>
+                    <Text style={styles.gameHeaderText}>ML</Text>
+                </View>
+                <View style={styles.spreadHeader}>
+                    <Text style={styles.gameHeaderText}>Spread</Text>
+                </View>
+                <View style={styles.totalHeader}>
+                    <Text style={styles.gameHeaderText}>Total</Text>
+                </View>
+            </View>
+            <FlatList 
+                data={nbaGames}
+                style={styles.feed}
+                renderItem={renderItem}
+                onRefresh={() => fetchNBAData()}
+                refreshing={loading}
+
+            />
+            <AdMobBanner
+                bannerSize="banner"
+                adUnitID="ca-app-pub-8519029912093094/4873811012" // Test ID, Replace with your-admob-unit-id
+                servePersonalizedAds // true or false
+            />
             
         </View>
       );
@@ -157,12 +208,14 @@ function Odds(props) {
         { key: 'first', title: 'NFL' },
         { key: 'second', title: 'NCAAF' },
         { key: 'third', title: 'MLB' },
+        { key: 'fourth', title: 'NBA'},
     ]);
 
     const renderScene = SceneMap({
         first: FirstRoute,
         second: SecondRoute,
         third: ThirdRoute,
+        fourth: FourthRoute,
     });
 
     const renderTabBar = props => (
@@ -401,6 +454,7 @@ const mapStateToProps = (store) => ({
     nflGames: store.nflGamesState.nflGames,
     ncaafGames: store.ncaafGamesState.ncaafGames,
     mlbGames: store.mlbGamesState.mlbGames,
+    nbaGames: store.nbaGamesState.nbaGames,
 })
 
 

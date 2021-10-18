@@ -3,6 +3,7 @@ import { Text, View, StyleSheet, Dimensions, Alert, ActivityIndicator, FlatList,
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import Foundation from 'react-native-vector-icons/Foundation'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import moment from 'moment'
@@ -33,7 +34,7 @@ function game(props) {
     
     useEffect(() => {
             fetchData()
-    }, [props.blocking, props.liked, props.route.params.postId, props.users, props.usersFollowingLoaded, props.feed])
+    }, [props.blocking, props.liked, props.faded, props.route.params.postId, props.users, props.usersFollowingLoaded, props.feed])
 
     const fetchData = () => {
         function matchUserToGamePost(gamePosts) {
@@ -60,13 +61,17 @@ function game(props) {
                 } else {
                     gamePosts[i].liked = false
                 }
+
+                if (props.faded.indexOf(gamePosts[i].id) > -1) {
+                    gamePosts[i].faded = true
+                } else {
+                    gamePosts[i].faded = false
+                }
                 
             }
             setGamePosts(gamePosts)
             setLoading(false)
         }
-
-        
 
         if (props.route.params.postId !== postId) {
             firebase.firestore()
@@ -111,9 +116,6 @@ function game(props) {
             .collection("userLikes")
             .doc(postId)
             .set({})
-            .then(
-                console.log(postId)
-            )
     }
 
     const onDislikePress = (userId, postId) => {
@@ -132,6 +134,49 @@ function game(props) {
             .collection("likes")
             .doc(firebase.auth().currentUser.uid)
             .collection("userLikes")
+            .doc(postId)
+            .delete({})
+    }
+
+    const onFadePress = (userId, postId) => {
+        firebase.firestore()
+            .collection("posts")
+            .doc(userId)
+            .collection("userPosts")
+            .doc(postId)
+            .collection("fades")
+            .doc(firebase.auth().currentUser.uid)
+            .set({})
+    }
+
+    const onUnfadePress = (userId, postId) => {
+        firebase.firestore()
+            .collection("posts")
+            .doc(userId)
+            .collection("userPosts")
+            .doc(postId)
+            .collection("fades")
+            .doc(firebase.auth().currentUser.uid)
+            .delete({})
+    }
+
+    const storeFade = (postId) => {
+        firebase.firestore()
+            .collection("fades")
+            .doc(firebase.auth().currentUser.uid)
+            .collection("userFades")
+            .doc(postId)
+            .set({})
+            .then(
+                console.log(postId)
+            )
+    }
+
+    const deleteFade = (postId) => {
+        firebase.firestore()
+            .collection("fades")
+            .doc(firebase.auth().currentUser.uid)
+            .collection("userFades")
             .doc(postId)
             .delete({})
     }
@@ -210,11 +255,7 @@ function game(props) {
                 })
     } 
     
-    <AdMobBanner
-        bannerSize="banner"
-        adUnitID="ca-app-pub-3940256099942544/6300978111" // Test ID, Replace with your-admob-unit-id
-        servePersonalizedAds // true or false
-    />
+    
     
     firebase.firestore()
         .collection("posts")
@@ -336,20 +377,54 @@ function game(props) {
                             </View>
                             <View style={styles.postFooterContainer}>
                                 { item.liked == true ?
+                                <View style={styles.likeContainer}>
                                     <TouchableOpacity
-                                        style={styles.likeContainer}
                                         onPress={() => {onDislikePress(item.user.uid, item.id); deleteLike(item.id)}} >
-                                        <Ionicons name={"hammer"} size={20} color={"grey"} />
+                                        <Ionicons name={"hammer"} size={20} color={"black"} />
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        onPress={() => props.navigation.navigate('LikesList', {userId: item.creator, postId: item.id})} >
                                         <Text style={styles.likeNumber}>{item.likesCount}</Text>
                                     </TouchableOpacity>
+                                </View>
                                 
                                 :
+                                
+                                <View style={styles.likeContainer}>
                                     <TouchableOpacity
-                                        style={styles.likeContainer}
                                         onPress={() => {onLikePress(item.user.uid, item.id); storeLike(item.id)}}> 
                                         <Ionicons name={"hammer-outline"}  size={20} color={"grey"}/>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        onPress={() => props.navigation.navigate('LikesList', {userId: item.creator, postId: item.id})} >
                                         <Text style={styles.likeNumber}>{item.likesCount}</Text>
                                     </TouchableOpacity>
+                                </View>
+                                }
+                                { item.faded == true ?
+                                <View style={styles.likeContainer}>
+                                    <TouchableOpacity
+                                        onPress={() => {onUnfadePress(item.user.uid, item.id); deleteFade(item.id)}} >
+                                        <Foundation name={"skull"} size={20} color={"black"} />
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        onPress={() => props.navigation.navigate('FadesList', {userId: item.creator, postId: item.id})} >
+                                        <Text style={styles.likeNumber}>{item.fadesCount}</Text>
+                                    </TouchableOpacity>
+                                </View>
+                                
+                                :
+                                
+                                <View style={styles.likeContainer}>
+                                    <TouchableOpacity
+                                        onPress={() => {onFadePress(item.user.uid, item.id); storeFade(item.id)}}> 
+                                        <Foundation name={"skull"}  size={20} color={"#B3B6B7"}/>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        onPress={() => props.navigation.navigate('FadesList', {userId: item.creator, postId: item.id})} >
+                                        <Text style={styles.likeNumber}>{item.fadesCount}</Text>
+                                    </TouchableOpacity>
+                                </View>
                                 }
                                 <TouchableOpacity
                                     style={styles.commentsContainer}
@@ -374,7 +449,11 @@ function game(props) {
 
             />
             <View style={styles.adView}>
-                
+                <AdMobBanner
+                    bannerSize="banner"
+                    adUnitID="ca-app-pub-8519029912093094/3359767373" // Real ID
+                    servePersonalizedAds // true or false
+                />
             </View>
             <TouchableOpacity
                 activeOpacity={0.8}
@@ -575,6 +654,7 @@ const mapStateToProps = (store) => ({
     following: store.userState.following,
     blocking: store.userState.blocking,
     liked: store.userState.liked,
+    faded: store.userState.faded,
     feed: store.usersState.feed,
     usersFollowingLoaded: store.usersState.usersFollowingLoaded,
 })

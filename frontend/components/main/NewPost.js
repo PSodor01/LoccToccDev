@@ -97,6 +97,7 @@ const AddPostScreen = ({ route, props }) => {
           creation: firebase.firestore.FieldValue.serverTimestamp(),
           creator: firebase.auth().currentUser.uid,
           likesCount: 0,
+          fadesCount: 0,
           comments: 0,
           downloadURL
         }).then(() => {

@@ -40,7 +40,8 @@ function Profile(props) {
                 .get()
                 .then((snapshot) => {
                     if (snapshot.exists) {
-                        setUser(snapshot.data());
+                        setUser(snapshot.data())
+
                     }
                     else {
                         console.log('does not exist')
@@ -84,7 +85,10 @@ function Profile(props) {
             .doc(firebase.auth().currentUser.uid)
             .collection("userFollowing")
             .doc(props.route.params.uid)
-            .set({})
+            .set({
+                id: props.route.params.uid,
+                follower: firebase.auth().currentUser.uid,
+            })
             
     }
     const onUnfollow = () => {
@@ -264,7 +268,7 @@ function Profile(props) {
     const reportPostHandler = () => {
         Alert.alert(
             'Report Post',
-            'Please report this post if you feel it obtains objectionable content. Our team will investigate within 24 hours and may remove the content or content creator based on our findings.',
+            'Please report this post if you feel it contains objectionable content. Our team will investigate within 24 hours and may remove the content or content creator based on our findings.',
 
             [
                 { text: 'Report', onPress: () => handleReportPostEmail()},
@@ -285,7 +289,7 @@ function Profile(props) {
             .doc(props.route.params.uid)
             .collection("userPosts")
             .doc(id)
-            .delete()
+            .delete({})
             .then(() => {
                 console.log('Post Deleted!');
                 Alert.alert(
@@ -399,12 +403,22 @@ function Profile(props) {
                     <Text style={styles.followText}>Posts</Text>
                 </View>
                 <View style={styles.profileStatsBox}>
-                    <Text style={styles.followNumber}>{user.followerCount < 1 ? 0 : user.followerCount}</Text>
-                    <Text style={styles.followText}>Followers</Text>
+                    <TouchableOpacity 
+                        style={styles.profileStatsBox}
+                        onPress={() => props.navigation.navigate('Follower', {userId: props.route.params.uid})}>
+                        <Text style={styles.followNumber}>{user.followerCount < 1 ? 0 : user.followerCount}</Text>
+                        <Text style={styles.followText}>Followers</Text>
+                    </TouchableOpacity>
+                    
                 </View>
                 <View style={styles.profileStatsBox}>
-                    <Text style={styles.followNumber}>{user.followingCount < 1 ? 0 : user.followingCount}</Text>
-                    <Text style={styles.followText}>Following</Text>
+                    <TouchableOpacity 
+                        style={styles.profileStatsBox}
+                        onPress={() => props.navigation.navigate('Following', {userId: props.route.params.uid})}>
+                        <Text style={styles.followNumber}>{user.followingCount < 1 ? 0 : user.followingCount}</Text>
+                        <Text style={styles.followText}>Following</Text>
+                    </TouchableOpacity>
+                    
                 </View>
             </View>
 
