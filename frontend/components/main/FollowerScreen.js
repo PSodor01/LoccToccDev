@@ -33,6 +33,7 @@ function FollowerScreen(props) {
                     following[i].user = user
                 }
             }
+            
             setFollowing(following)
 
         }

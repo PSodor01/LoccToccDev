@@ -29,7 +29,10 @@ function Profile(props) {
         const { currentUser, posts } = props;
     
         if (props.route.params.uid === firebase.auth().currentUser.uid) {
-            setUser(currentUser)
+            setUser(currentUser);
+            posts.sort(function (x, y) {
+                return y.creation - x.creation;
+            })
             setUserPosts(posts)
             setLoading(false);
         }
@@ -59,8 +62,12 @@ function Profile(props) {
                         const id = doc.id;
                         return { id, ...data }
                     })
+                    posts.sort(function (x, y) {
+                        return y.creation - x.creation;
+                    })
                     setUserPosts(posts)
                     setLoading(false);
+                    
                 })
         }
 

@@ -1,4 +1,4 @@
-import { USER_STATE_CHANGE, USER_POSTS_STATE_CHANGE, USER_FOLLOWING_STATE_CHANGE, LIKES_STATE_CHANGE, FADES_STATE_CHANGE, USER_BLOCKING_STATE_CHANGE, USERS_LIKES_STATE_CHANGE, CLEAR_DATA } from "../constants"
+import { USER_STATE_CHANGE, USER_POSTS_STATE_CHANGE, ALL_USERS_STATE_CHANGE, USER_FOLLOWING_STATE_CHANGE, LIKES_STATE_CHANGE, FADES_STATE_CHANGE, USER_BLOCKING_STATE_CHANGE, USERS_LIKES_STATE_CHANGE, CLEAR_DATA } from "../constants"
 
 const initialState = {
     currentUser: null,
@@ -7,6 +7,7 @@ const initialState = {
     blocking: [],
     liked: [],
     faded: [],
+    allUsers: [],
 }
 
 export const user = (state = initialState, action) => {
@@ -42,6 +43,11 @@ export const user = (state = initialState, action) => {
             return {
                 ...state,
                 faded: action.faded
+            }
+        case ALL_USERS_STATE_CHANGE:
+            return {
+                ...state,
+                allUsers: action.allUsers
             }
         case USERS_LIKES_STATE_CHANGE:
             return {

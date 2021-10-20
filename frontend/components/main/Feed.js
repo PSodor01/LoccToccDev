@@ -29,11 +29,13 @@ function Feed(props) {
     const fetchData = () => {
         if (props.usersFollowingLoaded == props.following.length && props.following.length !== 0) {
             props.feed.sort(function (x, y) {
-                return x.creation - y.creation;
+                return y.creation - x.creation;
             })
-            setPosts(props.feed)
-            
+            setPosts(props.feed);
         }
+        console.log(posts)
+
+        
 
         for (let i = 0; i < props.feed.length; i++) {
 
@@ -52,7 +54,6 @@ function Feed(props) {
         }
 
         setLoading(false)
-        console.log(posts)
         
     }
     
@@ -75,7 +76,6 @@ function Feed(props) {
             .doc(postId)
             .set({})
             .then(
-                console.log(postId)
             )
     }
 
@@ -105,7 +105,7 @@ function Feed(props) {
             .doc(userId)
             .collection("userPosts")
             .doc(postId)
-            .collection("fade")
+            .collection("fades")
             .doc(firebase.auth().currentUser.uid)
             .set({})
     }
@@ -117,9 +117,7 @@ function Feed(props) {
             .collection("userFades")
             .doc(postId)
             .set({})
-            .then(
-                console.log(postId)
-            )
+            
     }
 
     const onUnfadePress = (userId, postId) => {

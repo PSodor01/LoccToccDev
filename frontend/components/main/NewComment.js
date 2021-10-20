@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, TouchableOpacity, ActivityIndicator, FlatList, TouchableWithoutFeedback, StyleSheet, TextInput, Image, Alert, Keyboard, KeyboardAvoidingView,} from 'react-native'
+import { View, Text, TouchableOpacity, ActivityIndicator, Dimensions, FlatList, TouchableWithoutFeedback, StyleSheet, TextInput, Image, Alert, Keyboard, KeyboardAvoidingView,} from 'react-native'
 
 import { Feather } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -285,7 +285,9 @@ function NewCommentScreen(props, route) {
                     />  
                     <TextInput
                     placeholder="Type your comment here..."
+                    style={styles.postTextInput}
                     numberOfLines={4}
+                    multiline={true}
                     maxLength={1000}
                     onChangeText={(text) => setText(text)}
                     />
@@ -486,6 +488,9 @@ searchSection: {
 xButton: {
   alignItems: 'flex-end',
   paddingTop: 2,
+},
+postTextInput: {
+  width: Dimensions.get('window').width * .80,
 }
   
   });

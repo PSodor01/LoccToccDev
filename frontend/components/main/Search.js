@@ -7,23 +7,57 @@ import firebase from 'firebase'
 require("firebase/firestore")
 require("firebase/firebase-storage")
 
-export default function Search(props) {
-    const [users, setUsers] = useState([])
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import { fetchAllUsers, fetchUsersData } from '../../redux/actions/index'
 
-    const fetchUsers = (search) => {
-        firebase.firestore()
-            .collection('users')
-            .where('name', '>=', search)
-            .get()
-            .then((snapshot) => {
-                let users = snapshot.docs.map(doc => {
-                    const data = doc.data();
-                    const id = doc.id;
-                    return { id, ...data }
-                });
-                setUsers(users);
-            })
+function Search(props) {
+    const [allUsers, setAllUsers] = useState([]);
+    const [search, setSearch] = useState('');
+
+    useEffect(() => {
+        
+        
+        setAllUsers(props.allUsers)
+
+        
+    }, [props.allUsers])
+
+    const ItemView = ({item}) => {
+        return (
+            <View style={styles.feedItem}>
+                <TouchableOpacity style={styles.postLeftContainer}
+                    onPress={() => props.navigation.navigate("Profile", {uid: item.id})}>
+                    <Image 
+                        style={styles.profilePhotoPostContainer}
+                        source={{uri: item.name ? item.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                    />
+                    <Text style={styles.searchResultsText}>{item.name}</Text>
+                </TouchableOpacity>
+                
+            </View>
+        )
     }
+
+    const searchFilter = (text) => {
+        if (text) {
+            const newData = allUsers.filter((item) => {
+                const itemData = item.name ? item.name.toUpperCase() : ''.toUpperCase();
+
+                const textData = text.toUpperCase();
+                return itemData.indexOf(textData) > -1
+
+                
+            });
+            setAllUsers(newData)
+            setSearch(text)
+        } else {
+            setAllUsers(props.allUsers)
+            setSearch(text)
+        }
+    }
+
+   
     
     return (
         <View style={styles.textInputContainer}>
@@ -32,26 +66,16 @@ export default function Search(props) {
                 <TextInput
                     style={styles.textInput}
                     placeholder="Type to find friends..."
-                    onChangeText={(search) => fetchUsers(search)} />
+                    value={search}
+                    onChangeText={(text) => searchFilter(text)}
+                   />
             </View>
 
             <FlatList
-                data={users}
+                data = {allUsers.sort((a, b) => a.name.localeCompare(b.name))}
                 style={styles.feed}
-                renderItem={({ item }) => (
-                    <View style={styles.feedItem}>
-                        <TouchableOpacity style={styles.postLeftContainer}
-                            onPress={() => props.navigation.navigate("Profile", {uid: item.id})}>
-                            <Image 
-                                style={styles.profilePhotoPostContainer}
-                                source={{uri: item.name ? item.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
-                            />
-                            <Text style={styles.searchResultsText}>{item.name}</Text>
-                        </TouchableOpacity>
-                        
-                    </View>
-                    
-            )}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={ItemView}
             />
         </View>
         
@@ -112,8 +136,14 @@ const styles = StyleSheet.create({
         flexDirection: "row",
     },
     
-   
-    
 })
+
+const mapStateToProps = (store) => ({
+    users: store.usersState.users,
+    allUsers: store.userState.allUsers,
+})
+const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUsersData }, dispatch);
+
+export default connect(mapStateToProps,  mapDispatchProps)(Search);
 
 

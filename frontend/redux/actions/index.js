@@ -1,4 +1,4 @@
-import { USER_STATE_CHANGE, USER_POSTS_STATE_CHANGE, USER_BLOCKING_STATE_CHANGE, LIKES_STATE_CHANGE, FADES_STATE_CHANGE, USER_FOLLOWING_STATE_CHANGE, USERS_DATA_STATE_CHANGE,USERS_POSTS_STATE_CHANGE, USERS_LIKES_STATE_CHANGE, NFL_GAMES_STATE_CHANGE, NCAAF_GAMES_STATE_CHANGE, MLB_GAMES_STATE_CHANGE, NBA_GAMES_STATE_CHANGE, CLEAR_DATA} from '../constants/index'
+import { USER_STATE_CHANGE, USER_POSTS_STATE_CHANGE, ALL_USERS_STATE_CHANGE, USER_BLOCKING_STATE_CHANGE, LIKES_STATE_CHANGE, FADES_STATE_CHANGE, USER_FOLLOWING_STATE_CHANGE, USERS_DATA_STATE_CHANGE,USERS_POSTS_STATE_CHANGE, USERS_LIKES_STATE_CHANGE, NFL_GAMES_STATE_CHANGE, NCAAF_GAMES_STATE_CHANGE, MLB_GAMES_STATE_CHANGE, NBA_GAMES_STATE_CHANGE, CLEAR_DATA} from '../constants/index'
 import firebase from 'firebase'
 import { SnapshotViewIOSComponent } from 'react-native'
 require('firebase/firestore')
@@ -116,6 +116,23 @@ export function fetchFades() {
             })
     })
 }
+
+export function fetchAllUsers() {
+    return ((dispatch) => {
+        firebase.firestore()
+            .collection("users")
+            .onSnapshot((snapshot) => {
+                let allUsers = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    return { id, ...data }
+                })
+                dispatch({ type: ALL_USERS_STATE_CHANGE, allUsers });
+                for(let i = 0; i < allUsers.length; i++){
+                }
+            })
+    })
+}
             
 export function fetchUsersData(uid, getPosts) {
     return ((dispatch, getState) => {
@@ -145,29 +162,31 @@ export function fetchUsersData(uid, getPosts) {
 }
 
 export function fetchUsersFollowingPosts(uid) {
-    return (dispatch, getState) => {
+    return ((dispatch, getState) => {
         firebase.firestore()
             .collection("posts")
             .doc(uid)
             .collection("userPosts")
-            .orderBy("creation", "asc")
+            .orderBy("creation", "desc")
             .get()
             .then((snapshot) => {
                 const uid = snapshot.query._.C_.path.segments[1]
-                const user = getState().usersState.users.find((el) => el.uid === uid);
-                const posts = snapshot.docs.map((doc) => {
+                const user = getState().usersState.users.find(el => el.uid === uid);
+
+
+                let posts = snapshot.docs.map(doc => {
                     const data = doc.data();
                     const id = doc.id;
-                    return {id, ...data, user};
-                });
-                
+                    return { id, ...data, user }
+                })
 
                 for(let i = 0; i< posts.length; i++){
                     dispatch(fetchUsersFollowingLikes(uid, posts[i].id))
                 }
                 dispatch({ type: USERS_POSTS_STATE_CHANGE, posts, uid })
-            }) .catch((err) => console.log(err.message));
-    }
+
+            })
+    })
 }
 
 export function fetchUsersFollowingLikes(uid, postId) {
