@@ -26,7 +26,7 @@ const AddPostScreen = ({ route, props }) => {
   const [gifs, setGifs] = useState([]);
   const [term, updateTerm] = useState('');
 
-  const { gameId, homeTeam, awayTeam } = route.params;
+  const { gameId, homeTeam, awayTeam, gameDate } = route.params;
 
   const getUser = async() => {
     const currentUser = await firebase.firestore()

@@ -44,6 +44,8 @@ export function fetchUserPosts() {
     })
 }
 
+
+
 export function fetchUserFollowing() {
     return ((dispatch) => {
         firebase.firestore()

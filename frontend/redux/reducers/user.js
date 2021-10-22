@@ -38,7 +38,6 @@ export const user = (state = initialState, action) => {
                 ...state,
                 liked: action.liked
             }
-
         case FADES_STATE_CHANGE:
             return {
                 ...state,

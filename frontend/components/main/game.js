@@ -70,6 +70,7 @@ function game(props) {
                 
             }
             setGamePosts(gamePosts)
+            console.log(gamePosts.length)
             setLoading(false)
         }
 
@@ -219,62 +220,25 @@ function game(props) {
         );
       };
       
-    /*<View style={styles.postButtonContainer}>
-        <Text>Who will cover the spread?</Text>
-        <TouchableOpacity 
-            onPress={awayVote}>
-            <Text>{awayTeam}</Text>
-        </TouchableOpacity>
-        <Text>or</Text>
-        <TouchableOpacity 
-            onPress={homeVote}>
-            <Text>{homeTeam}</Text>
-        </TouchableOpacity>
-            
-    </View>  
-    const homeVote = () => {
-        firebase.firestore()
-            .collection("games")
-            .doc(gameId)
-            .collection("votes")
-            .doc("homeVote")
-            .collection(firebase.auth().currentUser.uid)
-            .add({
-                creator: firebase.auth().currentUser.uid,
-                })
-    }
-
-    const awayVote = () => {
-        firebase.firestore()
-            .collection("games")
-            .doc(gameId)
-            .collection("votes")
-            .doc("awayVote")
-            .collection(firebase.auth().currentUser.uid)
-                creator: firebase.auth().currentUser.uid,
-                })
-    } 
+      /*<View style={styles.postButtonContainer}>
+                    {homeSpread > 0 ? 
+                        <Text>VOTE: Who will cover {homeSpread} points?</Text> 
+                        : <Text>VOTE: Who will cover {awaySpread} points?</Text>
+                    }
+                <TouchableOpacity 
+                    onPress={() => {onLikePress(item.user.uid, item.id)}}>
+                    <Text>{awayTeam}</Text>
+                </TouchableOpacity>
+                <Text>or</Text>
+                <TouchableOpacity 
+                    onPress={() => {onLikePress(item.user.uid, item.id)}}>
+                    <Text>{homeTeam}</Text>
+                </TouchableOpacity>
+                    
+            </View> */
+      
     
     
-    
-    firebase.firestore()
-        .collection("posts")
-        .doc(gamePosts[i].creator)
-        .collection("userPosts")
-        .doc(gamePosts[i].id)
-        .collection("likes")
-        .doc(firebase.auth().currentUser.uid)
-        .onSnapshot((snapshot) => {
-            if (snapshot.exists) {
-                gamePosts[i].likeTest = true
-                console.log(gamePosts[i].likeTest)
-            }
-            else {
-                gamePosts[i].likeTest = false
-                console.log(gamePosts[i].likeTest)
-            }
-        })
-    */
     
     const navigation = useNavigation();
     
@@ -458,7 +422,7 @@ function game(props) {
             <TouchableOpacity
                 activeOpacity={0.8}
                 style={styles.button}
-                onPress={() => props.navigation.navigate('NewPost', { gameId: gameId, homeTeam: homeTeam, awayTeam: awayTeam })}
+                onPress={() => props.navigation.navigate('NewPost', { gameId: gameId, homeTeam: homeTeam, awayTeam: awayTeam, gameDate: gameDate })}
             >
                 <MaterialCommunityIcons name={"plus"} size={30} color="white" />
             </TouchableOpacity>
@@ -625,7 +589,7 @@ const styles = StyleSheet.create({
     button: {
         backgroundColor: "#009387",
         position: 'absolute',
-        bottom: 20,
+        bottom: 60,
         right: 20,
         width: 60,
         height: 60,

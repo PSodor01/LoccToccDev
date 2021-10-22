@@ -245,7 +245,7 @@ function Odds(props) {
                                         <Text style={styles.spreadText}>+{item.awayMoneyline}</Text> 
                                         : <Text style={styles.spreadText}>{item.awayMoneyline}</Text>
                                     }
-                                </View>
+                                </View> 
                                 <View style={styles.spreadItem}>
                                     {item.awaySpread > 0 ? 
                                         <Text style={styles.spreadText}>+{item.awaySpread}</Text> 
@@ -455,6 +455,7 @@ const mapStateToProps = (store) => ({
     ncaafGames: store.ncaafGamesState.ncaafGames,
     mlbGames: store.mlbGamesState.mlbGames,
     nbaGames: store.nbaGamesState.nbaGames,
+
 })
 
 
