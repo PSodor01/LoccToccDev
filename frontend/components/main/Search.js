@@ -17,9 +17,7 @@ function Search(props) {
 
     useEffect(() => {
         
-        
         setAllUsers(props.allUsers)
-
         
     }, [props.allUsers])
 
@@ -66,17 +64,21 @@ function Search(props) {
                 <TextInput
                     style={styles.textInput}
                     placeholder="Type to find friends..."
+                    clearButtonMode={'while-editing'}
                     value={search}
                     onChangeText={(text) => searchFilter(text)}
                    />
             </View>
 
+            {search == '' ?
+            null :
+            
             <FlatList
                 data = {allUsers.sort((a, b) => a.name.localeCompare(b.name))}
                 style={styles.feed}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={ItemView}
-            />
+            /> }
         </View>
         
             

@@ -191,7 +191,7 @@ function Feed(props) {
             <View style={styles.bannerAdContainer}>
                 <AdMobBanner
                     bannerSize="banner"
-                    adUnitID="ca-app-pub-8519029912093094/6377243182" // Real ID
+                    adUnitID="ca-app-pub-8519029912093094/6377243182" // Real ID: 8519029912093094/6377243182, test ID: 3940256099942544/2934735716
                     servePersonalizedAds // true or false
                 />
             </View>

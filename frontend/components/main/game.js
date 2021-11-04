@@ -29,12 +29,15 @@ function game(props) {
     const [gamePosts, setGamePosts] = useState([]);
     const [postId, setPostId] = useState("")
     const [loading, setLoading] = useState(true)
+    const [sortCriteria, setSortCriteria] = useState(true)
+    const [awayVote, setAwayVote] = useState("")
+    const [homeVote, setHomeVote] = useState("")
 
-    const {gameId, gameDate, homeTeam, awayTeam, homeMoneyline, awayMoneyline, homeSpread, awaySpread, homeSpreadOdds, awaySpreadOdds, over, overOdds, under, underOdds, awayTeamVote, homeTeamVote} = props.route.params;
+    const {gameId, gameDate, homeTeam, awayTeam, homeMoneyline, awayMoneyline, homeSpread, awaySpread, homeSpreadOdds, awaySpreadOdds, over, overOdds, under, underOdds} = props.route.params;
     
     useEffect(() => {
             fetchData()
-    }, [props.blocking, props.liked, props.faded, props.route.params.postId, props.users, props.usersFollowingLoaded, props.feed])
+    }, [props.blocking, props.liked, props.faded, props.route.params.postId, props.users])
 
     const fetchData = () => {
         function matchUserToGamePost(gamePosts) {
@@ -70,7 +73,6 @@ function game(props) {
                 
             }
             setGamePosts(gamePosts)
-            console.log(gamePosts.length)
             setLoading(false)
         }
 
@@ -78,7 +80,7 @@ function game(props) {
             firebase.firestore()
             .collectionGroup("userPosts")
             .where('gameId', '==', gameId)
-            .orderBy("creation", "desc")
+            .orderBy('creation', 'desc')
             .get()
             .then((snapshot) => {
 
@@ -97,6 +99,8 @@ function game(props) {
             setLoading(false)
         }
         
+        setVoteCount()
+
     }
 
     const onLikePress = (userId, postId) => {
@@ -168,9 +172,7 @@ function game(props) {
             .collection("userFades")
             .doc(postId)
             .set({})
-            .then(
-                console.log(postId)
-            )
+            
     }
 
     const deleteFade = (postId) => {
@@ -181,6 +183,144 @@ function game(props) {
             .doc(postId)
             .delete({})
     }
+
+    const gameVote = () => {
+
+        firebase.firestore()
+            .collection("votes")
+            .doc(gameId)
+            .collection("gameVotes")
+            .doc("info")
+            .get()
+            .then((snapshot) => {
+                if (snapshot.exists) {
+                    firebase.firestore()
+                    .collection("votes")
+                    .doc(gameId)
+                    .collection("gameVotes")
+                    .doc(firebase.auth().currentUser.uid)
+                    .get()
+                    .then((snapshot) => {
+                        if (snapshot.exists) {
+                        }
+                        else {
+
+                            firebase.firestore()
+                            .collection("votes")
+                            .doc(gameId)
+                            .collection("gameVotes")
+                            .doc(firebase.auth().currentUser.uid)
+                            .set({})
+
+                        }
+                    })
+                }
+                else {
+                    firebase.firestore()
+                    .collection("votes")
+                    .doc(gameId)
+                    .collection("gameVotes")
+                    .doc(firebase.auth().currentUser.uid)
+                    .set({})
+                    
+                    const gameVotes = 
+                        firebase.firestore()
+                        .collection("votes")
+                        .doc(gameId)
+                        .collection("gameVotes")
+                        .doc('info')
+
+                    gameVotes
+                        .set({
+                            gameDate: gameDate,
+                            awayCount: 0,
+                            homeCount: 0,
+
+                        })
+
+                }
+            })
+    }
+
+    const increaseAwayCount = () => {
+
+        firebase.firestore()
+            .collection("votes")
+            .doc(gameId)
+            .collection("gameVotes")
+            .doc(firebase.auth().currentUser.uid)
+            .get()
+            .then((snapshot) => {
+                if (snapshot.exists) {
+                    
+                }
+                else {
+
+                    firebase.firestore()
+                    .collection("votes")
+                    .doc(gameId)
+                    .collection("gameVotes")
+                    .doc('info')
+                    .update({
+                        awayCount: firebase.firestore.FieldValue.increment(1)
+                    })
+
+                }
+            })
+    }
+
+    const increaseHomeCount = () => {
+
+        firebase.firestore()
+            .collection("votes")
+            .doc(gameId)
+            .collection("gameVotes")
+            .doc(firebase.auth().currentUser.uid)
+            .get()
+            .then((snapshot) => {
+                if (snapshot.exists) {
+                    
+                }
+                else {
+
+                    firebase.firestore()
+                    .collection("votes")
+                    .doc(gameId)
+                    .collection("gameVotes")
+                    .doc('info')
+                    .update({
+                        homeCount: firebase.firestore.FieldValue.increment(1)
+                    })
+
+                }
+            })
+    }
+
+    const setVoteCount = () => {
+
+        firebase.firestore()
+        .collection("votes")
+        .doc(gameId)
+        .collection("gameVotes")
+        .doc("info")
+        .get()
+        .then((snapshot) => {
+            if (snapshot.exists) {
+                let votes = snapshot.data();
+
+                const away = parseFloat((votes.awayCount / (votes.awayCount + votes.homeCount))*100).toFixed(0)+"%"
+                const home = parseFloat((votes.homeCount / (votes.awayCount + votes.homeCount))*100).toFixed(0)+"%"
+
+                setAwayVote(away)
+                setHomeVote(home)
+
+            }
+            else {
+            }
+        })
+
+    }
+
 
     const handleReportPostEmail = (name, caption) => {
         const to = ['ReportPost@locctocc.com'] // string or array of email addresses
@@ -219,38 +359,148 @@ function game(props) {
           </Text>
         );
       };
-      
-      /*<View style={styles.postButtonContainer}>
-                    {homeSpread > 0 ? 
-                        <Text>VOTE: Who will cover {homeSpread} points?</Text> 
-                        : <Text>VOTE: Who will cover {awaySpread} points?</Text>
-                    }
-                <TouchableOpacity 
-                    onPress={() => {onLikePress(item.user.uid, item.id)}}>
-                    <Text>{awayTeam}</Text>
-                </TouchableOpacity>
-                <Text>or</Text>
-                <TouchableOpacity 
-                    onPress={() => {onLikePress(item.user.uid, item.id)}}>
-                    <Text>{homeTeam}</Text>
-                </TouchableOpacity>
+
+    const sortFunction = () => {
+        if (sortCriteria == true) {
+            setSortCriteria(false)
+        } else {
+            setSortCriteria(true)
+        }
+    }
+
+
+    const renderItem = ({item}) => {
+        return (
+            <View>
+                { item.blocked == true ?
+
+                null
                     
-            </View> */
+                :
+
+                item.user !== undefined ?
+                <View style={styles.feedItem}>
+                    <TouchableOpacity
+                    onPress={() => props.navigation.navigate("Profile", {uid: item.user.uid})}>
+                    <Image 
+                        style={styles.profilePhotoCommentContainer}
+                        source={{uri: item.user ? item.user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                    />
+                </TouchableOpacity>
+                <View style={styles.postRightContainer}>
+                    
+                    <View style={styles.postHeaderContainer}>
+                        <Text style={styles.profileNameFeedText}>{item.user.name}</Text>
+                        <Text style={styles.postTimeContainer}>{moment(item.creation.toDate()).fromNow()}</Text>
+                    </View>
+                    <View style={styles.postContentContainer}>
+                        {item.caption != null ? <Text style={styles.captionText}>{item.caption}</Text> : null}
+                        {item.downloadURL != "blank" ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
+                    </View>
+                    <View style={styles.postFooterContainer}>
+                        { item.liked == true ?
+                        <View style={styles.likeContainer}>
+                            <TouchableOpacity
+                                onPress={() => {onDislikePress(item.user.uid, item.id); deleteLike(item.id)}} >
+                                <Ionicons name={"hammer"} size={20} color={"black"} />
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => props.navigation.navigate('LikesList', {userId: item.creator, postId: item.id})} >
+                                <Text style={styles.likeNumber}>{item.likesCount}</Text>
+                            </TouchableOpacity>
+                        </View>
+                        
+                        :
+                        
+                        <View style={styles.likeContainer}>
+                            <TouchableOpacity
+                                onPress={() => {onLikePress(item.user.uid, item.id); storeLike(item.id)}}> 
+                                <Ionicons name={"hammer-outline"}  size={20} color={"grey"}/>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => props.navigation.navigate('LikesList', {userId: item.creator, postId: item.id})} >
+                                <Text style={styles.likeNumber}>{item.likesCount}</Text>
+                            </TouchableOpacity>
+                        </View>
+                        }
+                        { item.faded == true ?
+                        <View style={styles.likeContainer}>
+                            <TouchableOpacity
+                                onPress={() => {onUnfadePress(item.user.uid, item.id); deleteFade(item.id)}} >
+                                <Foundation name={"skull"} size={20} color={"black"} />
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => props.navigation.navigate('FadesList', {userId: item.creator, postId: item.id})} >
+                                <Text style={styles.likeNumber}>{item.fadesCount}</Text>
+                            </TouchableOpacity>
+                        </View>
+                        
+                        :
+                        
+                        <View style={styles.likeContainer}>
+                            <TouchableOpacity
+                                onPress={() => {onFadePress(item.user.uid, item.id); storeFade(item.id)}}> 
+                                <Foundation name={"skull"}  size={20} color={"#B3B6B7"}/>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => props.navigation.navigate('FadesList', {userId: item.creator, postId: item.id})} >
+                                <Text style={styles.likeNumber}>{item.fadesCount}</Text>
+                            </TouchableOpacity>
+                        </View>
+                        }
+                        <TouchableOpacity
+                            style={styles.commentsContainer}
+                            onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.user.uid, posterId: item.user.uid, posterName: item.user.name, postCreation: item.creation, postCaption: item.caption, posterImg: item.user.userImg, postImg: item.downloadURL })}>
+                            <Ionicons name={"chatbubble-outline"} size={20} color={"grey"} marginRight={10} />
+                            <Text style={styles.likeNumber}>{item.comments}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.flagContainer}
+                            onPress={() => reportPostHandler({name: item.user.name, caption: item.caption})}>
+                            <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
+                        </TouchableOpacity>
+                    </View>
+                </View>
+                    
+
+                    </View>
+                    
+                    : null}
+            </View>
+        )}
       
-    
-    
-    
     const navigation = useNavigation();
     
     return (
         <View style={styles.container}>
-            
             <View style={styles.gameContainer}>
                 <View>
                     <Text>{moment(gameDate).format("LT")}</Text> 
                     <View style={styles.awayGameInfoContainer}>
                         <View style={styles.teamItem}>
-                            <Text style={styles.teamText}>{awayTeam}</Text>
+                            <TouchableOpacity
+                                onPress={() => {gameVote(); increaseAwayCount()}}>
+                                <View style={styles.voteContainer}>
+                                    <Text style={styles.teamText}>{awayTeam}</Text>
+
+                                    {awayVote == '0%' ? 
+                                        <Text style={styles.noVote}>{awayVote} </Text>
+                                        :
+                                        awayVote == '100%' ? 
+                                            <Text style={styles.winningVote}>{awayVote} </Text> 
+                                            :
+                                            awayVote == '50%' ? 
+                                            <Text style={styles.noVote}>{awayVote} </Text> 
+                                            :
+                                            awayVote > '50%' ? 
+                                            <Text style={styles.winningVote}>{awayVote} </Text> 
+                                            :
+                                            <Text style={styles.losingVote}>{awayVote} </Text>
+                                        
+                                    }
+                                    
+                                </View>
+                            </TouchableOpacity>
                         </View>
                         <View style={styles.moneylineItem}>
                             {awayMoneyline > 0 ? 
@@ -278,7 +528,29 @@ function game(props) {
                     </View>
                     <View style={styles.homeGameInfoContainer}>
                         <View style={styles.teamItem}>
-                            <Text style={styles.teamText}>{homeTeam}</Text>
+                            <TouchableOpacity
+                                onPress={() => {gameVote(); increaseHomeCount()}}>
+                                <View style={styles.voteContainer}>
+                                    <Text style={styles.teamText}>{homeTeam}</Text>
+
+                                    {homeVote == '0%' ? 
+                                        <Text style={styles.noVote}>{homeVote} </Text>
+                                        :
+                                        homeVote == '100%' ? 
+                                            <Text style={styles.winningVote}>{homeVote} </Text> 
+                                            :
+                                            homeVote == '50%' ? 
+                                            <Text style={styles.noVote}>{homeVote} </Text> 
+                                            :
+                                            homeVote > '50%' ? 
+                                            <Text style={styles.winningVote}>{homeVote} </Text> 
+                                            :
+                                            <Text style={styles.losingVote}>{homeVote} </Text>
+                                        
+                                    }
+                                    
+                                </View>
+                            </TouchableOpacity>
                         </View>
                         <View style={styles.moneylineItem}>
                             {homeMoneyline > 0 ? 
@@ -306,116 +578,40 @@ function game(props) {
                         </View>
                     </View>
                 </View>                    
+            </View> 
+            <View style={styles.sortContainer}>
+                <Text style={styles.sortText}>Sort: </Text>
+                <TouchableOpacity 
+                    onPress={() => {sortFunction()}}>
+                    <Foundation name={"clock"} size={20} color={"#B3B6B7"} />
+                </TouchableOpacity>
+                <Text style={styles.sortText}> or </Text>
+                <TouchableOpacity 
+                    onPress={() => {sortFunction()}}>
+                    <MaterialCommunityIcons name={"arrow-vertical-lock"} size={20} color={"#B3B6B7"} />
+                </TouchableOpacity>
             </View>
+            {sortCriteria == true ? 
             <FlatList
-                data={gamePosts}
+                data = {gamePosts.sort(function (x, y) {return y.creation - x.creation})}
                 ListEmptyComponent={EmptyListMessage}
                 onRefresh={() => fetchData()}
                 refreshing={loading}
-                renderItem={({ item }) => (
-                    <View>
-                        { item.blocked == true ?
-
-                        null
-                            
-                        :
-
-                        item.user !== undefined ?
-                        <View style={styles.feedItem}>
-                            <TouchableOpacity
-                            onPress={() => props.navigation.navigate("Profile", {uid: item.user.uid})}>
-                            <Image 
-                                style={styles.profilePhotoCommentContainer}
-                                source={{uri: item.user ? item.user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
-                            />
-                        </TouchableOpacity>
-                        <View style={styles.postRightContainer}>
-                            
-                            <View style={styles.postHeaderContainer}>
-                                <Text style={styles.profileNameFeedText}>{item.user.name}</Text>
-                                <Text style={styles.postTimeContainer}>{moment(item.creation.toDate()).fromNow()}</Text>
-                            </View>
-                            <View style={styles.postContentContainer}>
-                                {item.caption != null ? <Text style={styles.captionText}>{item.caption}</Text> : null}
-                                {item.downloadURL != "blank" ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
-                            </View>
-                            <View style={styles.postFooterContainer}>
-                                { item.liked == true ?
-                                <View style={styles.likeContainer}>
-                                    <TouchableOpacity
-                                        onPress={() => {onDislikePress(item.user.uid, item.id); deleteLike(item.id)}} >
-                                        <Ionicons name={"hammer"} size={20} color={"black"} />
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        onPress={() => props.navigation.navigate('LikesList', {userId: item.creator, postId: item.id})} >
-                                        <Text style={styles.likeNumber}>{item.likesCount}</Text>
-                                    </TouchableOpacity>
-                                </View>
-                                
-                                :
-                                
-                                <View style={styles.likeContainer}>
-                                    <TouchableOpacity
-                                        onPress={() => {onLikePress(item.user.uid, item.id); storeLike(item.id)}}> 
-                                        <Ionicons name={"hammer-outline"}  size={20} color={"grey"}/>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        onPress={() => props.navigation.navigate('LikesList', {userId: item.creator, postId: item.id})} >
-                                        <Text style={styles.likeNumber}>{item.likesCount}</Text>
-                                    </TouchableOpacity>
-                                </View>
-                                }
-                                { item.faded == true ?
-                                <View style={styles.likeContainer}>
-                                    <TouchableOpacity
-                                        onPress={() => {onUnfadePress(item.user.uid, item.id); deleteFade(item.id)}} >
-                                        <Foundation name={"skull"} size={20} color={"black"} />
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        onPress={() => props.navigation.navigate('FadesList', {userId: item.creator, postId: item.id})} >
-                                        <Text style={styles.likeNumber}>{item.fadesCount}</Text>
-                                    </TouchableOpacity>
-                                </View>
-                                
-                                :
-                                
-                                <View style={styles.likeContainer}>
-                                    <TouchableOpacity
-                                        onPress={() => {onFadePress(item.user.uid, item.id); storeFade(item.id)}}> 
-                                        <Foundation name={"skull"}  size={20} color={"#B3B6B7"}/>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        onPress={() => props.navigation.navigate('FadesList', {userId: item.creator, postId: item.id})} >
-                                        <Text style={styles.likeNumber}>{item.fadesCount}</Text>
-                                    </TouchableOpacity>
-                                </View>
-                                }
-                                <TouchableOpacity
-                                    style={styles.commentsContainer}
-                                    onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.user.uid, posterId: item.user.uid, posterName: item.user.name, postCreation: item.creation, postCaption: item.caption, posterImg: item.user.userImg, postImg: item.downloadURL })}>
-                                    <Ionicons name={"chatbubble-outline"} size={20} color={"grey"} marginRight={10} />
-                                    <Text style={styles.likeNumber}>{item.comments}</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={styles.flagContainer}
-                                    onPress={() => reportPostHandler({name: item.user.name, caption: item.caption})}>
-                                    <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                            
-
-                            </View>
-                            
-                            : null}
-                    </View>
-                )}
-
+                renderItem={renderItem}
             />
+                : 
+            <FlatList
+                data = {gamePosts.sort((a, b) => parseFloat(b.likesCount) - parseFloat(a.likesCount))}
+                ListEmptyComponent={EmptyListMessage}
+                onRefresh={() => fetchData()}
+                refreshing={loading}
+                renderItem={renderItem}
+            />
+            }
             <View style={styles.adView}>
                 <AdMobBanner
                     bannerSize="banner"
-                    adUnitID="ca-app-pub-8519029912093094/3359767373" // Real ID
+                    adUnitID="ca-app-pub-8519029912093094/3359767373" // Real ID: 8519029912093094/3359767373, test ID: 3940256099942544/2934735716
                     servePersonalizedAds // true or false
                 />
             </View>
@@ -608,6 +804,32 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: '1%',
+    },
+    sortContainer: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        marginHorizontal: "2%",
+    },
+    sortText: {
+        color: '#B3B6B7' 
+    },
+    voteContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+    },
+    losingVote: {
+        color: "#F9350E",
+        fontSize: 12
+    },
+    winningVote: {
+        color: "#35EA10",
+        fontSize: 12
+    },
+    noVote: {
+        color: "#B3B6B7",
+        fontSize: 12
+
     }
     
 })

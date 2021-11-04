@@ -50,7 +50,6 @@ export class Register extends Component {
         this.state = {
             email: '',
             password: '',
-            birthday: '',
             gender: '',
             name: '',
             createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
@@ -118,7 +117,6 @@ export class Register extends Component {
                         followingCount: 0,
                     })
                 console.log(result)
-                result.user.sendEmailVerification();
             })
             .catch(error => {   
                 alert(error.message)

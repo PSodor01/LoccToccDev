@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, useWindowDimensions, ActivityIndicator, Dimensions, FlatList, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, useWindowDimensions, TextInput, Dimensions, FlatList, TouchableOpacity } from 'react-native';
 import { TabView, TabBar, SceneMap } from 'react-native-tab-view';
 
 import moment from 'moment'
@@ -16,23 +16,15 @@ function Odds(props) {
     const [games, setGames] = useState([]);
     const [nflGames, setnflGames] = useState([]);
     const [ncaafGames, setncaafGames] = useState([]);
-    const [mlbGames, setmlbGames] = useState([]);
     const [nbaGames, setnbaGames] = useState([]);
     const [loading, setLoading] = useState(true);
 
      useEffect(() => {
-        setGames(props.games)
-        fetchMLBData()
         fetchNFLData()
         fetchNCAAFData()
         fetchNBAData()
-    }, [props.games, props.nflGames, props.ncaafGames, props.mlbGames, props.nbaGames])
+    }, [ props.nflGames, props.ncaafGames, props.nbaGames])
 
-    const fetchMLBData = () => {
-        setmlbGames(props.mlbGames)
-            setLoading(false);
-        }
-    
     const fetchNFLData = () => {
         setnflGames(props.nflGames)
             setLoading(false);
@@ -68,167 +60,15 @@ function Odds(props) {
             null
         } */
 
-    const FirstRoute = () => (
-        <View style={styles.container}>
-        <View style={styles.gameHeaderContainer}>
-            <View style={styles.teamHeader}>
-                <Text style={styles.gameHeaderText}>Team</Text>
-            </View>
-            <View style={styles.moneylineHeader}>
-                <Text style={styles.gameHeaderText}>ML</Text>
-            </View>
-            <View style={styles.spreadHeader}>
-                <Text style={styles.gameHeaderText}>Spread</Text>
-            </View>
-            <View style={styles.totalHeader}>
-                <Text style={styles.gameHeaderText}>Total</Text>
-            </View>
-        </View>
-        <FlatList 
-            data={nflGames}
-            style={styles.feed}
-            renderItem={renderItem}
-            onRefresh={() => fetchNFLData()}
-            refreshing={loading}
-
-        />
-        <AdMobBanner
+    /*<AdMobBanner
             bannerSize="banner"
             adUnitID="ca-app-pub-8519029912093094/4873811012" // Test ID, Replace with your-admob-unit-id
             servePersonalizedAds // true or false
         />
-        
-       
-    </View>
-    );
+         */
     
-    const SecondRoute = () => (
-        <View style={styles.container}>
-        <View style={styles.gameHeaderContainer}>
-            <View style={styles.teamHeader}>
-                <Text style={styles.gameHeaderText}>Team</Text>
-            </View>
-            <View style={styles.moneylineHeader}>
-                <Text style={styles.gameHeaderText}>ML</Text>
-            </View>
-            <View style={styles.spreadHeader}>
-                <Text style={styles.gameHeaderText}>Spread</Text>
-            </View>
-            <View style={styles.totalHeader}>
-                <Text style={styles.gameHeaderText}>Total</Text>
-            </View>
-        </View>
-        <FlatList 
-            data={ncaafGames}
-            style={styles.feed}
-            renderItem={renderItem}
-            onRefresh={() => fetchNCAAFData()}
-            refreshing={loading}
 
-        />
-        <AdMobBanner
-            bannerSize="banner"
-            adUnitID="ca-app-pub-8519029912093094/4873811012" // Test ID, Replace with your-admob-unit-id
-            servePersonalizedAds // true or false
-        />
-        
-    </View>
-    );
-    
-    const ThirdRoute = () => (
-        <View style={styles.container}>
-            <View style={styles.gameHeaderContainer}>
-                <View style={styles.teamHeader}>
-                    <Text style={styles.gameHeaderText}>Team</Text>
-                </View>
-                <View style={styles.moneylineHeader}>
-                    <Text style={styles.gameHeaderText}>ML</Text>
-                </View>
-                <View style={styles.spreadHeader}>
-                    <Text style={styles.gameHeaderText}>Spread</Text>
-                </View>
-                <View style={styles.totalHeader}>
-                    <Text style={styles.gameHeaderText}>Total</Text>
-                </View>
-            </View>
-            <FlatList 
-                data={mlbGames}
-                style={styles.feed}
-                renderItem={renderItem}
-                onRefresh={() => fetchMLBData()}
-                refreshing={loading}
-
-            />
-            <AdMobBanner
-                bannerSize="banner"
-                adUnitID="ca-app-pub-8519029912093094/4873811012" // Test ID, Replace with your-admob-unit-id
-                servePersonalizedAds // true or false
-            />
-            
-        </View>
-      );
-
-      const FourthRoute = () => (
-        <View style={styles.container}>
-            <View style={styles.gameHeaderContainer}>
-                <View style={styles.teamHeader}>
-                    <Text style={styles.gameHeaderText}>Team</Text>
-                </View>
-                <View style={styles.moneylineHeader}>
-                    <Text style={styles.gameHeaderText}>ML</Text>
-                </View>
-                <View style={styles.spreadHeader}>
-                    <Text style={styles.gameHeaderText}>Spread</Text>
-                </View>
-                <View style={styles.totalHeader}>
-                    <Text style={styles.gameHeaderText}>Total</Text>
-                </View>
-            </View>
-            <FlatList 
-                data={nbaGames}
-                style={styles.feed}
-                renderItem={renderItem}
-                onRefresh={() => fetchNBAData()}
-                refreshing={loading}
-
-            />
-            <AdMobBanner
-                bannerSize="banner"
-                adUnitID="ca-app-pub-8519029912093094/4873811012" // Test ID, Replace with your-admob-unit-id
-                servePersonalizedAds // true or false
-            />
-            
-        </View>
-      );
-
-    const layout = useWindowDimensions();
-
-    const [index, setIndex] = React.useState(0);
-    const [routes] = React.useState([
-        { key: 'first', title: 'NFL' },
-        { key: 'second', title: 'NCAAF' },
-        { key: 'third', title: 'MLB' },
-        { key: 'fourth', title: 'NBA'},
-    ]);
-
-    const renderScene = SceneMap({
-        first: FirstRoute,
-        second: SecondRoute,
-        third: ThirdRoute,
-        fourth: FourthRoute,
-    });
-
-    const renderTabBar = props => (
-        <TabBar
-            {...props}
-        activeColor={'white'}
-        inactiveColor={'black'}
-        
-            style={{backgroundColor:'darkgrey'}}
-        />
-    );
-
-    const renderItem = ({item, index}) => {
+    const renderItem = ({item}) => {
         return (
             <View>
                 <View style={styles.gameContainer}>
@@ -299,6 +139,134 @@ function Odds(props) {
             </View>
         )
     }
+
+    const FirstRoute = () => (
+        <View style={styles.container}>
+            <View style={styles.gameHeaderContainer}>
+                <View style={styles.teamHeader}>
+                    <Text style={styles.gameHeaderText}>Team</Text>
+                </View>
+                <View style={styles.moneylineHeader}>
+                    <Text style={styles.gameHeaderText}>ML</Text>
+                </View>
+                <View style={styles.spreadHeader}>
+                    <Text style={styles.gameHeaderText}>Spread</Text>
+                </View>
+                <View style={styles.totalHeader}>
+                    <Text style={styles.gameHeaderText}>Total</Text>
+                </View>
+            </View>
+        <FlatList
+            data={nflGames}
+            style={styles.feed}
+            renderItem={renderItem}
+            onRefresh={() => fetchNFLData()}
+            refreshing={loading}
+        />
+        <AdMobBanner
+            bannerSize="banner"
+            adUnitID="ca-app-pub-8519029912093094/4873811012" // Real ID: 8519029912093094/4873811012, test ID: 3940256099942544/2934735716
+            servePersonalizedAds // true or false
+        />
+        
+        
+       
+    </View>
+    );
+    
+    const SecondRoute = () => (
+        <View style={styles.container}>
+        <View style={styles.gameHeaderContainer}>
+            <View style={styles.teamHeader}>
+                <Text style={styles.gameHeaderText}>Team</Text>
+            </View>
+            <View style={styles.moneylineHeader}>
+                <Text style={styles.gameHeaderText}>ML</Text>
+            </View>
+            <View style={styles.spreadHeader}>
+                <Text style={styles.gameHeaderText}>Spread</Text>
+            </View>
+            <View style={styles.totalHeader}>
+                <Text style={styles.gameHeaderText}>Total</Text>
+            </View>
+        </View>
+        <FlatList 
+            data={ncaafGames}
+            style={styles.feed}
+            renderItem={renderItem}
+            onRefresh={() => fetchNCAAFData()}
+            refreshing={loading}
+        />
+        <AdMobBanner
+            bannerSize="banner"
+            adUnitID="ca-app-pub-8519029912093094/4873811012" // Real ID: 8519029912093094/4873811012, test ID: 3940256099942544/2934735716
+            servePersonalizedAds // true or false
+        />
+        
+        
+    </View>
+    );
+    
+      const ThirdRoute = () => (
+        <View style={styles.container}>
+            <View style={styles.gameHeaderContainer}>
+                <View style={styles.teamHeader}>
+                    <Text style={styles.gameHeaderText}>Team</Text>
+                </View>
+                <View style={styles.moneylineHeader}>
+                    <Text style={styles.gameHeaderText}>ML</Text>
+                </View>
+                <View style={styles.spreadHeader}>
+                    <Text style={styles.gameHeaderText}>Spread</Text>
+                </View>
+                <View style={styles.totalHeader}>
+                    <Text style={styles.gameHeaderText}>Total</Text>
+                </View>
+            </View>
+            <FlatList 
+                data={nbaGames}
+                style={styles.feed}
+                renderItem={renderItem}
+                onRefresh={() => fetchNBAData()}
+                refreshing={loading}
+
+            />
+            <AdMobBanner
+                bannerSize="banner"
+                adUnitID="ca-app-pub-8519029912093094/4873811012" // Real ID: 8519029912093094/4873811012, test ID: 3940256099942544/2934735716
+                servePersonalizedAds // true or false
+            />
+            
+            
+        </View>
+      );
+
+    const layout = useWindowDimensions();
+
+    const [index, setIndex] = React.useState(0);
+    const [routes] = React.useState([
+        { key: 'first', title: 'NFL' },
+        { key: 'second', title: 'NCAAF' },
+        { key: 'third', title: 'NBA'},
+    ]);
+
+    const renderScene = SceneMap({
+        first: FirstRoute,
+        second: SecondRoute,
+        third: ThirdRoute,
+    });
+
+    const renderTabBar = props => (
+        <TabBar
+            {...props}
+        activeColor={'white'}
+        inactiveColor={'black'}
+        
+            style={{backgroundColor:'darkgrey'}}
+        />
+    );
+
+    
 
 
     return (
@@ -445,6 +413,19 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         flex: 1,
     },
+    textInput: {
+        height: 30,
+        width: Dimensions.get('window').width * .80,
+        paddingHorizontal: 20,
+        backgroundColor: "#ffffff",
+        borderRadius: 20,
+        borderWidth: .5,
+        borderColor: "#CACFD2"
+    },
+    textInputContainer: {
+        padding: 10,
+        
+    }
     
     
     

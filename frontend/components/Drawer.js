@@ -6,7 +6,6 @@ import { DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 
 import firebase from 'firebase'
@@ -101,6 +100,7 @@ export function DrawerContent(props) {
                             label="Contact Us"
                             onPress={() => {props.navigation.navigate('ContactUs')}}
                         />
+                        
                     
                     </Drawer.Section>
                 </View>

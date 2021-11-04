@@ -2,7 +2,7 @@
   "expo": {
     "name": "locctocc",
     "slug": "locctocc",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "orientation": "portrait",
     "icon": "./assets/locctocclogo.png",
     "splash": {
@@ -23,6 +23,9 @@
         "NSCameraUsageDescription": "Enable Camera Access so that you can upload photos as posts or as your profile picture",
         "NSPhotoLibraryUsageDescription": "Enable Photo Library Access so that you can upload photos as posts or as your profile picture",
         "GADApplicationIdentifier": "ca-app-pub-8519029912093094~3459984543"
+      },
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-8519029912093094~3459984543" 
       }
     },
     "android": {
