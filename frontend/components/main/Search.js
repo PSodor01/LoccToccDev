@@ -14,6 +14,7 @@ import { fetchAllUsers, fetchUsersData } from '../../redux/actions/index'
 function Search(props) {
     const [allUsers, setAllUsers] = useState([]);
     const [search, setSearch] = useState('');
+    const [browse, setBrowse] = useState(false)
 
     useEffect(() => {
         
@@ -23,17 +24,22 @@ function Search(props) {
 
     const ItemView = ({item}) => {
         return (
-            <View style={styles.feedItem}>
-                <TouchableOpacity style={styles.postLeftContainer}
-                    onPress={() => props.navigation.navigate("Profile", {uid: item.id})}>
-                    <Image 
-                        style={styles.profilePhotoPostContainer}
-                        source={{uri: item.name ? item.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
-                    />
-                    <Text style={styles.searchResultsText}>{item.name}</Text>
-                </TouchableOpacity>
-                
+            <View>
+            {item.id == 'L3PlC2PXHYMYHsrdUtaS6tr7Ij13' ?
+                null :
+
+                <View style={styles.feedItem}>
+                    <TouchableOpacity style={styles.postLeftContainer}
+                        onPress={() => props.navigation.navigate("Profile", {uid: item.id})}>
+                        <Image 
+                            style={styles.profilePhotoPostContainer}
+                            source={{uri: item.name ? item.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                        />
+                        <Text style={styles.searchResultsText}>{item.name}</Text>
+                    </TouchableOpacity> 
+                </View> }
             </View>
+            
         )
     }
 
@@ -55,12 +61,24 @@ function Search(props) {
         }
     }
 
+    const browseFunction = () => {
+        if (browse == true) {
+            setBrowse(false)
+        } else {
+            setBrowse(true)
+        }
+    }
+
    
     
     return (
         <View style={styles.textInputContainer}>
             <View style={styles.appTextContainer}>
-                <FontAwesome5 name="search-dollar" color="grey" size={20} paddingRight={5} />
+                <TouchableOpacity
+                    onPress={() => {browseFunction()}}
+                    style={styles.showAllButton}>
+                    <FontAwesome5 name={"search-dollar"} size={20} color={"#009387"}/>
+                </TouchableOpacity>
                 <TextInput
                     style={styles.textInput}
                     placeholder="Type to find friends..."
@@ -68,10 +86,19 @@ function Search(props) {
                     value={search}
                     onChangeText={(text) => searchFilter(text)}
                    />
+                
             </View>
+            
 
             {search == '' ?
-            null :
+                browse == true ?
+                    <FlatList
+                        data = {allUsers.sort((a, b) => a.name.localeCompare(b.name))}
+                        style={styles.feed}
+                        keyExtractor={(item, index) => index.toString()}
+                        renderItem={ItemView}
+                />  :
+                null :
             
             <FlatList
                 data = {allUsers.sort((a, b) => a.name.localeCompare(b.name))}
@@ -79,6 +106,8 @@ function Search(props) {
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={ItemView}
             /> }
+
+            
         </View>
         
             
@@ -137,6 +166,9 @@ const styles = StyleSheet.create({
     postLeftContainer: {
         flexDirection: "row",
     },
+    showAllButton: {
+        marginRight: "2%",
+    }
     
 })
 
