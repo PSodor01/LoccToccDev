@@ -22,7 +22,7 @@ const DismissKeyboard = ({ children }) => (
 
 const MAX_LEN = 15,
   MIN_LEN = 6,
-  PASS_LABELS = ["Too Short", "Weak", "Better", "There we go!", "YES!!"];
+  PASS_LABELS = ["Too Short", "Weak Sauce", "Better", "There we go!", "YES!!"];
 
 /*
 <View style={styles.datePicker}>
@@ -39,6 +39,23 @@ const MAX_LEN = 15,
     />
 
 </View>
+<View style={{ paddingTop: 10, marginTop: 30 }}>
+    <Picker
+    style={{ justifyContent: 'center', height: 100}}
+    itemStyle={{ fontSize: 14, }}
+    selectedValue={this.state.gender}
+    onValueChange={(itemValue, itemIndex) => this.setState({gender: itemValue})}
+    >
+        <Picker.Item
+            label='Female'
+            value='female'
+        />
+        <Picker.Item
+            label='Male'
+            value='male'
+        />
+    </Picker>
+</View>
     */
 
 export class Register extends Component {
@@ -50,7 +67,6 @@ export class Register extends Component {
         this.state = {
             email: '',
             password: '',
-            gender: '',
             name: '',
             createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
             aboutMe: '',
@@ -67,7 +83,6 @@ export class Register extends Component {
     state={
         visibility:false,
         DateDisplay:"",
-        gender:'male',
         checked: false,
 
 
@@ -76,7 +91,6 @@ export class Register extends Component {
     handleConfirm=(date) => {
         this.setState({ DateDisplay:date.toUTCString() }, 
         this.setState({ visibility: false }),
-        this.setState({ birthday: date.toUTCString()}),
         console.log("Date picked:", date.toUTCString())
 
         )
@@ -99,7 +113,7 @@ export class Register extends Component {
     }
 
     async onSignUp() {
-        const { email, password, birthday, gender, name, aboutMe, location, userImg, createdAt } = this.state;
+        const { email, password, name, aboutMe, location, userImg, createdAt } = this.state;
         firebase.auth().createUserWithEmailAndPassword(email, password)
             .then((result) => {
                 firebase.firestore().collection("users")
@@ -107,8 +121,6 @@ export class Register extends Component {
                     .set({
                         name,
                         email,
-                        birthday,
-                        gender,
                         aboutMe,
                         location,
                         userImg,
@@ -187,23 +199,7 @@ export class Register extends Component {
                         : null
                         }
                         
-                        <View style={{ paddingTop: 10, marginTop: 30 }}>
-                            <Picker
-                            style={{ justifyContent: 'center', height: 100}}
-                            itemStyle={{ fontSize: 14, }}
-                            selectedValue={this.state.gender}
-                            onValueChange={(itemValue, itemIndex) => this.setState({gender: itemValue})}
-                            >
-                                <Picker.Item
-                                    label='Female'
-                                    value='female'
-                                />
-                                <Picker.Item
-                                    label='Male'
-                                    value='male'
-                                />
-                            </Picker>
-                        </View>
+                        
                         <View style={styles.agreementContainer}>
                             <CheckBox 
                                 checked={this.state.checked}

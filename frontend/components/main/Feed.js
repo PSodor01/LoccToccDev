@@ -179,21 +179,17 @@ function Feed(props) {
       };
 
       /*<AdMobBanner
-            bannerSize="banner"
-            adUnitID="ca-app-pub-8519029912093094/6377243182" // Real ID
-            servePersonalizedAds // true or false
-        /> */
+                    bannerSize="banner"
+                    adUnitID="ca-app-pub-3940256099942544/2934735716" // Real ID: 8519029912093094/6377243182, test ID: 3940256099942544/2934735716
+                    servePersonalizedAds // true or false
+                /> */
 
     const navigation = useNavigation();
 
     return (
         <View style={styles.containerGallery}>
             <View style={styles.bannerAdContainer}>
-                <AdMobBanner
-                    bannerSize="banner"
-                    adUnitID="ca-app-pub-8519029912093094/6377243182" // Real ID: 8519029912093094/6377243182, test ID: 3940256099942544/2934735716
-                    servePersonalizedAds // true or false
-                />
+                
             </View>
             <FlatList
                 style={styles.feed}
