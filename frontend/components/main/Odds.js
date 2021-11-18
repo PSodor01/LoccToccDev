@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, useWindowDimensions, TextInput, Dimensions, FlatList, TouchableOpacity } from 'react-native';
 import { TabView, TabBar, SceneMap } from 'react-native-tab-view';
 
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Ionicons from 'react-native-vector-icons/Ionicons'
+
 import moment from 'moment'
 
 import {AdMobBanner, AdMobInterstitial} from 'expo-ads-admob'
@@ -10,42 +14,134 @@ import firebase from 'firebase'
 require("firebase/firestore")
 require("firebase/firebase-storage")
 import { connect } from 'react-redux'
+import Icon from 'react-native-vector-icons/Ionicons';
 
 function Odds(props) {
 
-    const [games, setGames] = useState([]);
+    const [sportGames, setSportGames] = useState([]);
     const [nflGames, setnflGames] = useState([]);
     const [ncaafGames, setncaafGames] = useState([]);
     const [ncaabGames, setncaabGames] = useState([]);
     const [nbaGames, setnbaGames] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [search, setSearch] = useState('');
+    const [sport, setSport] = useState('');
+    const [browse, setBrowse] = useState(false);
 
      useEffect(() => {
-        fetchNFLData()
-        fetchNCAAFData()
-        fetchNBAData()
-        fetchNCAABData()
-    }, [ props.nflGames, props.ncaafGames, props.nbaGames, props.ncaabGames])
+        fetchData()
+        setSportGames(props.nflGames)
+        setSport('NFL')
+    }, [ props.nflGames, props.ncaafGames, props.nbaGames, props.ncaabGames ])
 
-    const fetchNFLData = () => {
-        setnflGames(props.nflGames)
-            setLoading(false);
+    const fetchData = () => {
+
+        function matchGametoPostCount(postsCount) {
+            for (let i = 0; i < props.nflGames.length; i++) {
+
+                if (postsCount.indexOf(props.nflGames[i].gameId) > -1) {
+                    console.log(props.nflGames[i].gameId)
+                } else {
+                    console.log('no match')
+
+                }
+                
+            }
+            setnflGames(props.nflGames)
+            setLoading(false)
         }
+
+        firebase.firestore()
+        .collectionGroup("votes")
+        .orderBy('id', 'desc')
+        .get()
+        .then((snapshot) => {
+
+            let postsCount = snapshot.docs.map(doc => {
+                const data = doc.data();
+                const id = doc.id;
+                return { id, ...data }
+            })
+                
+                matchGametoPostCount(postsCount)
+
+            })
+
     
-    const fetchNCAAFData = () => {
+
+
+        
         setncaafGames(props.ncaafGames)
-            setLoading(false);
-        }
-
-    const fetchNCAABData = () => {
         setncaabGames(props.ncaabGames)
-            setLoading(false);
+        setnbaGames(props.nbaGames)
+        setLoading(false);
         }
     
-    const fetchNBAData = () => {
-        setnbaGames(props.nbaGames)
-            setLoading(false);
+    const searchNFLFilter = (text) => {
+        if (text) {
+            const newData = sportGames.filter((item) => {
+                const awayData = item.awayTeam ? item.awayTeam.toUpperCase() : ''.toUpperCase();
+                const homeData = item.homeTeam ? item.homeTeam.toUpperCase() : ''.toUpperCase();
+
+                const textData = text.toUpperCase();
+                return (awayData.indexOf(textData) > -1 ||
+                homeData.indexOf(textData) > -1)
+                
+            });
+            setSportGames(newData)
+            setSearch(text)
+        } else {
+            if (sport == 'NFL') {setSportGames(props.nflGames)}
+            if (sport == 'NBA') {setSportGames(props.nbaGames)} 
+            if (sport == 'NCAAF') {setSportGames(props.ncaafGames)} 
+            if (sport == 'NCAAB') {setSportGames(props.ncaabGames)}
+            setSearch(text)
         }
+        
+    }
+
+    const browseFunction = () => {
+        if (browse == true) {
+            setBrowse(false)
+        } else {
+            setBrowse(true)
+        }
+    }
+    
+    const setSportFunction = (sport) => {
+        if (sport == 'NFL') {setSportGames(props.nflGames); setSport('NFL')}
+        if (sport == 'NBA') {setSportGames(props.nbaGames); setSport('NBA')} 
+        if (sport == 'NCAAF') {setSportGames(props.ncaafGames); setSport('NCAAF')} 
+        if (sport == 'NCAAB') {setSportGames(props.ncaabGames); setSport('NCAAB')}
+    }
+
+    const nbaIcon = (<Icon name="basketball-outline" color="#ee6730" size={16}/>);
+    const nflIcon = (<Icon name="american-football" color="#825736" size={16}/>);
+    const ncaafIcon = (<MaterialCommunityIcons name="football-helmet" color="#00843D" size={16}/>);
+    const ncaabIcon = (<MaterialCommunityIcons name="basketball-hoop-outline" color="grey" size={16}/>);
+
+    const sportsList = [
+        {
+            sport: 'NFL',
+            id: '1',
+            icon: nflIcon
+        },
+        {
+            sport: 'NBA',
+            id: '2',
+            icon: nbaIcon
+        },
+        {
+            sport: 'NCAAF',
+            id: '3',
+            icon: ncaafIcon
+        },
+        {
+            sport: 'NCAAB',
+            id: '4',
+            icon: ncaabIcon
+        },
+      ];
     
     /*const interstitial = async () => {
         await AdMobInterstitial.setAdUnitID('ca-app-pub-3940256099942544/1033173712'); // Test ID, Replace with your-admob-unit-id
@@ -67,15 +163,21 @@ function Odds(props) {
             null
         } */
 
-    /*<AdMobBanner
-            bannerSize="banner"
-            adUnitID="ca-app-pub-3940256099942544/2934735716" // Real ID: 8519029912093094/4873811012, test ID: 3940256099942544/2934735716
-            servePersonalizedAds // true or false
-        />
-         */
     
-
-    const renderItem = ({item}) => {
+    
+    const renderSportsListItem = ({ item }) => (
+        <View style={styles.sportContainer}>
+            <TouchableOpacity
+                style={styles.sportButton}
+                onPress={() => {setSportFunction(item.sport)}}>
+                <Text>{item.sport}</Text>
+                <Text> {item.icon}</Text>
+            </TouchableOpacity>
+        </View>
+        
+    );
+        
+    const renderItem = ({ item }) => {
         return (
             <View>
                 <View style={styles.gameContainer}>
@@ -147,96 +249,37 @@ function Odds(props) {
         )
     }
 
-    const FirstRoute = () => (
+    return (
         <View style={styles.container}>
-            <View style={styles.gameHeaderContainer}>
-                <View style={styles.teamHeader}>
-                    <Text style={styles.gameHeaderText}>Team</Text>
-                </View>
-                <View style={styles.moneylineHeader}>
-                    <Text style={styles.gameHeaderText}>ML</Text>
-                </View>
-                <View style={styles.spreadHeader}>
-                    <Text style={styles.gameHeaderText}>Spread</Text>
-                </View>
-                <View style={styles.totalHeader}>
-                    <Text style={styles.gameHeaderText}>Total</Text>
-                </View>
+            <View style={styles.sportListContainer}>
+                <TouchableOpacity
+                    onPress={() => {browseFunction()}}
+                    style={styles.showAllButton}>
+                    <FontAwesome5 name={"search-dollar"} size={20} color={"#009387"}/>
+                </TouchableOpacity>
+                <FlatList
+                    data={sportsList}
+                    keyExtractor={(item, index) => index.toString()}
+                    renderItem={renderSportsListItem}
+                    horizontal={true}
+                    showsHorizontalScrollIndicator={false}
+                />
             </View>
-        <FlatList
-            data={nflGames}
-            style={styles.feed}
-            renderItem={renderItem}
-            onRefresh={() => fetchNFLData()}
-            refreshing={loading}
-        />
-        
-        
-        
-       
-    </View>
-    );
-    
-    const SecondRoute = () => (
-        <View style={styles.container}>
-        <View style={styles.gameHeaderContainer}>
-            <View style={styles.teamHeader}>
-                <Text style={styles.gameHeaderText}>Team</Text>
-            </View>
-            <View style={styles.moneylineHeader}>
-                <Text style={styles.gameHeaderText}>ML</Text>
-            </View>
-            <View style={styles.spreadHeader}>
-                <Text style={styles.gameHeaderText}>Spread</Text>
-            </View>
-            <View style={styles.totalHeader}>
-                <Text style={styles.gameHeaderText}>Total</Text>
-            </View>
-        </View>
-        <FlatList 
-            data={ncaafGames}
-            style={styles.feed}
-            renderItem={renderItem}
-            onRefresh={() => fetchNCAAFData()}
-            refreshing={loading}
-        />
-        
-        
-    </View>
-    );
-    
-    const ThirdRoute = () => (
-    <View style={styles.container}>
-        <View style={styles.gameHeaderContainer}>
-            <View style={styles.teamHeader}>
-                <Text style={styles.gameHeaderText}>Team</Text>
-            </View>
-            <View style={styles.moneylineHeader}>
-                <Text style={styles.gameHeaderText}>ML</Text>
-            </View>
-            <View style={styles.spreadHeader}>
-                <Text style={styles.gameHeaderText}>Spread</Text>
-            </View>
-            <View style={styles.totalHeader}>
-                <Text style={styles.gameHeaderText}>Total</Text>
-            </View>
-        </View>
-        <FlatList 
-            data={nbaGames}
-            style={styles.feed}
-            renderItem={renderItem}
-            onRefresh={() => fetchNBAData()}
-            refreshing={loading}
 
-        />
-       
-        
-        
-    </View>
-    );
-
-    const FourthRoute = () => (
-        <View style={styles.container}>
+                {browse == true ? 
+                <View style={styles.searchContainer}>
+                    <TextInput
+                        style={styles.textInput}
+                        placeholder="Find your lock..."
+                        clearButtonMode={'while-editing'}
+                        autoCorrect={false}
+                        value={search}
+                        onChangeText={(text) => searchNFLFilter(text)}
+                   />
+                </View>
+                    
+                   : null}
+                
             <View style={styles.gameHeaderContainer}>
                 <View style={styles.teamHeader}>
                     <Text style={styles.gameHeaderText}>Team</Text>
@@ -252,57 +295,24 @@ function Odds(props) {
                 </View>
             </View>
             <FlatList 
-                data={ncaabGames}
+                data={sportGames}
                 style={styles.feed}
                 renderItem={renderItem}
                 onRefresh={() => fetchNCAABData()}
                 refreshing={loading}
     
             />
+            <View style={styles.adView}>
+                <AdMobBanner
+                    bannerSize="banner"
+                    adUnitID="ca-app-pub-3940256099942544/2934735716" // Real ID: 8519029912093094/4907013689, test ID: 3940256099942544/2934735716
+                    servePersonalizedAds // true or false
+                />
+            </View>
             
-            
-            
+         
         </View>
-        );
-
-    const layout = useWindowDimensions();
-
-    const [index, setIndex] = React.useState(0);
-    const [routes] = React.useState([
-        { key: 'first', title: 'NFL' },
-        { key: 'second', title: 'NCAAF' },
-        { key: 'third', title: 'NBA'},
-        { key: 'fourth', title: 'NCAAB'},
-    ]);
-
-    const renderScene = SceneMap({
-        first: FirstRoute,
-        second: SecondRoute,
-        third: ThirdRoute,
-        fourth: FourthRoute,
-    });
-
-    const renderTabBar = props => (
-        <TabBar
-            {...props}
-        activeColor={'white'}
-        inactiveColor={'black'}
         
-            style={{backgroundColor:'darkgrey'}}
-        />
-    );
-
-    
-
-
-    return (
-        <TabView
-            navigationState={{ index, routes }}
-            renderScene={renderScene}
-            renderTabBar={renderTabBar}
-            onIndexChange={setIndex}
-            initialLayout={{ width: layout.width }}
-        />
         
     );
     
@@ -316,9 +326,13 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center',
         paddingTop: 6,
         backgroundColor: "#e1e2e6",
+    },
+    sportListContainer: {
+        alignItems: 'center',
+        paddingBottom: "2%",
+        flexDirection: 'row',
     },
     gameContainer: {
         padding: 6,
@@ -408,37 +422,6 @@ const styles = StyleSheet.create({
         width: 60,
         alignItems: 'center',
     },
-    teamText: {
-    },
-    listTab: {
-        flexDirection: 'row',
-        alignSelf: 'center',
-        marginBottom: 20,
-        paddingTop: 5,
-    },
-    btnTab: {
-        width: Dimensions.get('window').width /3,
-        flexDirection: 'row',
-        backgroundColor: "#ffffff",
-        borderRadius: 15,
-        padding: 6,
-        justifyContent: 'center',
-        marginRight: 10,
-    },
-    textTab: {
-        fontSize: 16
-    },
-    btnTabActive: {
-        backgroundColor: 'grey'
-    },
-    textTabActive: {
-        color: '#fff',
-    },
-    loadingContainer: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        flex: 1,
-    },
     textInput: {
         height: 30,
         width: Dimensions.get('window').width * .80,
@@ -451,7 +434,33 @@ const styles = StyleSheet.create({
     textInputContainer: {
         padding: 10,
         
-    }
+    },
+    sportContainer: {
+        flexDirection: 'row',
+        backgroundColor: "#ffffff",
+        borderRadius: 20,
+        borderColor: "#CACFD2",
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        borderWidth: .5,
+        justifyContent: 'center',
+        marginHorizontal: 2,
+        alignItems: 'center'
+    },
+    sportButton: {
+        flexDirection: 'row'
+    },
+    showAllButton: {
+        marginHorizontal: "2%",
+    },
+    searchContainer: {
+        alignItems: 'center',
+        paddingBottom: 5,
+    },
+    adView: {
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
     
     
     

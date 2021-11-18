@@ -11,7 +11,7 @@
             try {
               const result = await Share.share({
                 message:
-                  'React Native | A framework for building native apps using React',
+                  'Check out locctocc! https://apps.apple.com/app/apple-store/id1585460244?pt=123488891&ct=IA&mt=8',
               });
               if (result.action === Share.sharedAction) {
                 if (result.activityType) {

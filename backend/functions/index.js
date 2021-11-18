@@ -6,7 +6,19 @@ admin.initializeApp();
 
 const db = admin.firestore()
 
-exports.addLike = functions.firestore.document('/posts/{creatorId}/userPosts/{postId}/likes/{userId}')
+exports.testLike = functions.firestore.document('/likes/{userId}/userLikes/{postId}')
+  .onCreate((snap, context) => {
+    return db
+      .collection('posts')
+      .doc(context.params.creatorId)
+      .collection('userPosts')
+      .doc(context.params.postId)
+      .update({
+        likesCount: admin.firestore.FieldValue.increment(1)
+      })
+  })
+
+  exports.addLike = functions.firestore.document('/posts/{creatorId}/userPosts/{postId}/likes/{userId}')
   .onCreate((snap, context) => {
     return db
       .collection('posts')
@@ -441,6 +453,34 @@ exports.getNFLGameData = functions.pubsub.schedule('every 5 minutes').onRun(asyn
         });
 
       
+  }catch(err) {console.error(err.message)}
+
+  })
+
+  exports.deleteNCAABGameData = functions.pubsub.schedule('00 11 * * *').timeZone('America/New_York').onRun(async() => {
+    try {
+      const writeResult = admin
+          .firestore()
+          .collection('ncaab')
+          .get()
+          .then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            doc.ref.delete({});
+          });
+        });
+  }catch(err) {console.error(err.message)}
+
+  })
+
+  exports.deleteVoteData = functions.pubsub.schedule('every 5 minutes').timeZone('America/New_York').onRun(async() => {
+    try {
+      const getVotes = admin
+        .firestore()
+        .collection('votes')
+        .doc('test')
+        .get()
+        
+         
   }catch(err) {console.error(err.message)}
 
   })

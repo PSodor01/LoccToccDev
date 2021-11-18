@@ -113,7 +113,55 @@ const AddPostScreen = ({ route, props }) => {
       })).catch((error) => {
         console.log(error)
     })
+
+    firebase.firestore()
+        .collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .update({
+            postsCount: firebase.firestore.FieldValue.increment(1)
+        })
+
     }
+
+    const increasePostsCount = () => {
+
+      firebase.firestore()
+          .collection("votes")
+          .doc(gameId)
+          .collection("gameVotes")
+          .doc("info")
+          .get()
+          .then((snapshot) => {
+              if (snapshot.exists) {
+                firebase.firestore()
+                .collection("votes")
+                .doc(gameId)
+                .collection("gameVotes")
+                .doc('info')
+                .update({
+                    gamePostsCount: firebase.firestore.FieldValue.increment(1)
+                })
+              }
+              else {
+                  
+                  const gameVotes = 
+                      firebase.firestore()
+                      .collection("votes")
+                      .doc(gameId)
+                      .collection("gameVotes")
+                      .doc('info')
+
+                  gameVotes
+                      .set({
+                        gameDate: gameDate,
+                        awayCount: 0,
+                        homeCount: 0,
+                        gamePostsCount: 1,
+
+                      })
+              }
+          })
+  }
 
     const uploadImage = async () => {
       if( image == null ) {
@@ -258,7 +306,7 @@ const AddPostScreen = ({ route, props }) => {
                   </TouchableOpacity>
                 </View>
                 <View style={styles.postButtonContainer}>
-                  <TouchableOpacity onPress={() => {uploadImage()}} style={styles.postButton}>
+                  <TouchableOpacity onPress={() => {uploadImage(); increasePostsCount()}} style={styles.postButton}>
                       <Text style={styles.shareText}>POST</Text>
                   </TouchableOpacity>
                 </View>

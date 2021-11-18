@@ -1,11 +1,14 @@
 import React, {useEffect, useState} from 'react';
-import { View, StyleSheet, Linking } from 'react-native';
-import { Avatar, Title, Caption, Drawer, Text, TouchableRipple, Switch } from 'react-native-paper'
+import { View, StyleSheet, Share } from 'react-native';
+import { Avatar, Title, Caption, Drawer } from 'react-native-paper'
 import { DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+
 
 
 import firebase from 'firebase'
@@ -40,6 +43,26 @@ export function DrawerContent(props) {
     const onLogout = () => {
         firebase.auth().signOut();
     }
+
+    const onShare = async () => {
+        try {
+          const result = await Share.share({
+            message:
+              'Check out locctocc! https://apps.apple.com/app/apple-store/id1585460244?pt=123488891&ct=IA&mt=8',
+          });
+          if (result.action === Share.sharedAction) {
+            if (result.activityType) {
+              // shared with activity type of result.activityType
+            } else {
+              // shared
+            }
+          } else if (result.action === Share.dismissedAction) {
+            // dismissed
+          }
+        } catch (error) {
+          alert(error.message);
+        }
+      };
 
     return(
         <View style={{ flex: 1 }}>
@@ -92,20 +115,41 @@ export function DrawerContent(props) {
                         />
                         <DrawerItem 
                             icon={({color, size}) => (
-                                <Icon 
-                                name="phone-lock-outline"
+                                <FontAwesome 
+                                name="handshake-o"
                                 color={color}
                                 size={size}/>
                             )}
-                            label="Contact Us"
-                            onPress={() => {props.navigation.navigate('ContactUs')}}
+                            label="Our Partners"
+                            onPress={() => {props.navigation.navigate('Partners')}}
                         />
+                        <DrawerItem 
+                            icon={({color, size}) => (
+                                <MaterialIcons 
+                                name="emoji-people"
+                                color={color}
+                                size={size}/>
+                            )}
+                            label="Share with friends!"
+                            onPress={() => onShare()}
+                        />
+                        
                         
                     
                     </Drawer.Section>
                 </View>
             </DrawerContentScrollView>
             <Drawer.Section style={styles.bottomDrawerSection}>
+                <DrawerItem 
+                    icon={({color, size}) => (
+                        <Icon 
+                        name="phone-lock-outline"
+                        color={color}
+                        size={size}/>
+                    )}
+                    label="Contact Us"
+                    onPress={() => {props.navigation.navigate('ContactUs')}}
+                />
                 <DrawerItem 
                     icon={({color, size}) => (
                         <FontAwesome5

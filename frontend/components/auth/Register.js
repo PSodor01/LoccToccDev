@@ -127,6 +127,7 @@ export class Register extends Component {
                         createdAt,
                         followerCount: 0,
                         followingCount: 0,
+                        postsCount: 0,
                     })
                 console.log(result)
             })

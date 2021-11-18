@@ -91,6 +91,7 @@ function game(props) {
                 })
                     
                     matchUserToGamePost(gamePosts)
+                    console.log(gamePosts)
 
                 })
 
@@ -103,18 +104,7 @@ function game(props) {
 
     }
 
-    const onLikePress = (userId, postId) => {
-        firebase.firestore()
-            .collection("posts")
-            .doc(userId)
-            .collection("userPosts")
-            .doc(postId)
-            .collection("likes")
-            .doc(firebase.auth().currentUser.uid)
-            .set({})
-    }
-
-    const storeLike = (postId) => {
+    const storeLike = (postId, userId) => {
         firebase.firestore()
             .collection("likes")
             .doc(firebase.auth().currentUser.uid)
@@ -123,45 +113,12 @@ function game(props) {
             .set({})
     }
 
-    const onDislikePress = (userId, postId) => {
-        firebase.firestore()
-            .collection("posts")
-            .doc(userId)
-            .collection("userPosts")
-            .doc(postId)
-            .collection("likes")
-            .doc(firebase.auth().currentUser.uid)
-            .delete({})
-    }
-
-    const deleteLike = (postId) => {
+    const deleteLike = (postId, userId) => {
         firebase.firestore()
             .collection("likes")
             .doc(firebase.auth().currentUser.uid)
             .collection("userLikes")
             .doc(postId)
-            .delete({})
-    }
-
-    const onFadePress = (userId, postId) => {
-        firebase.firestore()
-            .collection("posts")
-            .doc(userId)
-            .collection("userPosts")
-            .doc(postId)
-            .collection("fades")
-            .doc(firebase.auth().currentUser.uid)
-            .set({})
-    }
-
-    const onUnfadePress = (userId, postId) => {
-        firebase.firestore()
-            .collection("posts")
-            .doc(userId)
-            .collection("userPosts")
-            .doc(postId)
-            .collection("fades")
-            .doc(firebase.auth().currentUser.uid)
             .delete({})
     }
 
@@ -172,7 +129,6 @@ function game(props) {
             .collection("userFades")
             .doc(postId)
             .set({})
-            
     }
 
     const deleteFade = (postId) => {
@@ -182,6 +138,50 @@ function game(props) {
             .collection("userFades")
             .doc(postId)
             .delete({})
+    }
+
+    const onLikePress = (userId, postId) => {
+        firebase.firestore()
+            .collection("posts")
+            .doc(userId)
+            .collection("userPosts")
+            .doc(postId)
+            .update({
+                likesCount: firebase.firestore.FieldValue.increment(1)
+            })
+    }
+
+    const onDislikePress = (userId, postId) => {
+        firebase.firestore()
+            .collection("posts")
+            .doc(userId)
+            .collection("userPosts")
+            .doc(postId)
+            .update({
+                likesCount: firebase.firestore.FieldValue.increment(-1)
+            })
+    }
+
+    const onFadePress = (userId, postId) => {
+        firebase.firestore()
+            .collection("posts")
+            .doc(userId)
+            .collection("userPosts")
+            .doc(postId)
+            .update({
+                fadesCount: firebase.firestore.FieldValue.increment(1)
+            })
+    }
+
+    const onUnfadePress = (userId, postId) => {
+        firebase.firestore()
+            .collection("posts")
+            .doc(userId)
+            .collection("userPosts")
+            .doc(postId)
+            .update({
+                fadesCount: firebase.firestore.FieldValue.increment(-1)
+            })
     }
 
     const gameVote = () => {
@@ -235,15 +235,14 @@ function game(props) {
                             gameDate: gameDate,
                             awayCount: 0,
                             homeCount: 0,
+                            gamePostsCount: 0,
 
                         })
-
                 }
             })
     }
 
     const increaseAwayCount = () => {
-
         firebase.firestore()
             .collection("votes")
             .doc(gameId)
@@ -270,7 +269,6 @@ function game(props) {
     }
 
     const increaseHomeCount = () => {
-
         firebase.firestore()
             .collection("votes")
             .doc(gameId)
@@ -297,7 +295,6 @@ function game(props) {
     }
 
     const setVoteCount = () => {
-
         firebase.firestore()
         .collection("votes")
         .doc(gameId)
@@ -308,8 +305,8 @@ function game(props) {
             if (snapshot.exists) {
                 let votes = snapshot.data();
 
-                const away = parseFloat((votes.awayCount / (votes.awayCount + votes.homeCount))*100).toFixed(0)+"%"
-                const home = parseFloat((votes.homeCount / (votes.awayCount + votes.homeCount))*100).toFixed(0)+"%"
+                const away = votes.awayCount ? parseFloat((votes.awayCount / (votes.awayCount + votes.homeCount))*100).toFixed(0)+"%" : null 
+                const home = votes.homeCount ? parseFloat((votes.homeCount / (votes.awayCount + votes.homeCount))*100).toFixed(0)+"%" : null 
 
                 setAwayVote(away)
                 setHomeVote(home)
@@ -367,11 +364,7 @@ function game(props) {
             setSortCriteria(true)
         }
     }
-    /*<AdMobBanner
-        bannerSize="banner"
-        adUnitID="ca-app-pub-3940256099942544/2934735716" // Real ID: 8519029912093094/3359767373, test ID: 3940256099942544/2934735716
-        servePersonalizedAds // true or false
-    />*/
+    
 
 
     const renderItem = ({item}) => {
@@ -614,7 +607,11 @@ function game(props) {
             />
             }
             <View style={styles.adView}>
-                
+                <AdMobBanner
+                    bannerSize="banner"
+                    adUnitID="ca-app-pub-3940256099942544/2934735716" // Real ID: 8519029912093094/5150749785, test ID: 3940256099942544/2934735716
+                    servePersonalizedAds // true or false
+                />
             </View>
             <TouchableOpacity
                 activeOpacity={0.8}
@@ -804,7 +801,6 @@ const styles = StyleSheet.create({
     adView: {
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: '1%',
     },
     sortContainer: {
         flexDirection: 'row',

@@ -52,6 +52,7 @@ import AboutUsScreen from './components/main/AboutUs'
 import LegalDocsScreen from './components/main/LegalDocs'
 import HouseGuidelinesScreen from './components/main/HouseGuidelines'
 import ContactUsScreen from './components/main/ContactUs'
+import PartnersScreen from './components/main/Partners'
 import FollowingScreen from './components/main/FollowingScreen'
 import FollowerScreen from './components/main/FollowerScreen'
 import LikesList from './components/main/LikesList'
@@ -220,6 +221,18 @@ const MainStackScreen = ({navigation, props}) => (
       <MainStack.Screen name="ContactUs" component={ContactUsScreen}
         options={{
             headerTitle: "Contact Us",
+            headerLeft: () => (
+              <TouchableOpacity 
+              style={{ alignItems: "flex-end", marginLeft:16 }}
+              onPress={() => navigation.goBack()}
+              >
+              <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+            </TouchableOpacity>
+            )
+          }} />
+      <MainStack.Screen name="Partners" component={PartnersScreen}
+        options={{
+            headerTitle: "Our Partners",
             headerLeft: () => (
               <TouchableOpacity 
               style={{ alignItems: "flex-end", marginLeft:16 }}

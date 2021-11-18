@@ -30,9 +30,25 @@ function Profile(props) {
     
         if (props.route.params.uid === firebase.auth().currentUser.uid) {
             setUser(currentUser);
-            posts.sort(function (x, y) {
-                return y.creation - x.creation;
-            })
+            firebase.firestore()
+                .collection("posts")
+                .doc(firebase.auth().currentUser.uid)
+                .collection("userPosts")
+                .orderBy("creation", "desc")
+                .get()
+                .then((snapshot) => {
+                    let posts = snapshot.docs.map(doc => {
+                        const data = doc.data();
+                        const id = doc.id;
+                        return { id, ...data }
+                    })
+                    posts.sort(function (x, y) {
+                        return y.creation - x.creation;
+                    })
+                    setUserPosts(posts)
+                    setLoading(false);
+                    
+                })
             setUserPosts(posts)
             setLoading(false);
         }
@@ -105,40 +121,6 @@ function Profile(props) {
             .collection("userFollowing")
             .doc(props.route.params.uid)
             .delete()
-    }
-
-    const onLikePress = (id) => {
-        const userPosts = firebase.firestore()
-            .collection("posts")
-            .doc(props.route.params.uid)
-            .collection("userPosts")
-            .doc(id);
-        
-        userPosts.collection("likes")
-            .doc(firebase.auth().currentUser.uid)
-            .set({})
-            .then(() => {
-                userPosts.update({
-                    likesCount: firebase.firestore.FieldValue.increment(1)
-                });
-            })
-    }
-    
-    const onDislikePress = (id) => {
-        const userPosts = firebase.firestore()
-            .collection("posts")
-            .doc(props.route.params.uid)
-            .collection("userPosts")
-            .doc(id);
-
-        userPosts.collection("likes")
-            .doc(firebase.auth().currentUser.uid)
-            .delete()
-            .then(() => {
-                userPosts.update({
-                    likesCount: firebase.firestore.FieldValue.increment(-1)
-                });
-            })
     }
 
     const increaseFollowerCount = () => {
@@ -302,6 +284,15 @@ function Profile(props) {
                 Alert.alert(
                   'Your post has been deleted!',
                 );
+
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                postsCount: firebase.firestore.FieldValue.increment(-1)
+            })
+
+
             
     })
     }
@@ -406,7 +397,7 @@ function Profile(props) {
             </View>
             <View style={styles.profileStatsContainer}>
                 <View style={styles.profileStatsBox}>
-                    <Text style={styles.followNumber}>{user ? userPosts.length : 0}</Text>
+                    <Text style={styles.followNumber}>{user ? user.postsCount : 0}</Text>
                     <Text style={styles.followText}>Posts</Text>
                 </View>
                 <View style={styles.profileStatsBox}>
@@ -678,7 +669,6 @@ const styles = StyleSheet.create({
 })
 const mapStateToProps = (store) => ({
     currentUser: store.userState.currentUser,
-    posts: store.userState.posts,
     following: store.userState.following,
     blocking: store.userState.blocking,
 })
