@@ -141,6 +141,16 @@ function game(props) {
     }
 
     const onLikePress = (userId, postId) => {
+
+        firebase.firestore()
+            .collection("posts")
+            .doc(userId)
+            .collection("userPosts")
+            .doc(postId)
+            .collection("likes")
+            .doc(firebase.auth().currentUser.uid)
+            .set({})
+
         firebase.firestore()
             .collection("posts")
             .doc(userId)
@@ -160,6 +170,16 @@ function game(props) {
             .update({
                 likesCount: firebase.firestore.FieldValue.increment(-1)
             })
+
+        firebase.firestore()
+            .collection("posts")
+            .doc(userId)
+            .collection("userPosts")
+            .doc(postId)
+            .collection("likes")
+            .doc(firebase.auth().currentUser.uid)
+            .delete()
+        
     }
 
     const onFadePress = (userId, postId) => {
@@ -171,6 +191,15 @@ function game(props) {
             .update({
                 fadesCount: firebase.firestore.FieldValue.increment(1)
             })
+
+        firebase.firestore()
+            .collection("posts")
+            .doc(userId)
+            .collection("userPosts")
+            .doc(postId)
+            .collection("fades")
+            .doc(firebase.auth().currentUser.uid)
+            .set({})
     }
 
     const onUnfadePress = (userId, postId) => {
@@ -182,6 +211,16 @@ function game(props) {
             .update({
                 fadesCount: firebase.firestore.FieldValue.increment(-1)
             })
+
+        firebase.firestore()
+            .collection("posts")
+            .doc(userId)
+            .collection("userPosts")
+            .doc(postId)
+            .collection("fades")
+            .doc(firebase.auth().currentUser.uid)
+            .delete()
+
     }
 
     const gameVote = () => {

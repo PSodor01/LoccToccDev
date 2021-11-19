@@ -12,7 +12,6 @@ import { bindActionCreators } from 'redux'
 import { fetchUsersData } from '../../redux/actions/index'
 
 function FollowerScreen(props) {
-    const [users, setUsers] = useState([])
     const [following, setFollowing] = useState([])
 
     const { userId } = props.route.params;
@@ -49,7 +48,6 @@ function FollowerScreen(props) {
                     return { id, ...data }
                 })
                 matchUserToFollower(following)
-                console.log(following)
             })
 
 
