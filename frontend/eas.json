@@ -1,4 +1,17 @@
 {
+  "build": {
+    "Development": {
+      "developmentClient": "true",
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal"
+    },
+    "production": {
+      "node": "1.0.13"
+    }
+  },
+  
   "submit": {
     "release": {
       "android": {
