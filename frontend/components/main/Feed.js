@@ -398,7 +398,7 @@ function Feed(props) {
                     { item.liked == true ?
                         <View style={styles.likeContainer}>
                             <TouchableOpacity
-                                onPress={() => {deleteLike(item.id)}} >
+                                onPress={() => {onDislikePress(item.user.uid, item.id); deleteLike(item.id)}} >
                                 <Ionicons name={"hammer"} size={20} color={"black"} />
                             </TouchableOpacity>
                             <TouchableOpacity
@@ -411,7 +411,7 @@ function Feed(props) {
                         
                         <View style={styles.likeContainer}>
                             <TouchableOpacity
-                                onPress={() => {storeLike(item.id)}}> 
+                                onPress={() => {onLikePress(item.user.uid, item.id); storeLike(item.id)}}> 
                                 <Ionicons name={"hammer-outline"}  size={20} color={"grey"}/>
                             </TouchableOpacity>
                             <TouchableOpacity
@@ -423,7 +423,7 @@ function Feed(props) {
                         { item.faded == true ?
                         <View style={styles.likeContainer}>
                             <TouchableOpacity
-                                onPress={() => {deleteFade(item.id)}} >
+                                onPress={() => {onUnfadePress(item.user.uid, item.id); deleteFade(item.id)}} >
                                 <Foundation name={"skull"} size={20} color={"black"} />
                             </TouchableOpacity>
                             <TouchableOpacity
@@ -436,7 +436,7 @@ function Feed(props) {
                         
                         <View style={styles.likeContainer}>
                             <TouchableOpacity
-                                onPress={() => {storeFade(item.id)}}> 
+                                onPress={() => {onFadePress(item.user.uid, item.id); storeFade(item.id)}}> 
                                 <Foundation name={"skull"}  size={20} color={"#B3B6B7"}/>
                             </TouchableOpacity>
                             <TouchableOpacity
