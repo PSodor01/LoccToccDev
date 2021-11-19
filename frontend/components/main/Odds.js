@@ -35,8 +35,14 @@ function Odds(props) {
     }, [ props.nflGames, props.ncaafGames, props.nbaGames, props.ncaabGames ])
 
     const fetchData = () => {
+        setnflGames(props.nflGames)
+        setncaafGames(props.ncaafGames)
+        setncaabGames(props.ncaabGames)
+        setnbaGames(props.nbaGames)
+        setLoading(false);
+        }
 
-        function matchGametoPostCount(postsCount) {
+        /*function matchGametoPostCount(postsCount) {
             for (let i = 0; i < props.nflGames.length; i++) {
 
                 if (postsCount.indexOf(props.nflGames[i].gameId) > -1) {
@@ -47,7 +53,6 @@ function Odds(props) {
                 }
                 
             }
-            setnflGames(props.nflGames)
             setLoading(false)
         }
 
@@ -65,17 +70,7 @@ function Odds(props) {
                 
                 matchGametoPostCount(postsCount)
 
-            })
-
-    
-
-
-        
-        setncaafGames(props.ncaafGames)
-        setncaabGames(props.ncaabGames)
-        setnbaGames(props.nbaGames)
-        setLoading(false);
-        }
+            }) */
     
     const searchNFLFilter = (text) => {
         if (text) {
@@ -298,14 +293,12 @@ function Odds(props) {
                 data={sportGames}
                 style={styles.feed}
                 renderItem={renderItem}
-                onRefresh={() => fetchNCAABData()}
-                refreshing={loading}
     
             />
             <View style={styles.adView}>
                 <AdMobBanner
                     bannerSize="banner"
-                    adUnitID="ca-app-pub-3940256099942544/2934735716" // Real ID: 8519029912093094/4907013689, test ID: 3940256099942544/2934735716
+                    adUnitID="ca-app-pub-8519029912093094/4907013689" // Real ID: 8519029912093094/4907013689, test ID: 3940256099942544/2934735716
                     servePersonalizedAds // true or false
                 />
             </View>
