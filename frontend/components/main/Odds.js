@@ -3,6 +3,7 @@ import { Text, View, StyleSheet, useWindowDimensions, TextInput, Dimensions, Fla
 import { TabView, TabBar, SceneMap } from 'react-native-tab-view';
 
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
@@ -27,51 +28,120 @@ function Odds(props) {
     const [search, setSearch] = useState('');
     const [sport, setSport] = useState('');
     const [browse, setBrowse] = useState(false);
+    const [trendingGames, setTrendingGames] = useState([]);
 
      useEffect(() => {
         fetchData()
         setSportGames(props.nflGames)
         setSport('NFL')
-    }, [ props.nflGames, props.ncaafGames, props.nbaGames, props.ncaabGames ])
+    }, [ props.nflGames, props.ncaafGames, props.nbaGames, props.ncaabGames, props.trendingGames])
 
     const fetchData = () => {
-        setnflGames(props.nflGames)
-        setncaafGames(props.ncaafGames)
-        setncaabGames(props.ncaabGames)
-        setnbaGames(props.nbaGames)
-        setLoading(false);
-        }
+        for (let i = 0; i < props.nflGames.length; i++) {
 
-        /*function matchGametoPostCount(postsCount) {
-            for (let i = 0; i < props.nflGames.length; i++) {
-
-                if (postsCount.indexOf(props.nflGames[i].gameId) > -1) {
-                    console.log(props.nflGames[i].gameId)
-                } else {
-                    console.log('no match')
-
+            firebase.firestore()
+            .collection("votes")
+            .doc(props.nflGames[i].gameId)
+            .collection("gameVotes")
+            .doc("info")
+            .get()
+            .then((snapshot) => {
+                if (snapshot.exists) {
+                    let gameMiscData = snapshot.data();
+                    props.nflGames[i].gamePostsCount = gameMiscData.gamePostsCount
                 }
-                
-            }
-            setLoading(false)
-        }
-
-        firebase.firestore()
-        .collectionGroup("votes")
-        .orderBy('id', 'desc')
-        .get()
-        .then((snapshot) => {
-
-            let postsCount = snapshot.docs.map(doc => {
-                const data = doc.data();
-                const id = doc.id;
-                return { id, ...data }
+                else {
+                    props.nflGames[i].gamePostsCount = 0
+                }
             })
-                
-                matchGametoPostCount(postsCount)
+        }
+        setnflGames(props.nflGames)
 
-            }) */
-    
+        for (let i = 0; i < props.nbaGames.length; i++) {
+
+            firebase.firestore()
+            .collection("votes")
+            .doc(props.nbaGames[i].gameId)
+            .collection("gameVotes")
+            .doc("info")
+            .get()
+            .then((snapshot) => {
+                if (snapshot.exists) {
+                    let gameMiscData = snapshot.data();
+                    props.nbaGames[i].gamePostsCount = gameMiscData.gamePostsCount
+                }
+                else {
+                    props.nbaGames[i].gamePostsCount = 0
+                }
+            })
+        }
+        setnbaGames(props.nbaGames)
+
+        for (let i = 0; i < props.ncaafGames.length; i++) {
+
+            firebase.firestore()
+            .collection("votes")
+            .doc(props.ncaafGames[i].gameId)
+            .collection("gameVotes")
+            .doc("info")
+            .get()
+            .then((snapshot) => {
+                if (snapshot.exists) {
+                    let gameMiscData = snapshot.data();
+                    props.ncaafGames[i].gamePostsCount = gameMiscData.gamePostsCount
+                }
+                else {
+                    props.ncaafGames[i].gamePostsCount = 0
+                }
+            })
+        }
+        setncaafGames(props.ncaafGames)
+
+        for (let i = 0; i < props.ncaabGames.length; i++) {
+
+            firebase.firestore()
+            .collection("votes")
+            .doc(props.ncaabGames[i].gameId)
+            .collection("gameVotes")
+            .doc("info")
+            .get()
+            .then((snapshot) => {
+                if (snapshot.exists) {
+                    let gameMiscData = snapshot.data();
+                    props.ncaabGames[i].gamePostsCount = gameMiscData.gamePostsCount
+                }
+                else {
+                    props.ncaabGames[i].gamePostsCount = 0
+                }
+            })
+        }
+        setncaabGames(props.ncaabGames)
+                 
+        setLoading(false)
+
+        /*const allGames2 = nflGames.concat(nbaGames,ncaafGames)
+        const allGames3 = allGames2.concat(ncaabGames)
+        const allGames = allGames3.filter(function(allGames) {
+            return allGames.gamePostsCount > 0;
+        });
+        setTrendingGames(allGames)
+        console.log(allGames)
+        
+        allGames = props.nflGames.concat(props.nbaGames, props.ncaafGames, props.ncaabGames);
+        allGames = allGames.filter(function(allGames) {
+            return allGames.gamePostsCount > 0;
+        });
+        */
+
+       //trendingGames.push(...nbaGames);
+
+       array1 = props.nflGames
+        .concat(props.nbaGames, props.ncaabGames, props.ncaafGames)
+
+        setTrendingGames(array1)
+
+    }
+
     const searchNFLFilter = (text) => {
         if (text) {
             const newData = sportGames.filter((item) => {
@@ -90,6 +160,7 @@ function Odds(props) {
             if (sport == 'NBA') {setSportGames(props.nbaGames)} 
             if (sport == 'NCAAF') {setSportGames(props.ncaafGames)} 
             if (sport == 'NCAAB') {setSportGames(props.ncaabGames)}
+            if(sport == 'Trending') {setSportGames(trendingGames)}
             setSearch(text)
         }
         
@@ -104,6 +175,7 @@ function Odds(props) {
     }
     
     const setSportFunction = (sport) => {
+        if (sport == 'Trending') {setSportGames(trendingGames); setSport('Trending'); }
         if (sport == 'NFL') {setSportGames(props.nflGames); setSport('NFL')}
         if (sport == 'NBA') {setSportGames(props.nbaGames); setSport('NBA')} 
         if (sport == 'NCAAF') {setSportGames(props.ncaafGames); setSport('NCAAF')} 
@@ -114,26 +186,32 @@ function Odds(props) {
     const nflIcon = (<Icon name="american-football" color="#825736" size={16}/>);
     const ncaafIcon = (<MaterialCommunityIcons name="football-helmet" color="#00843D" size={16}/>);
     const ncaabIcon = (<MaterialCommunityIcons name="basketball-hoop-outline" color="grey" size={16}/>);
+    const trendingIcon = (<MaterialCommunityIcons name="trending-up" color="#00FF00" size={16}/>);
 
     const sportsList = [
         {
-            sport: 'NFL',
+            sport: 'Trending',
             id: '1',
+            icon: trendingIcon
+        },
+        {
+            sport: 'NFL',
+            id: '2',
             icon: nflIcon
         },
         {
             sport: 'NBA',
-            id: '2',
+            id: '3',
             icon: nbaIcon
         },
         {
             sport: 'NCAAF',
-            id: '3',
+            id: '4',
             icon: ncaafIcon
         },
         {
             sport: 'NCAAB',
-            id: '4',
+            id: '5',
             icon: ncaabIcon
         },
       ];
@@ -161,14 +239,29 @@ function Odds(props) {
     
     
     const renderSportsListItem = ({ item }) => (
-        <View style={styles.sportContainer}>
-            <TouchableOpacity
-                style={styles.sportButton}
-                onPress={() => {setSportFunction(item.sport)}}>
-                <Text>{item.sport}</Text>
-                <Text> {item.icon}</Text>
-            </TouchableOpacity>
+        <View>
+        {sport == item.sport ?
+            <View style={styles.sportContainerHighlight}>
+                <TouchableOpacity
+                    style={styles.sportButton}
+                    onPress={() => {setSportFunction(item.sport)}}>
+                    <Text>{item.sport}</Text>
+                    <Text> {item.icon}</Text>
+                </TouchableOpacity>
+            </View>
+        :
+            <View style={styles.sportContainer}>
+                <TouchableOpacity
+                    style={styles.sportButton}
+                    onPress={() => {setSportFunction(item.sport)}}>
+                    <Text>{item.sport}</Text>
+                    <Text> {item.icon}</Text>
+                </TouchableOpacity>
+            </View>
+        }
+            
         </View>
+        
         
     );
         
@@ -179,7 +272,38 @@ function Odds(props) {
                     <TouchableOpacity
                         onPress={() => props.navigation.navigate('game', {gameId: item.gameId, gameDate: item.gameDate, homeTeam: item.homeTeam, awayTeam: item.awayTeam, homeSpread: item.homeSpread, awaySpread: item.awaySpread, homeSpreadOdds: item.homeSpreadOdds, awaySpreadOdds: item.awaySpreadOdds, awayMoneyline: item.awayMoneyline, homeMoneyline: item.homeMoneyline, over: item.over, overOdds: item.overOdds, under: item.under, underOdds: item.underOdds, awayTeamVote: item.awayTeamVote, homeTeamVote: item.homeTeamVote })}>
                         <View>
-                            <Text>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
+                            {item.gamePostsCount > 4 ?
+                                <View style={styles.gameDateContainer}>
+                                    <Text>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
+                                    <View style={styles.pepperContainer}>
+                                        <FontAwesome5 name={"pepper-hot"} size={16} color={"#B81D13"}/>
+                                        <FontAwesome5 name={"pepper-hot"} size={16} color={"#B81D13"}/>
+                                        <FontAwesome5 name={"pepper-hot"} size={16} color={"#B81D13"}/>
+                                    </View>
+                                </View>
+                                
+                            : 
+                            item.gamePostsCount > 2 ?
+                                <View style={styles.gameDateContainer}>
+                                    <Text>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
+                                    <View style={styles.pepperContainer}>
+                                        <FontAwesome5 name={"pepper-hot"} size={16} color={"orange"}/>
+                                        <FontAwesome5 name={"pepper-hot"} size={16} color={"orange"}/>
+                                    </View>
+                                </View>
+                            : 
+                            item.gamePostsCount > 0 ? 
+                                <View style={styles.gameDateContainer}>
+                                    <Text>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
+                                    <View style={styles.pepperContainer}>
+                                        <FontAwesome5 name={"pepper-hot"} size={16} color={"#fed550"}/>
+                                    </View>
+                                </View>
+                            :
+                                <View style={styles.gameDateContainer}>
+                                    <Text>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
+                                </View>
+                                }
                             <View style={styles.awayGameInfoContainer}>
                                 <View style={styles.teamItem}>
                                     <Text style={styles.teamText}>{item.awayTeam}</Text>
@@ -289,12 +413,21 @@ function Odds(props) {
                     <Text style={styles.gameHeaderText}>Total</Text>
                 </View>
             </View>
+            {sportGames == trendingGames ?
+                <FlatList 
+                data = {sportGames.sort((a, b) => parseFloat(b.gamePostsCount) - parseFloat(a.gamePostsCount)).slice(0, 10)}
+                style={styles.feed}
+                renderItem={renderItem}
+    
+            />
+            :
             <FlatList 
                 data={sportGames}
                 style={styles.feed}
                 renderItem={renderItem}
     
             />
+            }
             <View style={styles.adView}>
                 <AdMobBanner
                     bannerSize="banner"
@@ -440,6 +573,18 @@ const styles = StyleSheet.create({
         marginHorizontal: 2,
         alignItems: 'center'
     },
+    sportContainerHighlight: {
+        flexDirection: 'row',
+        backgroundColor: "#ffffff",
+        borderRadius: 20,
+        borderColor: "black",
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        borderWidth: .5,
+        justifyContent: 'center',
+        marginHorizontal: 2,
+        alignItems: 'center'
+    },
     sportButton: {
         flexDirection: 'row'
     },
@@ -454,6 +599,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+    gameDateContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingRight: 5
+    },
+    pepperContainer: {
+        flexDirection: 'row',
+    }
     
     
     

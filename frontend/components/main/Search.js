@@ -3,6 +3,8 @@ import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Image } 
 
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 
+import {AdMobBanner} from 'expo-ads-admob'
+
 import firebase from 'firebase'
 require("firebase/firestore")
 require("firebase/firebase-storage")
@@ -98,7 +100,9 @@ function Search(props) {
                         keyExtractor={(item, index) => index.toString()}
                         renderItem={ItemView}
                 />  :
-                null :
+                <View style={styles.feed}>
+
+                </View> :
             
             <FlatList
                 data = {allUsers.sort((a, b) => a.name.localeCompare(b.name))}
@@ -106,6 +110,14 @@ function Search(props) {
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={ItemView}
             /> }
+
+            <View style={styles.adView}>
+                <AdMobBanner
+                    bannerSize="banner"
+                    adUnitID="ca-app-pub-8519029912093094/1666835736" // Real ID: 8519029912093094/1666835736, test ID: 3940256099942544/2934735716
+                    servePersonalizedAds // true or false
+                />
+            </View>
 
             
         </View>
@@ -168,7 +180,11 @@ const styles = StyleSheet.create({
     },
     showAllButton: {
         marginRight: "2%",
-    }
+    },
+    adView: {
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
     
 })
 

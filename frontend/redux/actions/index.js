@@ -1,4 +1,4 @@
-import { USER_STATE_CHANGE, ALL_USERS_STATE_CHANGE, USER_BLOCKING_STATE_CHANGE, LIKES_STATE_CHANGE, FADES_STATE_CHANGE, USER_FOLLOWING_STATE_CHANGE, USERS_DATA_STATE_CHANGE,USERS_POSTS_STATE_CHANGE, USERS_LIKES_STATE_CHANGE, NFL_GAMES_STATE_CHANGE, NCAAF_GAMES_STATE_CHANGE, MLB_GAMES_STATE_CHANGE, NBA_GAMES_STATE_CHANGE, NCAAB_GAMES_STATE_CHANGE, CLEAR_DATA} from '../constants/index'
+import { USER_STATE_CHANGE, ALL_USERS_STATE_CHANGE, USER_BLOCKING_STATE_CHANGE, LIKES_STATE_CHANGE, FADES_STATE_CHANGE, USER_FOLLOWING_STATE_CHANGE, USERS_DATA_STATE_CHANGE,NFL_GAMES_STATE_CHANGE, NCAAF_GAMES_STATE_CHANGE, MLB_GAMES_STATE_CHANGE, NBA_GAMES_STATE_CHANGE, NCAAB_GAMES_STATE_CHANGE, CLEAR_DATA} from '../constants/index'
 import firebase from 'firebase'
 import { SnapshotViewIOSComponent } from 'react-native'
 require('firebase/firestore')
@@ -9,6 +9,7 @@ export function clearData() {
         dispatch({type: CLEAR_DATA})
     })
 }
+
 export function fetchUser() {
     return ((dispatch) => {
         firebase.firestore()
@@ -228,6 +229,8 @@ export function fetchNCAABGames() {
         })
     })
 }
+
+
 
 
         

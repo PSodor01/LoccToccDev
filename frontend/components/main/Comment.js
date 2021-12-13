@@ -9,6 +9,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 
 import moment from 'moment';
 
+import {AdMobBanner} from 'expo-ads-admob'
+
 import ShareButton from '../buttons/ShareButton'
 
 import firebase from 'firebase'
@@ -199,6 +201,13 @@ function Comment(props, route) {
                     
                 )}
             />
+            <View style={styles.adView}>
+                <AdMobBanner
+                    bannerSize="banner"
+                    adUnitID="ca-app-pub-8519029912093094/9708977287" // Real ID: 8519029912093094/9708977287, test ID: 3940256099942544/2934735716
+                    servePersonalizedAds // true or false
+                />
+            </View>
         </View>
     )
 }
@@ -363,6 +372,10 @@ emptyListStyle: {
     fontSize: 18,
     textAlign: 'justify',
     marginHorizontal: "5%",
+},
+adView: {
+    alignItems: 'center',
+    justifyContent: 'center',
 },
 
   

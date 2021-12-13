@@ -91,7 +91,6 @@ function game(props) {
                 })
                     
                     matchUserToGamePost(gamePosts)
-                    console.log(gamePosts)
 
                 })
 

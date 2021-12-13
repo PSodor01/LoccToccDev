@@ -133,7 +133,7 @@ exports.getMLBGameData = functions.pubsub.schedule('every 5 minutes').onRun(asyn
 
 exports.getNFLGameData = functions.pubsub.schedule('every 5 minutes').onRun(async() => {
   try {
-    const response = await axios.get('https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds/?apiKey=410146d3f5db8991f4ef289a2ecd9ec2&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso')
+    const response = await axios.get('https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso')
       .then(result => {
         result.data.forEach(game => {
 
@@ -195,7 +195,7 @@ exports.getNFLGameData = functions.pubsub.schedule('every 5 minutes').onRun(asyn
 
   exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(async() => {
     try {
-      const response = await axios.get('https://api.the-odds-api.com/v4/sports/americanfootball_ncaaf/odds/?apiKey=410146d3f5db8991f4ef289a2ecd9ec2&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso')
+      const response = await axios.get('https://api.the-odds-api.com/v4/sports/americanfootball_ncaaf/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso')
       .then(result => {
         result.data.forEach(game => {
 
@@ -263,13 +263,13 @@ exports.getNFLGameData = functions.pubsub.schedule('every 5 minutes').onRun(asyn
 
   exports.getNBAGameData = functions.pubsub.schedule('every 5 minutes').onRun(async() => {
     try {
-      const response = await axios.get('https://api.the-odds-api.com/v4/sports/basketball_nba/odds/?apiKey=410146d3f5db8991f4ef289a2ecd9ec2&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso')
+      const response = await axios.get('https://api.the-odds-api.com/v4/sports/basketball_nba/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso')
       .then(result => {
         result.data.forEach(game => {
 
           let i = game.bookmakers.findIndex((item) => item.key === 'fanduel')
 
-          if (game.away_team == game.bookmakers[0].markets[0].outcomes[0].name) {
+          if (game.away_team == game.bookmakers[i].markets[0].outcomes[0].name) {
 
             const writeResult = admin
             .firestore()
@@ -327,7 +327,7 @@ exports.getNFLGameData = functions.pubsub.schedule('every 5 minutes').onRun(asyn
 
   exports.getNCAABGameData = functions.pubsub.schedule('every 5 minutes').onRun(async() => {
     try {
-      const response = await axios.get('https://api.the-odds-api.com/v4/sports/basketball_ncaab/odds/?apiKey=410146d3f5db8991f4ef289a2ecd9ec2&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso')
+      const response = await axios.get('https://api.the-odds-api.com/v4/sports/basketball_ncaab/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso')
       .then(result => {
         result.data.forEach(game => {
 

@@ -362,8 +362,6 @@ function Feed(props) {
                         </View> 
                     </View>
                     }
-                
-                        
                 </View>  
             </View>
         )}
