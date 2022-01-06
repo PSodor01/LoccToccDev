@@ -1,39 +1,38 @@
     
-    import React from 'react';
-    import { StyleSheet, TouchableOpacity, Text, Share } from 'react-native'
+    import React, { useRef } from 'react';
+    import { StyleSheet, TouchableOpacity, View, Text, Share } from 'react-native'
 
     import Ionicons from 'react-native-vector-icons/Ionicons';
 
+    import { captureRef } from 'react-native-view-shot';
+
+
     
     const ShareButton = () => {
-        
-        const onShare = async () => {
-            try {
-              const result = await Share.share({
-                message:
-                  'Check out locctocc! https://apps.apple.com/app/apple-store/id1585460244?pt=123488891&ct=IA&mt=8',
+      const viewRef = useRef();
+      const shareDummyImage = async () => {
+          try {
+              const uri = await captureRef(viewRef, {
+                  format: 'png',
+                  quality: 0.7
               });
-              if (result.action === Share.sharedAction) {
-                if (result.activityType) {
-                  // shared with activity type of result.activityType
-                } else {
-                  // shared
-                }
-              } else if (result.action === Share.dismissedAction) {
-                // dismissed
-              }
-            } catch (error) {
-              alert(error.message);
-            }
-          };
-        
-        return (
-            <TouchableOpacity
-                onPress={onShare}>
-                <Ionicons name={"ios-share"} size={20} color={"grey"} marginRight={10} />
-            </TouchableOpacity>
-        )
-    }
+              await Share.share({ url:uri });
+          } catch(error){
+              console.error(err);
+          }
+      }
+
+      return (
+          <View ref={viewRef}>
+              <Text>Hello World!</Text>
+              <Text>Locctocc rules</Text>
+              <TouchableOpacity
+                  onPress={shareDummyImage}>
+                  <Ionicons name={"ios-share"} size={20} color={"grey"} marginRight={10} />
+              </TouchableOpacity>
+          </View>
+      )
+  }
     
     export default ShareButton
     

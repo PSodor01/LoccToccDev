@@ -27,13 +27,14 @@ import { fetchUsersData } from '../../redux/actions/index'
 function game(props) {
 
     const [gamePosts, setGamePosts] = useState([]);
-    const [postId, setPostId] = useState("")
-    const [loading, setLoading] = useState(true)
-    const [sortCriteria, setSortCriteria] = useState(true)
-    const [awayVote, setAwayVote] = useState("")
-    const [homeVote, setHomeVote] = useState("")
+    const [postId, setPostId] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [sortCriteria, setSortCriteria] = useState(true);
+    const [awayVote, setAwayVote] = useState("");
+    const [homeVote, setHomeVote] = useState("");
+    const [drawVote, setDrawVote] = useState("");
 
-    const {gameId, gameDate, homeTeam, awayTeam, homeMoneyline, awayMoneyline, homeSpread, awaySpread, homeSpreadOdds, awaySpreadOdds, over, overOdds, under, underOdds} = props.route.params;
+    const {gameId, gameDate, homeTeam, awayTeam, homeMoneyline, awayMoneyline, homeSpread, awaySpread, homeSpreadOdds, awaySpreadOdds, over, overOdds, under, underOdds, drawMoneyline, sport} = props.route.params;
     
     useEffect(() => {
             fetchData()
@@ -273,6 +274,7 @@ function game(props) {
                             gameDate: gameDate,
                             awayCount: 0,
                             homeCount: 0,
+                            drawCount: 0,
                             gamePostsCount: 0,
 
                         })
@@ -332,6 +334,32 @@ function game(props) {
             })
     }
 
+    const increaseDrawCount = () => {
+        firebase.firestore()
+            .collection("votes")
+            .doc(gameId)
+            .collection("gameVotes")
+            .doc(firebase.auth().currentUser.uid)
+            .get()
+            .then((snapshot) => {
+                if (snapshot.exists) {
+                    
+                }
+                else {
+
+                    firebase.firestore()
+                    .collection("votes")
+                    .doc(gameId)
+                    .collection("gameVotes")
+                    .doc('info')
+                    .update({
+                        drawCount: firebase.firestore.FieldValue.increment(1)
+                    })
+
+                }
+            })
+    }
+
     const setVoteCount = () => {
         firebase.firestore()
         .collection("votes")
@@ -343,11 +371,13 @@ function game(props) {
             if (snapshot.exists) {
                 let votes = snapshot.data();
 
-                const away = votes.awayCount ? parseFloat((votes.awayCount / (votes.awayCount + votes.homeCount))*100).toFixed(0)+"%" : null 
-                const home = votes.homeCount ? parseFloat((votes.homeCount / (votes.awayCount + votes.homeCount))*100).toFixed(0)+"%" : null 
+                const away = votes.awayCount ? parseFloat((votes.awayCount / (votes.awayCount + votes.homeCount + votes.drawCount))*100).toFixed(0)+"%" : null 
+                const home = votes.homeCount ? parseFloat((votes.homeCount / (votes.awayCount + votes.homeCount + votes.drawCount))*100).toFixed(0)+"%" : null
+                const draw = votes.drawCount ? parseFloat((votes.drawCount / (votes.awayCount + votes.homeCount + votes.drawCount))*100).toFixed(0)+"%" : null 
 
                 setAwayVote(away)
                 setHomeVote(home)
+                setDrawVote(draw)
 
             }
             else {
@@ -512,107 +542,235 @@ function game(props) {
             <View style={styles.gameContainer}>
                 <View>
                     <Text>{moment(gameDate).format("LT")}</Text> 
-                    <View style={styles.awayGameInfoContainer}>
-                        <View style={styles.teamItem}>
-                            <TouchableOpacity
-                                onPress={() => {gameVote(); increaseAwayCount()}}>
-                                <View style={styles.voteContainer}>
-                                    <Text style={styles.teamText}>{awayTeam}</Text>
+                    {sport == 'soccer_epl' ? 
+                    <View>
+                        <View style={styles.awayGameInfoContainer}>
+                            <View style={styles.teamItem}>
+                                <TouchableOpacity
+                                    onPress={() => {gameVote(); increaseAwayCount()}}>
+                                    <View style={styles.voteContainer}>
+                                        <Text style={styles.teamText}>{awayTeam}</Text>
 
-                                    {awayVote == '0%' ? 
-                                        <Text style={styles.noVote}>{awayVote} </Text>
-                                        :
-                                        awayVote == '100%' ? 
-                                            <Text style={styles.winningVote}>{awayVote} </Text> 
+                                        {awayVote == '0%' ? 
+                                            <Text style={styles.noVote}>{awayVote} </Text>
                                             :
-                                            awayVote == '50%' ? 
-                                            <Text style={styles.noVote}>{awayVote} </Text> 
-                                            :
-                                            awayVote > '50%' ? 
-                                            <Text style={styles.winningVote}>{awayVote} </Text> 
-                                            :
-                                            <Text style={styles.losingVote}>{awayVote} </Text>
+                                            awayVote == '100%' ? 
+                                                <Text style={styles.winningVote}>{awayVote} </Text> 
+                                                :
+                                                awayVote == '50%' ? 
+                                                <Text style={styles.noVote}>{awayVote} </Text> 
+                                                :
+                                                awayVote > '50%' ? 
+                                                <Text style={styles.winningVote}>{awayVote} </Text> 
+                                                :
+                                                <Text style={styles.losingVote}>{awayVote} </Text>
+                                            
+                                        }
                                         
-                                    }
-                                    
-                                </View>
-                            </TouchableOpacity>
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.moneylineItem}>
+                                {awayMoneyline > 0 ? 
+                                    <Text style={styles.spreadText}>+{awayMoneyline}</Text> 
+                                    : <Text style={styles.spreadText}>{awayMoneyline}</Text>
+                                }
+                            </View>
+                            <View style={styles.totalItem}>
+                                <Text style={styles.spreadText}>{over}</Text>
+                                {overOdds > 0 ? 
+                                    <Text style={styles.oddsTopRowText}>+{overOdds}</Text> 
+                                    : <Text style={styles.oddsTopRowText}>{overOdds}</Text>
+                                }
+                            </View>
                         </View>
-                        <View style={styles.moneylineItem}>
-                            {awayMoneyline > 0 ? 
-                                <Text style={styles.spreadText}>+{awayMoneyline}</Text> 
-                                : <Text style={styles.spreadText}>{awayMoneyline}</Text>
-                            }
+                        <View style={styles.awayGameInfoContainer}>
+                            <View style={styles.teamItem}>
+                                <TouchableOpacity
+                                    onPress={() => {gameVote(); increaseHomeCount()}}>
+                                    <View style={styles.voteContainer}>
+                                        <Text style={styles.teamText}>{homeTeam}</Text>
+
+                                        {homeVote == '0%' ? 
+                                            <Text style={styles.noVote}>{homeVote} </Text>
+                                            :
+                                            homeVote == '100%' ? 
+                                                <Text style={styles.winningVote}>{homeVote} </Text> 
+                                                :
+                                                homeVote == '50%' ? 
+                                                <Text style={styles.noVote}>{homeVote} </Text> 
+                                                :
+                                                homeVote > '50%' ? 
+                                                <Text style={styles.winningVote}>{homeVote} </Text> 
+                                                :
+                                                <Text style={styles.losingVote}>{homeVote} </Text>
+                                            
+                                        }
+                                        
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.moneylineItem}>
+                                {homeMoneyline > 0 ? 
+                                    <Text style={styles.spreadText}>+{homeMoneyline}</Text> 
+                                    : <Text style={styles.spreadText}>{homeMoneyline}</Text>
+                                }
+                            </View>
+                            <View style={styles.totalItem}>
+                                <Text style={styles.spreadText}>{under}</Text> 
+                                {underOdds > 0 ?
+                                    <Text style={styles.oddsBottomRowText}>+{underOdds}</Text>
+                                    : <Text style={styles.oddsBottomRowText}>{underOdds}</Text>
+                                }
+                            </View>
                         </View>
-                        <View style={styles.spreadItem}>
-                            {awaySpread > 0 ? 
-                                <Text style={styles.spreadText}>+{awaySpread}</Text> 
-                                : <Text style={styles.spreadText}>{awaySpread}</Text>
-                            }
-                            {awaySpreadOdds > 0 ? 
-                                <Text style={styles.oddsTopRowText}>+{awaySpreadOdds}</Text> 
-                                : <Text style={styles.oddsTopRowText}>{awaySpreadOdds}</Text>
-                            }
-                        </View>
-                        <View style={styles.totalItem}>
-                            <Text style={styles.spreadText}>O {over}</Text>
-                            {overOdds > 0 ? 
-                                <Text style={styles.oddsTopRowText}>+{overOdds}</Text> 
-                                : <Text style={styles.oddsTopRowText}>{overOdds}</Text>
-                            }
+                        <View style={styles.homeGameInfoContainer}>
+                            <View style={styles.teamItem}>
+                                <TouchableOpacity
+                                    onPress={() => {gameVote(); increaseDrawCount()}}>
+                                    <View style={styles.voteContainer}>
+                                        <Text style={styles.teamText}>Draw</Text>
+
+                                        {drawVote == '0%' ? 
+                                            <Text style={styles.noVote}>{drawVote} </Text>
+                                            :
+                                            drawVote == '100%' ? 
+                                                <Text style={styles.winningVote}>{drawVote} </Text> 
+                                                :
+                                                drawVote == '50%' ? 
+                                                <Text style={styles.noVote}>{drawVote} </Text> 
+                                                :
+                                                drawVote > '50%' ? 
+                                                <Text style={styles.winningVote}>{drawVote} </Text> 
+                                                :
+                                                <Text style={styles.losingVote}>{drawVote} </Text>
+                                            
+                                        }
+                                        
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.moneylineItem}>
+                                {drawMoneyline > 0 ? 
+                                    <Text style={styles.spreadText}>+{drawMoneyline}</Text> 
+                                    : <Text style={styles.spreadText}>{drawMoneyline}</Text>
+                                }
+                            </View>
+                            <View style={styles.totalItem}>
+                                <Text style={styles.spreadText}>{under}</Text> 
+                                {underOdds > 0 ?
+                                    <Text style={styles.oddsBottomRowText}>+{underOdds}</Text>
+                                    : <Text style={styles.oddsBottomRowText}>{underOdds}</Text>
+                                }
+                            </View>
                         </View>
                     </View>
-                    <View style={styles.homeGameInfoContainer}>
-                        <View style={styles.teamItem}>
-                            <TouchableOpacity
-                                onPress={() => {gameVote(); increaseHomeCount()}}>
-                                <View style={styles.voteContainer}>
-                                    <Text style={styles.teamText}>{homeTeam}</Text>
+                    :
+                    <View>
+                        <View style={styles.awayGameInfoContainer}>
+                            <View style={styles.teamItem}>
+                                <TouchableOpacity
+                                    onPress={() => {gameVote(); increaseAwayCount()}}>
+                                    <View style={styles.voteContainer}>
+                                        <Text style={styles.teamText}>{awayTeam}</Text>
 
-                                    {homeVote == '0%' ? 
-                                        <Text style={styles.noVote}>{homeVote} </Text>
-                                        :
-                                        homeVote == '100%' ? 
-                                            <Text style={styles.winningVote}>{homeVote} </Text> 
+                                        {awayVote == '0%' ? 
+                                            <Text style={styles.noVote}>{awayVote} </Text>
                                             :
-                                            homeVote == '50%' ? 
-                                            <Text style={styles.noVote}>{homeVote} </Text> 
-                                            :
-                                            homeVote > '50%' ? 
-                                            <Text style={styles.winningVote}>{homeVote} </Text> 
-                                            :
-                                            <Text style={styles.losingVote}>{homeVote} </Text>
+                                            awayVote == '100%' ? 
+                                                <Text style={styles.winningVote}>{awayVote} </Text> 
+                                                :
+                                                awayVote == '50%' ? 
+                                                <Text style={styles.noVote}>{awayVote} </Text> 
+                                                :
+                                                awayVote > '50%' ? 
+                                                <Text style={styles.winningVote}>{awayVote} </Text> 
+                                                :
+                                                <Text style={styles.losingVote}>{awayVote} </Text>
+                                            
+                                        }
                                         
-                                    }
-                                    
-                                </View>
-                            </TouchableOpacity>
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.moneylineItem}>
+                                {awayMoneyline > 0 ? 
+                                    <Text style={styles.spreadText}>+{awayMoneyline}</Text> 
+                                    : <Text style={styles.spreadText}>{awayMoneyline}</Text>
+                                }
+                            </View>
+                            <View style={styles.spreadItem}>
+                                {awaySpread > 0 ? 
+                                    <Text style={styles.spreadText}>+{awaySpread}</Text> 
+                                    : <Text style={styles.spreadText}>{awaySpread}</Text>
+                                }
+                                {awaySpreadOdds > 0 ? 
+                                    <Text style={styles.oddsTopRowText}>+{awaySpreadOdds}</Text> 
+                                    : <Text style={styles.oddsTopRowText}>{awaySpreadOdds}</Text>
+                                }
+                            </View>
+                            <View style={styles.totalItem}>
+                                <Text style={styles.spreadText}>O {over}</Text>
+                                {overOdds > 0 ? 
+                                    <Text style={styles.oddsTopRowText}>+{overOdds}</Text> 
+                                    : <Text style={styles.oddsTopRowText}>{overOdds}</Text>
+                                }
+                            </View>
                         </View>
-                        <View style={styles.moneylineItem}>
-                            {homeMoneyline > 0 ? 
-                                <Text style={styles.spreadText}>+{homeMoneyline}</Text> 
-                                : <Text style={styles.spreadText}>{homeMoneyline}</Text>
-                            }
-                        </View>
-                        <View style={styles.spreadItem}>
-                            {homeSpread > 0 ? 
-                                <Text style={styles.spreadText}>+{homeSpread}</Text> 
-                                : <Text style={styles.spreadText}>{homeSpread}</Text>
-                            }
-                            {homeSpreadOdds > 0 ?
-                                <Text style={styles.oddsBottomRowText}>+{homeSpreadOdds}</Text>
-                                : <Text style={styles.oddsBottomRowText}>{homeSpreadOdds}</Text>
-                            }
-                            
-                        </View>
-                        <View style={styles.totalItem}>
-                            <Text style={styles.spreadText}>U {under}</Text> 
-                            {underOdds > 0 ?
-                                <Text style={styles.oddsBottomRowText}>+{underOdds}</Text>
-                                : <Text style={styles.oddsBottomRowText}>{underOdds}</Text>
-                            }
+                        <View style={styles.homeGameInfoContainer}>
+                            <View style={styles.teamItem}>
+                                <TouchableOpacity
+                                    onPress={() => {gameVote(); increaseHomeCount()}}>
+                                    <View style={styles.voteContainer}>
+                                        <Text style={styles.teamText}>{homeTeam}</Text>
+
+                                        {homeVote == '0%' ? 
+                                            <Text style={styles.noVote}>{homeVote} </Text>
+                                            :
+                                            homeVote == '100%' ? 
+                                                <Text style={styles.winningVote}>{homeVote} </Text> 
+                                                :
+                                                homeVote == '50%' ? 
+                                                <Text style={styles.noVote}>{homeVote} </Text> 
+                                                :
+                                                homeVote > '50%' ? 
+                                                <Text style={styles.winningVote}>{homeVote} </Text> 
+                                                :
+                                                <Text style={styles.losingVote}>{homeVote} </Text>
+                                            
+                                        }
+                                        
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.moneylineItem}>
+                                {homeMoneyline > 0 ? 
+                                    <Text style={styles.spreadText}>+{homeMoneyline}</Text> 
+                                    : <Text style={styles.spreadText}>{homeMoneyline}</Text>
+                                }
+                            </View>
+                            <View style={styles.spreadItem}>
+                                {homeSpread > 0 ? 
+                                    <Text style={styles.spreadText}>+{homeSpread}</Text> 
+                                    : <Text style={styles.spreadText}>{homeSpread}</Text>
+                                }
+                                {homeSpreadOdds > 0 ?
+                                    <Text style={styles.oddsBottomRowText}>+{homeSpreadOdds}</Text>
+                                    : <Text style={styles.oddsBottomRowText}>{homeSpreadOdds}</Text>
+                                }
+                                
+                            </View>
+                            <View style={styles.totalItem}>
+                                <Text style={styles.spreadText}>U {under}</Text> 
+                                {underOdds > 0 ?
+                                    <Text style={styles.oddsBottomRowText}>+{underOdds}</Text>
+                                    : <Text style={styles.oddsBottomRowText}>{underOdds}</Text>
+                                }
+                            </View>
                         </View>
                     </View>
+                    }
+                    
                 </View>                    
             </View> 
             <View style={styles.sortContainer}>
@@ -644,6 +802,8 @@ function game(props) {
                 renderItem={renderItem}
             />
             }
+
+
             <View style={styles.adView}>
                 <AdMobBanner
                     bannerSize="banner"
@@ -674,7 +834,6 @@ const styles = StyleSheet.create({
         marginVertical:4,
         marginRight: "1%",
         marginLeft: "1%",
-        alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
         borderColor: "rgba(0,0,0,0.1)",
@@ -812,7 +971,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         width: "80%",
         paddingTop: 5,
-        marginLeft: "5%",
+        marginLeft: "3%",
         paddingBottom: 2,
     },
     postRightContainer: {

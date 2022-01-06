@@ -348,7 +348,7 @@ function Profile(props) {
 
             <View style={{ paddingTop: "2%" }}>
                 {props.route.params.uid !== firebase.auth().currentUser.uid ? (
-                    <View>
+                    <View style={{ flexDirection:'row', alignItems: 'center', justifyContent: 'center'}}>
                         {following ? (
                             <TouchableOpacity
                                 onPress={() => {onUnfollow(); decreaseFollowerCount(); decreaseFollowingCount();}}
@@ -517,7 +517,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         width: "30%",
         alignSelf: "center",
-        marginBottom: "2%",
+        marginBottom: "1%",
     },
     followButton: {
         borderColor: "#0033cc",
@@ -527,14 +527,14 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         width: "30%",
         alignSelf: "center",
-        marginBottom: "2%",
+        marginBottom: "1%",
     },
     blockUserButton: {
         borderColor: "red",
         borderWidth: 1,
         borderRadius: 6,
-        paddingVertical: 6,
-        paddingHorizontal: 8,
+        paddingVertical: 8,
+        paddingHorizontal: 12,
         width: "30%",
         alignSelf: 'center',
         alignItems: "center",
@@ -545,8 +545,8 @@ const styles = StyleSheet.create({
         borderColor: "green",
         borderWidth: 1,
         borderRadius: 6,
-        paddingVertical: 6,
-        paddingHorizontal: 8,
+        paddingVertical: 8,
+        paddingHorizontal: 12,
         width: "30%",
         alignSelf: 'center',
         alignItems: "center",

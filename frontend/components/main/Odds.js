@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, useWindowDimensions, TextInput, Dimensions, FlatList, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, useWindowDimensions, Alert, TextInput, Dimensions, FlatList, TouchableOpacity } from 'react-native';
 import { TabView, TabBar, SceneMap } from 'react-native-tab-view';
 
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Ionicons from 'react-native-vector-icons/Ionicons'
+
+import * as Notifications from 'expo-notifications'
+import * as Permissions from 'expo-permissions'
+import Constants from 'expo-constants'
 
 import moment from 'moment'
 
@@ -24,17 +28,20 @@ function Odds(props) {
     const [ncaafGames, setncaafGames] = useState([]);
     const [ncaabGames, setncaabGames] = useState([]);
     const [nbaGames, setnbaGames] = useState([]);
+    const [eplGames, seteplGames] = useState([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [sport, setSport] = useState('');
     const [browse, setBrowse] = useState(false);
     const [trendingGames, setTrendingGames] = useState([]);
+    const [notification, setNotification] = useState('');
 
      useEffect(() => {
         fetchData()
         setSportGames(props.nflGames)
         setSport('NFL')
-    }, [ props.nflGames, props.ncaafGames, props.nbaGames, props.ncaabGames, props.trendingGames])
+
+    }, [ props.nflGames, props.ncaafGames, props.nbaGames, props.ncaabGames, props.eplGames, props.trendingGames])
 
     const fetchData = () => {
         for (let i = 0; i < props.nflGames.length; i++) {
@@ -116,24 +123,9 @@ function Odds(props) {
             })
         }
         setncaabGames(props.ncaabGames)
+
                  
         setLoading(false)
-
-        /*const allGames2 = nflGames.concat(nbaGames,ncaafGames)
-        const allGames3 = allGames2.concat(ncaabGames)
-        const allGames = allGames3.filter(function(allGames) {
-            return allGames.gamePostsCount > 0;
-        });
-        setTrendingGames(allGames)
-        console.log(allGames)
-        
-        allGames = props.nflGames.concat(props.nbaGames, props.ncaafGames, props.ncaabGames);
-        allGames = allGames.filter(function(allGames) {
-            return allGames.gamePostsCount > 0;
-        });
-        */
-
-       //trendingGames.push(...nbaGames);
 
        array1 = props.nflGames
         .concat(props.nbaGames, props.ncaabGames, props.ncaafGames)
@@ -141,6 +133,77 @@ function Odds(props) {
         setTrendingGames(array1)
 
     }
+
+    useEffect(() =>{
+        (() => registerForPushNotificationsAsync())()
+    }, []);
+
+    const registerForPushNotificationsAsync = async () => {
+        let token;
+        if (Constants.isDevice) {
+          const { status: existingStatus } = await Notifications.getPermissionsAsync();
+          let finalStatus = existingStatus;
+          if (existingStatus !== 'granted') {
+            const { status } = await Notifications.requestPermissionsAsync();
+            finalStatus = status;
+          }
+          if (finalStatus !== 'granted') {
+            alert('Failed to get push token for push notification!');
+            return;
+          }
+          token = (await Notifications.getExpoPushTokenAsync()).data;
+        } else {
+          alert('Must use physical device for Push Notifications');
+        }
+
+        if (token) {
+            const res = await firebase.firestore()
+                .collection("users")
+                .doc(firebase.auth().currentUser.uid)
+                .set({token}, { merge:true });
+        }
+        
+      
+        if (Platform.OS === 'android') {
+          Notifications.setNotificationChannelAsync('default', {
+            name: 'default',
+            importance: Notifications.AndroidImportance.MAX,
+            vibrationPattern: [0, 250, 250, 250],
+            lightColor: '#FF231F7C',
+          });
+        }
+      
+        return token;
+      }
+
+    const sendNotification = async (token) => {
+        async function sendPushNotification(expoPushToken) {
+            const message = {
+                to: token,
+                sound: 'default',
+                title: 'locctocc',
+                body: notification ? notification : 'Empty Notification',
+            };
+            
+            await fetch('https://exp.host/--/api/v2/push/send', {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Accept-encoding': 'gzip, deflate',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(message),
+            });
+            }
+
+    }
+
+    const sendNotificationToAllUsers = async () => {
+        const users = await firebase.firestore().collection("users").get();
+        users.docs.map((user) => sendNotification(user.data().token))
+    };
+
+    
 
     const searchNFLFilter = (text) => {
         if (text) {
@@ -160,6 +223,7 @@ function Odds(props) {
             if (sport == 'NBA') {setSportGames(props.nbaGames)} 
             if (sport == 'NCAAF') {setSportGames(props.ncaafGames)} 
             if (sport == 'NCAAB') {setSportGames(props.ncaabGames)}
+            if (sport == 'EPL') {setSportGames(props.eplGames)}
             if(sport == 'Trending') {setSportGames(trendingGames)}
             setSearch(text)
         }
@@ -180,12 +244,14 @@ function Odds(props) {
         if (sport == 'NBA') {setSportGames(props.nbaGames); setSport('NBA')} 
         if (sport == 'NCAAF') {setSportGames(props.ncaafGames); setSport('NCAAF')} 
         if (sport == 'NCAAB') {setSportGames(props.ncaabGames); setSport('NCAAB')}
+        if (sport == 'EPL') {setSportGames(props.eplGames); setSport('EPL')}
     }
 
     const nbaIcon = (<Icon name="basketball-outline" color="#ee6730" size={16}/>);
     const nflIcon = (<Icon name="american-football" color="#825736" size={16}/>);
     const ncaafIcon = (<MaterialCommunityIcons name="football-helmet" color="#00843D" size={16}/>);
     const ncaabIcon = (<MaterialCommunityIcons name="basketball-hoop-outline" color="grey" size={16}/>);
+    const eplIcon = (<MaterialCommunityIcons name="soccer" color="black" size={16}/>);
     const trendingIcon = (<MaterialCommunityIcons name="trending-up" color="#00FF00" size={16}/>);
 
     const sportsList = [
@@ -214,8 +280,13 @@ function Odds(props) {
             id: '5',
             icon: ncaabIcon
         },
+        {
+            sport: 'EPL',
+            id: '6',
+            icon: eplIcon
+        },
       ];
-    
+
     /*const interstitial = async () => {
         await AdMobInterstitial.setAdUnitID('ca-app-pub-3940256099942544/1033173712'); // Test ID, Replace with your-admob-unit-id
         try {
@@ -270,7 +341,7 @@ function Odds(props) {
             <View>
                 <View style={styles.gameContainer}>
                     <TouchableOpacity
-                        onPress={() => props.navigation.navigate('game', {gameId: item.gameId, gameDate: item.gameDate, homeTeam: item.homeTeam, awayTeam: item.awayTeam, homeSpread: item.homeSpread, awaySpread: item.awaySpread, homeSpreadOdds: item.homeSpreadOdds, awaySpreadOdds: item.awaySpreadOdds, awayMoneyline: item.awayMoneyline, homeMoneyline: item.homeMoneyline, over: item.over, overOdds: item.overOdds, under: item.under, underOdds: item.underOdds, awayTeamVote: item.awayTeamVote, homeTeamVote: item.homeTeamVote })}>
+                        onPress={() => props.navigation.navigate('game', {gameId: item.gameId, gameDate: item.gameDate, homeTeam: item.homeTeam, awayTeam: item.awayTeam, homeSpread: item.homeSpread, awaySpread: item.awaySpread, homeSpreadOdds: item.homeSpreadOdds, awaySpreadOdds: item.awaySpreadOdds, awayMoneyline: item.awayMoneyline, homeMoneyline: item.homeMoneyline, over: item.over, overOdds: item.overOdds, under: item.under, underOdds: item.underOdds, sport: item.sport })}>
                         <View>
                             {item.gamePostsCount > 4 ?
                                 <View style={styles.gameDateContainer}>
@@ -368,8 +439,104 @@ function Odds(props) {
         )
     }
 
+    const renderEPLItem = ({ item }) => {
+        return (
+            <View>
+                <View style={styles.eplGameContainer}>
+                    <TouchableOpacity
+                        onPress={() => props.navigation.navigate('game', {gameId: item.gameId, gameDate: item.gameDate, homeTeam: item.homeTeam, awayTeam: item.awayTeam, awayMoneyline: item.awayMoneyline, homeMoneyline: item.homeMoneyline, drawMoneyline: item.drawMoneyline, sport: item.sport })}>
+                        <View>
+                            {item.gamePostsCount > 4 ?
+                                <View style={styles.gameDateContainer}>
+                                    <Text>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
+                                    <View style={styles.pepperContainer}>
+                                        <FontAwesome5 name={"pepper-hot"} size={16} color={"#B81D13"}/>
+                                        <FontAwesome5 name={"pepper-hot"} size={16} color={"#B81D13"}/>
+                                        <FontAwesome5 name={"pepper-hot"} size={16} color={"#B81D13"}/>
+                                    </View>
+                                </View>
+                                
+                            : 
+                            item.gamePostsCount > 2 ?
+                                <View style={styles.gameDateContainer}>
+                                    <Text>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
+                                    <View style={styles.pepperContainer}>
+                                        <FontAwesome5 name={"pepper-hot"} size={16} color={"orange"}/>
+                                        <FontAwesome5 name={"pepper-hot"} size={16} color={"orange"}/>
+                                    </View>
+                                </View>
+                            : 
+                            item.gamePostsCount > 0 ? 
+                                <View style={styles.gameDateContainer}>
+                                    <Text>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
+                                    <View style={styles.pepperContainer}>
+                                        <FontAwesome5 name={"pepper-hot"} size={16} color={"#fed550"}/>
+                                    </View>
+                                </View>
+                            :
+                                <View style={styles.gameDateContainer}>
+                                    <Text>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
+                                </View>
+                                }
+                            <View style={styles.eplAwayGameInfoContainer}>
+                                <View style={styles.teamItem}>
+                                    <Text style={styles.teamText}>{item.awayTeam}</Text>
+                                </View>
+                                <View style={styles.moneylineItem}>
+                                    {item.awayMoneyline > 0 ? 
+                                        <Text style={styles.spreadText}>+{item.awayMoneyline}</Text> 
+                                        : <Text style={styles.spreadText}>{item.awayMoneyline}</Text>
+                                    }
+                                </View> 
+                            </View>
+                            <View style={styles.eplAwayGameInfoContainer}>
+                                <View style={styles.teamItem}>
+                                    <Text style={styles.teamText}>{item.homeTeam}</Text>
+                                </View>
+                                <View style={styles.moneylineItem}>
+                                    {item.homeMoneyline > 0 ? 
+                                        <Text style={styles.spreadText}>+{item.homeMoneyline}</Text> 
+                                        : <Text style={styles.spreadText}>{item.homeMoneyline}</Text>
+                                    }
+                                </View>
+                            </View>
+                            <View style={styles.eplHomeGameInfoContainer}>
+                                <View style={styles.teamItem}>
+                                    <Text style={styles.teamText}>Draw</Text>
+                                </View>
+                                <View style={styles.moneylineItem}>
+                                    {item.drawMoneyline > 0 ? 
+                                        <Text style={styles.spreadText}>+{item.drawMoneyline}</Text> 
+                                        : <Text style={styles.spreadText}>{item.drawMoneyline}</Text>
+                                    }
+                                </View>
+                            </View>
+                        </View>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        )
+    }
+
     return (
         <View style={styles.container}>
+            {firebase.auth().currentUser.uid == 'U6u9pFuuwLVEn97z76a07WHK1V63' ?
+            <View style={styles.notificationContainer}>
+                <TextInput
+                    style={styles.notificationInput}
+                    onChangeText={(text) => setNotification(text)}
+                    placeholder="Message"
+                    clearButtonMode={'always'}
+                />
+                
+                <TouchableOpacity
+                    onPress={() => {sendNotificationToAllUsers()}}
+                    style={styles.notificationButton}>
+                        <Text style={styles.notificationText}>SEND</Text>
+                </TouchableOpacity>
+            </View>
+            :
+            null}
             <View style={styles.sportListContainer}>
                 <TouchableOpacity
                     onPress={() => {browseFunction()}}
@@ -383,8 +550,8 @@ function Odds(props) {
                     horizontal={true}
                     showsHorizontalScrollIndicator={false}
                 />
+                
             </View>
-
                 {browse == true ? 
                 <View style={styles.searchContainer}>
                     <TextInput
@@ -418,6 +585,14 @@ function Odds(props) {
                 data = {sportGames.sort((a, b) => parseFloat(b.gamePostsCount) - parseFloat(a.gamePostsCount)).slice(0, 10)}
                 style={styles.feed}
                 renderItem={renderItem}
+    
+            />
+            :
+            sportGames == props.eplGames ?
+            <FlatList 
+                data={sportGames}
+                style={styles.feed}
+                renderItem={renderEPLItem}
     
             />
             :
@@ -476,13 +651,37 @@ const styles = StyleSheet.create({
         backgroundColor: "#ffffff",
 
     },
+    eplGameContainer: {
+        padding: 6,
+        marginVertical:4,
+        marginRight: 2,
+        marginLeft: 2,
+        borderWidth: 1,
+        borderColor: "rgba(0,0,0,0.1)",
+        borderRadius: 10,
+        shadowColor: "#ccc",
+        shadowOpacity: 0.5,
+        shadowRadius: 2,
+        backgroundColor: "#ffffff",
+
+    },
     awayGameInfoContainer: { 
         flexDirection: 'row',
         borderBottomColor: "#e1e2e6",
         borderBottomWidth: 1,
     },
+    eplAwayGameInfoContainer: { 
+        flexDirection: 'row',
+        borderBottomColor: "#e1e2e6",
+        borderBottomWidth: 1,
+        paddingVertical: 6,
+    },
     homeGameInfoContainer: { 
         flexDirection: 'row',
+    },
+    eplHomeGameInfoContainer: { 
+        flexDirection: 'row',
+        paddingVertical: 6,
     },
     gameHeaderText: {
         fontWeight: "bold",
@@ -507,6 +706,7 @@ const styles = StyleSheet.create({
         borderRightColor: "#e1e2e6",
         borderRightWidth: 1,
         justifyContent: 'center',
+        backgroundColor: "#ffffff"
     },
     spreadItem: {
         width: "16.5%",
@@ -606,6 +806,37 @@ const styles = StyleSheet.create({
     },
     pepperContainer: {
         flexDirection: 'row',
+    },
+    notificationButton: {
+        backgroundColor: "#0033cc",
+        borderRadius: 6,
+        paddingVertical: 4,
+        paddingHorizontal: 6,
+        width: "20%",
+        alignSelf: "center",
+        marginBottom: "1%",
+        marginTop: "1%",
+    },
+    notificationText: {
+        color: "#fff",
+        fontSize: 14,
+        fontWeight: "bold",
+        alignSelf: "center",
+    },
+    notificationInput: {
+        height: 30,
+        width: "75%",
+        paddingHorizontal: 20,
+        backgroundColor: "#ffffff",
+        borderRadius: 20,
+        borderWidth: .5,
+        borderColor: "#CACFD2",
+        alignSelf: "center",
+
+    },
+    notificationContainer: {
+        paddingBottom: 5
+
     }
     
     
@@ -618,6 +849,7 @@ const mapStateToProps = (store) => ({
     mlbGames: store.mlbGamesState.mlbGames,
     nbaGames: store.nbaGamesState.nbaGames,
     ncaabGames: store.ncaabGamesState.ncaabGames,
+    eplGames: store.eplGamesState.eplGames,
 
 })
 

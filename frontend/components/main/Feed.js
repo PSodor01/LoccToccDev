@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from 'react'
-import { StyleSheet, View, Text, Image, FlatList, TouchableOpacity, Alert } from 'react-native'
+import React, { useState, useEffect, useRef } from 'react'
+import { StyleSheet, View, Text, Image, FlatList, TouchableOpacity, Alert, Share } from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons';
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Foundation from 'react-native-vector-icons/Foundation'
 
 import { useNavigation } from '@react-navigation/native';
-import email from 'react-native-email'
+import email from 'react-native-email';
+import { captureRef } from 'react-native-view-shot';
 
 import moment from 'moment';
 
 import ShareButton from '../buttons/ShareButton'
-    
+
 import firebase from 'firebase'
 require('firebase/firestore')
 
@@ -20,16 +21,20 @@ import { fetchUsersData } from '../../redux/actions/index'
 
 import {AdMobBanner} from 'expo-ads-admob'
 
+
+
 function Feed(props) {
     const [loading, setLoading] = useState(true);
     const [allPosts, setAllPosts] = useState([]);
     const [followCriteria, setFollowCriteria] = useState(false)
+    const [currentUserFollowingCount, setCurrentUserFollowingCount] = useState('')
     
 
      useEffect(() => {
         fetchData()
+        setCurrentUserFollowingCount(props.currentUser.followingCount)
 
-    }, [props.blocking, props.faded, props.liked, props.following])
+    }, [props.blocking, props.faded, props.liked, props.following, props.currentUser])
 
     const fetchData = () => {
 
@@ -107,8 +112,6 @@ function Feed(props) {
             .collection("userLikes")
             .doc(postId)
             .set({})
-
-        
     }
 
     const deleteLike = (postId, userId) => {
@@ -220,8 +223,6 @@ function Feed(props) {
             .doc(firebase.auth().currentUser.uid)
             .delete()
 
-
-
     }
 
     const handleReportPostEmail = () => {
@@ -262,7 +263,7 @@ function Feed(props) {
         );
       };
 
-      const followingFunction = () => {
+    const followingFunction = () => {
         if (followCriteria == true) {
             setFollowCriteria(false)
         } else {
@@ -270,7 +271,21 @@ function Feed(props) {
         }
     }
 
-      const renderItem = ({item}) => {
+    const viewRef = useRef({});
+    const shareDummyImage = async (name, caption) => {
+        try {
+            const uri = await captureRef(viewRef, {
+                format: 'png',
+                quality: 0.7
+            });
+            await Share.share({ url:uri });
+        } catch(err){
+            console.error(err);
+        }
+        console.log(name, caption)
+    }
+    
+    const renderItem = ({item}) => {
         return (
             <View>
                 <View >
@@ -364,106 +379,108 @@ function Feed(props) {
                     }
                 </View>  
             </View>
-        )}
+    )}
 
-        const renderFollowingItem = ({item}) => {
-            return (
-                <View>
-                    <View >
-                    { item.following != true ?
-    
-                        null
-                            
-                        : 
-                        <View style={styles.feedItem}>
-                            <TouchableOpacity
-                                onPress={() => props.navigation.navigate("Profile", {uid: item.user.uid})}>
-                                <Image 
-                                    style={styles.profilePhotoPostContainer}
-                                    source={{uri: item.user ? item.user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
-                                />
-                            </TouchableOpacity>
-                            <View style={styles.postRightContainer}>
-                                <View style={styles.postHeaderContainer}>
-                                    {item.user ? <Text style={styles.profileNameFeedText}>{item.user.name}</Text> : null}
-                                    <Text style={styles.postTimeContainer}>{moment(item.creation.toDate()).fromNow()}</Text>
-                                </View>
-                                <View style={styles.postContentContainer}>
-                                    {item.caption != null ? <Text style={styles.captionText}>{item.caption}</Text> : null}
-                                    {item.downloadURL != "blank" ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
-                                </View>
-                                <View style={styles.postFooterContainer}>
-                    { item.liked == true ?
-                        <View style={styles.likeContainer}>
-                            <TouchableOpacity
-                                onPress={() => {onDislikePress(item.user.uid, item.id); deleteLike(item.id)}} >
-                                <Ionicons name={"hammer"} size={20} color={"black"} />
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                onPress={() => props.navigation.navigate('LikesList', {userId: item.creator, postId: item.id})} >
-                                <Text style={styles.likeNumber}>{item.likesCount}</Text>
-                            </TouchableOpacity>
-                        </View>
+    const renderFollowingItem = ({item}) => {
+        return (
+            <View>
+                <View >
+                { item.following != true ?
+
+                    null
                         
-                        :
-                        
-                        <View style={styles.likeContainer}>
-                            <TouchableOpacity
-                                onPress={() => {onLikePress(item.user.uid, item.id); storeLike(item.id)}}> 
-                                <Ionicons name={"hammer-outline"}  size={20} color={"grey"}/>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                onPress={() => props.navigation.navigate('LikesList', {userId: item.creator, postId: item.id})} >
-                                <Text style={styles.likeNumber}>{item.likesCount}</Text>
-                            </TouchableOpacity>
-                        </View>
-                        }
-                        { item.faded == true ?
-                        <View style={styles.likeContainer}>
-                            <TouchableOpacity
-                                onPress={() => {onUnfadePress(item.user.uid, item.id); deleteFade(item.id)}} >
-                                <Foundation name={"skull"} size={20} color={"black"} />
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                onPress={() => props.navigation.navigate('FadesList', {userId: item.creator, postId: item.id})} >
-                                <Text style={styles.likeNumber}>{item.fadesCount}</Text>
-                            </TouchableOpacity>
-                        </View>
-                        
-                        :
-                        
-                        <View style={styles.likeContainer}>
-                            <TouchableOpacity
-                                onPress={() => {onFadePress(item.user.uid, item.id); storeFade(item.id)}}> 
-                                <Foundation name={"skull"}  size={20} color={"#B3B6B7"}/>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                onPress={() => props.navigation.navigate('FadesList', {userId: item.creator, postId: item.id})} >
-                                <Text style={styles.likeNumber}>{item.fadesCount}</Text>
-                            </TouchableOpacity>
-                        </View>
-                        }
+                    : 
+                    <View
+                         style={styles.feedItem}>
                         <TouchableOpacity
-                            style={styles.commentsContainer}
-                            onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.user.uid, posterId: item.user.uid, posterName: item.user.name, postCreation: item.creation, postCaption: item.caption, posterImg: item.user.userImg, postImg: item.downloadURL })}>
-                            <Ionicons name={"chatbubble-outline"} size={20} color={"grey"} marginRight={10} />
-                            <Text style={styles.likeNumber}>{item.comments}</Text>
+                            onPress={() => props.navigation.navigate("Profile", {uid: item.user.uid})}>
+                            <Image 
+                                style={styles.profilePhotoPostContainer}
+                                source={{uri: item.user ? item.user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                            />
+                        </TouchableOpacity>
+                        <View style={styles.postRightContainer}>
+                            <View style={styles.postHeaderContainer}>
+                                {item.user ? <Text style={styles.profileNameFeedText}>{item.user.name}</Text> : null}
+                                <Text style={styles.postTimeContainer}>{moment(item.creation.toDate()).fromNow()}</Text>
+                            </View>
+                            <View style={styles.postContentContainer}>
+                                {item.caption != null ? <Text style={styles.captionText}>{item.caption}</Text> : null}
+                                {item.downloadURL != "blank" ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
+                            </View>
+                            <View style={styles.postFooterContainer}>
+                { item.liked == true ?
+                    <View style={styles.likeContainer}>
+                        <TouchableOpacity
+                            onPress={() => {onDislikePress(item.user.uid, item.id); deleteLike(item.id)}} >
+                            <Ionicons name={"hammer"} size={20} color={"black"} />
                         </TouchableOpacity>
                         <TouchableOpacity
-                            style={styles.flagContainer}
-                            onPress={() => reportPostHandler({name: item.user.name, caption: item.caption})}>
-                            <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
+                            onPress={() => props.navigation.navigate('LikesList', {userId: item.creator, postId: item.id})} >
+                            <Text style={styles.likeNumber}>{item.likesCount}</Text>
                         </TouchableOpacity>
                     </View>
-                            </View> 
-                        </View>
-                        }
                     
-                            
+                    :
+                    
+                    <View style={styles.likeContainer}>
+                        <TouchableOpacity
+                            onPress={() => {onLikePress(item.user.uid, item.id); storeLike(item.id)}}> 
+                            <Ionicons name={"hammer-outline"}  size={20} color={"grey"}/>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => props.navigation.navigate('LikesList', {userId: item.creator, postId: item.id})} >
+                            <Text style={styles.likeNumber}>{item.likesCount}</Text>
+                        </TouchableOpacity>
                     </View>
-                     
+                    }
+                    { item.faded == true ?
+                    <View style={styles.likeContainer}>
+                        <TouchableOpacity
+                            onPress={() => {onUnfadePress(item.user.uid, item.id); deleteFade(item.id)}} >
+                            <Foundation name={"skull"} size={20} color={"black"} />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => props.navigation.navigate('FadesList', {userId: item.creator, postId: item.id})} >
+                            <Text style={styles.likeNumber}>{item.fadesCount}</Text>
+                        </TouchableOpacity>
+                    </View>
+                    
+                    
+                    :
+                    
+                    <View style={styles.likeContainer}>
+                        <TouchableOpacity
+                            onPress={() => {onFadePress(item.user.uid, item.id); storeFade(item.id)}}> 
+                            <Foundation name={"skull"}  size={20} color={"#B3B6B7"}/>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => props.navigation.navigate('FadesList', {userId: item.creator, postId: item.id})} >
+                            <Text style={styles.likeNumber}>{item.fadesCount}</Text>
+                        </TouchableOpacity>
+                    </View>
+                    }
+                    <TouchableOpacity
+                        style={styles.commentsContainer}
+                        onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.user.uid, posterId: item.user.uid, posterName: item.user.name, postCreation: item.creation, postCaption: item.caption, posterImg: item.user.userImg, postImg: item.downloadURL })}>
+                        <Ionicons name={"chatbubble-outline"} size={20} color={"grey"} marginRight={10} />
+                        <Text style={styles.likeNumber}>{item.comments}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.flagContainer}
+                        onPress={() => reportPostHandler({name: item.user.name, caption: item.caption})}>
+                        <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
+                    </TouchableOpacity>
                 </View>
-            )}
+                        </View> 
+                    </View>
+                    }
+                
+                        
+                </View>
+                    
+            </View>
+        )}
 
       
 
@@ -472,17 +489,19 @@ function Feed(props) {
     return (
         <View style={styles.containerGallery}>
             <View style={styles.bannerAdContainer}>
-                
             </View>
-            {followCriteria == false ?
+            {
+                
+            followCriteria == false ?
             <View style={styles.sortContainer}>
                 <TouchableOpacity 
                     style={styles.sortButton}
                     onPress={() => {followingFunction()}}>
-                    <Text style={styles.sortText}>See all: </Text>
+                    <Text style={styles.sortText}>See All: </Text>
                     <Ionicons name={"lock-open-outline"} size={16} color={"#B3B6B7"} marginRight={10}/>
                 </TouchableOpacity>
-            </View> :
+            </View> 
+            :
             <View style={styles.sortContainer}>
                 <TouchableOpacity
                     style={styles.sortButton}
@@ -491,6 +510,11 @@ function Feed(props) {
                     <Ionicons name={"lock-closed-outline"} size={16} color={"#B3B6B7"} marginRight={10}/>
                 </TouchableOpacity>
             </View> }
+            {currentUserFollowingCount == '0' && followCriteria == false ?
+            <Text style={styles.noFollowingText}>Follow others to see their locks here. Choose a game on the home screen or choose 'See All' above to get started!</Text>
+            :
+            null
+            }
             {followCriteria == false ? 
             <FlatList
                 style={styles.feed}
@@ -586,7 +610,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         width: "80%",
         paddingTop: 8,
-        marginLeft: "5%",
+        marginLeft: "3%",
 
     },
     postRightContainer: {
@@ -631,6 +655,10 @@ const styles = StyleSheet.create({
     },
     sortButton: {
         flexDirection: 'row',
+    },
+    noFollowingText: {
+        fontSize: 16,
+        paddingTop: 10,
     },
     adView: {
         alignItems: 'center',
