@@ -69,7 +69,7 @@ exports.testLike = functions.firestore.document('/likes/{userId}/userLikes/{post
 
 exports.getMLBGameData = functions.pubsub.schedule('every 5 minutes').onRun(async() => {
   try {
-    const response = await axios.get('https://api.the-odds-api.com/v4/sports/baseball_mlb/odds/?apiKey=410146d3f5db8991f4ef289a2ecd9ec2&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso')
+    const response = await axios.get('https://api.the-odds-api.com/v4/sports/baseball_mlb/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso')
     .then(result => {
       result.data.forEach(game => {
 
@@ -389,7 +389,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
 
   exports.getEPLGameData = functions.pubsub.schedule('every 5 minutes').onRun(async() => {
     try {
-      const response = await axios.get('https://api.the-odds-api.com/v4/sports/soccer_epl/odds/?apiKey=410146d3f5db8991f4ef289a2ecd9ec2&regions=us&markets=h2h,totals&oddsFormat=american&dateFormat=iso')
+      const response = await axios.get('https://api.the-odds-api.com/v4/sports/soccer_epl/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,totals&oddsFormat=american&dateFormat=iso')
       .then(result => {
         result.data.forEach(game => {
   
@@ -435,6 +435,74 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
       })
   }catch(err) {console.error(err.message)}
   
+  })
+
+  exports.getNHLGameData = functions.pubsub.schedule('every 5 minutes').onRun(async() => {
+    try {
+      const response = await axios.get('https://api.the-odds-api.com/v4/sports/icehockey_nhl/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso')
+      .then(result => {
+        result.data.forEach(game => {
+
+          if (game.bookmakers.findIndex((item) => item.key === 'fanduel') > -1) {
+            let i = game.bookmakers.findIndex((item) => item.key === 'fanduel')
+            if (game.away_team == game.bookmakers[0].markets[0].outcomes[0].name) {
+
+              const writeResult = admin
+              .firestore()
+              .collection("nhl")
+              .doc(game.id)
+              .set({
+                gameId: game.id,
+                asite: game.bookmakers[i].key,
+                sport: game.sport_key,
+                gameDate: game.commence_time,
+                awayTeam: game.away_team,
+                homeTeam: game.home_team,
+                awayMoneyline: game.bookmakers[i].markets[0].outcomes[0].price,
+                homeMoneyline: game.bookmakers[i].markets[0].outcomes[1].price,
+                awaySpread: game.bookmakers[i].markets[1].outcomes[0].point,
+                homeSpread: game.bookmakers[i].markets[1].outcomes[1].point,
+                awaySpreadOdds: game.bookmakers[i].markets[1].outcomes[0].price,
+                homeSpreadOdds: game.bookmakers[i].markets[1].outcomes[1].price,
+                over: game.bookmakers[i].markets[2].outcomes[0].point,
+                under: game.bookmakers[i].markets[2].outcomes[1].point,
+                overOdds: game.bookmakers[i].markets[2].outcomes[0].price,
+                underOdds: game.bookmakers[i].markets[2].outcomes[1].price,
+            })
+  
+            } else {
+              const writeResult = admin
+              .firestore()
+              .collection("nhl")
+              .doc(game.id)
+              .set({
+                gameId: game.id,
+                asite: game.bookmakers[i].key,
+                sport: game.sport_key,
+                gameDate: game.commence_time,
+                awayTeam: game.away_team,
+                homeTeam: game.home_team,
+                awayMoneyline: game.bookmakers[i].markets[0].outcomes[1].price,
+                homeMoneyline: game.bookmakers[i].markets[0].outcomes[0].price,
+                awaySpread: game.bookmakers[i].markets[1].outcomes[1].point,
+                homeSpread: game.bookmakers[i].markets[1].outcomes[0].point,
+                awaySpreadOdds: game.bookmakers[i].markets[1].outcomes[1].price,
+                homeSpreadOdds: game.bookmakers[i].markets[1].outcomes[0].price,
+                over: game.bookmakers[i].markets[2].outcomes[0].point,
+                under: game.bookmakers[i].markets[2].outcomes[1].point,
+                overOdds: game.bookmakers[i].markets[2].outcomes[0].price,
+                underOdds: game.bookmakers[i].markets[2].outcomes[1].price,
+            })
+  
+            }
+          } else {
+            return
+
+          }
+        })
+      })
+  }catch(err) {console.error(err.message)}
+
   })
 
   exports.deleteNFLGameData = functions.pubsub.schedule('00 11 * * *').timeZone('America/New_York').onRun(async() => {
@@ -527,6 +595,23 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
             doc.ref.delete({});
           });
         });
+  }catch(err) {console.error(err.message)}
+
+  })
+
+  exports.deleteNHLGameData = functions.pubsub.schedule('00 11 * * *').timeZone('America/New_York').onRun(async() => {
+    try {
+      const writeResult = admin
+          .firestore()
+          .collection('nhl')
+          .get()
+          .then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            doc.ref.delete({});
+          });
+        });
+
+      
   }catch(err) {console.error(err.message)}
 
   })

@@ -493,6 +493,7 @@ function Feed(props) {
             {
                 
             followCriteria == false ?
+            
             <View style={styles.sortContainer}>
                 <TouchableOpacity 
                     style={styles.sortButton}
@@ -511,7 +512,7 @@ function Feed(props) {
                 </TouchableOpacity>
             </View> }
             {currentUserFollowingCount == '0' && followCriteria == false ?
-            <Text style={styles.noFollowingText}>Follow others to see their locks here. Choose a game on the home screen or choose 'See All' above to get started!</Text>
+            <Text style={styles.noFollowingText}>Follow others to see their locks here</Text>
             :
             null
             }
@@ -519,7 +520,6 @@ function Feed(props) {
             <FlatList
                 style={styles.feed}
                 data = {allPosts.sort(function (x, y) {return y.creation - x.creation})}
-                ListEmptyComponent={EmptyListMessage}
                 onRefresh={() => fetchData()}
                 refreshing={loading}
                 renderItem={renderFollowingItem}

@@ -38,7 +38,7 @@ function Search(props) {
                             source={{uri: item.name ? item.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
                         />
                         <Text style={styles.searchResultsText}>{item.name}</Text>
-                    </TouchableOpacity> 
+                    </TouchableOpacity>
                 </View> }
             </View>
             

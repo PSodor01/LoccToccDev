@@ -8,7 +8,7 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import firebase from 'firebase'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { fetchUser, fetchUserFollowing, fetchUserBlocking, fetchAllUsers, fetchLikes, fetchFades, fetchNFLGames, fetchNCAAFGames, fetchNCAABGames, fetchMLBGames, fetchNBAGames, fetchEPLGames, clearData } from '../redux/actions/index'
+import { fetchUser, fetchUserFollowing, fetchUserBlocking, fetchAllUsers, fetchLikes, fetchFades, fetchNFLGames, fetchNCAAFGames, fetchNCAABGames, fetchMLBGames, fetchNBAGames, fetchEPLGames, fetchNHLGames, clearData } from '../redux/actions/index'
 
 import FeedScreen from './main/Feed'
 import ProfileScreen from './main/Profile'
@@ -64,6 +64,7 @@ export class Main extends Component {
         this.props.fetchNBAGames();
         this.props.fetchNCAABGames();
         this.props.fetchEPLGames();
+        this.props.fetchNHLGames();
     }
     render() {
         return (
@@ -133,7 +134,8 @@ const mapStateToProps = (store) => ({
     nbaGames: store.nbaGamesState.nbaGames,
     ncaabGames: store.ncaabGamesState.ncaabGames,
     eplGames: store.eplGamesState.eplGames,
+    nhlGames: store.nhlGamesState.nhlGames,
 })
-const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUser, fetchUserFollowing, fetchAllUsers, fetchUserBlocking, fetchLikes, fetchFades, fetchNFLGames, fetchNCAAFGames, fetchMLBGames, fetchNBAGames, fetchNCAABGames, fetchEPLGames, clearData }, dispatch);
+const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUser, fetchUserFollowing, fetchAllUsers, fetchUserBlocking, fetchLikes, fetchFades, fetchNFLGames, fetchNCAAFGames, fetchMLBGames, fetchNBAGames, fetchNCAABGames, fetchEPLGames, fetchNHLGames, clearData }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchProps)(Main);

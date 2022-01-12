@@ -1,4 +1,4 @@
-import { NFL_GAMES_STATE_CHANGE, NCAAF_GAMES_STATE_CHANGE, NCAAB_GAMES_STATE_CHANGE, MLB_GAMES_STATE_CHANGE, NBA_GAMES_STATE_CHANGE, EPL_GAMES_STATE_CHANGE, CLEAR_DATA } from "../constants"
+import { NFL_GAMES_STATE_CHANGE, NCAAF_GAMES_STATE_CHANGE, NCAAB_GAMES_STATE_CHANGE, MLB_GAMES_STATE_CHANGE, NBA_GAMES_STATE_CHANGE, EPL_GAMES_STATE_CHANGE, NHL_GAMES_STATE_CHANGE, CLEAR_DATA } from "../constants"
 
 const initialState = {
     nflGames: [],
@@ -7,6 +7,7 @@ const initialState = {
     nbaGames: [],
     ncaabGames: [],
     eplGames: [],
+    nhlGames: [],
 }
 
 export const nflGames = (state = initialState, action) => {
@@ -85,6 +86,20 @@ export const eplGames = (state = initialState, action) => {
             return {
                 ...state,
                 eplGames: action.eplGames
+            }
+        case CLEAR_DATA:
+            return initialState
+        default:
+            return state;
+    }
+}
+
+export const nhlGames = (state = initialState, action) => {
+    switch (action.type) {
+        case NHL_GAMES_STATE_CHANGE:
+            return {
+                ...state,
+                nhlGames: action.nhlGames
             }
         case CLEAR_DATA:
             return initialState

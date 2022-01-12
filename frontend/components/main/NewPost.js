@@ -156,6 +156,7 @@ const AddPostScreen = ({ route, props }) => {
                         gameDate: gameDate,
                         awayCount: 0,
                         homeCount: 0,
+                        drawCount:0,
                         gamePostsCount: 1,
 
                       })
