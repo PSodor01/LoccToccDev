@@ -146,8 +146,7 @@ const styles = StyleSheet.create({
     appTextContainer: {
         alignItems: "center",
         justifyContent: 'center',
-        paddingBottom: 5,
-        marginTop: "5%",
+        marginTop: "2%",
         flexDirection: 'row',
         padding: 5,
     },
@@ -169,7 +168,7 @@ const styles = StyleSheet.create({
     },
     feedItem:{
         padding:6,
-        marginVertical:5,
+        marginVertical:2,
         marginHorizontal:5,
         borderBottomWidth: 1,
         borderBottomColor: "#e1e2e6",

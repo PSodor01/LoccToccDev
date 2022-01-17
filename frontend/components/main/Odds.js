@@ -125,6 +125,26 @@ function Odds(props) {
         }
         setncaabGames(props.ncaabGames)
 
+        for (let i = 0; i < props.eplGames.length; i++) {
+
+            firebase.firestore()
+            .collection("votes")
+            .doc(props.eplGames[i].gameId)
+            .collection("gameVotes")
+            .doc("info")
+            .get()
+            .then((snapshot) => {
+                if (snapshot.exists) {
+                    let gameMiscData = snapshot.data();
+                    props.eplGames[i].gamePostsCount = gameMiscData.gamePostsCount
+                }
+                else {
+                    props.eplGames[i].gamePostsCount = 0
+                }
+            })
+        }
+        seteplGames(props.eplGames)
+
                  
         setLoading(false)
 
@@ -149,7 +169,7 @@ function Odds(props) {
             finalStatus = status;
           }
           if (finalStatus !== 'granted') {
-            alert('Failed to get push token for push notification!');
+            //alert('Failed to get push token for push notification!');
             return;
           }
           token = (await Notifications.getExpoPushTokenAsync()).data;
@@ -256,7 +276,7 @@ function Odds(props) {
     const nbaIcon = (<Icon name="basketball-outline" color="#ee6730" size={16}/>);
     const nflIcon = (<Icon name="american-football" color="#825736" size={16}/>);
     const nhlIcon = (<MaterialCommunityIcons name="hockey-sticks" color="#B87333" size={16}/>);
-    const ncaabIcon = (<MaterialCommunityIcons name="basketball-hoop-outline" color="grey" size={16}/>);
+    const ncaabIcon = (<MaterialCommunityIcons name="basketball-hoop-outline" color="#0033cc" size={16}/>);
     const eplIcon = (<MaterialCommunityIcons name="soccer" color="black" size={16}/>);
     const trendingIcon = (<MaterialCommunityIcons name="trending-up" color="#00FF00" size={16}/>);
 
@@ -674,6 +694,7 @@ const styles = StyleSheet.create({
         marginVertical:4,
         marginRight: 2,
         marginLeft: 2,
+        justifyContent: 'center',
         borderWidth: 1,
         borderColor: "rgba(0,0,0,0.1)",
         borderRadius: 10,
