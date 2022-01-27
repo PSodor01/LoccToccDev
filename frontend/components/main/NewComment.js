@@ -127,6 +127,48 @@ function NewCommentScreen(props, route) {
         })
       }
 
+      const sendNotification = async (token, notification) => {
+        const message = {
+          to: token,
+          sound: 'default',
+          body: notification ? notification : 'Empty Notification',
+        };
+        
+        await fetch('https://exp.host/--/api/v2/push/send', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Accept-encoding': 'gzip, deflate',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(message),
+        });
+      }
+
+    const sendNotificationForComment = async () => {
+        const users = await firebase
+            .firestore()
+            .collection("users")
+            .doc(props.route.params.uid)
+            .get()
+            .then((snapshot) => {
+                if (snapshot.exists) {
+                    let data = snapshot.data();
+
+                    const token = data.token
+
+                    if (token != undefined) {
+                        const commenterName = userData.name
+                        const notification = commenterName + ' commented on your post'
+                        sendNotification(notification, token)
+                    } else {
+                    }
+                }
+                else {
+                }
+            })
+    };
+
       const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -303,7 +345,7 @@ function NewCommentScreen(props, route) {
                           </TouchableOpacity>
                       </View>
                       <View style={styles.postButtonContainer}>
-                          <TouchableOpacity onPress={() => {uploadImage(); onCommentCount();}} style={styles.postButton}>
+                          <TouchableOpacity onPress={() => {uploadImage(); onCommentCount(); sendNotificationForComment()}} style={styles.postButton}>
                               <Text style={styles.shareText}>POST</Text>
                           </TouchableOpacity>
                       </View>

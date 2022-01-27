@@ -22,14 +22,14 @@
             }
         };  
 
+        const testButton = (name, caption) => {
+            console.log(name, caption)
+        }
+
       return (
           <View>
-            <View ref={viewRef}>
-                <Text>@locctocc</Text>
-                
-            </View>
                 <TouchableOpacity
-                    onPress={shareDummyImage}>
+                    >
                     <Ionicons name={"ios-share"} size={20} color={"grey"} marginRight={10} />
                 </TouchableOpacity>
           </View>

@@ -221,7 +221,6 @@ function Odds(props) {
         users.docs.map((user) => sendNotification(user.data().token))
     };
 
-    
 
     const searchNFLFilter = (text) => {
         if (text) {
@@ -565,6 +564,11 @@ function Odds(props) {
                     onPress={() => {displayNotificationInput()}}
                     style={styles.notificationButton}>
                         <Text style={styles.notificationText}>NOTIFICATION</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => {sendTestNotification()}}
+                    style={styles.sendButton}>
+                        <Text style={styles.notificationText}>TEST</Text>
                 </TouchableOpacity>
             </View>
             :

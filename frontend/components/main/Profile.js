@@ -184,24 +184,6 @@ function Profile(props) {
             
     }
 
-    const blockUserHandler = () => {
-        Alert.alert(
-            'Block?',
-            'If you block this user you will no longer see their posts on any of your activity feeds.',
-
-            [
-                { text: 'Block', onPress: () => blockUser()},
-                {
-                    text: 'Cancel',
-                    onPress: () => {},
-                    style: 'cancel',
-                },
-            ],
-            { cancelable: true }
-
-        )
-    }
-
     const blockAndUnfollowHandler = () => {
         Alert.alert(
             'Block?',
@@ -244,6 +226,48 @@ function Profile(props) {
 
         )
     }
+
+    const sendNotification = async (token, notification) => {
+        const message = {
+            to: token,
+            sound: 'default',
+            body: notification ? notification : 'Empty Notification',
+        };
+        
+        await fetch('https://exp.host/--/api/v2/push/send', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Accept-encoding': 'gzip, deflate',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(message),
+        });
+    }
+
+    const sendNotificationForFollow = async () => {
+        const users = await firebase
+            .firestore()
+            .collection("users")
+            .doc(props.route.params.uid)
+            .get()
+            .then((snapshot) => {
+                if (snapshot.exists) {
+                    let data = snapshot.data();
+
+                    const token = data.token
+
+                    if (token != undefined) {
+                        const followName = props.currentUser.name
+                        const notification = followName + ' started following you'
+                        sendNotification(notification, token)
+                    } else {
+                    }
+                }
+                else {
+                }
+            })
+    };
 
     const handleReportPostEmail = () => {
         const to = ['ReportPost@locctocc.com'] // string or array of email addresses
@@ -361,11 +385,12 @@ function Profile(props) {
                         ) :
                             (
                                 <TouchableOpacity
-                                    onPress={() => {onFollow(); increaseFollowerCount(); increaseFollowingCount();}}
+                                    onPress={() => {onFollow(); increaseFollowerCount(); increaseFollowingCount(); sendNotificationForFollow();}}
                                     title="Follow"
                                     style={styles.followButton}>
                                         <Text style={styles.follow}> Follow </Text>
                                 </TouchableOpacity>
+                                
                             )}
                         {following && blocking != true ? (
                             <TouchableOpacity

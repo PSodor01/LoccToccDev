@@ -113,6 +113,72 @@ function game(props) {
             .set({})
     }
 
+    const sendNotification = async (token, notification) => {
+        const message = {
+            to: token,
+            sound: 'default',
+            body: notification ? notification : 'Empty Notification',
+        };
+        
+        await fetch('https://exp.host/--/api/v2/push/send', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Accept-encoding': 'gzip, deflate',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(message),
+        });
+    }
+
+    const sendNotificationForLike = async (uid) => {
+        const users = await firebase
+            .firestore()
+            .collection("users")
+            .doc(uid)
+            .get()
+            .then((snapshot) => {
+                if (snapshot.exists) {
+                    let data = snapshot.data();
+
+                    const token = data.token
+
+                    if (token != undefined) {
+                        const likeName = props.currentUser.name
+                        const notification = likeName + ' hammered your post'
+                        sendNotification(notification, token)
+                    } else {
+                    }
+                }
+                else {
+                }
+            })
+    };
+
+    const sendNotificationForFade = async (uid) => {
+        const users = await firebase
+            .firestore()
+            .collection("users")
+            .doc(uid)
+            .get()
+            .then((snapshot) => {
+                if (snapshot.exists) {
+                    let data = snapshot.data();
+
+                    const token = data.token
+
+                    if (token != undefined) {
+                        const likedName = props.currentUser.name
+                        const notification = likedName + ' faded your post'
+                        sendNotification(notification, token)
+                    } else {
+                    }
+                }
+                else {
+                }
+            })
+    };
+
     const deleteLike = (postId, userId) => {
         firebase.firestore()
             .collection("likes")
@@ -480,7 +546,7 @@ function game(props) {
                         
                         <View style={styles.likeContainer}>
                             <TouchableOpacity
-                                onPress={() => {onLikePress(item.user.uid, item.id); storeLike(item.id)}}> 
+                                onPress={() => {onLikePress(item.user.uid, item.id); storeLike(item.id); sendNotificationForLike(item.user.uid, item.user.name)}}> 
                                 <Ionicons name={"hammer-outline"}  size={20} color={"grey"}/>
                             </TouchableOpacity>
                             <TouchableOpacity
@@ -505,7 +571,7 @@ function game(props) {
                         
                         <View style={styles.likeContainer}>
                             <TouchableOpacity
-                                onPress={() => {onFadePress(item.user.uid, item.id); storeFade(item.id)}}> 
+                                onPress={() => {onFadePress(item.user.uid, item.id); storeFade(item.id), sendNotificationForFade(item.user.uid, item.user.name)}}> 
                                 <Foundation name={"skull"}  size={20} color={"#B3B6B7"}/>
                             </TouchableOpacity>
                             <TouchableOpacity
