@@ -113,7 +113,7 @@ function game(props) {
             .set({})
     }
 
-    const sendNotification = async (token, notification) => {
+    const sendNotification = async (notification, token) => {
         const message = {
             to: token,
             sound: 'default',
