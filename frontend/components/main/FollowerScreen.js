@@ -73,7 +73,7 @@ function FollowerScreen(props) {
     return (
         <View style={styles.textInputContainer}>
             <FlatList
-                data={following}
+                data = {following}
                 ListEmptyComponent={EmptyListMessage}
                 style={styles.feed}
                 renderItem={({ item }) => (
@@ -95,38 +95,16 @@ function FollowerScreen(props) {
 };
 
 const styles = StyleSheet.create({
-    textInput: {
-        height: 30,
-        width: "75%",
-        paddingHorizontal: 20,
-        backgroundColor: "#ffffff",
-        borderRadius: 20,
-        borderWidth: .5,
-        borderColor: "#CACFD2"
-
-    },
     textInputContainer: {
         flex: 1,
         backgroundColor: "#ffffff",
 
-    },
-    appTextContainer: {
-        alignItems: "center",
-        justifyContent: 'center',
-        paddingBottom: 5,
-        marginTop: "5%",
-        flexDirection: 'row',
-        padding: 5,
     },
     searchResultsText: {
         fontSize: 16,
         padding: 5,
         alignSelf: 'center',
         marginLeft: "5%",
-    },
-    feed: {
-        backgroundColor: "#ffffff",
-        flex: 1,
     },
     profilePhotoPostContainer: {
         backgroundColor: "#e1e2e6",
@@ -135,9 +113,7 @@ const styles = StyleSheet.create({
         borderRadius: 40,
     },
     feedItem:{
-        padding:6,
-        marginVertical:5,
-        marginHorizontal:5,
+        padding:4,
         borderBottomWidth: 1,
         borderBottomColor: "#e1e2e6",
         flexDirection: 'row',
@@ -151,7 +127,6 @@ const styles = StyleSheet.create({
         textAlign: 'justify',
         marginHorizontal: "5%",
       },
-    
    
     
 })

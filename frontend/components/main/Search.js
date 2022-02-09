@@ -18,7 +18,7 @@ function Search(props) {
     const [search, setSearch] = useState('');
     const [browse, setBrowse] = useState(false)
 
-    useEffect(() => {
+    useEffect((uid) => {
         
         setAllUsers(props.allUsers)
         
@@ -114,7 +114,7 @@ function Search(props) {
             <View style={styles.adView}>
                 <AdMobBanner
                     bannerSize="banner"
-                    adUnitID="ca-app-pub-8519029912093094/1666835736" // Real ID: 8519029912093094/1666835736, test ID: 3940256099942544/2934735716
+                    adUnitID="ca-app-pub-3940256099942544/2934735716" // Real ID: 8519029912093094/1666835736, test ID: 3940256099942544/2934735716
                     servePersonalizedAds // true or false
                 />
             </View>

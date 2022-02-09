@@ -3,9 +3,9 @@ import { Text, View, StyleSheet, useWindowDimensions, Alert, TextInput, Dimensio
 import { TabView, TabBar, SceneMap } from 'react-native-tab-view';
 
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import Ionicons from 'react-native-vector-icons/Ionicons'
+import Icon from 'react-native-vector-icons/Ionicons';
+
 
 import * as Notifications from 'expo-notifications'
 import * as Permissions from 'expo-permissions'
@@ -19,7 +19,6 @@ import firebase from 'firebase'
 require("firebase/firestore")
 require("firebase/firebase-storage")
 import { connect } from 'react-redux'
-import Icon from 'react-native-vector-icons/Ionicons';
 
 function Odds(props) {
 
@@ -36,6 +35,7 @@ function Odds(props) {
     const [trendingGames, setTrendingGames] = useState([]);
     const [notification, setNotification] = useState('');
     const [notificationCriteria, setNotificationCriteria] = useState(false);
+    const [bannerId, setBannerId] = useState('ca-app-pub-3940256099942544/2934735716')
 
      useEffect(() => {
         fetchData()
@@ -264,12 +264,12 @@ function Odds(props) {
     }
     
     const setSportFunction = (sport) => {
-        if (sport == 'Trending') {setSportGames(trendingGames); setSport('Trending'); }
-        if (sport == 'NFL') {setSportGames(props.nflGames); setSport('NFL')}
-        if (sport == 'NBA') {setSportGames(props.nbaGames); setSport('NBA')} 
-        if (sport == 'NHL') {setSportGames(props.nhlGames); setSport('NHL')} 
-        if (sport == 'NCAAB') {setSportGames(props.ncaabGames); setSport('NCAAB')}
-        if (sport == 'EPL') {setSportGames(props.eplGames); setSport('EPL')}
+        if (sport == 'Trending') {setSportGames(trendingGames); setSport('Trending'); setBannerId('ca-app-pub-3940256099942544/2934735716')} // Real ID: 8519029912093094/4907013689, test ID: 3940256099942544/2934735716
+        if (sport == 'NFL') {setSportGames(props.nflGames); setSport('NFL'); setBannerId('ca-app-pub-3940256099942544/2934735716')} // Real ID: 8519029912093094/7298151920, test ID: 3940256099942544/2934735716
+        if (sport == 'NBA') {setSportGames(props.nbaGames); setSport('NBA'); setBannerId('ca-app-pub-3940256099942544/2934735716')} // Real ID: 8519029912093094/2973755922, test ID: 3940256099942544/2934735716
+        if (sport == 'NHL') {setSportGames(props.nhlGames); setSport('NHL'); setBannerId('ca-app-pub-3940256099942544/2934735716')} // Real ID: 8519029912093094/4095265900, test ID: 3940256099942544/2934735716
+        if (sport == 'NCAAB') {setSportGames(props.ncaabGames); setSport('NCAAB'); setBannerId('ca-app-pub-3940256099942544/2934735716')} // Real ID: 8519029912093094/8772877514, test ID: 3940256099942544/2934735716
+        if (sport == 'EPL') {setSportGames(props.eplGames); setSport('EPL'); setBannerId('ca-app-pub-3940256099942544/2934735716')} // Real ID: 8519029912093094/8198162447, test ID: 3940256099942544/2934735716
     }
 
     const nbaIcon = (<Icon name="basketball-outline" color="#ee6730" size={16}/>);
@@ -648,7 +648,7 @@ function Odds(props) {
             <View style={styles.adView}>
                 <AdMobBanner
                     bannerSize="banner"
-                    adUnitID="ca-app-pub-8519029912093094/4907013689" // Real ID: 8519029912093094/4907013689, test ID: 3940256099942544/2934735716
+                    adUnitID={bannerId} 
                     servePersonalizedAds // true or false
                 />
             </View>
@@ -670,7 +670,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         paddingTop: 6,
-        backgroundColor: "#e1e2e6",
+        backgroundColor: "#ffffff",
     },
     sportListContainer: {
         alignItems: 'center',
@@ -684,12 +684,8 @@ const styles = StyleSheet.create({
         marginLeft: 2,
         alignItems: 'center',
         justifyContent: 'center',
-        borderWidth: 1,
-        borderColor: "rgba(0,0,0,0.1)",
-        borderRadius: 10,
-        shadowColor: "#ccc",
-        shadowOpacity: 0.5,
-        shadowRadius: 2,
+        borderTopWidth: .8,
+        borderTopColor: "#ccc",
         backgroundColor: "#ffffff",
 
     },
@@ -699,12 +695,8 @@ const styles = StyleSheet.create({
         marginRight: 2,
         marginLeft: 2,
         justifyContent: 'center',
-        borderWidth: 1,
-        borderColor: "rgba(0,0,0,0.1)",
-        borderRadius: 10,
-        shadowColor: "#ccc",
-        shadowOpacity: 0.5,
-        shadowRadius: 2,
+        borderTopWidth: .8,
+        borderTopColor: "#ccc",
         backgroundColor: "#ffffff",
 
     },
@@ -751,6 +743,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: "#ffffff"
     },
+    teamText: {
+    },
     spreadItem: {
         width: "16.5%",
         borderRightColor: "#e1e2e6",
@@ -777,7 +771,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
     teamHeader: {
-        width: "50%",
+        width: "48%",
+        marginLeft: "2%"
     },
     spreadHeader: {
         width: "16.5%",
@@ -808,7 +803,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         backgroundColor: "#ffffff",
         borderRadius: 20,
-        borderColor: "#CACFD2",
+        borderColor: "#ccc",
         paddingHorizontal: 15,
         paddingVertical: 10,
         borderWidth: .5,

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, ScrollView, TouchableOpacity, Text, Linking, Button, TextInput, StyleSheet, TouchableWithoutFeedback, Keyboard } from 'react-native'
+import { View, TouchableOpacity, Text, Linking, TextInput, StyleSheet, TouchableWithoutFeedback, Keyboard } from 'react-native'
 
 import { FontAwesome5 } from "@expo/vector-icons";
 
@@ -60,7 +60,6 @@ const MAX_LEN = 15,
 
 export class Register extends Component {
 
-
     constructor(props) {
         super(props);
 
@@ -73,7 +72,6 @@ export class Register extends Component {
             location: '',
             userImg: null,
             checked: false,
-
 
         }
 
@@ -142,13 +140,18 @@ export class Register extends Component {
         return (
             <DismissKeyboard>
                 <View style={styles.mainContainer}>
+                    <View style={styles.topContainer}>
+                        <View style={styles.circleContainer}>
+                            <View style={styles.leftCircle}></View>
+                            <View style={styles.rightCircle}></View>
+                        </View>
                     <TouchableOpacity 
-                        style= {{marginTop: "7.5%", marginLeft: '7.5%'}}
+                        style= {{marginTop: "12.5%", marginLeft: '7.5%'}}
                         onPress={() => this.props.navigation.goBack()}
                         >
                         <FontAwesome5 name="chevron-left" size={24} color="#009387" />
                     </TouchableOpacity>
-                    <View style= {{flexDirection: 'row', justifyContent: 'center'}}>
+                    <View style= {{flexDirection: 'row', marginTop: '30%',justifyContent: 'center'}}>
                         <Text style={styles.loadingLogo}>locctocc </Text>
                         <FontAwesome5 name="comment-dollar" color="#009387" size={30} />
                     </View>
@@ -165,6 +168,7 @@ export class Register extends Component {
                         }}> Join the family
                         </Text>
                     </View>
+                </View>
                     <View style={styles.textInputContainer}>
                         <TextInput
                             style={styles.textInput}
@@ -268,6 +272,30 @@ export class Register extends Component {
 };
 
 const styles = StyleSheet.create({
+    leftCircle: {
+        backgroundColor: "#0066cc",
+        width: 200,
+        height: 200,
+        borderRadius: 200,
+        left: -50,
+        right: -50,
+        top: -50,
+    },
+    rightCircle: {
+        backgroundColor: "#009387",
+        width: 400,
+        height: 400,
+        borderRadius: 200,
+        left: 100,
+        right: 200,
+        top: -400,
+    },
+    circleContainer: {
+        flex: 1,
+        top: -50,
+    },
+    topContainer: {
+    },
     textInput: {
         height: 40,
         marginRight: "15%",
@@ -354,7 +382,8 @@ const styles = StyleSheet.create({
         fontSize: 10,
   },
   agreementContainer: {
-      flexDirection: 'row'
+      flexDirection: 'row',
+      paddingBottom: 20,
   }
     
     
