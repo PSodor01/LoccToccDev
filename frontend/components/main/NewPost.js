@@ -280,7 +280,7 @@ const AddPostScreen = ({ route, props }) => {
           <Animated.View style={{margin: 15, 
           opacity: Animated.add(0.1, Animated.multiply(this.fall, 1.0)),
           }}>
-            <Text style={styles.gameText}>{awayTeam} vs {homeTeam}</Text>
+            {awayTeam ? <Text style={styles.gameText}>{awayTeam} vs {homeTeam}</Text> : null}
             <View style={styles.typePostContainer}>
               <Image 
                     style={styles.profilePhotoPostContainer}

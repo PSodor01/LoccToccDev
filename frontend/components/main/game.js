@@ -33,11 +33,18 @@ function game(props) {
     const [awayVote, setAwayVote] = useState("");
     const [homeVote, setHomeVote] = useState("");
     const [drawVote, setDrawVote] = useState("");
+    const [prop, setProp] = useState(false)
 
     const {gameId, gameDate, homeTeam, awayTeam, homeMoneyline, awayMoneyline, homeSpread, awaySpread, homeSpreadOdds, awaySpreadOdds, over, overOdds, under, underOdds, drawMoneyline, sport} = props.route.params;
-    
+    const {propName, outcome1, outcome2, outcome3, outcome4, outcome5, outcome6, outcome7, outcome8, outcome9, outcome10, outcome1Odds, outcome2Odds, outcome3Odds, outcome4Odds, outcome5Odds, outcome6Odds, outcome7Odds, outcome8Odds, outcome9Odds, outcome10Odds,} = props.route.params;
+
     useEffect(() => {
             fetchData()
+            if (propName == null) {
+                setProp(false);
+            } else {
+                setProp(true)
+            }
     }, [props.blocking, props.liked, props.faded, props.route.params.postId, props.users])
 
     const fetchData = () => {
@@ -605,6 +612,7 @@ function game(props) {
     
     return (
         <View style={styles.container}>
+            {prop != true ? 
             <View style={styles.gameContainer}>
                 <View>
                     <Text>{moment(gameDate).format("LT")}</Text> 
@@ -839,6 +847,80 @@ function game(props) {
                     
                 </View>                    
             </View> 
+            :
+            <View style={styles.mainPropContainer}>
+                <TouchableOpacity>
+                    <View style={styles.propContainer}>
+                        <View style={styles.propHeaderContainer}>
+                            <Text style={styles.gameHeaderText}>{propName}</Text>
+                        </View>
+                        <View style={styles.propOddsContainer}>
+                            <View style={styles.propItemLeft}>
+                                <Text>{outcome1}</Text>
+                                <Text style={styles.oddsBottomRowText}>{outcome1Odds}</Text>
+                            </View>
+                            
+                            <View style={styles.propItemRight}>
+                                <Text>{outcome2}</Text>
+                                {outcome2Odds != null ? <Text style={styles.oddsBottomRowText}>{outcome2Odds}</Text> : <Text></Text>}
+                            </View>
+                        </View>
+                        {outcome3 == null ? 
+                        null
+                        :
+                        <View>
+                            <View style={styles.propOddsContainer}>
+                                <View style={styles.extraPropItemLeft}>
+                                    <Text>{outcome3}</Text>
+                                    <Text style={styles.oddsBottomRowText}>{outcome3Odds}</Text>
+                                </View>
+                                <View style={styles.extraPropItemRight}>
+                                    <Text>{outcome4}</Text>
+                                    <Text style={styles.oddsBottomRowText}>{outcome4Odds}</Text> 
+                                </View>
+                            </View>
+                            <View style={styles.propOddsContainer}>
+                                <View style={styles.extraPropItemLeft}>
+                                    <Text>{outcome5}</Text>
+                                    <Text style={styles.oddsBottomRowText}>{outcome5Odds}</Text>
+                                </View>
+                                <View style={styles.extraPropItemRight}>
+                                    <Text>{outcome6}</Text>
+                                    <Text style={styles.oddsBottomRowText}>{outcome6Odds}</Text> 
+                                </View>
+                            </View>
+                            <View style={styles.propOddsContainer}>
+                                <View style={styles.extraPropItemLeft}>
+                                    <Text>{outcome7}</Text>
+                                    <Text style={styles.oddsBottomRowText}>{outcome7Odds}</Text>
+                                </View>
+                                <View style={styles.extraPropItemRight}>
+                                    {outcome8 == null ? <Text></Text> : <Text>{outcome8}</Text>}
+                                    {outcome8 == null ? <Text></Text> : <Text style={styles.oddsBottomRowText}>{outcome8Odds}</Text>}
+                                </View>
+                            </View>
+                        </View>
+                        }
+                        {outcome9 == null ? 
+                        null
+                        :
+                        <View>
+                            <View style={styles.propOddsContainer}>
+                                <View style={styles.extraPropItemLeft}>
+                                    <Text>{outcome9}</Text>
+                                    <Text style={styles.oddsBottomRowText}>{outcome9Odds}</Text>
+                                </View>
+                                <View style={styles.extraPropItemRight}>
+                                    <Text>{outcome10}</Text>
+                                    <Text style={styles.oddsBottomRowText}>{outcome10Odds}</Text>
+                                </View>
+                            </View>
+                        </View>
+                        }
+                    </View>
+                </TouchableOpacity>
+            </View>
+            }
             <View style={styles.sortContainer}>
                 <Text style={styles.sortText}>Sort: </Text>
                 <TouchableOpacity 
@@ -873,7 +955,7 @@ function game(props) {
             <View style={styles.adView}>
                 <AdMobBanner
                     bannerSize="banner"
-                    adUnitID="ca-app-pub-3940256099942544/2934735716" // Real ID: 8519029912093094/5150749785, test ID: 3940256099942544/2934735716
+                    adUnitID="ca-app-pub-8519029912093094/5150749785" // Real ID: 8519029912093094/5150749785, test ID: 3940256099942544/2934735716
                     servePersonalizedAds // true or false
                 />
             </View>
@@ -1090,7 +1172,51 @@ const styles = StyleSheet.create({
         color: "#B3B6B7",
         fontSize: 12
 
-    }
+    },
+    propContainer: {
+    },
+    propOddsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-evenly'
+    },
+    mainPropContainer: {
+        borderBottomWidth: .8,
+        borderBottomColor: "#ccc",
+        backgroundColor: "#ffffff",
+        marginHorizontal:"5%",
+    },
+    propHeaderContainer: {
+        alignItems: 'center',
+        paddingTop: 8,
+    },
+    propItemRight: {
+        alignItems: 'center',
+        paddingBottom: 10,
+        width: "50%"
+    },
+    propItemLeft: {
+        alignItems: 'center',
+        paddingBottom: 10,
+        width: "50%",
+        borderRightColor: "#e1e2e6",
+        borderRightWidth: 1,
+    },
+    extraPropItemRight: {
+        alignItems: 'center',
+        paddingBottom: 10,
+        width: "50%",
+        borderTopColor: "#e1e2e6",
+        borderTopWidth: 1,
+    },
+    extraPropItemLeft: {
+        alignItems: 'center',
+        paddingBottom: 10,
+        width: "50%",
+        borderTopColor: "#e1e2e6",
+        borderTopWidth: 1,
+        borderRightColor: "#e1e2e6",
+        borderRightWidth: 1,
+    },
     
 })
 

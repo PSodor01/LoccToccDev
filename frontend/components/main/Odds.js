@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, useWindowDimensions, Alert, TextInput, Dimensions, FlatList, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, useWindowDimensions, Alert, ScrollView, TextInput, Dimensions, FlatList, TouchableOpacity } from 'react-native';
 import { TabView, TabBar, SceneMap } from 'react-native-tab-view';
 
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
@@ -35,7 +35,8 @@ function Odds(props) {
     const [trendingGames, setTrendingGames] = useState([]);
     const [notification, setNotification] = useState('');
     const [notificationCriteria, setNotificationCriteria] = useState(false);
-    const [bannerId, setBannerId] = useState('ca-app-pub-3940256099942544/2934735716')
+    const [bannerId, setBannerId] = useState('ca-app-pub-8519029912093094/7298151920') //test id: 3940256099942544/2934735716
+    const [sbProps, setsbProps] = useState([]);
 
      useEffect(() => {
         fetchData()
@@ -145,7 +146,6 @@ function Odds(props) {
         }
         seteplGames(props.eplGames)
 
-                 
         setLoading(false)
 
        array1 = props.nflGames
@@ -264,12 +264,13 @@ function Odds(props) {
     }
     
     const setSportFunction = (sport) => {
-        if (sport == 'Trending') {setSportGames(trendingGames); setSport('Trending'); setBannerId('ca-app-pub-3940256099942544/2934735716')} // Real ID: 8519029912093094/4907013689, test ID: 3940256099942544/2934735716
-        if (sport == 'NFL') {setSportGames(props.nflGames); setSport('NFL'); setBannerId('ca-app-pub-3940256099942544/2934735716')} // Real ID: 8519029912093094/7298151920, test ID: 3940256099942544/2934735716
-        if (sport == 'NBA') {setSportGames(props.nbaGames); setSport('NBA'); setBannerId('ca-app-pub-3940256099942544/2934735716')} // Real ID: 8519029912093094/2973755922, test ID: 3940256099942544/2934735716
-        if (sport == 'NHL') {setSportGames(props.nhlGames); setSport('NHL'); setBannerId('ca-app-pub-3940256099942544/2934735716')} // Real ID: 8519029912093094/4095265900, test ID: 3940256099942544/2934735716
-        if (sport == 'NCAAB') {setSportGames(props.ncaabGames); setSport('NCAAB'); setBannerId('ca-app-pub-3940256099942544/2934735716')} // Real ID: 8519029912093094/8772877514, test ID: 3940256099942544/2934735716
-        if (sport == 'EPL') {setSportGames(props.eplGames); setSport('EPL'); setBannerId('ca-app-pub-3940256099942544/2934735716')} // Real ID: 8519029912093094/8198162447, test ID: 3940256099942544/2934735716
+        if (sport == 'Trending') {setSportGames(trendingGames); setSport('Trending'); setBannerId('ca-app-pub-8519029912093094/4907013689')} // Real ID: 8519029912093094/4907013689, test ID: 3940256099942544/2934735716
+        if (sport == 'NFL') {setSportGames(props.nflGames); setSport('NFL'); setBannerId('ca-app-pub-8519029912093094/7298151920')} // Real ID: 8519029912093094/7298151920, test ID: 3940256099942544/2934735716
+        if (sport == 'NBA') {setSportGames(props.nbaGames); setSport('NBA'); setBannerId('ca-app-pub-8519029912093094/2973755922')} // Real ID: 8519029912093094/2973755922, test ID: 3940256099942544/2934735716
+        if (sport == 'NHL') {setSportGames(props.nhlGames); setSport('NHL'); setBannerId('ca-app-pub-8519029912093094/4095265900')} // Real ID: 8519029912093094/4095265900, test ID: 3940256099942544/2934735716
+        if (sport == 'NCAAB') {setSportGames(props.ncaabGames); setSport('NCAAB'); setBannerId('ca-app-pub-8519029912093094/8772877514')} // Real ID: 8519029912093094/8772877514, test ID: 3940256099942544/2934735716
+        if (sport == 'EPL') {setSportGames(props.eplGames); setSport('EPL'); setBannerId('ca-app-pub-8519029912093094/8198162447')} // Real ID: 8519029912093094/8198162447, test ID: 3940256099942544/2934735716
+        if (sport == 'SB Props') {setSportGames('sbProps'); setSport(null); setBannerId('ca-app-pub-8519029912093094/8198162447')}
     }
 
     const nbaIcon = (<Icon name="basketball-outline" color="#ee6730" size={16}/>);
@@ -278,6 +279,7 @@ function Odds(props) {
     const ncaabIcon = (<MaterialCommunityIcons name="basketball-hoop-outline" color="#0033cc" size={16}/>);
     const eplIcon = (<MaterialCommunityIcons name="soccer" color="black" size={16}/>);
     const trendingIcon = (<MaterialCommunityIcons name="trending-up" color="#00FF00" size={16}/>);
+    const propsIcon = (<MaterialCommunityIcons name= "trophy" color="#ffd700" size={16}/>)
 
     const sportsList = [
         {
@@ -291,25 +293,156 @@ function Odds(props) {
             icon: nflIcon
         },
         {
-            sport: 'NBA',
+            sport: 'SB Props',
             id: '3',
+            icon: propsIcon
+        },
+        {
+            sport: 'NBA',
+            id: '4',
             icon: nbaIcon
         },
         {
             sport: 'NCAAB',
-            id: '4',
+            id: '5',
             icon: ncaabIcon
         },
         {
             sport: 'NHL',
-            id: '5',
+            id: '6',
             icon: nhlIcon
         },
         {
             sport: 'EPL',
-            id: '6',
+            id: '7',
             icon: eplIcon
         },
+      ];
+
+      const propsList = [
+        {
+            propName: 'Coin Toss Outcome',
+            id: '1',
+            outcome1: 'Heads',
+            outcome2: 'Tails',
+            outcome1Odds: -105,
+            outcome2Odds: -105,
+        },
+        {
+            propName: 'Coin Toss Winner',
+            id: '2',
+            outcome1: 'CIN Bengals',
+            outcome2: 'LA Rams',
+            outcome1Odds: -105,
+            outcome2Odds: -105,
+        },
+        {
+            propName: 'National Anthem Length: 99.5 Seconds',
+            id: '3',
+            outcome1: 'Over',
+            outcome2: 'Under',
+            outcome1Odds: -147,
+            outcome2Odds: "+110",
+        },
+        {
+            propName: 'Color of Gatorade Poured on Winning Coach',
+            id: '4',
+            outcome1: 'Clear/Water',
+            outcome2: 'Orange',
+            outcome3: 'Yellow/Green',
+            outcome4: 'Blue',
+            outcome5: 'None',
+            outcome6: 'Red/Pink',
+            outcome7: 'Purple',
+            outcome1Odds: '+250',
+            outcome2Odds: '+300',
+            outcome3Odds: '+350',
+            outcome4Odds: '+400',
+            outcome5Odds: '+600',
+            outcome6Odds: '+1200',
+            outcome7Odds: '+1400',
+        },
+        {
+            propName: 'Any Kick to Hit Uprights',
+            id: '5',
+            outcome1: 'Yes',
+            outcome2: 'No',
+            outcome1Odds: "+400",
+            outcome2Odds: -550,
+        },
+        {
+            propName: 'Any Non-QB to Throw a TD Pass',
+            id: '6',
+            outcome1: 'Yes',
+            outcome2: 'No',
+            outcome1Odds: "+1400",
+            outcome2Odds: null,
+        },
+        {
+            propName: 'Any offensive lineman to score a TD',
+            id: '7',
+            outcome1: 'Yes',
+            outcome2: 'No',
+            outcome1Odds: "+2200",
+            outcome2Odds: null,
+        },
+        {
+            propName: 'Game to End in Walk Off FG in regulation',
+            id: '8',
+            outcome1: 'Yes',
+            outcome2: 'No',
+            outcome1Odds: "+500",
+            outcome2Odds: null,
+        },
+        {
+            propName: 'MVP',
+            id: '9',
+            outcome1: 'Matthew Stafford',
+            outcome2: 'Joe Burrow',
+            outcome3: 'Cooper Kupp',
+            outcome4: 'Aaron Donald',
+            outcome5: "Ja'Marr Chase",
+            outcome6: 'Odell Beckham Jr.',
+            outcome7: 'Cam Akers',
+            outcome8: 'Tee Higgins',
+            outcome9: 'Von Miller',
+            outcome10: 'Joe Mixon',
+            outcome1Odds: '+100',
+            outcome2Odds: '+225',
+            outcome3Odds: '+600',
+            outcome4Odds: '+1600',
+            outcome5Odds: '+1800',
+            outcome6Odds: '+2800',
+            outcome7Odds: '+3500',
+            outcome8Odds: '+4500',
+            outcome9Odds: '+4500',
+            outcome10Odds: '+4500',
+
+        },
+        {
+            propName: 'First Song to be Played during Halftime Show',
+            id: '10',
+            outcome1: 'California Love',
+            outcome2: 'Family Affair',
+            outcome3: 'The Next Episode',
+            outcome4: 'Still D.R.E',
+            outcome5: "Nuthin' But a G' Thang",
+            outcome6: 'Lose Yourself',
+            outcome7: "Drop It LIke It's Hot",
+            outcome8: 'All The Stars',
+            outcome9: 'Humble',
+            outcome1Odds: '+270',
+            outcome2Odds: '+500',
+            outcome3Odds: '+550',
+            outcome4Odds: '+550',
+            outcome5Odds: '+650',
+            outcome6Odds: '+700',
+            outcome7Odds: '+750',
+            outcome8Odds: '+1000',
+            outcome9Odds: '+1000',
+
+        },
+        
       ];
 
     /*const interstitial = async () => {
@@ -360,7 +493,109 @@ function Odds(props) {
         
         
     );
+
+    const renderPropItem = ({ item }) => (
+        <View style={styles.mainPropContainer}>
+            <TouchableOpacity
+                onPress={() => props.navigation.navigate('game', 
+                    {gameId: item.id, 
+                    propName: item.propName, 
+                    outcome1: item.outcome1,
+                    outcome2: item.outcome2, 
+                    outcome3: item.outcome3, 
+                    outcome4: item.outcome4, 
+                    outcome5: item.outcome5, 
+                    outcome6: item.outcome6, 
+                    outcome7: item.outcome7, 
+                    outcome8: item.outcome8, 
+                    outcome9: item.outcome9, 
+                    outcome10: item.outcome10,
+                    outcome1Odds: item.outcome1Odds,
+                    outcome2Odds: item.outcome2Odds, 
+                    outcome3Odds: item.outcome3Odds, 
+                    outcome4Odds: item.outcome4Odds, 
+                    outcome5Odds: item.outcome5Odds, 
+                    outcome6Odds: item.outcome6Odds, 
+                    outcome7Odds: item.outcome7Odds, 
+                    outcome8Odds: item.outcome8Odds, 
+                    outcome9Odds: item.outcome9Odds, 
+                    outcome10Odds: item.outcome10Odds,  
+                    })}>
+                <View style={styles.propContainer}>
+                    <View style={styles.propHeaderContainer}>
+                        <Text style={styles.gameHeaderText}>{item.propName}</Text>
+                    </View>
+                    <View style={styles.propOddsContainer}>
+                        <View style={styles.propItemLeft}>
+                            <Text>{item.outcome1}</Text>
+                            <Text style={styles.oddsBottomRowText}>{item.outcome1Odds}</Text>
+                        </View>
+                        
+                        <View style={styles.propItemRight}>
+                            <Text>{item.outcome2}</Text>
+                            {item.outcome2Odds != null ? <Text style={styles.oddsBottomRowText}>{item.outcome2Odds}</Text> : <Text></Text>}
+                        </View>
+                    </View>
+                    {item.outcome3 == null ? 
+                    null
+                    :
+                    <View>
+                        <View style={styles.propOddsContainer}>
+                            <View style={styles.extraPropItemLeft}>
+                                <Text>{item.outcome3}</Text>
+                                <Text style={styles.oddsBottomRowText}>{item.outcome3Odds}</Text>
+                            </View>
+                            <View style={styles.extraPropItemRight}>
+                                <Text>{item.outcome4}</Text>
+                                <Text style={styles.oddsBottomRowText}>{item.outcome4Odds}</Text> 
+                            </View>
+                        </View>
+                        <View style={styles.propOddsContainer}>
+                            <View style={styles.extraPropItemLeft}>
+                                <Text>{item.outcome5}</Text>
+                                <Text style={styles.oddsBottomRowText}>{item.outcome5Odds}</Text>
+                            </View>
+                            <View style={styles.extraPropItemRight}>
+                                <Text>{item.outcome6}</Text>
+                                <Text style={styles.oddsBottomRowText}>{item.outcome6Odds}</Text> 
+                            </View>
+                        </View>
+                        <View style={styles.propOddsContainer}>
+                            <View style={styles.extraPropItemLeft}>
+                                <Text>{item.outcome7}</Text>
+                                <Text style={styles.oddsBottomRowText}>{item.outcome7Odds}</Text>
+                            </View>
+                            <View style={styles.extraPropItemRight}>
+                                {item.outcome8 == null ? <Text></Text> : <Text>{item.outcome8}</Text>}
+                                {item.outcome8 == null ? <Text></Text> : <Text style={styles.oddsBottomRowText}>{item.outcome8Odds}</Text>}
+                            </View>
+                        </View>
+                    </View>
+                    }
+                    {item.outcome9 == null ? 
+                    null
+                    :
+                    <View>
+                        <View style={styles.propOddsContainer}>
+                            <View style={styles.extraPropItemLeft}>
+                                <Text>{item.outcome9}</Text>
+                                <Text style={styles.oddsBottomRowText}>{item.outcome9Odds}</Text>
+                            </View>
+                            <View style={styles.extraPropItemRight}>
+                                {item.outcome10 == null ? <Text></Text> : <Text>{item.outcome10}</Text>}
+                                {item.outcome10 == null ? <Text></Text> : <Text style={styles.oddsBottomRowText}>{item.outcome10Odds}</Text>}
+                            </View>
+                        </View>
+                    </View>
+                    }
+                </View>
+            </TouchableOpacity>
+        </View>
         
+        
+    );
+
+      
     const renderItem = ({ item }) => {
         return (
             <View>
@@ -622,7 +857,16 @@ function Odds(props) {
                     <Text style={styles.gameHeaderText}>Total</Text>
                 </View>
             </View>
-            {sportGames == trendingGames ?
+            {
+                sportGames == 'sbProps' ? 
+                <FlatList 
+                    data = {propsList}
+                    style={styles.feed}
+                    renderItem={renderPropItem}
+    
+                />
+            :
+                sportGames == trendingGames ?
                 <FlatList 
                 data = {sportGames.sort((a, b) => parseFloat(b.gamePostsCount) - parseFloat(a.gamePostsCount)).slice(0, 10)}
                 style={styles.feed}
@@ -630,6 +874,7 @@ function Odds(props) {
     
             />
             :
+            
             sportGames == props.eplGames ?
             <FlatList 
                 data={sportGames}
@@ -687,7 +932,6 @@ const styles = StyleSheet.create({
         borderTopWidth: .8,
         borderTopColor: "#ccc",
         backgroundColor: "#ffffff",
-
     },
     eplGameContainer: {
         padding: 6,
@@ -885,7 +1129,52 @@ const styles = StyleSheet.create({
     notificationContainer: {
         paddingBottom: 5
 
+    },
+    propContainer: {
+    },
+    propOddsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-evenly'
+    },
+    mainPropContainer: {
+        borderTopWidth: .8,
+        borderTopColor: "#ccc",
+        backgroundColor: "#ffffff",
+        marginHorizontal:"5%",
+    },
+    propHeaderContainer: {
+        alignItems: 'center',
+        paddingTop: 8,
+    },
+    propItemRight: {
+        alignItems: 'center',
+        paddingBottom: 10,
+        width: "50%"
+    },
+    propItemLeft: {
+        alignItems: 'center',
+        paddingBottom: 10,
+        width: "50%",
+        borderRightColor: "#e1e2e6",
+        borderRightWidth: 1,
+    },
+    extraPropItemRight: {
+        alignItems: 'center',
+        paddingBottom: 10,
+        width: "50%",
+        borderTopColor: "#e1e2e6",
+        borderTopWidth: 1,
+    },
+    extraPropItemLeft: {
+        alignItems: 'center',
+        paddingBottom: 10,
+        width: "50%",
+        borderTopColor: "#e1e2e6",
+        borderTopWidth: 1,
+        borderRightColor: "#e1e2e6",
+        borderRightWidth: 1,
     }
+    
     
     
     
