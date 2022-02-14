@@ -10,6 +10,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import moment from 'moment';
 
 import {AdMobBanner} from 'expo-ads-admob'
+import Constants from 'expo-constants'
 
 import ShareButton from '../buttons/ShareButton'
 
@@ -90,6 +91,10 @@ function Comment(props, route) {
         }
     }
 
+    const testID = 'ca-app-pub-3940256099942544/2934735716';
+    const productionID = 'ca-app-pub-8519029912093094/9708977287';
+    // Is a real device and running in production.
+    const adUnitID = Constants.isDevice && !__DEV__ ? productionID : testID;
 
     const handleReportPostEmail = () => {
         const to = ['ReportPost@locctocc.com'] // string or array of email addresses
@@ -204,7 +209,7 @@ function Comment(props, route) {
             <View style={styles.adView}>
                 <AdMobBanner
                     bannerSize="banner"
-                    adUnitID="ca-app-pub-8519029912093094/9708977287" // Real ID: 8519029912093094/9708977287, test ID: 3940256099942544/2934735716
+                    adUnitID={adUnitID} // Real ID: 8519029912093094/9708977287, test ID: 3940256099942544/2934735716
                     servePersonalizedAds // true or false
                 />
             </View>

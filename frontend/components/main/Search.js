@@ -4,6 +4,7 @@ import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Image } 
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 
 import {AdMobBanner} from 'expo-ads-admob'
+import Constants from 'expo-constants'
 
 import firebase from 'firebase'
 require("firebase/firestore")
@@ -38,6 +39,7 @@ function Search(props) {
                             source={{uri: item.name ? item.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
                         />
                         <Text style={styles.searchResultsText}>{item.name}</Text>
+                        <Text>{item.token}</Text>
                     </TouchableOpacity>
                 </View> }
             </View>
@@ -70,6 +72,11 @@ function Search(props) {
             setBrowse(true)
         }
     }
+
+    const testID = 'ca-app-pub-3940256099942544/2934735716';
+    const productionID = 'ca-app-pub-8519029912093094/1666835736';
+    // Is a real device and running in production.
+    const adUnitID = Constants.isDevice && !__DEV__ ? productionID : testID;
 
    
     
@@ -114,7 +121,7 @@ function Search(props) {
             <View style={styles.adView}>
                 <AdMobBanner
                     bannerSize="banner"
-                    adUnitID="ca-app-pub-8519029912093094/1666835736" // Real ID: 8519029912093094/1666835736, test ID: 3940256099942544/2934735716
+                    adUnitID={adUnitID} // Real ID: 8519029912093094/1666835736, test ID: 3940256099942544/2934735716
                     servePersonalizedAds // true or false
                 />
             </View>

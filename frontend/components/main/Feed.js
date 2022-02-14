@@ -20,6 +20,7 @@ import { bindActionCreators } from 'redux'
 import { fetchUsersData } from '../../redux/actions/index'
 
 import {AdMobBanner} from 'expo-ads-admob'
+import Constants from 'expo-constants'
 
 
 
@@ -254,8 +255,7 @@ function Feed(props) {
                     let data = snapshot.data();
 
                     const token = data.token
-                    const email = data.email
-                    console.log(data.email)
+                    
  
                     if (token != undefined) {
                         const likeName = props.currentUser.name
@@ -292,6 +292,11 @@ function Feed(props) {
                 }
             })
     };
+
+    const testID = 'ca-app-pub-3940256099942544/2934735716';
+    const productionID = 'ca-app-pub-8519029912093094/5453808592';
+    // Is a real device and running in production.
+    const adUnitID = Constants.isDevice && !__DEV__ ? productionID : testID;
 
     const handleReportPostEmail = () => {
         const to = ['ReportPost@locctocc.com'] // string or array of email addresses
@@ -605,7 +610,7 @@ function Feed(props) {
             <View style={styles.adView}>
                 <AdMobBanner
                     bannerSize="banner"
-                    adUnitID="ca-app-pub-8519029912093094/5453808592" // Real ID: 8519029912093094/5453808592, test ID: 3940256099942544/2934735716
+                    adUnitID={adUnitID} // Real ID: 8519029912093094/5453808592, test ID: 3940256099942544/2934735716
                     servePersonalizedAds // true or false
                 />
             </View>

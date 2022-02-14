@@ -9,6 +9,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import moment from 'moment'
 
 import { AdMobBanner } from 'expo-ads-admob'
+import Constants from 'expo-constants'
 
 import { useNavigation } from '@react-navigation/native';
 
@@ -459,6 +460,10 @@ function game(props) {
 
     }
 
+    const testID = 'ca-app-pub-3940256099942544/2934735716';
+    const productionID = 'ca-app-pub-8519029912093094/5150749785';
+    // Is a real device and running in production.
+    const adUnitID = Constants.isDevice && !__DEV__ ? productionID : testID;
 
     const handleReportPostEmail = (name, caption) => {
         const to = ['ReportPost@locctocc.com'] // string or array of email addresses
@@ -955,7 +960,7 @@ function game(props) {
             <View style={styles.adView}>
                 <AdMobBanner
                     bannerSize="banner"
-                    adUnitID="ca-app-pub-8519029912093094/5150749785" // Real ID: 8519029912093094/5150749785, test ID: 3940256099942544/2934735716
+                    adUnitID={adUnitID}// Real ID: 8519029912093094/5150749785, test ID: 3940256099942544/2934735716
                     servePersonalizedAds // true or false
                 />
             </View>
