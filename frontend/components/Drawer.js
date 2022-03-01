@@ -8,6 +8,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 
 
@@ -152,8 +153,8 @@ export function DrawerContent(props) {
                 />
                 <DrawerItem 
                     icon={({color, size}) => (
-                        <FontAwesome5
-                        name="user-shield"
+                        <MaterialCommunityIcons
+                        name="shield-lock"
                         color={color}
                         size={size}/>
                     )}

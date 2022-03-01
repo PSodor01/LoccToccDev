@@ -23,7 +23,6 @@ import {AdMobBanner} from 'expo-ads-admob'
 import Constants from 'expo-constants'
 
 
-
 function Feed(props) {
     const [loading, setLoading] = useState(true);
     const [allPosts, setAllPosts] = useState([]);

@@ -46,6 +46,7 @@ import NewPostScreen from './components/main/NewPost'
 import NewCommentScreen from './components/main/NewComment'
 import EditProfileScreen from './components/main/EditProfile'
 import Feed from './components/main/Feed'
+import Research from './components/main/Research'
 import Search from './components/main/Search'
 import Profile from './components/main/Profile'
 import AboutUsScreen from './components/main/AboutUs'
@@ -120,6 +121,7 @@ const MainStackScreen = ({navigation, props}) => (
         })} 
           />
       <MainStack.Screen name="Search" component={Search}/>
+      <MainStack.Screen name="Research" component={Research}/>
       <MainStack.Screen name="Profile" component={Profile}
         options={{
           headerTitle: () => (

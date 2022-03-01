@@ -96,7 +96,7 @@ exports.getMLBGameData = functions.pubsub.schedule('every 5 minutes').onRun(asyn
             overOdds: game.bookmakers[0].markets[2].outcomes[0].price,
             underOdds: game.bookmakers[0].markets[2].outcomes[1].price,
             
-        })
+        }, { merge:true });
 
         } else {
           const writeResult = admin
@@ -120,7 +120,7 @@ exports.getMLBGameData = functions.pubsub.schedule('every 5 minutes').onRun(asyn
             overOdds: game.bookmakers[0].markets[2].outcomes[0].price,
             underOdds: game.bookmakers[0].markets[2].outcomes[1].price,
            
-        })
+        }, { merge:true });
 
         }
 
@@ -159,7 +159,7 @@ exports.getNFLGameData = functions.pubsub.schedule('every 5 minutes').onRun(asyn
               under: game.bookmakers[0].markets[2].outcomes[1].point,
               overOdds: game.bookmakers[0].markets[2].outcomes[0].price,
               underOdds: game.bookmakers[0].markets[2].outcomes[1].price,
-          })
+          }, { merge:true });
 
           } else {
             const writeResult = admin
@@ -182,7 +182,7 @@ exports.getNFLGameData = functions.pubsub.schedule('every 5 minutes').onRun(asyn
               under: game.bookmakers[0].markets[2].outcomes[1].point,
               overOdds: game.bookmakers[0].markets[2].outcomes[0].price,
               underOdds: game.bookmakers[0].markets[2].outcomes[1].price,
-          })
+          }, { merge:true });
 
           }
 
@@ -221,7 +221,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
               under: game.bookmakers[0].markets[2].outcomes[1].point,
               overOdds: game.bookmakers[0].markets[2].outcomes[0].price,
               underOdds: game.bookmakers[0].markets[2].outcomes[1].price,
-          })
+          }, { merge:true });
 
           } else {
             const writeResult = admin
@@ -244,7 +244,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
               under: game.bookmakers[0].markets[2].outcomes[1].point,
               overOdds: game.bookmakers[0].markets[2].outcomes[0].price,
               underOdds: game.bookmakers[0].markets[2].outcomes[1].price,
-          })
+          }, { merge:true });
 
           }
 
@@ -285,7 +285,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
               under: game.bookmakers[i].markets[2].outcomes[1].point,
               overOdds: game.bookmakers[i].markets[2].outcomes[0].price,
               underOdds: game.bookmakers[i].markets[2].outcomes[1].price,
-          })
+          }, { merge:true });
 
           } else {
             const writeResult = admin
@@ -308,7 +308,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
               under: game.bookmakers[i].markets[2].outcomes[1].point,
               overOdds: game.bookmakers[i].markets[2].outcomes[0].price,
               underOdds: game.bookmakers[i].markets[2].outcomes[1].price,
-          })
+          }, { merge:true });
 
           }
 
@@ -317,6 +317,44 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
       })
   }catch(err) {console.error(err.message)}
 
+  })
+
+  exports.getNBAScoresData = functions.pubsub.schedule('every 5 minutes').onRun(async() => {
+    try {
+      const response = await axios.get('https://api.the-odds-api.com/v4/sports/basketball_nba/scores/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&dateFormat=iso')
+      .then(result => {
+        result.data.forEach(game => {
+  
+          if (game.away_team == game.scores[0].name) {
+  
+            const writeResult = admin
+            .firestore()
+            .collection("nba")
+            .doc(game.id)
+            .set({
+              awayScore: game.scores[0].score,
+              homeScore: game.scores[1].score,
+              
+            }, { merge:true });
+  
+          } else {
+            const writeResult = admin
+            .firestore()
+            .collection("nba")
+            .doc(game.id)
+            .set({
+              awayScore: game.scores[1].score,
+              homeScore: game.scores[0].score,
+             
+          }, { merge:true });
+  
+          }
+  
+          
+        })
+      })
+  }catch(err) {console.error(err.message)}
+  
   })
 
   exports.getNCAABGameData = functions.pubsub.schedule('every 5 minutes').onRun(async() => {
@@ -335,7 +373,6 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
               .doc(game.id)
               .set({
                 gameId: game.id,
-                asite: game.bookmakers[i].key,
                 sport: game.sport_key,
                 gameDate: game.commence_time,
                 awayTeam: game.away_team,
@@ -350,7 +387,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
                 under: game.bookmakers[i].markets[2].outcomes[1].point,
                 overOdds: game.bookmakers[i].markets[2].outcomes[0].price,
                 underOdds: game.bookmakers[i].markets[2].outcomes[1].price,
-            })
+            }, { merge:true });
   
             } else {
               const writeResult = admin
@@ -359,7 +396,6 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
               .doc(game.id)
               .set({
                 gameId: game.id,
-                asite: game.bookmakers[i].key,
                 sport: game.sport_key,
                 gameDate: game.commence_time,
                 awayTeam: game.away_team,
@@ -374,7 +410,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
                 under: game.bookmakers[i].markets[2].outcomes[1].point,
                 overOdds: game.bookmakers[i].markets[2].outcomes[0].price,
                 underOdds: game.bookmakers[i].markets[2].outcomes[1].price,
-            })
+            }, { merge:true });
   
             }
           } else {
@@ -385,6 +421,44 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
       })
   }catch(err) {console.error(err.message)}
 
+  })
+
+  exports.getNCAABScoresData = functions.pubsub.schedule('every 5 minutes').onRun(async() => {
+    try {
+      const response = await axios.get('https://api.the-odds-api.com/v4/sports/basketball_ncaab/scores/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&dateFormat=iso')
+      .then(result => {
+        result.data.forEach(game => {
+  
+          if (game.away_team == game.scores[0].name) {
+  
+            const writeResult = admin
+            .firestore()
+            .collection("ncaab")
+            .doc(game.id)
+            .set({
+              awayScore: game.scores[0].score,
+              homeScore: game.scores[1].score,
+              
+            }, { merge:true });
+  
+          } else {
+            const writeResult = admin
+            .firestore()
+            .collection("ncaab")
+            .doc(game.id)
+            .set({
+              awayScore: game.scores[1].score,
+              homeScore: game.scores[0].score,
+             
+          }, { merge:true });
+  
+          }
+  
+          
+        })
+      })
+  }catch(err) {console.error(err.message)}
+  
   })
 
   exports.getEPLGameData = functions.pubsub.schedule('every 5 minutes').onRun(async() => {
@@ -409,7 +483,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
               homeMoneyline: game.bookmakers[0].markets[0].outcomes[1].price,
               drawMoneyline: game.bookmakers[0].markets[0].outcomes[2].price,
               
-          })
+          }, { merge:true });
   
           } else {
             const writeResult = admin
@@ -426,7 +500,45 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
               homeMoneyline: game.bookmakers[0].markets[0].outcomes[0].price,
               drawMoneyline: game.bookmakers[0].markets[0].outcomes[2].price,
              
-          })
+          }, { merge:true });
+  
+          }
+  
+          
+        })
+      })
+  }catch(err) {console.error(err.message)}
+  
+  })
+
+  exports.getEPLScoresData = functions.pubsub.schedule('every 5 minutes').onRun(async() => {
+    try {
+      const response = await axios.get('https://api.the-odds-api.com/v4/sports/soccer_epl/scores/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&dateFormat=iso')
+      .then(result => {
+        result.data.forEach(game => {
+  
+          if (game.away_team == game.scores[0].name) {
+  
+            const writeResult = admin
+            .firestore()
+            .collection("epl")
+            .doc(game.id)
+            .set({
+              awayScore: game.scores[0].score,
+              homeScore: game.scores[1].score,
+              
+            }, { merge:true });
+  
+          } else {
+            const writeResult = admin
+            .firestore()
+            .collection("epl")
+            .doc(game.id)
+            .set({
+              awayScore: game.scores[1].score,
+              homeScore: game.scores[0].score,
+             
+          }, { merge:true });
   
           }
   
@@ -453,7 +565,6 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
               .doc(game.id)
               .set({
                 gameId: game.id,
-                asite: game.bookmakers[i].key,
                 sport: game.sport_key,
                 gameDate: game.commence_time,
                 awayTeam: game.away_team,
@@ -468,7 +579,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
                 under: game.bookmakers[i].markets[2].outcomes[1].point,
                 overOdds: game.bookmakers[i].markets[2].outcomes[0].price,
                 underOdds: game.bookmakers[i].markets[2].outcomes[1].price,
-            })
+            }, { merge:true });
   
             } else {
               const writeResult = admin
@@ -477,7 +588,6 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
               .doc(game.id)
               .set({
                 gameId: game.id,
-                asite: game.bookmakers[i].key,
                 sport: game.sport_key,
                 gameDate: game.commence_time,
                 awayTeam: game.away_team,
@@ -492,7 +602,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
                 under: game.bookmakers[i].markets[2].outcomes[1].point,
                 overOdds: game.bookmakers[i].markets[2].outcomes[0].price,
                 underOdds: game.bookmakers[i].markets[2].outcomes[1].price,
-            })
+            }, { merge:true });
   
             }
           } else {
@@ -503,6 +613,44 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
       })
   }catch(err) {console.error(err.message)}
 
+  })
+
+  exports.getNHLScoresData = functions.pubsub.schedule('every 5 minutes').onRun(async() => {
+    try {
+      const response = await axios.get('https://api.the-odds-api.com/v4/sports/icehockey_nhl/scores/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&dateFormat=iso')
+      .then(result => {
+        result.data.forEach(game => {
+  
+          if (game.away_team == game.scores[0].name) {
+  
+            const writeResult = admin
+            .firestore()
+            .collection("nhl")
+            .doc(game.id)
+            .set({
+              awayScore: game.scores[0].score,
+              homeScore: game.scores[1].score,
+              
+            }, { merge:true });
+  
+          } else {
+            const writeResult = admin
+            .firestore()
+            .collection("nhl")
+            .doc(game.id)
+            .set({
+              awayScore: game.scores[1].score,
+              homeScore: game.scores[0].score,
+             
+          }, { merge:true });
+  
+          }
+  
+          
+        })
+      })
+  }catch(err) {console.error(err.message)}
+  
   })
 
   exports.deleteNFLGameData = functions.pubsub.schedule('00 11 * * *').timeZone('America/New_York').onRun(async() => {

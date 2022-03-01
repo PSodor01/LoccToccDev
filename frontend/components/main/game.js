@@ -1024,13 +1024,13 @@ const styles = StyleSheet.create({
         fontSize: 12,
     },
     teamItem: {
-        width: "50%",
+        width: "55%",
         borderRightColor: "#e1e2e6",
         borderRightWidth: 1,
         justifyContent: 'center',
     },
     spreadItem: {
-        width: "16.5%",
+        width: "15%",
         borderRightColor: "#e1e2e6",
         borderRightWidth: 1,
         alignItems: 'center',
@@ -1038,7 +1038,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     moneylineItem: {
-        width: "16.5%",
+        width: "15%",
         borderRightColor: "#e1e2e6",
         borderRightWidth: 1,
         alignItems: 'center',
@@ -1046,7 +1046,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     totalItem: {
-        width: "16.5%",
+        width: "15%",
         alignItems: 'center',
         paddingTop: 2,
         justifyContent: 'center',

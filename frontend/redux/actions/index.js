@@ -1,4 +1,4 @@
-import { USER_STATE_CHANGE, ALL_USERS_STATE_CHANGE, USER_BLOCKING_STATE_CHANGE, LIKES_STATE_CHANGE, FADES_STATE_CHANGE, USER_FOLLOWING_STATE_CHANGE, USERS_DATA_STATE_CHANGE,NFL_GAMES_STATE_CHANGE, NCAAF_GAMES_STATE_CHANGE, MLB_GAMES_STATE_CHANGE, NBA_GAMES_STATE_CHANGE, NCAAB_GAMES_STATE_CHANGE, EPL_GAMES_STATE_CHANGE, NHL_GAMES_STATE_CHANGE, CLEAR_DATA} from '../constants/index'
+import { USER_STATE_CHANGE, ALL_USERS_STATE_CHANGE, USER_BLOCKING_STATE_CHANGE, LIKES_STATE_CHANGE, NEW_GAMES_STATE_CHANGE, FADES_STATE_CHANGE, USER_FOLLOWING_STATE_CHANGE, USERS_DATA_STATE_CHANGE,NFL_GAMES_STATE_CHANGE, NCAAF_GAMES_STATE_CHANGE, MLB_GAMES_STATE_CHANGE, NBA_GAMES_STATE_CHANGE, NCAAB_GAMES_STATE_CHANGE, EPL_GAMES_STATE_CHANGE, NHL_GAMES_STATE_CHANGE, CLEAR_DATA} from '../constants/index'
 import firebase from 'firebase'
 import { SnapshotViewIOSComponent } from 'react-native'
 require('firebase/firestore')
@@ -115,7 +115,7 @@ export function fetchAllUsers() {
             })
     })
 }
-            
+
 export function fetchUsersData(uid, getPosts) {
     return ((dispatch, getState) => {
         const found = getState().usersState.users.some(el => el.uid === uid);
@@ -139,126 +139,79 @@ export function fetchUsersData(uid, getPosts) {
     })
 }
 
-
-
-export function fetchNFLGames() {
-    return((dispatch) => {
-        firebase.firestore()
-        .collection("nfl")
-        .orderBy("gameDate", "asc")
-        .get()
-        .then((snapshot) => {
-            let nflGames = snapshot.docs.map(doc => {
-                const data = doc.data();
-                const id = doc.id;
-                return { id, ...data }
-            })
-            dispatch({ type: NFL_GAMES_STATE_CHANGE, nflGames })
-        })
-    })
-}
-
-export function fetchNCAAFGames() {
-    return((dispatch) => {
-        firebase.firestore()
-        .collection("ncaaf")
-        .orderBy("gameDate", "asc")
-        .get()
-        .then((snapshot) => {
-            let ncaafGames = snapshot.docs.map(doc => {
-                const data = doc.data();
-                const id = doc.id;
-                return { id, ...data }
-            })
-            dispatch({ type: NCAAF_GAMES_STATE_CHANGE, ncaafGames })
-        })
-    })
-}
-
-export function fetchMLBGames() {
-    return((dispatch) => {
-        firebase.firestore()
-        .collection("mlb")
-        .orderBy("gameDate", "asc")
-        .get()
-        .then((snapshot) => {
-            let mlbGames = snapshot.docs.map(doc => {
-                const data = doc.data();
-                const id = doc.id;
-                return { id, ...data }
-            })
-            dispatch({ type: MLB_GAMES_STATE_CHANGE, mlbGames })
-        })
-    })
-}
-
 export function fetchNBAGames() {
-    return((dispatch) => {
+    return ((dispatch) => {
         firebase.firestore()
-        .collection("nba")
-        .orderBy("gameDate", "asc")
-        .get()
-        .then((snapshot) => {
-            let nbaGames = snapshot.docs.map(doc => {
-                const data = doc.data();
-                const id = doc.id;
-                return { id, ...data }
+            .collection("nba")
+            .orderBy('gameDate', 'desc')
+            .onSnapshot((snapshot) => {
+                let nbaGames = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    return { id, ...data }
+                })
+                dispatch({ type: NBA_GAMES_STATE_CHANGE, nbaGames });
+                for(let i = 0; i < nbaGames.length; i++){
+                }
             })
-            dispatch({ type: NBA_GAMES_STATE_CHANGE, nbaGames })
-        })
     })
 }
 
 export function fetchNCAABGames() {
-    return((dispatch) => {
+    return ((dispatch) => {
         firebase.firestore()
-        .collection("ncaab")
-        .orderBy("gameDate", "asc")
-        .get()
-        .then((snapshot) => {
-            let ncaabGames = snapshot.docs.map(doc => {
-                const data = doc.data();
-                const id = doc.id;
-                return { id, ...data }
+            .collection("ncaab")
+            .orderBy('gameDate', 'desc')
+            .onSnapshot((snapshot) => {
+                let ncaabGames = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    return { id, ...data }
+                })
+                dispatch({ type: NCAAB_GAMES_STATE_CHANGE, ncaabGames });
+                for(let i = 0; i < ncaabGames.length; i++){
+                }
             })
-            dispatch({ type: NCAAB_GAMES_STATE_CHANGE, ncaabGames })
-        })
     })
 }
 
 export function fetchNHLGames() {
-    return((dispatch) => {
+    return ((dispatch) => {
         firebase.firestore()
-        .collection("nhl")
-        .orderBy("gameDate", "asc")
-        .get()
-        .then((snapshot) => {
-            let nhlGames = snapshot.docs.map(doc => {
-                const data = doc.data();
-                const id = doc.id;
-                return { id, ...data }
+            .collection("nhl")
+            .orderBy('gameDate', 'desc')
+            .onSnapshot((snapshot) => {
+                let nhlGames = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    return { id, ...data }
+                })
+                dispatch({ type: NHL_GAMES_STATE_CHANGE, nhlGames });
+                for(let i = 0; i < nhlGames.length; i++){
+                }
             })
-            dispatch({ type: NHL_GAMES_STATE_CHANGE, nhlGames })
-        })
     })
 }
 
 export function fetchEPLGames() {
-    return((dispatch) => {
+    return ((dispatch) => {
         firebase.firestore()
-        .collection("epl")
-        .orderBy("gameDate", "asc")
-        .get()
-        .then((snapshot) => {
-            let eplGames = snapshot.docs.map(doc => {
-                const data = doc.data();
-                const id = doc.id;
-                return { id, ...data }
+            .collection("epl")
+            .orderBy('gameDate', 'desc')
+            .onSnapshot((snapshot) => {
+                let eplGames = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    return { id, ...data }
+                })
+                dispatch({ type: EPL_GAMES_STATE_CHANGE, eplGames });
+                for(let i = 0; i < eplGames.length; i++){
+                }
             })
-            dispatch({ type: EPL_GAMES_STATE_CHANGE, eplGames })
-        })
     })
 }
+
+
 
 
 

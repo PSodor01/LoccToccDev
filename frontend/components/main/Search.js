@@ -6,29 +6,28 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import {AdMobBanner} from 'expo-ads-admob'
 import Constants from 'expo-constants'
 
-import firebase from 'firebase'
 require("firebase/firestore")
 require("firebase/firebase-storage")
 
 import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
-import { fetchAllUsers, fetchUsersData } from '../../redux/actions/index'
 
 function Search(props) {
     const [allUsers, setAllUsers] = useState([]);
+    const [allGames, setAllGames] = useState([]);
     const [search, setSearch] = useState('');
     const [browse, setBrowse] = useState(false)
 
-    useEffect((uid) => {
+    useEffect(() => {
         
         setAllUsers(props.allUsers)
+        setAllGames(props.allGames)
         
-    }, [props.allUsers])
+    }, [props.allUsers, props.allGames])
 
     const ItemView = ({item}) => {
         return (
             <View>
-            {item.id == 'L3PlC2PXHYMYHsrdUtaS6tr7Ij13' ?
+            {item.id == 'L3PlC2PXHYMYHsrdUtaS6tr7Ij13' || item.id == '74hAr9c5tYcERhqgyVbcwrPEr083' ?
                 null :
 
                 <View style={styles.feedItem}>
@@ -194,11 +193,10 @@ const styles = StyleSheet.create({
 })
 
 const mapStateToProps = (store) => ({
-    users: store.usersState.users,
     allUsers: store.userState.allUsers,
+    allGames: store.userState.allGames,
 })
-const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUsersData }, dispatch);
 
-export default connect(mapStateToProps,  mapDispatchProps)(Search);
+export default connect(mapStateToProps)(Search);
 
 

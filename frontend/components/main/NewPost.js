@@ -12,6 +12,9 @@ import * as ImagePicker from 'expo-image-picker';
 import Animated from 'react-native-reanimated';
 import BottomSheet from 'reanimated-bottom-sheet';
 
+import {AdMobBanner} from 'expo-ads-admob'
+import Constants from 'expo-constants'
+
 import firebase from 'firebase'
 require("firebase/firestore")
 require("firebase/firebase-storage")
@@ -202,6 +205,11 @@ const AddPostScreen = ({ route, props }) => {
         task.on("state_changed", taskProgress, taskError, taskCompleted);
       }}
 
+    const testID = 'ca-app-pub-3940256099942544/2934735716';
+    const productionID = 'ca-app-pub-8519029912093094/5346208751';
+    // Is a real device and running in production.
+    const adUnitID = Constants.isDevice && !__DEV__ ? productionID : testID;
+
   const navigation = useNavigation();
 
   async function fetchGifs() {
@@ -267,7 +275,7 @@ const AddPostScreen = ({ route, props }) => {
     fall = new Animated.Value(1);
 
   return (
-        <KeyboardAvoidingView style={styles.container}>
+        <View style={styles.container}>
           <BottomSheet 
               ref={this.bs}
               snapPoints={[550, -5]}
@@ -307,9 +315,17 @@ const AddPostScreen = ({ route, props }) => {
                   </TouchableOpacity>
                 </View>
                 <View style={styles.postButtonContainer}>
+                {image == null && post == null ? 
+                  <View style={styles.postButtonGreyed}>
+                      <Text style={styles.shareText}>POST</Text>
+                  </View>
+                  
+                  :
+                 
                   <TouchableOpacity onPress={() => {uploadImage(); increasePostsCount()}} style={styles.postButton}>
                       <Text style={styles.shareText}>POST</Text>
                   </TouchableOpacity>
+                }
                 </View>
             </View>
             {loading ? (
@@ -331,7 +347,7 @@ const AddPostScreen = ({ route, props }) => {
               {image != null ? <Image source={{uri: image}} style={styles.AddImage}/> : null}
             </View>
           </Animated.View>
-        </KeyboardAvoidingView>
+        </View>
       
     
   );
@@ -410,9 +426,13 @@ postButton: {
   paddingVertical: 3,
   paddingHorizontal: 8,
 },
-container: {
-  flex: 1,
-  backgroundColor: '#fff',
+postButtonGreyed: {
+  alignSelf: 'center',
+  backgroundColor: '#CACFD2',
+  borderRadius: 6,
+  alignSelf: 'center',
+  paddingVertical: 3,
+  paddingHorizontal: 8,
 },
 textInput: {
   height: 30,
@@ -491,6 +511,10 @@ xButton: {
 },
 postTextInput: {
   width: Dimensions.get('window').width * .80,
-}
+},
+adView: {
+  alignItems: 'center',
+  justifyContent: 'center',
+},
 
 })

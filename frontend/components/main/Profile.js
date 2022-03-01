@@ -8,8 +8,6 @@ import email from 'react-native-email'
 
 import moment from 'moment';
 
-import ShareButton from '../buttons/ShareButton'
-
 import firebase from 'firebase'
 require('firebase/firestore')
 import { connect } from 'react-redux'
@@ -98,8 +96,6 @@ function Profile(props) {
         } else {
             setBlocking(false);
         }
-
-        
     }
 
     const onFollow = () => {
@@ -112,8 +108,8 @@ function Profile(props) {
                 id: props.route.params.uid,
                 follower: firebase.auth().currentUser.uid,
             })
-            
     }
+
     const onUnfollow = () => {
         firebase.firestore()
             .collection("following")
@@ -171,7 +167,6 @@ function Profile(props) {
                   "User succesfully blocked" 
                 );
               })
-            
     }
 
     const unBlockUser = () => {
@@ -181,7 +176,6 @@ function Profile(props) {
             .collection("userBlocking")
             .doc(props.route.params.uid)
             .delete()
-            
     }
 
     const blockAndUnfollowHandler = () => {
