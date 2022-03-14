@@ -13,16 +13,14 @@ import { connect } from 'react-redux'
 
 function Search(props) {
     const [allUsers, setAllUsers] = useState([]);
-    const [allGames, setAllGames] = useState([]);
     const [search, setSearch] = useState('');
     const [browse, setBrowse] = useState(false)
 
     useEffect(() => {
         
         setAllUsers(props.allUsers)
-        setAllGames(props.allGames)
         
-    }, [props.allUsers, props.allGames])
+    }, [props.allUsers])
 
     const ItemView = ({item}) => {
         return (
@@ -194,7 +192,6 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = (store) => ({
     allUsers: store.userState.allUsers,
-    allGames: store.userState.allGames,
 })
 
 export default connect(mapStateToProps)(Search);

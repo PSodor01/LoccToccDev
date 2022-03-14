@@ -112,6 +112,13 @@ function Feed(props) {
             .collection("userLikes")
             .doc(postId)
             .set({})
+
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                loccMadnessScore: firebase.firestore.FieldValue.increment(5)
+            })
     }
 
     const deleteLike = (postId, userId) => {
@@ -122,6 +129,13 @@ function Feed(props) {
             .doc(postId)
             .delete({})
         
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                loccMadnessScore: firebase.firestore.FieldValue.increment(-5)
+            })
+        
     }
 
     const storeFade = (postId) => {
@@ -131,6 +145,13 @@ function Feed(props) {
             .collection("userFades")
             .doc(postId)
             .set({})
+
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                loccMadnessScore: firebase.firestore.FieldValue.increment(-10)
+            })
     }
 
     const deleteFade = (postId) => {
@@ -140,6 +161,13 @@ function Feed(props) {
             .collection("userFades")
             .doc(postId)
             .delete({})
+
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                loccMadnessScore: firebase.firestore.FieldValue.increment(10)
+            })
     }
 
     const onLikePress = (userId, postId) => {
@@ -161,6 +189,13 @@ function Feed(props) {
             .update({
                 likesCount: firebase.firestore.FieldValue.increment(1)
             })
+
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .update({
+                loccMadnessScore: firebase.firestore.FieldValue.increment(15)
+        })
     }
 
     const onDislikePress = (userId, postId) => {
@@ -181,6 +216,13 @@ function Feed(props) {
             .collection("likes")
             .doc(firebase.auth().currentUser.uid)
             .delete()
+
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .update({
+                loccMadnessScore: firebase.firestore.FieldValue.increment(-15)
+        })
         
     }
 
@@ -202,6 +244,13 @@ function Feed(props) {
             .collection("fades")
             .doc(firebase.auth().currentUser.uid)
             .set({})
+
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .update({
+                loccMadnessScore: firebase.firestore.FieldValue.increment(-50)
+        })
     }
 
     const onUnfadePress = (userId, postId) => {
@@ -222,6 +271,13 @@ function Feed(props) {
             .collection("fades")
             .doc(firebase.auth().currentUser.uid)
             .delete()
+
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .update({
+                loccMadnessScore: firebase.firestore.FieldValue.increment(50)
+        })
 
     }
 

@@ -126,6 +126,13 @@ function Profile(props) {
             .update({
                 followerCount: firebase.firestore.FieldValue.increment(1)
             })
+
+        firebase.firestore()
+            .collection("users")
+            .doc(props.route.params.uid)
+            .update({
+                loccMadnessScore: firebase.firestore.FieldValue.increment(15)
+        })
     }
 
     const increaseFollowingCount = () => {
@@ -135,6 +142,13 @@ function Profile(props) {
             .update({
                 followingCount: firebase.firestore.FieldValue.increment(1)
             })
+
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                loccMadnessScore: firebase.firestore.FieldValue.increment(15)
+        })
     }
 
     const decreaseFollowerCount = () => {
@@ -144,6 +158,13 @@ function Profile(props) {
             .update({
                 followerCount: firebase.firestore.FieldValue.increment(-1)
             })
+        
+        firebase.firestore()
+            .collection("users")
+            .doc(props.route.params.uid)
+            .update({
+                loccMadnessScore: firebase.firestore.FieldValue.increment(-15)
+        })
     }
 
     const decreaseFollowingCount = () => {
@@ -153,6 +174,13 @@ function Profile(props) {
             .update({
                 followingCount: firebase.firestore.FieldValue.increment(-1)
             })
+
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                loccMadnessScore: firebase.firestore.FieldValue.increment(-15)
+        })
     }
 
     const blockUser = () => {

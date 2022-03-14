@@ -1,7 +1,7 @@
 import { USER_STATE_CHANGE, ALL_USERS_STATE_CHANGE, USER_FOLLOWING_STATE_CHANGE, LIKES_STATE_CHANGE, FADES_STATE_CHANGE, USER_BLOCKING_STATE_CHANGE, CLEAR_DATA } from "../constants"
 
 const initialState = {
-    currentUser: null,
+    currentUser: [],
     following: [],
     blocking: [],
     liked: [],

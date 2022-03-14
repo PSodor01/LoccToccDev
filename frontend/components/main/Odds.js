@@ -34,7 +34,13 @@ function Odds(props) {
     const [trendingGames, setTrendingGames] = useState([]);
     const [notification, setNotification] = useState('');
     const [notificationCriteria, setNotificationCriteria] = useState(false);
-    const [bannerId, setBannerId] = useState('ca-app-pub-8519029912093094/8772877514') //test id: 3940256099942544/2934735716
+    const [bannerId, setBannerId] = useState('') //test id: 3940256099942544/2934735716
+
+    
+    useEffect(() => {
+        setBannerId('ca-app-pub-8519029912093094/8772877514')
+        
+    }, [])
 
     useEffect(() => {
         fetchData()
@@ -45,8 +51,28 @@ function Odds(props) {
             setSportGames(props.ncaabGames)
             setSport('NCAAB')
         }
-
+        
     }, [ props.nhlGames, props.nbaGames, props.ncaabGames, props.eplGames, props.trendingGames])
+
+    useEffect(() => {
+
+        firebase.firestore()
+        .collection('users')
+        .doc(firebase.auth().currentUser.uid)
+        .get()
+        .then((snapshot) => {
+            if (snapshot.exists) {
+                if (snapshot.data().loccMadnessScore > -100000) {
+
+                } else{
+                    firebase.firestore()
+                    .collection("users")
+                    .doc(firebase.auth().currentUser.uid)
+                    .set({loccMadnessScore: 100}, { merge:true });
+                }
+            }
+        })
+    }, [])
 
     
     const fetchData = () => {
@@ -183,6 +209,8 @@ function Odds(props) {
       
         return token;
       }
+
+      
 
     const sendNotification = async (token) => {
         const message = {
@@ -359,7 +387,7 @@ function Odds(props) {
                         <View>
                             {item.gamePostsCount > 4 ?
                                 <View style={styles.gameDateContainer}>
-                                    <Text>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
+                                    <Text style={styles.dateText}>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
                                     <View style={styles.pepperContainer}>
                                         <FontAwesome5 name={"pepper-hot"} size={16} color={"#B81D13"}/>
                                         <FontAwesome5 name={"pepper-hot"} size={16} color={"#B81D13"}/>
@@ -370,7 +398,7 @@ function Odds(props) {
                             : 
                             item.gamePostsCount > 2 ?
                                 <View style={styles.gameDateContainer}>
-                                    <Text>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
+                                    <Text style={styles.dateText}>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
                                     
                                     <View style={styles.pepperContainer}>
                                         <FontAwesome5 name={"pepper-hot"} size={16} color={"orange"}/>
@@ -380,19 +408,21 @@ function Odds(props) {
                             : 
                             item.gamePostsCount > 0 ? 
                                 <View style={styles.gameDateContainer}>
-                                    <Text>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
+                                    <Text style={styles.dateText}>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
                                     <View style={styles.pepperContainer}>
                                         <FontAwesome5 name={"pepper-hot"} size={16} color={"#fed550"}/>
                                     </View>
                                 </View>
                             :
                                 <View style={styles.gameDateContainer}>
-                                    <Text>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
+                                    <Text style={styles.dateText}>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
                                 </View>
                                 }
                             <View style={styles.awayGameInfoContainer}>
                                 <View style={styles.teamItem}>
-                                    <Text style={styles.teamText}>{item.awayTeam}</Text>
+                                    <View style={styles.teamNameItem}>
+                                        <Text style={styles.teamText}>{item.awayTeam}</Text>
+                                    </View>
                                     {item.awayScore || item.homeScore ? <Text style={styles.scoreText}>{item.awayScore}</Text> : null}
                                 </View>
                                 <View style={styles.moneylineItem}>
@@ -421,7 +451,9 @@ function Odds(props) {
                             </View>
                             <View style={styles.homeGameInfoContainer}>
                                 <View style={styles.teamItem}>
-                                    <Text style={styles.teamText}>{item.homeTeam}</Text>
+                                    <View style={styles.teamNameItem}>
+                                        <Text style={styles.teamText}>{item.homeTeam}</Text>
+                                    </View>
                                     {item.awayScore || item.homeScore ? <Text style={styles.scoreText}>{item.homeScore}</Text> : null}
                                 </View>
                                 <View style={styles.moneylineItem}>
@@ -465,7 +497,7 @@ function Odds(props) {
                         <View>
                             {item.gamePostsCount > 4 ?
                                 <View style={styles.gameDateContainer}>
-                                    <Text>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
+                                    <Text style={styles.dateText}>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
                                     <View style={styles.pepperContainer}>
                                         <FontAwesome5 name={"pepper-hot"} size={16} color={"#B81D13"}/>
                                         <FontAwesome5 name={"pepper-hot"} size={16} color={"#B81D13"}/>
@@ -476,7 +508,7 @@ function Odds(props) {
                             : 
                             item.gamePostsCount > 2 ?
                                 <View style={styles.gameDateContainer}>
-                                    <Text>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
+                                    <Text style={styles.dateText}>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
                                     <View style={styles.pepperContainer}>
                                         <FontAwesome5 name={"pepper-hot"} size={16} color={"orange"}/>
                                         <FontAwesome5 name={"pepper-hot"} size={16} color={"orange"}/>
@@ -485,14 +517,14 @@ function Odds(props) {
                             : 
                             item.gamePostsCount > 0 ? 
                                 <View style={styles.gameDateContainer}>
-                                    <Text>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
+                                    <Text style={styles.dateText}>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
                                     <View style={styles.pepperContainer}>
                                         <FontAwesome5 name={"pepper-hot"} size={16} color={"#fed550"}/>
                                     </View>
                                 </View>
                             :
                                 <View style={styles.gameDateContainer}>
-                                    <Text>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
+                                    <Text style={styles.dateText}>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
                                 </View>
                                 }
                             <View style={styles.eplAwayGameInfoContainer}>
@@ -692,8 +724,6 @@ const styles = StyleSheet.create({
     },
     awayGameInfoContainer: { 
         flexDirection: 'row',
-        borderBottomColor: "#e1e2e6",
-        borderBottomWidth: 1,
     },
     eplAwayGameInfoContainer: { 
         flexDirection: 'row',
@@ -736,6 +766,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingRight: 2,
     },
+    teamNameItem: {
+        width: "90%",
+        backgroundColor: "#ffffff",
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingRight: 2,
+    },
     scoreText: {
         color: '#0033cc',
         fontWeight: 'bold',
@@ -759,27 +797,27 @@ const styles = StyleSheet.create({
     },
     totalItem: {
         width: "15%",
+        justifyContent: 'space-between',
         alignItems: 'center',
         paddingTop: 2,
-        justifyContent: 'center',
     },
     gameHeaderContainer: {
         flexDirection: 'row',
     },
     teamHeader: {
-        width: "48%",
+        width: "50%",
         marginLeft: "2%"
     },
     spreadHeader: {
-        width: "16.5%",
+        width: "15%",
         alignItems: 'center',
     },
     moneylineHeader: {
-        width: "16.5%",
+        width: "15%",
         alignItems: 'center',
     },
     totalHeader: {
-        width: 60,
+        width: "15%",
         alignItems: 'center',
     },
     textInput: {
@@ -837,6 +875,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         paddingRight: 5
+    },
+    dateText: {
+        color: 'grey',
+        fontSize: 12,
+    },
+    teamText: {
     },
     pepperContainer: {
         flexDirection: 'row',
@@ -943,6 +987,8 @@ const mapStateToProps = (store) => ({
     nhlGames: store.nhlGamesState.nhlGames,
     eplGames: store.eplGamesState.eplGames,
     nbaGames: store.nbaGamesState.nbaGames,
+    allUsers: store.userState.allUsers,
+    currentUser: store.userState.currentUser,
 
 
 })

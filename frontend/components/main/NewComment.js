@@ -114,7 +114,14 @@ function NewCommentScreen(props, route) {
               }).then((function () {
                 navigation.goBack()
             }))
-          }
+
+          firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                loccMadnessScore: firebase.firestore.FieldValue.increment(40)
+        })
+      }
 
     const onCommentCount = () => {
         firebase.firestore()
@@ -125,6 +132,14 @@ function NewCommentScreen(props, route) {
         .update({
             comments: firebase.firestore.FieldValue.increment(1)
         })
+
+        firebase.firestore()
+            .collection("users")
+            .doc(props.route.params.uid)
+            .update({
+                loccMadnessScore: firebase.firestore.FieldValue.increment(20)
+        })
+
       }
 
       const sendNotification = async (notification, token) => {

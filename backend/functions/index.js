@@ -363,8 +363,8 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
       .then(result => {
         result.data.forEach(game => {
 
-          if (game.bookmakers.findIndex((item) => item.key === 'draftkings') > -1) {
-            let i = game.bookmakers.findIndex((item) => item.key === 'draftkings')
+          if (game.bookmakers.findIndex((item) => item.key === 'fanduel') > -1) {
+            let i = game.bookmakers.findIndex((item) => item.key === 'fanduel')
             if (game.away_team == game.bookmakers[0].markets[0].outcomes[0].name) {
 
               const writeResult = admin
@@ -423,7 +423,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
 
   })
 
-  exports.getNCAABScoresData = functions.pubsub.schedule('every 5 minutes').onRun(async() => {
+  exports.getNCAABScoresData = functions.pubsub.schedule('every 2 minutes').onRun(async() => {
     try {
       const response = await axios.get('https://api.the-odds-api.com/v4/sports/basketball_ncaab/scores/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&dateFormat=iso')
       .then(result => {

@@ -31,6 +31,8 @@ function game(props) {
     const [postId, setPostId] = useState("");
     const [loading, setLoading] = useState(true);
     const [sortCriteria, setSortCriteria] = useState(true);
+    const [shareCriteria, setShareCriteria] = useState(false);
+    const [shareId, setShareId] = useState('')
     const [awayVote, setAwayVote] = useState("");
     const [homeVote, setHomeVote] = useState("");
     const [drawVote, setDrawVote] = useState("");
@@ -119,6 +121,173 @@ function game(props) {
             .collection("userLikes")
             .doc(postId)
             .set({})
+
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                loccMadnessScore: firebase.firestore.FieldValue.increment(5)
+            })
+            
+    }
+
+    const deleteLike = (postId, userId) => {
+        firebase.firestore()
+            .collection("likes")
+            .doc(firebase.auth().currentUser.uid)
+            .collection("userLikes")
+            .doc(postId)
+            .delete({})
+
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                loccMadnessScore: firebase.firestore.FieldValue.increment(-5)
+            })
+    }
+
+    const storeFade = (postId) => {
+        firebase.firestore()
+            .collection("fades")
+            .doc(firebase.auth().currentUser.uid)
+            .collection("userFades")
+            .doc(postId)
+            .set({})
+
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                loccMadnessScore: firebase.firestore.FieldValue.increment(-10)
+            })
+    }
+
+    const deleteFade = (postId) => {
+        firebase.firestore()
+            .collection("fades")
+            .doc(firebase.auth().currentUser.uid)
+            .collection("userFades")
+            .doc(postId)
+            .delete({})
+
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                loccMadnessScore: firebase.firestore.FieldValue.increment(10)
+            })
+    }
+
+    const onLikePress = (userId, postId) => {
+
+        firebase.firestore()
+            .collection("posts")
+            .doc(userId)
+            .collection("userPosts")
+            .doc(postId)
+            .collection("likes")
+            .doc(firebase.auth().currentUser.uid)
+            .set({})
+
+        firebase.firestore()
+            .collection("posts")
+            .doc(userId)
+            .collection("userPosts")
+            .doc(postId)
+            .update({
+                likesCount: firebase.firestore.FieldValue.increment(1)
+            })
+
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .update({
+                loccMadnessScore: firebase.firestore.FieldValue.increment(15)
+        })
+    }
+
+    const onDislikePress = (userId, postId) => {
+        firebase.firestore()
+            .collection("posts")
+            .doc(userId)
+            .collection("userPosts")
+            .doc(postId)
+            .update({
+                likesCount: firebase.firestore.FieldValue.increment(-1)
+            })
+
+        firebase.firestore()
+            .collection("posts")
+            .doc(userId)
+            .collection("userPosts")
+            .doc(postId)
+            .collection("likes")
+            .doc(firebase.auth().currentUser.uid)
+            .delete()
+        
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .update({
+                loccMadnessScore: firebase.firestore.FieldValue.increment(-15)
+        })
+        
+    }
+
+    const onFadePress = (userId, postId) => {
+        firebase.firestore()
+            .collection("posts")
+            .doc(userId)
+            .collection("userPosts")
+            .doc(postId)
+            .update({
+                fadesCount: firebase.firestore.FieldValue.increment(1)
+            })
+
+        firebase.firestore()
+            .collection("posts")
+            .doc(userId)
+            .collection("userPosts")
+            .doc(postId)
+            .collection("fades")
+            .doc(firebase.auth().currentUser.uid)
+            .set({})
+
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .update({
+                loccMadnessScore: firebase.firestore.FieldValue.increment(-50)
+        })
+    }
+
+    const onUnfadePress = (userId, postId) => {
+        firebase.firestore()
+            .collection("posts")
+            .doc(userId)
+            .collection("userPosts")
+            .doc(postId)
+            .update({
+                fadesCount: firebase.firestore.FieldValue.increment(-1)
+            })
+
+        firebase.firestore()
+            .collection("posts")
+            .doc(userId)
+            .collection("userPosts")
+            .doc(postId)
+            .collection("fades")
+            .doc(firebase.auth().currentUser.uid)
+            .delete()
+
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .update({
+                loccMadnessScore: firebase.firestore.FieldValue.increment(50)
+        })
+
     }
 
     const sendNotification = async (notification, token) => {
@@ -187,115 +356,6 @@ function game(props) {
             })
     };
 
-    const deleteLike = (postId, userId) => {
-        firebase.firestore()
-            .collection("likes")
-            .doc(firebase.auth().currentUser.uid)
-            .collection("userLikes")
-            .doc(postId)
-            .delete({})
-    }
-
-    const storeFade = (postId) => {
-        firebase.firestore()
-            .collection("fades")
-            .doc(firebase.auth().currentUser.uid)
-            .collection("userFades")
-            .doc(postId)
-            .set({})
-    }
-
-    const deleteFade = (postId) => {
-        firebase.firestore()
-            .collection("fades")
-            .doc(firebase.auth().currentUser.uid)
-            .collection("userFades")
-            .doc(postId)
-            .delete({})
-    }
-
-    const onLikePress = (userId, postId) => {
-
-        firebase.firestore()
-            .collection("posts")
-            .doc(userId)
-            .collection("userPosts")
-            .doc(postId)
-            .collection("likes")
-            .doc(firebase.auth().currentUser.uid)
-            .set({})
-
-        firebase.firestore()
-            .collection("posts")
-            .doc(userId)
-            .collection("userPosts")
-            .doc(postId)
-            .update({
-                likesCount: firebase.firestore.FieldValue.increment(1)
-            })
-    }
-
-    const onDislikePress = (userId, postId) => {
-        firebase.firestore()
-            .collection("posts")
-            .doc(userId)
-            .collection("userPosts")
-            .doc(postId)
-            .update({
-                likesCount: firebase.firestore.FieldValue.increment(-1)
-            })
-
-        firebase.firestore()
-            .collection("posts")
-            .doc(userId)
-            .collection("userPosts")
-            .doc(postId)
-            .collection("likes")
-            .doc(firebase.auth().currentUser.uid)
-            .delete()
-        
-    }
-
-    const onFadePress = (userId, postId) => {
-        firebase.firestore()
-            .collection("posts")
-            .doc(userId)
-            .collection("userPosts")
-            .doc(postId)
-            .update({
-                fadesCount: firebase.firestore.FieldValue.increment(1)
-            })
-
-        firebase.firestore()
-            .collection("posts")
-            .doc(userId)
-            .collection("userPosts")
-            .doc(postId)
-            .collection("fades")
-            .doc(firebase.auth().currentUser.uid)
-            .set({})
-    }
-
-    const onUnfadePress = (userId, postId) => {
-        firebase.firestore()
-            .collection("posts")
-            .doc(userId)
-            .collection("userPosts")
-            .doc(postId)
-            .update({
-                fadesCount: firebase.firestore.FieldValue.increment(-1)
-            })
-
-        firebase.firestore()
-            .collection("posts")
-            .doc(userId)
-            .collection("userPosts")
-            .doc(postId)
-            .collection("fades")
-            .doc(firebase.auth().currentUser.uid)
-            .delete()
-
-    }
 
     const gameVote = () => {
 
@@ -510,13 +570,18 @@ function game(props) {
             setSortCriteria(true)
         }
     }
+
+    const shareFunction = (postId) => {
+            setShareId(postId)
+            console.log(shareId)
+    }
     
 
 
     const renderItem = ({item}) => {
         return (
             <View>
-                { item.blocked == true ?
+                { item.blocked == true || item.id == postId ?
 
                 null
                     
@@ -947,6 +1012,8 @@ function game(props) {
                 renderItem={renderItem}
             />
                 : 
+
+                
             <FlatList
                 data = {gamePosts.sort((a, b) => parseFloat(b.likesCount) - parseFloat(a.likesCount))}
                 ListEmptyComponent={EmptyListMessage}

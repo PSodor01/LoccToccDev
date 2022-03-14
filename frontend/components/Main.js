@@ -14,6 +14,7 @@ import FeedScreen from './main/Feed'
 import ProfileScreen from './main/Profile'
 import Research from './main/Research'
 import SearchScreen from './main/Search'
+import ContestScreen from './main/Contest'
 import Odds from './main/Odds'
 
 const Stack = createStackNavigator();
@@ -89,6 +90,17 @@ export class Main extends Component {
                         ),
                     }}
                     />
+                <Tab.Screen 
+                name="Contest" 
+                component={ContestScreen} 
+                navigation={this.props.navigation}
+                options={{
+                    tabBarLabel: 'Leaders',
+                    tabBarColor: '#009387',
+                    tabBarIcon: ({ color, size }) => (
+                        <MaterialCommunityIcons name="trophy" color="#ffd700" size={26} />
+                    ),
+                }} />
                 <Tab.Screen 
                     name="Search" 
                     component={SearchScreen} 
