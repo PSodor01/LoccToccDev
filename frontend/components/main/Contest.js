@@ -11,6 +11,7 @@ import Constants from 'expo-constants'
 
 import Leaderboard from 'react-native-leaderboard';
 
+import firebase from 'firebase'
 require("firebase/firestore")
 require("firebase/firebase-storage")
 
@@ -43,6 +44,38 @@ function Contest(props) {
                 <Text style={styles.subTitleText}>{item.masters2022Score}</Text>
             </View>
         )}
+
+    const countWebsiteClicks = () => {
+        firebase.firestore()
+            .collection("brandClicks")
+            .doc('tropicalBros')
+            .update({
+                website: firebase.firestore.FieldValue.increment(1),
+            })
+
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                masters2022Score: firebase.firestore.FieldValue.increment(10)
+            })
+    }
+
+    const countInstagramClicks = () => {
+        firebase.firestore()
+            .collection("brandClicks")
+            .doc('tropicalBros')
+            .update({
+                instagram: firebase.firestore.FieldValue.increment(1)
+            })
+
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                masters2022Score: firebase.firestore.FieldValue.increment(10)
+            })
+    }
 
     renderInner = () => (
         <View style={styles.panel}>
@@ -148,22 +181,26 @@ function Contest(props) {
                             <Text style={styles.subTitleText}>Presented by:</Text>
                         </View>
                         <View style={styles.infoContainer}>
-                            <Text
-                                style={styles.linkText}
+                            <TouchableOpacity
+                                style={styles.linkText}>
+                                    <Text style={styles.linkText}
                                 onPress={() => {
+                                countWebsiteClicks()
                                 Linking.openURL('https://tropicalbros.com');
                                 }}>
-                                www.TROPICALBROS.com
-                            </Text>
+                                www.TROPICALBROS.com</Text>
+                            </TouchableOpacity>
                         </View>
                         <View style={styles.infoContainer}>
-                            <Text
-                                style={styles.linkText}
+                            <TouchableOpacity
+                                style={styles.linkText}>
+                                    <Text style={styles.linkText}
                                 onPress={() => {
+                                countInstagramClicks()
                                 Linking.openURL('https://www.instagram.com/tropical.bros/');
                                 }}>
-                                Follow!
-                            </Text>
+                                Follow!</Text>
+                            </TouchableOpacity>
                         </View>
                     </View>
                 </View>
