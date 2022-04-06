@@ -73,58 +73,60 @@ exports.getMLBGameData = functions.pubsub.schedule('every 5 minutes').onRun(asyn
     .then(result => {
       result.data.forEach(game => {
 
-        if (game.away_team == game.bookmakers[0].markets[0].outcomes[0].name) {
+        if (game.bookmakers.findIndex((item) => item.key === 'betrivers') > -1) {
+          let i = game.bookmakers.findIndex((item) => item.key === 'betrivers')
+          if (game.away_team == game.bookmakers[0].markets[0].outcomes[0].name) {
 
-          const writeResult = admin
-          .firestore()
-          .collection("mlb")
-          .doc(game.id)
-          .set({
-            gameId: game.id,
-            sport: game.sport_key,
-            gameDate: game.commence_time,
-            awayTeam: game.away_team,
-            homeTeam: game.home_team,
-            awayMoneyline: game.bookmakers[0].markets[0].outcomes[0].price,
-            homeMoneyline: game.bookmakers[0].markets[0].outcomes[1].price,
-            awaySpread: game.bookmakers[0].markets[1].outcomes[0].point,
-            homeSpread: game.bookmakers[0].markets[1].outcomes[1].point,
-            awaySpreadOdds: game.bookmakers[0].markets[1].outcomes[0].price,
-            homeSpreadOdds: game.bookmakers[1].markets[1].outcomes[1].price,
-            over: game.bookmakers[0].markets[2].outcomes[0].point,
-            under: game.bookmakers[0].markets[2].outcomes[1].point,
-            overOdds: game.bookmakers[0].markets[2].outcomes[0].price,
-            underOdds: game.bookmakers[0].markets[2].outcomes[1].price,
-            
-        }, { merge:true });
+            const writeResult = admin
+            .firestore()
+            .collection("mlb")
+            .doc(game.id)
+            .set({
+              gameId: game.id,
+              sport: game.sport_key,
+              gameDate: game.commence_time,
+              awayTeam: game.away_team,
+              homeTeam: game.home_team,
+              awayMoneyline: game.bookmakers[i].markets[0].outcomes[0].price,
+              homeMoneyline: game.bookmakers[i].markets[0].outcomes[1].price,
+              awaySpread: game.bookmakers[i].markets[1].outcomes[0].point,
+              homeSpread: game.bookmakers[i].markets[1].outcomes[1].point,
+              awaySpreadOdds: game.bookmakers[i].markets[1].outcomes[0].price,
+              homeSpreadOdds: game.bookmakers[i].markets[1].outcomes[1].price,
+              over: game.bookmakers[i].markets[2].outcomes[0].point,
+              under: game.bookmakers[i].markets[2].outcomes[1].point,
+              overOdds: game.bookmakers[i].markets[2].outcomes[0].price,
+              underOdds: game.bookmakers[i].markets[2].outcomes[1].price,
+          }, { merge:true });
 
+          } else {
+            const writeResult = admin
+            .firestore()
+            .collection("mlb")
+            .doc(game.id)
+            .set({
+              gameId: game.id,
+              sport: game.sport_key,
+              gameDate: game.commence_time,
+              awayTeam: game.away_team,
+              homeTeam: game.home_team,
+              awayMoneyline: game.bookmakers[i].markets[0].outcomes[1].price,
+              homeMoneyline: game.bookmakers[i].markets[0].outcomes[0].price,
+              awaySpread: game.bookmakers[i].markets[1].outcomes[1].point,
+              homeSpread: game.bookmakers[i].markets[1].outcomes[0].point,
+              awaySpreadOdds: game.bookmakers[i].markets[1].outcomes[1].price,
+              homeSpreadOdds: game.bookmakers[i].markets[1].outcomes[0].price,
+              over: game.bookmakers[i].markets[2].outcomes[0].point,
+              under: game.bookmakers[i].markets[2].outcomes[1].point,
+              overOdds: game.bookmakers[i].markets[2].outcomes[0].price,
+              underOdds: game.bookmakers[i].markets[2].outcomes[1].price,
+          }, { merge:true });
+
+          }
         } else {
-          const writeResult = admin
-          .firestore()
-          .collection("mlb")
-          .doc(game.id)
-          .set({
-            gameId: game.id,
-            sport: game.sport_key,
-            gameDate: game.commence_time,
-            awayTeam: game.away_team,
-            homeTeam: game.home_team,
-            awayMoneyline: game.bookmakers[0].markets[0].outcomes[1].price,
-            homeMoneyline: game.bookmakers[0].markets[0].outcomes[0].price,
-            awaySpread: game.bookmakers[0].markets[1].outcomes[1].point,
-            homeSpread: game.bookmakers[0].markets[1].outcomes[0].point,
-            awaySpreadOdds: game.bookmakers[0].markets[1].outcomes[1].price,
-            homeSpreadOdds: game.bookmakers[0].markets[1].outcomes[0].price,
-            over: game.bookmakers[0].markets[2].outcomes[0].point,
-            under: game.bookmakers[0].markets[2].outcomes[1].point,
-            overOdds: game.bookmakers[0].markets[2].outcomes[0].price,
-            underOdds: game.bookmakers[0].markets[2].outcomes[1].price,
-           
-        }, { merge:true });
+          return
 
         }
-
-        
       })
     })
 }catch(err) {console.error(err.message)}
@@ -790,14 +792,14 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
 
             if (game.bookmakers.findIndex((item) => item.key === 'draftkings') > -1) {
               let j = game.bookmakers.findIndex((item) => item.key === 'draftkings')
-              for (let i = 0; i < game.bookmakers[0].markets[0].outcomes.length; i++){
+              for (let i = 0; i < game.bookmakers[j].markets[0].outcomes.length; i++){
                 const writeResult = admin
                 .firestore()
                 .collection('futures')
                 .doc(game.bookmakers[j].markets[0].outcomes[i].name)
                 .set({
                   playerName: game.bookmakers[j].markets[0].outcomes[i].name,
-                  playerOdds: Math.round((game.bookmakers[0].markets[0].outcomes[i].price -1) * 100),
+                  playerOdds: Math.round((game.bookmakers[j].markets[0].outcomes[i].price -1) * 100),
                   gameId: game.id,
                   sport: 'NHL - Stanley Cup Winner',
                   

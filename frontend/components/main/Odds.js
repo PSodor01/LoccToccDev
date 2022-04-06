@@ -103,7 +103,7 @@ function Odds(props) {
                 }
             })
         }
-        setnbaGames(props.nbaGames)
+        setnbaGames(props.nbaGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))
 
         for (let i = 0; i < props.nhlGames.length; i++) {
 
@@ -123,7 +123,7 @@ function Odds(props) {
                 }
             })
         }
-        setnhlGames(props.nhlGames)
+        setnhlGames(props.nhlGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))
 
         for (let i = 0; i < props.mlbGames.length; i++) {
 
@@ -143,7 +143,7 @@ function Odds(props) {
                 }
             })
         }
-        setmlbGames(props.mlbGames)
+        setmlbGames(props.mlbGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))
 
         for (let i = 0; i < props.eplGames.length; i++) {
 
@@ -257,9 +257,9 @@ function Odds(props) {
             setSearch(text)
 
         } else {
-            if (sport == 'NBA') {setSportGames(props.nbaGames)} 
-            if (sport == 'NHL') {setSportGames(props.nhlGames)} 
-            if (sport == 'MLB') {setSportGames(props.mlbGames)}
+            if (sport == 'NBA') {setSportGames(props.nbaGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))} 
+            if (sport == 'NHL') {setSportGames(props.nhlGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))} 
+            if (sport == 'MLB') {setSportGames(props.mlbGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))}
             if (sport == 'EPL') {setSportGames(props.eplGames)}
             if (sport == 'Masters') {setSportGames(props.golfGames)}
             if (sport == 'Futures') {setSportGames(props.futureGames)}
@@ -769,7 +769,7 @@ function Odds(props) {
             :
 
             <FlatList 
-                data = {sportGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate))}
+                data = {sportGames}
                 style={styles.feed}
                 renderItem={renderItem}
     
