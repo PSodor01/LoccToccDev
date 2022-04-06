@@ -1,5 +1,5 @@
 import React, { Component, useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Dimensions, Alert, ActivityIndicator, FlatList, TouchableOpacity, Image } from 'react-native';
+import { Text, View, StyleSheet, Alert, ActivityIndicator, FlatList, TouchableOpacity, Image } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -31,24 +31,25 @@ function game(props) {
     const [postId, setPostId] = useState("");
     const [loading, setLoading] = useState(true);
     const [sortCriteria, setSortCriteria] = useState(true);
+    const [listAllPlayers, setListAllPlayers] = useState(false);
     const [shareCriteria, setShareCriteria] = useState(false);
     const [shareId, setShareId] = useState('')
     const [awayVote, setAwayVote] = useState("");
     const [homeVote, setHomeVote] = useState("");
     const [drawVote, setDrawVote] = useState("");
-    const [prop, setProp] = useState(false)
+    const [golfGames, setGolfGames] = useState([]);
+    const [futureGames, setFutureGames] = useState([]);
 
     const {gameId, gameDate, homeTeam, awayTeam, homeMoneyline, awayMoneyline, homeSpread, awaySpread, homeSpreadOdds, awaySpreadOdds, over, overOdds, under, underOdds, drawMoneyline, sport} = props.route.params;
-    const {propName, outcome1, outcome2, outcome3, outcome4, outcome5, outcome6, outcome7, outcome8, outcome9, outcome10, outcome1Odds, outcome2Odds, outcome3Odds, outcome4Odds, outcome5Odds, outcome6Odds, outcome7Odds, outcome8Odds, outcome9Odds, outcome10Odds,} = props.route.params;
 
     useEffect(() => {
             fetchData()
-            if (propName == null) {
-                setProp(false);
-            } else {
-                setProp(true)
-            }
     }, [props.blocking, props.liked, props.faded, props.route.params.postId, props.users])
+
+    useEffect(() => {
+        setGolfGames(props.golfGames)
+        setFutureGames(props.futureGames)
+    }, [])
 
     const fetchData = () => {
         function matchUserToGamePost(gamePosts) {
@@ -126,7 +127,7 @@ function game(props) {
             .collection("users")
             .doc(firebase.auth().currentUser.uid)
             .update({
-                loccMadnessScore: firebase.firestore.FieldValue.increment(5)
+                masters2022Score: firebase.firestore.FieldValue.increment(10)
             })
             
     }
@@ -143,7 +144,7 @@ function game(props) {
             .collection("users")
             .doc(firebase.auth().currentUser.uid)
             .update({
-                loccMadnessScore: firebase.firestore.FieldValue.increment(-5)
+                masters2022Score: firebase.firestore.FieldValue.increment(-10)
             })
     }
 
@@ -159,7 +160,7 @@ function game(props) {
             .collection("users")
             .doc(firebase.auth().currentUser.uid)
             .update({
-                loccMadnessScore: firebase.firestore.FieldValue.increment(-10)
+                masters2022Score: firebase.firestore.FieldValue.increment(-10)
             })
     }
 
@@ -175,7 +176,7 @@ function game(props) {
             .collection("users")
             .doc(firebase.auth().currentUser.uid)
             .update({
-                loccMadnessScore: firebase.firestore.FieldValue.increment(10)
+                masters2022Score: firebase.firestore.FieldValue.increment(10)
             })
     }
 
@@ -203,7 +204,7 @@ function game(props) {
             .collection("users")
             .doc(userId)
             .update({
-                loccMadnessScore: firebase.firestore.FieldValue.increment(15)
+                masters2022Score: firebase.firestore.FieldValue.increment(20)
         })
     }
 
@@ -230,7 +231,7 @@ function game(props) {
             .collection("users")
             .doc(userId)
             .update({
-                loccMadnessScore: firebase.firestore.FieldValue.increment(-15)
+                masters2022Score: firebase.firestore.FieldValue.increment(-20)
         })
         
     }
@@ -258,7 +259,7 @@ function game(props) {
             .collection("users")
             .doc(userId)
             .update({
-                loccMadnessScore: firebase.firestore.FieldValue.increment(-50)
+                masters2022Score: firebase.firestore.FieldValue.increment(-50)
         })
     }
 
@@ -285,7 +286,7 @@ function game(props) {
             .collection("users")
             .doc(userId)
             .update({
-                loccMadnessScore: firebase.firestore.FieldValue.increment(50)
+                masters2022Score: firebase.firestore.FieldValue.increment(50)
         })
 
     }
@@ -294,7 +295,7 @@ function game(props) {
         const message = {
             to: token,
             sound: 'default',
-            body: notification ? notification : 'Empty Notification',
+            body: notification ? notification : '',
         };
         
         await fetch('https://exp.host/--/api/v2/push/send', {
@@ -520,6 +521,26 @@ function game(props) {
 
     }
 
+    const renderListItem = ({ item }) => {
+        return (
+            <View>
+                <View style={styles.golfGameContainer}>
+                        <View style={styles.golfOddsContainer}>
+                            <View style={styles.golfPlayerContainer}>
+                                <Text style={styles.golfPlayerText}>{item.playerName}</Text>
+                            </View>
+                            <View>
+                                {item.playerOdds > 0 ?
+                                <Text>+{item.playerOdds}</Text> : <Text>{item.playerOdds}</Text>
+                                } 
+                            </View>
+                            
+                        </View>
+                </View>
+            </View>
+        )
+    }
+
     const testID = 'ca-app-pub-3940256099942544/2934735716';
     const productionID = 'ca-app-pub-8519029912093094/5150749785';
     // Is a real device and running in production.
@@ -568,6 +589,14 @@ function game(props) {
             setSortCriteria(false)
         } else {
             setSortCriteria(true)
+        }
+    }
+
+    const listAllPlayersFunction = () => {
+        if (listAllPlayers == true) {
+            setListAllPlayers(false)
+        } else {
+            setListAllPlayers(true)
         }
     }
 
@@ -682,12 +711,62 @@ function game(props) {
     
     return (
         <View style={styles.container}>
-            {prop != true ? 
             <View style={styles.gameContainer}>
+            {sport == 'US Masters Tournament Lines - Winner' || 
+            sport == 'NFL - Suberbowl Champion' ||
+            sport == 'MLB - World Series Winner' ||
+            sport == 'NBA - Championship' ||
+            sport == 'NHL - Stanley Cup Winner' 
+            ?
+            
+            <View style={styles.gameHeaderContainer}>
+                <Text style={styles.gameHeaderText}>{sport}</Text>
+                
+                
+                <TouchableOpacity 
+                    onPress={() => {listAllPlayersFunction()}}>
+                    <Text style={styles.seeAllText}>See All</Text>
+                </TouchableOpacity>
+            </View>
+            :
+            <View></View> 
+            
+            }
                 <View>
-                    <Text>{moment(gameDate).format("LT")}</Text> 
-                    {sport == 'soccer_epl' ? 
+                    {
+                    sport == 'NFL - Suberbowl Champion' || sport == 'MLB - World Series Winner' || sport == 'NBA - Championship' || sport == 'NHL - Stanley Cup Winner' ?
+                    listAllPlayers == false ?
+                    <FlatList 
+                        data = {futureGames.sort((a, b) => parseFloat(a.playerOdds) - parseFloat(b.playerOdds)).filter(futureSport => futureSport.sport == sport).slice(0, 5)}
+                        style={styles.feed}
+                        renderItem={renderListItem}
+                    />
+                    :
+                    <FlatList 
+                        data = {futureGames.sort((a, b) => parseFloat(a.playerOdds) - parseFloat(b.playerOdds)).filter(futureSport => futureSport.sport == sport)}
+                        style={styles.feed}
+                        renderItem={renderListItem}
+                    />
+
+                    :
+
+                    sport == 'US Masters Tournament Lines - Winner' ?
+                    listAllPlayers == false ?
+                    <FlatList 
+                        data = {golfGames.sort((a, b) => parseFloat(a.playerOdds) - parseFloat(b.playerOdds)).slice(0, 5)}
+                        style={styles.feed}
+                        renderItem={renderListItem}
+                    />
+                    :
+                    <FlatList 
+                        data = {golfGames.sort((a, b) => parseFloat(a.playerOdds) - parseFloat(b.playerOdds))}
+                        style={styles.feed}
+                        renderItem={renderListItem}
+                    />
+                    :
+                    sport == 'soccer_epl' ? 
                     <View>
+                         
                         <View style={styles.awayGameInfoContainer}>
                             <View style={styles.teamItem}>
                                 <TouchableOpacity
@@ -915,82 +994,11 @@ function game(props) {
                     </View>
                     }
                     
+                    
+                    
+                    
                 </View>                    
             </View> 
-            :
-            <View style={styles.mainPropContainer}>
-                <TouchableOpacity>
-                    <View style={styles.propContainer}>
-                        <View style={styles.propHeaderContainer}>
-                            <Text style={styles.gameHeaderText}>{propName}</Text>
-                        </View>
-                        <View style={styles.propOddsContainer}>
-                            <View style={styles.propItemLeft}>
-                                <Text>{outcome1}</Text>
-                                <Text style={styles.oddsBottomRowText}>{outcome1Odds}</Text>
-                            </View>
-                            
-                            <View style={styles.propItemRight}>
-                                <Text>{outcome2}</Text>
-                                {outcome2Odds != null ? <Text style={styles.oddsBottomRowText}>{outcome2Odds}</Text> : <Text></Text>}
-                            </View>
-                        </View>
-                        {outcome3 == null ? 
-                        null
-                        :
-                        <View>
-                            <View style={styles.propOddsContainer}>
-                                <View style={styles.extraPropItemLeft}>
-                                    <Text>{outcome3}</Text>
-                                    <Text style={styles.oddsBottomRowText}>{outcome3Odds}</Text>
-                                </View>
-                                <View style={styles.extraPropItemRight}>
-                                    <Text>{outcome4}</Text>
-                                    <Text style={styles.oddsBottomRowText}>{outcome4Odds}</Text> 
-                                </View>
-                            </View>
-                            <View style={styles.propOddsContainer}>
-                                <View style={styles.extraPropItemLeft}>
-                                    <Text>{outcome5}</Text>
-                                    <Text style={styles.oddsBottomRowText}>{outcome5Odds}</Text>
-                                </View>
-                                <View style={styles.extraPropItemRight}>
-                                    <Text>{outcome6}</Text>
-                                    <Text style={styles.oddsBottomRowText}>{outcome6Odds}</Text> 
-                                </View>
-                            </View>
-                            <View style={styles.propOddsContainer}>
-                                <View style={styles.extraPropItemLeft}>
-                                    <Text>{outcome7}</Text>
-                                    <Text style={styles.oddsBottomRowText}>{outcome7Odds}</Text>
-                                </View>
-                                <View style={styles.extraPropItemRight}>
-                                    {outcome8 == null ? <Text></Text> : <Text>{outcome8}</Text>}
-                                    {outcome8 == null ? <Text></Text> : <Text style={styles.oddsBottomRowText}>{outcome8Odds}</Text>}
-                                </View>
-                            </View>
-                        </View>
-                        }
-                        {outcome9 == null ? 
-                        null
-                        :
-                        <View>
-                            <View style={styles.propOddsContainer}>
-                                <View style={styles.extraPropItemLeft}>
-                                    <Text>{outcome9}</Text>
-                                    <Text style={styles.oddsBottomRowText}>{outcome9Odds}</Text>
-                                </View>
-                                <View style={styles.extraPropItemRight}>
-                                    <Text>{outcome10}</Text>
-                                    <Text style={styles.oddsBottomRowText}>{outcome10Odds}</Text>
-                                </View>
-                            </View>
-                        </View>
-                        }
-                    </View>
-                </TouchableOpacity>
-            </View>
-            }
             <View style={styles.sortContainer}>
                 <Text style={styles.sortText}>Sort: </Text>
                 <TouchableOpacity 
@@ -1055,19 +1063,13 @@ const styles = StyleSheet.create({
         marginRight: "1%",
         marginLeft: "1%",
         justifyContent: 'center',
-        borderWidth: 1,
-        borderColor: "rgba(0,0,0,0.1)",
-        borderRadius: 10,
-        shadowColor: "#ccc",
-        shadowOpacity: 0.5,
-        shadowRadius: 2,
+        borderBottomWidth: 1,
+        borderBottomColor: "rgba(0,0,0,0.1)",
         backgroundColor: "#ffffff",
 
     },
     awayGameInfoContainer: { 
         flexDirection: 'row',
-        borderBottomColor: "#e1e2e6",
-        borderBottomWidth: 1,
     },
     homeGameInfoContainer: { 
         flexDirection: 'row',
@@ -1094,7 +1096,19 @@ const styles = StyleSheet.create({
         width: "55%",
         borderRightColor: "#e1e2e6",
         borderRightWidth: 1,
-        justifyContent: 'center',
+        backgroundColor: "#ffffff",
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingRight: 2,
+    },
+    teamNameItem: {
+        width: "90%",
+        backgroundColor: "#ffffff",
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingRight: 2,
     },
     spreadItem: {
         width: "15%",
@@ -1120,6 +1134,8 @@ const styles = StyleSheet.create({
     },
     gameHeaderContainer: {
         flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginRight: '4%'
     },
     postButtonContainer: {
         paddingBottom: 5,
@@ -1243,52 +1259,35 @@ const styles = StyleSheet.create({
     noVote: {
         color: "#B3B6B7",
         fontSize: 12
-
     },
-    propContainer: {
-    },
-    propOddsContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-evenly'
-    },
-    mainPropContainer: {
-        borderBottomWidth: .8,
-        borderBottomColor: "#ccc",
+    golfGameContainer: {
+        padding: 10,
+        marginRight: 2,
+        marginLeft: 2,
+        borderTopWidth: .8,
+        borderTopColor: "#ccc",
         backgroundColor: "#ffffff",
-        marginHorizontal:"5%",
     },
-    propHeaderContainer: {
-        alignItems: 'center',
-        paddingTop: 8,
+    golfOddsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
     },
-    propItemRight: {
-        alignItems: 'center',
-        paddingBottom: 10,
-        width: "50%"
+    golfPlayerText: {
     },
-    propItemLeft: {
-        alignItems: 'center',
-        paddingBottom: 10,
-        width: "50%",
-        borderRightColor: "#e1e2e6",
-        borderRightWidth: 1,
+    gameHeaderText: {
+        fontWeight: "bold",
+        paddingBottom: 5,
     },
-    extraPropItemRight: {
-        alignItems: 'center',
-        paddingBottom: 10,
-        width: "50%",
-        borderTopColor: "#e1e2e6",
-        borderTopWidth: 1,
+    dateText: {
+        color: 'grey',
+        fontSize: 12,
     },
-    extraPropItemLeft: {
-        alignItems: 'center',
-        paddingBottom: 10,
-        width: "50%",
-        borderTopColor: "#e1e2e6",
-        borderTopWidth: 1,
-        borderRightColor: "#e1e2e6",
-        borderRightWidth: 1,
+    seeAllText: {
+        color: '#2e64e5',
+        fontWeight: 'bold',
+        fontSize: 12,
     },
+    
     
 })
 
@@ -1301,6 +1300,8 @@ const mapStateToProps = (store) => ({
     faded: store.userState.faded,
     feed: store.usersState.feed,
     usersFollowingLoaded: store.usersState.usersFollowingLoaded,
+    golfGames: store.golfGamesState.golfGames,
+    futureGames: store.futureGamesState.futureGames,
 })
 const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUsersData }, dispatch);
 

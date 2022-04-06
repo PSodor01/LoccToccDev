@@ -1,4 +1,20 @@
-import { USER_STATE_CHANGE, ALL_USERS_STATE_CHANGE, USER_BLOCKING_STATE_CHANGE, LIKES_STATE_CHANGE, NEW_GAMES_STATE_CHANGE, FADES_STATE_CHANGE, USER_FOLLOWING_STATE_CHANGE, USERS_DATA_STATE_CHANGE,NFL_GAMES_STATE_CHANGE, NCAAF_GAMES_STATE_CHANGE, MLB_GAMES_STATE_CHANGE, NBA_GAMES_STATE_CHANGE, NCAAB_GAMES_STATE_CHANGE, EPL_GAMES_STATE_CHANGE, NHL_GAMES_STATE_CHANGE, CLEAR_DATA} from '../constants/index'
+import { USER_STATE_CHANGE, 
+    ALL_USERS_STATE_CHANGE, 
+    USER_BLOCKING_STATE_CHANGE, 
+    LIKES_STATE_CHANGE, 
+    FADES_STATE_CHANGE, 
+    USER_FOLLOWING_STATE_CHANGE, 
+    USERS_DATA_STATE_CHANGE, 
+    NFL_GAMES_STATE_CHANGE, 
+    NCAAF_GAMES_STATE_CHANGE, 
+    MLB_GAMES_STATE_CHANGE,
+    NBA_GAMES_STATE_CHANGE, 
+    NCAAB_GAMES_STATE_CHANGE,
+    EPL_GAMES_STATE_CHANGE,
+    GOLF_GAMES_STATE_CHANGE,
+    FUTURE_GAMES_STATE_CHANGE,
+    NHL_GAMES_STATE_CHANGE, 
+    CLEAR_DATA} from '../constants/index'
 import firebase from 'firebase'
 import { SnapshotViewIOSComponent } from 'react-native'
 require('firebase/firestore')
@@ -157,19 +173,19 @@ export function fetchNBAGames() {
     })
 }
 
-export function fetchNCAABGames() {
+export function fetchMLBGames() {
     return ((dispatch) => {
         firebase.firestore()
-            .collection("ncaab")
+            .collection("mlb")
             .orderBy('gameDate', 'desc')
             .onSnapshot((snapshot) => {
-                let ncaabGames = snapshot.docs.map(doc => {
+                let mlbGames = snapshot.docs.map(doc => {
                     const data = doc.data();
                     const id = doc.id;
                     return { id, ...data }
                 })
-                dispatch({ type: NCAAB_GAMES_STATE_CHANGE, ncaabGames });
-                for(let i = 0; i < ncaabGames.length; i++){
+                dispatch({ type: MLB_GAMES_STATE_CHANGE, mlbGames });
+                for(let i = 0; i < mlbGames.length; i++){
                 }
             })
     })
@@ -206,6 +222,40 @@ export function fetchEPLGames() {
                 })
                 dispatch({ type: EPL_GAMES_STATE_CHANGE, eplGames });
                 for(let i = 0; i < eplGames.length; i++){
+                }
+            })
+    })
+}
+
+export function fetchGolfGames() {
+    return ((dispatch) => {
+        firebase.firestore()
+            .collection("golf")
+            .onSnapshot((snapshot) => {
+                let golfGames = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    return { id, ...data }
+                })
+                dispatch({ type: GOLF_GAMES_STATE_CHANGE, golfGames });
+                for(let i = 0; i < golfGames.length; i++){
+                }
+            })
+    })
+}
+
+export function fetchFutureGames() {
+    return ((dispatch) => {
+        firebase.firestore()
+            .collection("futures")
+            .onSnapshot((snapshot) => {
+                let futureGames = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    return { id, ...data }
+                })
+                dispatch({ type: FUTURE_GAMES_STATE_CHANGE, futureGames });
+                for(let i = 0; i < futureGames.length; i++){
                 }
             })
     })

@@ -131,7 +131,7 @@ function Profile(props) {
             .collection("users")
             .doc(props.route.params.uid)
             .update({
-                loccMadnessScore: firebase.firestore.FieldValue.increment(15)
+                masters2022Score: firebase.firestore.FieldValue.increment(25)
         })
     }
 
@@ -147,7 +147,7 @@ function Profile(props) {
             .collection("users")
             .doc(firebase.auth().currentUser.uid)
             .update({
-                loccMadnessScore: firebase.firestore.FieldValue.increment(15)
+                masters2022Score: firebase.firestore.FieldValue.increment(25)
         })
     }
 
@@ -163,7 +163,7 @@ function Profile(props) {
             .collection("users")
             .doc(props.route.params.uid)
             .update({
-                loccMadnessScore: firebase.firestore.FieldValue.increment(-15)
+                masters2022Score: firebase.firestore.FieldValue.increment(-25)
         })
     }
 
@@ -179,7 +179,7 @@ function Profile(props) {
             .collection("users")
             .doc(firebase.auth().currentUser.uid)
             .update({
-                loccMadnessScore: firebase.firestore.FieldValue.increment(-15)
+                masters2022Score: firebase.firestore.FieldValue.increment(-25)
         })
     }
 

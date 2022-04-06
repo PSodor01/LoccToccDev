@@ -6,6 +6,7 @@ import { View, ActivityIndicator, StyleSheet, Text, TouchableOpacity, Alert } fr
 import { FontAwesome5 } from "@expo/vector-icons";
 
 import * as firebase from 'firebase'
+import * as Analytics from 'expo-firebase-analytics';
 
 
 import { Provider } from 'react-redux'

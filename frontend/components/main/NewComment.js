@@ -119,7 +119,7 @@ function NewCommentScreen(props, route) {
             .collection("users")
             .doc(firebase.auth().currentUser.uid)
             .update({
-                loccMadnessScore: firebase.firestore.FieldValue.increment(40)
+              masters2022Score: firebase.firestore.FieldValue.increment(30)
         })
       }
 
@@ -137,7 +137,7 @@ function NewCommentScreen(props, route) {
             .collection("users")
             .doc(props.route.params.uid)
             .update({
-                loccMadnessScore: firebase.firestore.FieldValue.increment(20)
+              masters2022Score: firebase.firestore.FieldValue.increment(20)
         })
 
       }

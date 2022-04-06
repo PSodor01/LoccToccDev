@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native'
+import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Image, Linking } from 'react-native'
 
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 
@@ -22,8 +22,8 @@ function Contest(props) {
 
     useEffect(() => {
 
-        const contestParticipants = props.allUsers.filter(user => user.loccMadnessScore != null);
-        setAllUsers(contestParticipants.sort((a, b) => parseFloat(b.loccMadnessScore) - parseFloat(a.loccMadnessScore)).slice(0, 50))
+        const contestParticipants = props.allUsers.filter(user => user.masters2022Score != null);
+        setAllUsers(contestParticipants.sort((a, b) => parseFloat(b.masters2022Score) - parseFloat(a.masters2022Score)).slice(0, 50))
 
         const myScore = props.allUsers.filter(user => user.name == props.currentUser.name);
         setMyScore(myScore)
@@ -40,7 +40,7 @@ function Contest(props) {
     const renderMyScore = ({item}) => {
         return (
             <View>
-                <Text style={styles.subTitleText}>{item.loccMadnessScore}</Text>
+                <Text style={styles.subTitleText}>{item.masters2022Score}</Text>
             </View>
         )}
 
@@ -48,8 +48,8 @@ function Contest(props) {
         <View style={styles.panel}>
           <View >
             <View style={{alignItems: 'center'}}>
-                <Text style={styles.panelTitle}>Locc Madness</Text>
-                <Text>Welcome to Locc Madness: Locctocc's first cash giveaway contest!</Text>
+                <Text style={styles.panelTitle}>Locctocc Cash Contest</Text>
+                <Text>Masters and MLB Opening Weekend</Text>
                 <Text> </Text>
             </View>
             <View style={{ alignItems: 'center'}}>
@@ -57,9 +57,9 @@ function Contest(props) {
             </View>
             <View style={{textAlign: 'justify'}}>
                 <Text>- Post your locks and engage with other members of the community to earn points</Text>
-                <Text>- Contest will run for all of March Madness</Text>
-                <Text>- First place receives $150, second place receives $50</Text>
-                <Text>- Winner will be notified via email and will have 24 hours to respond</Text>
+                <Text>- Contest will run for the duration of the Masters tournament</Text>
+                <Text>- First place: $150, second place: $50</Text>
+                <Text>- Winners will be announced on our IG and notified via email and will have 24 hours to respond</Text>
                 <Text>- Prizes will be paid electronically (Venmo, Paypal, etc)</Text>
                 <Text>- Locctocc reserves the right to choose a new winner in the event of foul play</Text>
             </View>
@@ -121,26 +121,59 @@ function Contest(props) {
             <Animated.View style={{ flex:1, opacity: Animated.add(0.1, Animated.multiply(this.fall, 1.0)),}}>
                 <View style={styles.headerContainer}>
                     <View style={styles.titleContainer}>
-                        <Text style={styles.titleText}>Leaderboard   </Text>
-                        <TouchableOpacity onPress={() => this.bs.current.snapTo(0)}>
-                            <FontAwesome5 name="info-circle" size={18} justifyContent='center' alignItems='center' color="#2e64e5"/>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={styles.infoContainer}>
-                        <Text style={styles.subTitleText}>CASH PRIZES: $200</Text>
-                        
-                    </View>
-                    <View style={styles.infoContainer}>
-                        <Text style={styles.subTitleText}>My Score: </Text>
-                        <FlatList
-                            data ={myScore}
-                            renderItem={renderMyScore}
+                    <View>
+                        <Image 
+                            style={{ width: 130, height: 100, marginBottom: 5, marginRight: 10, }}
+                            source={require('../../assets/tropBrosLogo.png')}
                         />
                     </View>
+                    <View>
+                        <View style={styles.titleContainer}>
+                            <Text style={styles.titleText}>CASH PRIZES: $200  </Text>
+                            <TouchableOpacity onPress={() => this.bs.current.snapTo(0)}>
+                                <FontAwesome5 name="info-circle" size={18} justifyContent='center' alignItems='center' color="#2e64e5"/>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.infoContainer}>
+                            <Text style={styles.subTitleText}>My Score: </Text>
+                            <FlatList
+                                data ={myScore}
+                                renderItem={renderMyScore}
+                            />
+                        </View>
+                        <View style={styles.infoContainer}>
+                            <Text style={styles.subTitleText}> </Text>
+                        </View>
+                        <View style={styles.infoContainer}>
+                            <Text style={styles.subTitleText}>Presented by:</Text>
+                        </View>
+                        <View style={styles.infoContainer}>
+                            <Text
+                                style={styles.linkText}
+                                onPress={() => {
+                                Linking.openURL('https://tropicalbros.com');
+                                }}>
+                                www.TROPICALBROS.com
+                            </Text>
+                        </View>
+                        <View style={styles.infoContainer}>
+                            <Text
+                                style={styles.linkText}
+                                onPress={() => {
+                                Linking.openURL('https://www.instagram.com/tropical.bros/');
+                                }}>
+                                Follow!
+                            </Text>
+                        </View>
+                    </View>
+                </View>
+                <View style={styles.brandTextContainer}>
+                    <Text style={styles.brandText}>Enjoy Life in Style with Tropical Bros laid back lifestyle golf and beachwear. We deliver the highest quality products with the coolest designs at the most competitive prices.  Stay Tropical. </Text>
+                </View>
                 </View>
                 <Leaderboard 
                     data={allUsers} 
-                    sortBy='loccMadnessScore' 
+                    sortBy='masters2022Score' 
                     labelBy='name'
                     icon='userImg'
                     />
@@ -167,43 +200,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
 
-    },
-    scoreContainer: {
-        flexDirection: 'row',
-    },
-    searchResultsText: {
-        fontSize: 14,
-        padding: 8,
-        alignSelf: 'center',
-        marginLeft: "5%",
-    },
-    feed: {
-        borderColor: '#e1e2e6',
-        backgroundColor: "#B2DFDB",
-
-    },
-    profilePhotoPostContainer: {
-        backgroundColor: "#e1e2e6",
-        width: 40,
-        height: 40,
-        borderRadius: 40,
-    },
-    profilePhotoContainer: {
-
-    },
-    feedItem:{
-        padding:2,
-        marginVertical:2,
-        marginHorizontal:5, 
-        flexDirection: 'row',
-        borderWidth: 1,
-        borderRadius: 10,
-        borderColor: '#e1e2e6',
-        justifyContent: 'space-between',
-        backgroundColor: '#ffffff'
-    },
-    postLeftContainer: {
-        flexDirection: "row",
     },
     titleText: {
         fontSize: 16,
@@ -281,6 +277,17 @@ const styles = StyleSheet.create({
     adView: {
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    brandText: {
+        fontSize: 11,
+        textAlign: 'justify'
+    },
+    linkText: {
+        color: 'blue',
+    },
+    brandTextContainer: {
+        justifyContent: 'center',
+        width: "95%"
     },
     
 })

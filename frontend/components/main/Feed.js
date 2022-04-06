@@ -82,7 +82,7 @@ function Feed(props) {
         }
 
         var ourDate = new Date();
-        var pastDate = ourDate.getDate() - 5;
+        var pastDate = ourDate.getDate() - 3;
         ourDate.setDate(pastDate);
 
         firebase.firestore()
@@ -117,7 +117,7 @@ function Feed(props) {
             .collection("users")
             .doc(firebase.auth().currentUser.uid)
             .update({
-                loccMadnessScore: firebase.firestore.FieldValue.increment(5)
+                masters2022Score: firebase.firestore.FieldValue.increment(10)
             })
     }
 
@@ -133,7 +133,7 @@ function Feed(props) {
             .collection("users")
             .doc(firebase.auth().currentUser.uid)
             .update({
-                loccMadnessScore: firebase.firestore.FieldValue.increment(-5)
+                masters2022Score: firebase.firestore.FieldValue.increment(-10)
             })
         
     }
@@ -150,7 +150,7 @@ function Feed(props) {
             .collection("users")
             .doc(firebase.auth().currentUser.uid)
             .update({
-                loccMadnessScore: firebase.firestore.FieldValue.increment(-10)
+                masters2022Score: firebase.firestore.FieldValue.increment(-10)
             })
     }
 
@@ -166,7 +166,7 @@ function Feed(props) {
             .collection("users")
             .doc(firebase.auth().currentUser.uid)
             .update({
-                loccMadnessScore: firebase.firestore.FieldValue.increment(10)
+                masters2022Score: firebase.firestore.FieldValue.increment(10)
             })
     }
 
@@ -194,7 +194,7 @@ function Feed(props) {
             .collection("users")
             .doc(userId)
             .update({
-                loccMadnessScore: firebase.firestore.FieldValue.increment(15)
+                masters2022Score: firebase.firestore.FieldValue.increment(20)
         })
     }
 
@@ -221,7 +221,7 @@ function Feed(props) {
             .collection("users")
             .doc(userId)
             .update({
-                loccMadnessScore: firebase.firestore.FieldValue.increment(-15)
+                masters2022Score: firebase.firestore.FieldValue.increment(-20)
         })
         
     }
@@ -249,7 +249,7 @@ function Feed(props) {
             .collection("users")
             .doc(userId)
             .update({
-                loccMadnessScore: firebase.firestore.FieldValue.increment(-50)
+                masters2022Score: firebase.firestore.FieldValue.increment(-50)
         })
     }
 
@@ -276,7 +276,7 @@ function Feed(props) {
             .collection("users")
             .doc(userId)
             .update({
-                loccMadnessScore: firebase.firestore.FieldValue.increment(50)
+                masters2022Score: firebase.firestore.FieldValue.increment(50)
         })
 
     }
