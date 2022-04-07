@@ -14,6 +14,8 @@ import Constants from 'expo-constants'
 
 import ShareButton from '../buttons/ShareButton'
 
+import * as Analytics from 'expo-firebase-analytics';
+
 import firebase from 'firebase'
 require('firebase/firestore')
 
@@ -97,6 +99,9 @@ function Comment(props, route) {
     const adUnitID = Constants.isDevice && !__DEV__ ? productionID : testID;
 
     const handleReportPostEmail = () => {
+
+        Analytics.logEvent('reportComment', {});
+
         const to = ['ReportPost@locctocc.com'] // string or array of email addresses
         email(to, {
             // Optional additional arguments

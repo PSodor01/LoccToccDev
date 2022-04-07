@@ -9,6 +9,8 @@ import * as ImagePicker from 'expo-image-picker';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
+import * as Analytics from 'expo-firebase-analytics';
+
 import firebase from 'firebase'
 require("firebase/firestore")
 require("firebase/firebase-storage")
@@ -39,6 +41,9 @@ const EditProfileScreen = () => {
     }
 
     const handleUpdate = async() => {
+
+      Analytics.logEvent('submitEditProfile', {});
+
         let imgUrl = await uploadImage();
 
         if( imgUrl == null && userData.userImg ) {
@@ -149,6 +154,9 @@ const EditProfileScreen = () => {
       }
     
       const pickImage = async () => {
+
+        Analytics.logEvent('changeProfilePicture', {});
+
         let result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
           allowsEditing: true,

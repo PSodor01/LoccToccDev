@@ -12,6 +12,8 @@ import * as ImagePicker from 'expo-image-picker';
 import Animated from 'react-native-reanimated';
 import BottomSheet from 'reanimated-bottom-sheet';
 
+import * as Analytics from 'expo-firebase-analytics';
+
 import firebase from 'firebase'
 require('firebase/firestore')
 require("firebase/firebase-storage")
@@ -90,6 +92,9 @@ function NewCommentScreen(props, route) {
     }, [props.route.params.postId, props.users])
 
     const onCommentSend = (downloadURL) => {
+
+      Analytics.logEvent('newComment', {});
+
         firebase.firestore()
             .collection('posts')
             .doc(props.route.params.uid)
@@ -185,6 +190,9 @@ function NewCommentScreen(props, route) {
     };
 
       const pickImage = async () => {
+
+        Analytics.logEvent('addPictureToComment', {});
+
         let result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
           allowsEditing: true,
@@ -199,6 +207,10 @@ function NewCommentScreen(props, route) {
       };
 
       const pickGif = (url) => {
+
+        Analytics.logEvent('addGifToComment', {});
+
+
         let result =  (url);
         console.log(result);
     
@@ -209,7 +221,10 @@ function NewCommentScreen(props, route) {
       };
     
       const removeImage = () => {
-          setImage(null);
+
+        Analytics.logEvent('removeImageFromComment', {});
+
+        setImage(null);
       }
 
       const uploadImage = async () => {

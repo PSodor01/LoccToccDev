@@ -14,6 +14,7 @@ import BottomSheet from 'reanimated-bottom-sheet';
 
 import {AdMobBanner} from 'expo-ads-admob'
 import Constants from 'expo-constants'
+import * as Analytics from 'expo-firebase-analytics';
 
 import firebase from 'firebase'
 require("firebase/firestore")
@@ -61,6 +62,9 @@ const AddPostScreen = ({ route, props }) => {
   };
 
   const pickImage = async () => {
+
+    Analytics.logEvent('addPictureToPost', {});
+
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -75,6 +79,9 @@ const AddPostScreen = ({ route, props }) => {
   };
 
   const pickGif = (url) => {
+
+    Analytics.logEvent('addGifToPost', {});
+
     let result =  (url);
     console.log(result);
 
@@ -85,10 +92,14 @@ const AddPostScreen = ({ route, props }) => {
   };
 
   const removeImage = () => {
+    Analytics.logEvent('removeImageFromPost', {});
+
       setImage(null);
   }
 
   const savePostData = (downloadURL) => {
+
+    Analytics.logEvent('newPost', {});
 
     firebase.firestore()
         .collection('posts')

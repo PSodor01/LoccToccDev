@@ -17,6 +17,8 @@ import ShareButton from '../buttons/ShareButton'
 
 import email from 'react-native-email'
 
+import * as Analytics from 'expo-firebase-analytics';
+
 import firebase from 'firebase'
 require("firebase/firestore")
 require("firebase/firebase-storage")
@@ -129,6 +131,8 @@ function game(props) {
             .update({
                 masters2022Score: firebase.firestore.FieldValue.increment(10)
             })
+
+        Analytics.logEvent('hammerPost', {});
             
     }
 
@@ -162,6 +166,8 @@ function game(props) {
             .update({
                 masters2022Score: firebase.firestore.FieldValue.increment(-10)
             })
+
+        Analytics.logEvent('fadePost', {});
     }
 
     const deleteFade = (postId) => {
@@ -360,6 +366,8 @@ function game(props) {
 
     const gameVote = () => {
 
+        Analytics.logEvent('gameVote', {});
+
         firebase.firestore()
             .collection("votes")
             .doc(gameId)
@@ -547,6 +555,9 @@ function game(props) {
     const adUnitID = Constants.isDevice && !__DEV__ ? productionID : testID;
 
     const handleReportPostEmail = (name, caption) => {
+
+        Analytics.logEvent('reportPost', {});
+
         const to = ['ReportPost@locctocc.com'] // string or array of email addresses
         email(to, {
             // Optional additional arguments
@@ -589,6 +600,7 @@ function game(props) {
             setSortCriteria(false)
         } else {
             setSortCriteria(true)
+            Analytics.logEvent('sortPosts', {});
         }
     }
 
@@ -597,6 +609,7 @@ function game(props) {
             setListAllPlayers(false)
         } else {
             setListAllPlayers(true)
+            Analytics.logEvent('seeAllPlayers', {});
         }
     }
 

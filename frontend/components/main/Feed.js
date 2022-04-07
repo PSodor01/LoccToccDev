@@ -12,6 +12,8 @@ import moment from 'moment';
 
 import ShareButton from '../buttons/ShareButton'
 
+import * as Analytics from 'expo-firebase-analytics';
+
 import firebase from 'firebase'
 require('firebase/firestore')
 
@@ -119,6 +121,8 @@ function Feed(props) {
             .update({
                 masters2022Score: firebase.firestore.FieldValue.increment(10)
             })
+
+        Analytics.logEvent('hammerPost', {});
     }
 
     const deleteLike = (postId, userId) => {
@@ -152,6 +156,8 @@ function Feed(props) {
             .update({
                 masters2022Score: firebase.firestore.FieldValue.increment(-10)
             })
+
+        Analytics.logEvent('fadePost', {});
     }
 
     const deleteFade = (postId) => {
@@ -354,6 +360,9 @@ function Feed(props) {
     const adUnitID = Constants.isDevice && !__DEV__ ? productionID : testID;
 
     const handleReportPostEmail = () => {
+
+        Analytics.logEvent('reportPost', {});
+
         const to = ['ReportPost@locctocc.com'] // string or array of email addresses
         email(to, {
             // Optional additional arguments
@@ -396,6 +405,7 @@ function Feed(props) {
             setFollowCriteria(false)
         } else {
             setFollowCriteria(true)
+            Analytics.logEvent('filterPostsFriends', {});
         }
     }
 

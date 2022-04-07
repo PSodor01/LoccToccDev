@@ -19,6 +19,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.psodor01.locctocc",
+      "googleServicesFile": "../frontend/GoogleService-Info.plist",
       "infoPlist": {
         "NSCameraUsageDescription": "Enable Camera Access so that you can upload photos as posts or as your profile picture",
         "NSPhotoLibraryUsageDescription": "Enable Photo Library Access so that you can upload photos as posts or as your profile picture",
@@ -35,7 +36,19 @@
       }
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "config": {
+        "firebase": {
+          "apiKey": "AIzaSyAmXTsXkPI-J6mineXVOY9wa0y-B7R_GDw",
+          "authDomain": "locctoccdev.firebaseapp.com",
+          "databaseURL": "https://locctoccdev-default-rtdb.firebaseio.com",
+          "projectId": "locctoccdev",
+          "storageBucket": "locctoccdev.appspot.com",
+          "messagingSenderId": "736365930098",
+          "appId": "1:736365930098:web:a626e007f31172af5684eb",
+          "measurementId": "G-4YXWQRXEF1"
+        }
+      }
     }
   }
 }

@@ -11,6 +11,8 @@ import Constants from 'expo-constants'
 
 import Leaderboard from 'react-native-leaderboard';
 
+import * as Analytics from 'expo-firebase-analytics';
+
 import firebase from 'firebase'
 require("firebase/firestore")
 require("firebase/firebase-storage")
@@ -45,7 +47,15 @@ function Contest(props) {
             </View>
         )}
 
+    const countInfoClicks = () => {
+        Analytics.logEvent('contestInfoClicks', {});
+    }
+
     const countWebsiteClicks = () => {
+
+        Analytics.logEvent('websiteClicks', {});
+
+
         firebase.firestore()
             .collection("brandClicks")
             .doc('tropicalBros')
@@ -62,6 +72,9 @@ function Contest(props) {
     }
 
     const countInstagramClicks = () => {
+
+        Analytics.logEvent('instagramClicks', {});
+
         firebase.firestore()
             .collection("brandClicks")
             .doc('tropicalBros')
@@ -163,7 +176,8 @@ function Contest(props) {
                     <View>
                         <View style={styles.titleContainer}>
                             <Text style={styles.titleText}>CASH PRIZES: $200  </Text>
-                            <TouchableOpacity onPress={() => this.bs.current.snapTo(0)}>
+                            <TouchableOpacity onPress={() => {this.bs.current.snapTo(0); countInfoClicks()}}
+                            >
                                 <FontAwesome5 name="info-circle" size={18} justifyContent='center' alignItems='center' color="#2e64e5"/>
                             </TouchableOpacity>
                         </View>

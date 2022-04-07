@@ -39,10 +39,12 @@ function Odds(props) {
     const [notification, setNotification] = useState('');
     const [notificationCriteria, setNotificationCriteria] = useState(false);
     const [bannerId, setBannerId] = useState('') //test id: 3940256099942544/2934735716
-
     
     useEffect(() => {
         setBannerId('ca-app-pub-8519029912093094/8772877514')
+
+        Analytics.setUserId(firebase.auth().currentUser.uid);
+
     }, [])
 
     useEffect(() => {
@@ -274,6 +276,8 @@ function Odds(props) {
             setBrowse(false)
         } else {
             setBrowse(true)
+            Analytics.logEvent('search', {
+            });
         }
     }
 
@@ -286,15 +290,15 @@ function Odds(props) {
     }
     
     const setSportFunction = (sport) => {
-        if (sport == 'Trending') {setSportGames(trendingGames); setSport('Trending'); setBannerId('ca-app-pub-8519029912093094/4907013689')} // Real ID: 8519029912093094/4907013689, test ID: 3940256099942544/2934735716
-        if (sport == 'NFL') {setSportGames(props.nflGames); setSport('NFL'); setBannerId('ca-app-pub-8519029912093094/7298151920')} // Real ID: 8519029912093094/7298151920, test ID: 3940256099942544/2934735716
-        if (sport == 'NBA') {setSportGames(props.nbaGames); setSport('NBA'); setBannerId('ca-app-pub-8519029912093094/2973755922')} // Real ID: 8519029912093094/2973755922, test ID: 3940256099942544/2934735716
-        if (sport == 'NHL') {setSportGames(props.nhlGames); setSport('NHL'); setBannerId('ca-app-pub-8519029912093094/4095265900')} // Real ID: 8519029912093094/4095265900, test ID: 3940256099942544/2934735716
-        if (sport == 'NCAAB') {setSportGames(props.ncaabGames); setSport('NCAAB'); setBannerId('ca-app-pub-8519029912093094/8772877514')} // Real ID: 8519029912093094/8772877514, test ID: 3940256099942544/2934735716
-        if (sport == 'EPL') {setSportGames(props.eplGames); setSport('EPL'); setBannerId('ca-app-pub-8519029912093094/8198162447')}
-        if (sport == 'MLB') {setSportGames(props.mlbGames); setSport('MLB'); setBannerId('ca-app-pub-8519029912093094/2973755922')}
-        if (sport == 'Masters') {setSportGames(props.golfGames); setSport('Masters'); setBannerId('ca-app-pub-8519029912093094/8198162447')}
-        if (sport == 'Futures') {setSportGames(props.futureGames); setSport('Futures'); setBannerId('ca-app-pub-8519029912093094/8198162447')}
+        if (sport == 'Trending') {setSportGames(trendingGames); Analytics.logEvent('selectTrendingGames', {}); setSport('Trending'); setBannerId('ca-app-pub-8519029912093094/4907013689')} // Real ID: 8519029912093094/4907013689, test ID: 3940256099942544/2934735716
+        if (sport == 'NFL') {setSportGames(props.nflGames); Analytics.logEvent('selectNFLGames', {}); setSport('NFL'); setBannerId('ca-app-pub-8519029912093094/7298151920')} // Real ID: 8519029912093094/7298151920, test ID: 3940256099942544/2934735716
+        if (sport == 'NBA') {setSportGames(props.nbaGames); Analytics.logEvent('selectNBAGames', {}); setSport('NBA'); setBannerId('ca-app-pub-8519029912093094/2973755922')} // Real ID: 8519029912093094/2973755922, test ID: 3940256099942544/2934735716
+        if (sport == 'NHL') {setSportGames(props.nhlGames); Analytics.logEvent('selectNHLGames', {}); setSport('NHL'); setBannerId('ca-app-pub-8519029912093094/4095265900')} // Real ID: 8519029912093094/4095265900, test ID: 3940256099942544/2934735716
+        if (sport == 'NCAAB') {setSportGames(props.ncaabGames); Analytics.logEvent('selectNCAABGames', {}); setSport('NCAAB'); setBannerId('ca-app-pub-8519029912093094/8772877514')} // Real ID: 8519029912093094/8772877514, test ID: 3940256099942544/2934735716
+        if (sport == 'EPL') {setSportGames(props.eplGames); Analytics.logEvent('selectEPLGames', {}); setSport('EPL'); setBannerId('ca-app-pub-8519029912093094/8198162447')}
+        if (sport == 'MLB') {setSportGames(props.mlbGames); Analytics.logEvent('selectMLBGames', {}); setSport('MLB'); setBannerId('ca-app-pub-8519029912093094/2973755922')}
+        if (sport == 'Masters') {setSportGames(props.golfGames); Analytics.logEvent('selectMastersGames', {}); setSport('Masters'); setBannerId('ca-app-pub-8519029912093094/8198162447')}
+        if (sport == 'Futures') {setSportGames(props.futureGames); Analytics.logEvent('selectFuturesGames', {}); setSport('Futures'); setBannerId('ca-app-pub-8519029912093094/8198162447')}
     }
 
     const nbaIcon = (<Icon name="basketball-outline" color="#ee6730" size={16}/>);
@@ -690,19 +694,19 @@ function Odds(props) {
                 />
                 
             </View>
-                {browse == true ? 
-                <View style={styles.searchContainer}>
-                    <TextInput
-                        style={styles.textInput}
-                        placeholder="Find your lock..."
-                        clearButtonMode={'while-editing'}
-                        autoCorrect={false}
-                        value={search}
-                        onChangeText={(text) => searchNFLFilter(text)}
-                   />
-                </View>
-                    
-                   : null}
+            {browse == true ? 
+            <View style={styles.searchContainer}>
+                <TextInput
+                    style={styles.textInput}
+                    placeholder="Find your lock..."
+                    clearButtonMode={'while-editing'}
+                    autoCorrect={false}
+                    value={search}
+                    onChangeText={(text) => searchNFLFilter(text)}
+                />
+            </View>
+                
+            : null}
 
             {sportGames == futureGames  ?
             <View style={styles.gameHeaderContainer}>

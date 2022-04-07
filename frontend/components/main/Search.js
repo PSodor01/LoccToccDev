@@ -3,6 +3,8 @@ import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Image } 
 
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 
+import * as Analytics from 'expo-firebase-analytics';
+
 import {AdMobBanner} from 'expo-ads-admob'
 import Constants from 'expo-constants'
 
@@ -66,6 +68,7 @@ function Search(props) {
             setBrowse(false)
         } else {
             setBrowse(true)
+            Analytics.logEvent('seeAllUsersSearch', {});
         }
     }
 

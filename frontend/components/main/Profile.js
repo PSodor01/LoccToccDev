@@ -8,6 +8,8 @@ import email from 'react-native-email'
 
 import moment from 'moment';
 
+import * as Analytics from 'expo-firebase-analytics';
+
 import firebase from 'firebase'
 require('firebase/firestore')
 import { connect } from 'react-redux'
@@ -108,6 +110,8 @@ function Profile(props) {
                 id: props.route.params.uid,
                 follower: firebase.auth().currentUser.uid,
             })
+
+        Analytics.logEvent('followUser', {});
     }
 
     const onUnfollow = () => {
@@ -117,6 +121,8 @@ function Profile(props) {
             .collection("userFollowing")
             .doc(props.route.params.uid)
             .delete()
+
+        Analytics.logEvent('unfollowUser', {});
     }
 
     const increaseFollowerCount = () => {
@@ -195,6 +201,8 @@ function Profile(props) {
                   "User succesfully blocked" 
                 );
               })
+
+        Analytics.logEvent('blockUser', {});
     }
 
     const unBlockUser = () => {
@@ -204,6 +212,8 @@ function Profile(props) {
             .collection("userBlocking")
             .doc(props.route.params.uid)
             .delete()
+
+        Analytics.logEvent('unblockUser', {});
     }
 
     const blockAndUnfollowHandler = () => {
@@ -292,6 +302,10 @@ function Profile(props) {
     };
 
     const handleReportPostEmail = () => {
+
+        Analytics.logEvent('reportPost', {});
+
+
         const to = ['ReportPost@locctocc.com'] // string or array of email addresses
         email(to, {
             // Optional additional arguments
@@ -337,6 +351,8 @@ function Profile(props) {
             .update({
                 postsCount: firebase.firestore.FieldValue.increment(-1)
             })
+
+        Analytics.logEvent('deletePost', {});
 
 
             
