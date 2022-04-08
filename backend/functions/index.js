@@ -706,7 +706,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
                 .doc(game.bookmakers[0].markets[0].outcomes[i].name)
                 .set({
                   playerName: game.bookmakers[0].markets[0].outcomes[i].name,
-                  playerOdds: (game.bookmakers[0].markets[0].outcomes[i].price -1) * 100,
+                  playerOdds: Math.round((game.bookmakers[0].markets[0].outcomes[i].price -1) * 100),
                   gameId: game.id,
                   sport: 'US Masters Tournament Lines - Winner',
                   

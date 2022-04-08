@@ -43,7 +43,11 @@ function NewCommentScreen(props, route) {
             setUserData(documentSnapshot.data());
         }
         })
-        }  
+    }
+    
+    useEffect(() => {
+      Analytics.logEvent('screen_view', { screen_name: 'NewComment' })
+  }, [])
     
     useEffect(() => {
         getUser();

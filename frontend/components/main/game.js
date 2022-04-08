@@ -51,6 +51,7 @@ function game(props) {
     useEffect(() => {
         setGolfGames(props.golfGames)
         setFutureGames(props.futureGames)
+        Analytics.logEvent('screen_view', { screen_name: 'Game' })
     }, [])
 
     const fetchData = () => {

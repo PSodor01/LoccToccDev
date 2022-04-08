@@ -22,7 +22,11 @@ function Profile(props) {
     const [loading, setLoading] = useState(true);
     
     useEffect(() => {
+
         fetchData()
+
+        Analytics.logEvent('screen_view', { screen_name: 'Profile' })
+
     }, [props.route.params.uid, props.following, props.blocking])
 
     const fetchData = () => {

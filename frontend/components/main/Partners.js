@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, Linking, View, Text, ScrollView} from 'react-native'
+import { StyleSheet, Linking, View, Text, ScrollView, Image} from 'react-native'
 
 
 export default class PartnersScreen extends React.Component {
@@ -11,16 +11,23 @@ export default class PartnersScreen extends React.Component {
                     <Text style={styles.titleText}>We are proud to present our trusted partners:</Text>
                 </View>
                 <View style={styles.container}>
-                    <Text style={styles.titleText}>Bet Openly</Text>
-                    <Text style={styles.text}>Create Your Own Lines, Only 1% Juice!</Text>
-                    <Text
-                        style={styles.linkText}
-                        onPress={() => {
-                        Linking.openURL('https://betopenly.com');
-                        }}>
-                        Bet Openly
-                    </Text>
-                    <Text></Text>
+                    <View>
+                        <Image 
+                            style={{ width: 170, height: 40, marginBottom: 5, marginRight: 5, }}
+                            source={require('../../assets/betOpenlyLogo.png')}
+                        />
+                    </View>
+                    <View>
+                        <Text style={styles.text}>Create Your Own Lines, Only 1% Juice!</Text>
+                        <Text
+                            style={styles.linkText}
+                            onPress={() => {
+                            Linking.openURL('https://betopenly.com');
+                            }}>
+                            Bet Openly
+                        </Text>
+                        <Text></Text>
+                    </View>
                 </View>
             </ScrollView>
             

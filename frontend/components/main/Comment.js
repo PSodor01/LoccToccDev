@@ -48,7 +48,14 @@ function Comment(props, route) {
     useEffect(() => {
         fetchData()
         getUser()
+        
     }, [props.route.params.postId, props.users])
+
+    useEffect(() => {
+        
+        Analytics.logEvent('screen_view', { screen_name: 'Comment' })
+    
+    }, [])
 
     const fetchData = () => {
         function matchUserToComment(comments) {

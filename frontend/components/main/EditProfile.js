@@ -131,6 +131,8 @@ const EditProfileScreen = () => {
 
     useEffect(() => {
         getUser();
+
+        Analytics.logEvent('screen_view', { screen_name: 'EditProfile' })
     },[]);
 
     useEffect(() => {

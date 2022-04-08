@@ -36,6 +36,8 @@ function Feed(props) {
         fetchData()
         setCurrentUserFollowingCount(props.currentUser.followingCount)
 
+        Analytics.logEvent('screen_view', { screen_name: 'Feed' })
+
     }, [props.blocking, props.faded, props.liked, props.following, props.currentUser])
 
     const fetchData = () => {

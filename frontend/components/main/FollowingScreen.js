@@ -5,6 +5,8 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 
 import { useNavigation } from '@react-navigation/native';
 
+import * as Analytics from 'expo-firebase-analytics';
+
 import firebase from 'firebase'
 require("firebase/firestore")
 require("firebase/firebase-storage")
@@ -18,6 +20,10 @@ function FollowingScreen(props) {
     const [following, setFollowing] = useState([])
 
     const { userId } = props.route.params;
+
+    useEffect(() => {
+        Analytics.logEvent('screen_view', { screen_name: 'FollowingList' })
+    }, [])
 
     
     useEffect(() => {

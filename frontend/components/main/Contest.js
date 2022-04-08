@@ -37,6 +37,7 @@ function Contest(props) {
     useEffect(() => {
 
         interstitial()
+        Analytics.logEvent('screen_view', { screen_name: 'Contest' })
 
     }, [])
 

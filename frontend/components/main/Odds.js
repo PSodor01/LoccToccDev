@@ -44,6 +44,7 @@ function Odds(props) {
         setBannerId('ca-app-pub-8519029912093094/8772877514')
 
         Analytics.setUserId(firebase.auth().currentUser.uid);
+        Analytics.logEvent('screen_view', { screen_name: 'Odds' })
 
     }, [])
 

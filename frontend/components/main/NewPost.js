@@ -47,6 +47,10 @@ const AddPostScreen = ({ route, props }) => {
     useEffect(() => {
       getUser();
     },[]);
+
+    useEffect(() => {
+      Analytics.logEvent('screen_view', { screen_name: 'NewPost' })
+    }, [])
     
 
   const takePhotoFromCamera = () => {

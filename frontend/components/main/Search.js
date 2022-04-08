@@ -21,6 +21,7 @@ function Search(props) {
     useEffect(() => {
         
         setAllUsers(props.allUsers)
+        Analytics.logEvent('screen_view', { screen_name: 'Search' })
         
     }, [props.allUsers])
 
