@@ -237,6 +237,8 @@ function Odds(props) {
             },
             body: JSON.stringify(message),
         });
+
+        Analytics.logEvent('sendNotificationToAllUsers', {})
     }
 
     const sendNotificationToAllUsers = async () => {

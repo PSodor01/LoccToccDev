@@ -26,7 +26,7 @@ function Contest(props) {
     useEffect(() => {
 
         const contestParticipants = props.allUsers.filter(user => user.masters2022Score != null);
-        setAllUsers(contestParticipants.slice(0, 50))
+        setAllUsers(contestParticipants.sort((a, b) => parseFloat(b.masters2022Score) - parseFloat(a.masters2022Score)).slice(0, 50))
 
         const myScore = props.allUsers.filter(user => user.name == props.currentUser.name);
         setMyScore(myScore)
