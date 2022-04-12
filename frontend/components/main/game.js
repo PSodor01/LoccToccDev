@@ -46,12 +46,13 @@ function game(props) {
 
     useEffect(() => {
             fetchData()
+            Analytics.logEvent('screen_view', { screen_name: 'Game' })
+
     }, [props.blocking, props.liked, props.faded, props.route.params.postId, props.users])
 
     useEffect(() => {
         setGolfGames(props.golfGames)
         setFutureGames(props.futureGames)
-        Analytics.logEvent('screen_view', { screen_name: 'Game' })
     }, [])
 
     const fetchData = () => {
@@ -126,13 +127,6 @@ function game(props) {
             .doc(postId)
             .set({})
 
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                masters2022Score: firebase.firestore.FieldValue.increment(10)
-            })
-
         Analytics.logEvent('hammerPost', {});
             
     }
@@ -145,12 +139,6 @@ function game(props) {
             .doc(postId)
             .delete({})
 
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                masters2022Score: firebase.firestore.FieldValue.increment(-10)
-            })
     }
 
     const storeFade = (postId) => {
@@ -160,13 +148,6 @@ function game(props) {
             .collection("userFades")
             .doc(postId)
             .set({})
-
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                masters2022Score: firebase.firestore.FieldValue.increment(-10)
-            })
 
         Analytics.logEvent('fadePost', {});
     }
@@ -179,12 +160,6 @@ function game(props) {
             .doc(postId)
             .delete({})
 
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                masters2022Score: firebase.firestore.FieldValue.increment(10)
-            })
     }
 
     const onLikePress = (userId, postId) => {
@@ -207,12 +182,6 @@ function game(props) {
                 likesCount: firebase.firestore.FieldValue.increment(1)
             })
 
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                masters2022Score: firebase.firestore.FieldValue.increment(20)
-        })
     }
 
     const onDislikePress = (userId, postId) => {
@@ -233,13 +202,6 @@ function game(props) {
             .collection("likes")
             .doc(firebase.auth().currentUser.uid)
             .delete()
-        
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                masters2022Score: firebase.firestore.FieldValue.increment(-20)
-        })
         
     }
 
@@ -262,12 +224,6 @@ function game(props) {
             .doc(firebase.auth().currentUser.uid)
             .set({})
 
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                masters2022Score: firebase.firestore.FieldValue.increment(-50)
-        })
     }
 
     const onUnfadePress = (userId, postId) => {
@@ -288,13 +244,6 @@ function game(props) {
             .collection("fades")
             .doc(firebase.auth().currentUser.uid)
             .delete()
-
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                masters2022Score: firebase.firestore.FieldValue.increment(50)
-        })
 
     }
 

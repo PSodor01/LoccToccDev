@@ -44,23 +44,24 @@ function Odds(props) {
         setBannerId('ca-app-pub-8519029912093094/8772877514')
 
         Analytics.setUserId(firebase.auth().currentUser.uid);
-        Analytics.logEvent('screen_view', { screen_name: 'Odds' })
 
     }, [])
 
     useEffect(() => {
         fetchData()
-        if (sport == 'NBA' || sport == 'MLB' || sport == 'NHL' || sport == 'EPL' || sport == 'Futures' || sport == 'Trending') {
+        if ( sport == 'MLB' || sport == 'NHL' || sport == 'EPL' || sport == 'Futures' || sport == 'Trending') {
 
         } 
         else {
-            setSportGames(props.golfGames)
-            setSport('Masters')
+            setSportGames(props.nbaGames)
+            setSport('NBA')
         }
-        
-    }, [ props.nhlGames, props.nbaGames, props.mlbGames, props.eplGames, props.golfGames, props.futureGames, props.trendingGames])
 
-    useEffect(() => {
+        Analytics.logEvent('screen_view', { screen_name: 'Odds' })
+        
+    }, [ props.nhlGames, props.nbaGames, props.mlbGames, props.eplGames, props.futureGames, props.trendingGames])
+
+   /* useEffect(() => {
 
         firebase.firestore()
         .collection('users')
@@ -78,7 +79,7 @@ function Odds(props) {
                 }
             }
         })
-    }, [])
+    }, []) */
 
     
     const fetchData = () => {
@@ -167,7 +168,6 @@ function Odds(props) {
             })
         }
         seteplGames(props.eplGames)
-        setGolfGames(props.golfGames)
         setFutureGames(props.futureGames)
 
         trendingFunction(nbaGames, mlbGames, nhlGames)
@@ -238,12 +238,15 @@ function Odds(props) {
             body: JSON.stringify(message),
         });
 
-        Analytics.logEvent('sendNotificationToAllUsers', {})
+        
     }
 
     const sendNotificationToAllUsers = async () => {
         const users = await firebase.firestore().collection("users").get();
         users.docs.map((user) => sendNotification(user.data().token))
+
+        Analytics.logEvent('sendNotificationToAllUsers', {})
+
     };
 
 
@@ -279,7 +282,7 @@ function Odds(props) {
             setBrowse(false)
         } else {
             setBrowse(true)
-            Analytics.logEvent('search', {
+            Analytics.logEvent('searchGames', {
             });
         }
     }
@@ -322,33 +325,28 @@ function Odds(props) {
             icon: trendingIcon
         },
         {
-            sport: 'Masters',
-            id: '2',
-            icon: golfIcon
-        },
-        {
             sport: 'NBA',
-            id: '3',
+            id: '2',
             icon: nbaIcon
         },
         {
             sport: 'MLB',
-            id: '4',
+            id: '3',
             icon: mlbIcon
         },
         {
             sport: 'NHL',
-            id: '5',
+            id: '4',
             icon: nhlIcon
         },
         {
             sport: 'EPL',
-            id: '6',
+            id: '5',
             icon: eplIcon
         },
         {
             sport: 'Futures',
-            id: '7',
+            id: '6',
             icon: futureIcon
         },
       ];

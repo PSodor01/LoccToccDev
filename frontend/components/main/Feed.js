@@ -117,13 +117,6 @@ function Feed(props) {
             .doc(postId)
             .set({})
 
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                masters2022Score: firebase.firestore.FieldValue.increment(10)
-            })
-
         Analytics.logEvent('hammerPost', {});
     }
 
@@ -135,13 +128,6 @@ function Feed(props) {
             .doc(postId)
             .delete({})
         
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                masters2022Score: firebase.firestore.FieldValue.increment(-10)
-            })
-        
     }
 
     const storeFade = (postId) => {
@@ -151,13 +137,6 @@ function Feed(props) {
             .collection("userFades")
             .doc(postId)
             .set({})
-
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                masters2022Score: firebase.firestore.FieldValue.increment(-10)
-            })
 
         Analytics.logEvent('fadePost', {});
     }
@@ -170,12 +149,6 @@ function Feed(props) {
             .doc(postId)
             .delete({})
 
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                masters2022Score: firebase.firestore.FieldValue.increment(10)
-            })
     }
 
     const onLikePress = (userId, postId) => {
@@ -198,12 +171,6 @@ function Feed(props) {
                 likesCount: firebase.firestore.FieldValue.increment(1)
             })
 
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                masters2022Score: firebase.firestore.FieldValue.increment(20)
-        })
     }
 
     const onDislikePress = (userId, postId) => {
@@ -225,13 +192,6 @@ function Feed(props) {
             .doc(firebase.auth().currentUser.uid)
             .delete()
 
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                masters2022Score: firebase.firestore.FieldValue.increment(-20)
-        })
-        
     }
 
     const onFadePress = (userId, postId) => {
@@ -253,12 +213,6 @@ function Feed(props) {
             .doc(firebase.auth().currentUser.uid)
             .set({})
 
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                masters2022Score: firebase.firestore.FieldValue.increment(-50)
-        })
     }
 
     const onUnfadePress = (userId, postId) => {
@@ -279,13 +233,6 @@ function Feed(props) {
             .collection("fades")
             .doc(firebase.auth().currentUser.uid)
             .delete()
-
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                masters2022Score: firebase.firestore.FieldValue.increment(50)
-        })
 
     }
 
@@ -820,4 +767,3 @@ const mapStateToProps = (store) => ({
 const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUsersData }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchProps)(Feed);
-

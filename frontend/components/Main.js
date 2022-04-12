@@ -8,16 +8,27 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import firebase from 'firebase'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { fetchUser, fetchUserFollowing, fetchUserBlocking, fetchAllUsers, fetchLikes, fetchFades, fetchMLBGames, fetchNBAGames, fetchEPLGames, fetchGolfGames, fetchFutureGames, fetchNHLGames, clearData } from '../redux/actions/index'
+import { fetchUser, fetchUserFollowing, fetchUserBlocking, fetchAllUsers, fetchAllPosts, fetchLikes, fetchFades, fetchMLBGames, fetchNBAGames, fetchEPLGames, fetchGolfGames, fetchFutureGames, fetchNHLGames, clearData } from '../redux/actions/index'
 
 import FeedScreen from './main/Feed'
 import ProfileScreen from './main/Profile'
 import Research from './main/Research'
 import SearchScreen from './main/Search'
-import ContestScreen from './main/Contest'
 import Odds from './main/Odds'
 
 const Stack = createStackNavigator();
+
+  /*<Tab.Screen 
+    name="Contest" 
+    component={ContestScreen} 
+    navigation={this.props.navigation}
+    options={{
+        tabBarLabel: 'Leaders',
+        tabBarColor: '#009387',
+        tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="trophy" color="#ffd700" size={26} />
+        ),
+    }} /> */
 
 
 const MessageStack = ({navigation}) => (
@@ -60,6 +71,7 @@ export class Main extends Component {
         this.props.fetchLikes();
         this.props.fetchFades();
         this.props.fetchAllUsers();
+        this.props.fetchAllPosts();
         this.props.fetchNBAGames();
         this.props.fetchMLBGames();
         this.props.fetchEPLGames();
@@ -92,17 +104,6 @@ export class Main extends Component {
                         ),
                     }}
                     />
-                <Tab.Screen 
-                name="Contest" 
-                component={ContestScreen} 
-                navigation={this.props.navigation}
-                options={{
-                    tabBarLabel: 'Leaders',
-                    tabBarColor: '#009387',
-                    tabBarIcon: ({ color, size }) => (
-                        <MaterialCommunityIcons name="trophy" color="#ffd700" size={26} />
-                    ),
-                }} />
                 <Tab.Screen 
                     name="Search" 
                     component={SearchScreen} 
@@ -148,6 +149,6 @@ const mapStateToProps = (store) => ({
     golfGames: store.golfGamesState.golfGames,
     futureGames: store.futureGamesState.futureGames,
 })
-const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUser, fetchUserFollowing, fetchAllUsers, fetchUserBlocking, fetchLikes, fetchFades, fetchMLBGames, fetchNBAGames, fetchGolfGames, fetchEPLGames, fetchFutureGames, fetchNHLGames, clearData }, dispatch);
+const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUser, fetchUserFollowing, fetchAllUsers, fetchAllPosts, fetchUserBlocking, fetchLikes, fetchFades, fetchMLBGames, fetchNBAGames, fetchGolfGames, fetchEPLGames, fetchFutureGames, fetchNHLGames, clearData }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchProps)(Main);

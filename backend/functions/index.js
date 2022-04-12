@@ -746,18 +746,25 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
         .then(result => {
           result.data.forEach(game => {
 
-            for (let i = 0; i < game.bookmakers[0].markets[0].outcomes.length; i++){
+            if (game.bookmakers.findIndex((item) => item.key === 'draftkings') > -1) {
+              let j = game.bookmakers.findIndex((item) => item.key === 'draftkings')
+              for (let i = 0; i < game.bookmakers[j].markets[0].outcomes.length; i++){
                 const writeResult = admin
                 .firestore()
                 .collection('futures')
-                .doc(game.bookmakers[0].markets[0].outcomes[i].name)
+                .doc(game.bookmakers[j].markets[0].outcomes[i].name)
                 .set({
-                  playerName: game.bookmakers[0].markets[0].outcomes[i].name,
-                  playerOdds: Math.round((game.bookmakers[0].markets[0].outcomes[i].price -1) * 100),
+                  playerName: game.bookmakers[j].markets[0].outcomes[i].name,
+                  playerOdds: Math.round((game.bookmakers[j].markets[0].outcomes[i].price -1) * 100),
                   gameId: game.id,
                   sport: 'MLB - World Series Winner',
                   
                 }, { merge:true });
+            }
+    
+            } else {
+              return
+  
             }
           })
         })

@@ -132,13 +132,6 @@ const AddPostScreen = ({ route, props }) => {
         console.log(error)
     })
 
-    firebase.firestore()
-        .collection("users")
-        .doc(firebase.auth().currentUser.uid)
-        .update({
-            postsCount: firebase.firestore.FieldValue.increment(1),
-            masters2022Score: firebase.firestore.FieldValue.increment(30)
-        })
     }
 
     const increasePostsCount = () => {

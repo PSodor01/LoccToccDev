@@ -31,13 +31,13 @@ function Contest(props) {
         const myScore = props.allUsers.filter(user => user.name == props.currentUser.name);
         setMyScore(myScore)
 
+        Analytics.logEvent('screen_view', { screen_name: 'Contest' })
 
     }, [props.allUsers, props.currentUser])
 
     useEffect(() => {
 
         interstitial()
-        Analytics.logEvent('screen_view', { screen_name: 'Contest' })
 
     }, [])
 
@@ -46,7 +46,7 @@ function Contest(props) {
             <View>
                 <Text style={styles.subTitleText}>{item.masters2022Score}</Text>
             </View>
-        )}
+    )}
 
     const countInfoClicks = () => {
         Analytics.logEvent('contestInfoClicks', {});

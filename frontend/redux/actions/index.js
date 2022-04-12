@@ -14,7 +14,9 @@ import { USER_STATE_CHANGE,
     GOLF_GAMES_STATE_CHANGE,
     FUTURE_GAMES_STATE_CHANGE,
     NHL_GAMES_STATE_CHANGE, 
-    CLEAR_DATA} from '../constants/index'
+    ALL_POSTS_STATE_CHANGE,
+    CLEAR_DATA
+    } from '../constants/index'
 import firebase from 'firebase'
 import { SnapshotViewIOSComponent } from 'react-native'
 require('firebase/firestore')
@@ -129,6 +131,32 @@ export function fetchAllUsers() {
                 for(let i = 0; i < allUsers.length; i++){
                 }
             })
+    })
+}
+
+export function fetchAllPosts(uid) {
+    var ourDate = new Date();
+    var pastDate = ourDate.getDate() - 3;
+    ourDate.setDate(pastDate);
+
+    return ((dispatch) => {
+        firebase.firestore()
+            .collectionGroup("userPosts")
+            .where("creation", ">=", ourDate)
+            .orderBy('creation', 'desc')
+            .get()
+            .then((snapshot) => {
+                let allPosts = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    return { id, ...data }
+                })
+                console.log(allPosts)
+                dispatch({ type: ALL_POSTS_STATE_CHANGE, allPosts });
+                for(let i = 0; i < allPosts.length; i++){
+                }
+            })
+
     })
 }
 
