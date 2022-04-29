@@ -73,8 +73,8 @@ exports.getMLBGameData = functions.pubsub.schedule('every 5 minutes').onRun(asyn
     .then(result => {
       result.data.forEach(game => {
 
-        if (game.bookmakers.findIndex((item) => item.key === 'betrivers') > -1) {
-          let i = game.bookmakers.findIndex((item) => item.key === 'betrivers')
+        if (game.bookmakers.findIndex((item) => item.key === 'fanduel') > -1) {
+          let i = game.bookmakers.findIndex((item) => item.key === 'fanduel')
           if (game.away_team == game.bookmakers[0].markets[0].outcomes[0].name) {
 
             const writeResult = admin

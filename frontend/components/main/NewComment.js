@@ -31,7 +31,7 @@ function NewCommentScreen(props, route) {
     const [gifs, setGifs] = useState([]);
     const [term, updateTerm] = useState('');
 
-    const { posterName, postId, uid } = props.route.params;
+    const { posterName, postId, uid, awayTeam, homeTeam} = props.route.params;
 
     const getUser = async() => {
         const currentUser = await firebase.firestore()
@@ -39,9 +39,9 @@ function NewCommentScreen(props, route) {
         .doc(firebase.auth().currentUser.uid)
         .get()
         .then((documentSnapshot) => {
-        if( documentSnapshot.exists ) {
-            setUserData(documentSnapshot.data());
-        }
+          if( documentSnapshot.exists ) {
+              setUserData(documentSnapshot.data());
+          }
         })
     }
     
@@ -51,6 +51,7 @@ function NewCommentScreen(props, route) {
     
     useEffect(() => {
         getUser();
+        console.log(awayTeam, homeTeam)
     },[]);
 
     useEffect(() => {
@@ -142,7 +143,7 @@ function NewCommentScreen(props, route) {
         const message = {
           to: token,
           sound: 'default',
-          body: notification ? notification : 'Empty Notification',
+          body: notification ? notification : '',
         };
         
         await fetch('https://exp.host/--/api/v2/push/send', {
@@ -170,8 +171,10 @@ function NewCommentScreen(props, route) {
 
                     if (token != undefined) {
                         const commenterName = userData.name
-                        const notification = commenterName + ' commented on your post'
-                        sendNotification(notification, token)
+                        if (awayTeam  != undefined) {const notification = '(' + posterName + '): ' + commenterName + ' commented on your post on the ' + awayTeam + "/" + homeTeam + " game"
+                            sendNotification(notification, token)}
+                            else {const notification = '(' + posterName + '): ' + commenterName + ' commented on your post'
+                            sendNotification(notification, token)}
                     } else {
                     }
                 }
@@ -179,6 +182,8 @@ function NewCommentScreen(props, route) {
                 }
             })
     };
+
+    
 
       const pickImage = async () => {
 

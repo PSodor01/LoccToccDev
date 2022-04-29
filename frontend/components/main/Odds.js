@@ -41,7 +41,7 @@ function Odds(props) {
     const [bannerId, setBannerId] = useState('') //test id: 3940256099942544/2934735716
     
     useEffect(() => {
-        setBannerId('ca-app-pub-8519029912093094/8772877514')
+        setBannerId('ca-app-pub-8519029912093094/2973755922')
 
         Analytics.setUserId(firebase.auth().currentUser.uid);
 

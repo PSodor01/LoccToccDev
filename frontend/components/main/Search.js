@@ -10,20 +10,24 @@ import Constants from 'expo-constants'
 
 require("firebase/firestore")
 require("firebase/firebase-storage")
-
 import { connect } from 'react-redux'
 
 function Search(props) {
     const [allUsers, setAllUsers] = useState([]);
     const [search, setSearch] = useState('');
-    const [browse, setBrowse] = useState(false)
+    const [browse, setBrowse] = useState(false);
+    
 
     useEffect(() => {
         
         setAllUsers(props.allUsers)
         Analytics.logEvent('screen_view', { screen_name: 'Search' })
+
+        console.log(props.allUsers)
         
     }, [props.allUsers])
+
+    
 
     const ItemView = ({item}) => {
         return (
@@ -72,6 +76,8 @@ function Search(props) {
             Analytics.logEvent('seeAllUsersSearch', {});
         }
     }
+
+    
 
     const testID = 'ca-app-pub-3940256099942544/2934735716';
     const productionID = 'ca-app-pub-8519029912093094/1666835736';

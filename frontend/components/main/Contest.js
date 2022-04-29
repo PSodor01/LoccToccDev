@@ -22,8 +22,15 @@ import { connect } from 'react-redux'
 function Contest(props) {
     const [allUsers, setAllUsers] = useState([]);
     const [myScore, setMyScore] = useState([]);
+    const [contestLive, setContestLive] = useState();
 
     useEffect(() => {
+
+        if (props.contestStatus.contestLive == true) {
+            setContestLive(true)
+        } else {
+            setContestLive(false)
+        }
 
         const contestParticipants = props.allUsers.filter(user => user.masters2022Score != null);
         setAllUsers(contestParticipants.sort((a, b) => parseFloat(b.masters2022Score) - parseFloat(a.masters2022Score)).slice(0, 50))
@@ -33,7 +40,7 @@ function Contest(props) {
 
         Analytics.logEvent('screen_view', { screen_name: 'Contest' })
 
-    }, [props.allUsers, props.currentUser])
+    }, [props.allUsers, props.currentUser, props.contestStatus])
 
     useEffect(() => {
 
@@ -52,7 +59,7 @@ function Contest(props) {
         Analytics.logEvent('contestInfoClicks', {});
     }
 
-    const countWebsiteClicks = () => {
+    const countLocctoccWebsiteClicks = () => {
 
         Analytics.logEvent('websiteClicks', {});
 
@@ -72,7 +79,7 @@ function Contest(props) {
             })
     }
 
-    const countInstagramClicks = () => {
+    const countLocctoccInstagramClicks = () => {
 
         Analytics.logEvent('instagramClicks', {});
 
@@ -95,18 +102,18 @@ function Contest(props) {
         <View style={styles.panel}>
           <View >
             <View style={{alignItems: 'center'}}>
-                <Text style={styles.panelTitle}>Locctocc Cash Contest</Text>
-                <Text>Masters and MLB Opening Weekend</Text>
+                <Text style={styles.panelTitle}>Locctocc Cash Contests</Text>
                 <Text> </Text>
             </View>
             <View style={{ alignItems: 'center'}}>
                 <Text style={styles.panelSubtitle}>Contest Rules</Text>
+                <Text></Text>
             </View>
             <View style={{textAlign: 'justify'}}>
-                <Text>- Post your locks and engage with other members of the community to earn points</Text>
-                <Text>- Contest will run for the duration of the Masters tournament</Text>
-                <Text>- First place: $150, second place: $50</Text>
-                <Text>- Winners will be announced on our IG and notified via email and will have 24 hours to respond</Text>
+                <Text>- Post your locks and engage with other members of the community to participate</Text>
+                <Text>- Earn points by posting and collecting hammers, lose points for fades</Text>
+                <Text>- Cash prizes will be announced for each contest</Text>
+                <Text>- Winners will be announced on our IG and will have 24 hours to respond</Text>
                 <Text>- Prizes will be paid electronically (Venmo, Paypal, etc)</Text>
                 <Text>- Locctocc reserves the right to choose a new winner in the event of foul play</Text>
             </View>
@@ -166,63 +173,112 @@ function Contest(props) {
                 enabledGestureInteraction={true}       
             />
             <Animated.View style={{ flex:1, opacity: Animated.add(0.1, Animated.multiply(this.fall, 1.0)),}}>
+                
+                {contestLive == true ?
                 <View style={styles.headerContainer}>
                     <View style={styles.titleContainer}>
-                    <View>
-                        <Image 
-                            style={{ width: 130, height: 100, marginBottom: 5, marginRight: 10, }}
-                            source={require('../../assets/tropBrosLogo.png')}
-                        />
-                    </View>
-                    <View>
-                        <View style={styles.titleContainer}>
-                            <Text style={styles.titleText}>CASH PRIZES: $200  </Text>
-                            <TouchableOpacity onPress={() => {this.bs.current.snapTo(0); countInfoClicks()}}
-                            >
-                                <FontAwesome5 name="info-circle" size={18} justifyContent='center' alignItems='center' color="#2e64e5"/>
-                            </TouchableOpacity>
-                        </View>
-                        <View style={styles.infoContainer}>
-                            <Text style={styles.subTitleText}>My Score: </Text>
-                            <FlatList
-                                data ={myScore}
-                                renderItem={renderMyScore}
+                        <View>
+                            <Image 
+                                style={{ width: 130, height: 100, marginBottom: 5, marginRight: 10, }}
+                                source={require('../../assets/tropBrosLogo.png')}
                             />
                         </View>
-                        <View style={styles.infoContainer}>
-                            <Text style={styles.subTitleText}> </Text>
+                        <View>
+                            <View style={styles.titleContainer}>
+                                <Text style={styles.titleText}>CASH PRIZES: $200  </Text>
+                                <TouchableOpacity onPress={() => {this.bs.current.snapTo(0); countInfoClicks()}}
+                                >
+                                    <FontAwesome5 name="info-circle" size={18} justifyContent='center' alignItems='center' color="#2e64e5"/>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.infoContainer}>
+                                <Text style={styles.subTitleText}>My Score: </Text>
+                                <FlatList
+                                    data ={myScore}
+                                    renderItem={renderMyScore}
+                                />
+                            </View>
+                            <View style={styles.infoContainer}>
+                                <Text style={styles.subTitleText}> </Text>
+                            </View>
+                            <View style={styles.infoContainer}>
+                                <Text style={styles.subTitleText}>Presented by:</Text>
+                            </View>
+                            <View style={styles.infoContainer}>
+                                <TouchableOpacity
+                                    style={styles.linkText}>
+                                        <Text style={styles.linkText}
+                                    onPress={() => {
+                                    countWebsiteClicks()
+                                    Linking.openURL('https://tropicalbros.com');
+                                    }}>
+                                    www.TROPICALBROS.com</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.infoContainer}>
+                                <TouchableOpacity
+                                    style={styles.linkText}>
+                                        <Text style={styles.linkText}
+                                    onPress={() => {
+                                    countInstagramClicks()
+                                    Linking.openURL('https://www.instagram.com/tropical.bros/');
+                                    }}>
+                                    Follow!</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
-                        <View style={styles.infoContainer}>
-                            <Text style={styles.subTitleText}>Presented by:</Text>
-                        </View>
-                        <View style={styles.infoContainer}>
-                            <TouchableOpacity
-                                style={styles.linkText}>
-                                    <Text style={styles.linkText}
-                                onPress={() => {
-                                countWebsiteClicks()
-                                Linking.openURL('https://tropicalbros.com');
-                                }}>
-                                www.TROPICALBROS.com</Text>
-                            </TouchableOpacity>
-                        </View>
-                        <View style={styles.infoContainer}>
-                            <TouchableOpacity
-                                style={styles.linkText}>
-                                    <Text style={styles.linkText}
-                                onPress={() => {
-                                countInstagramClicks()
-                                Linking.openURL('https://www.instagram.com/tropical.bros/');
-                                }}>
-                                Follow!</Text>
-                            </TouchableOpacity>
+                    </View>
+                    <View style={styles.brandTextContainer}>
+                        <Text style={styles.brandText}>Enjoy Life in Style with Tropical Bros laid back lifestyle golf and beachwear. We deliver the highest quality products with the coolest designs at the most competitive prices.  Stay Tropical. </Text>
+                    </View>
+                </View>
+                :
+                <View style={styles.headerContainer}>
+                    <View style={styles.titleContainer}>
+                        <View>
+                            <View style={styles.titleContainer}>
+                                <Text style={styles.titleText}>Locctocc Cash Contests  </Text>
+                                <TouchableOpacity onPress={() => {this.bs.current.snapTo(0); countInfoClicks()}}>
+                                    <FontAwesome5 name="info-circle" size={18} justifyContent='center' alignItems='center' color="#2e64e5"/>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.infoContainer}>
+                                <Text style={styles.subTitleText}>New contests coming soon! Check back here and follow us on social media for updates!</Text>
+                            </View>
+                            <View style={styles.infoContainer}>
+                                <Text style={styles.subTitleText}> </Text>
+                            </View>
+                            <View style={styles.infoContainer}>
+                                <TouchableOpacity
+                                    style={styles.linkText}>
+                                        <Text style={styles.linkText}
+                                    onPress={() => {
+                                    countLocctoccWebsiteClicks()
+                                    Linking.openURL('https://www.instagram.com/locctocc/');
+                                    }}>
+                                    Instagram</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.infoContainer}>
+                                <TouchableOpacity
+                                    style={styles.linkText}>
+                                        <Text style={styles.linkText}
+                                    onPress={() => {
+                                    countLocctoccInstagramClicks()
+                                    Linking.openURL('https://twitter.com/LoccTocc');
+                                    }}>
+                                    Twitter</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.infoContainer}>
+                                <Text style={styles.subTitleText}>Previous contest leaderboard:</Text>
+                            </View>
                         </View>
                     </View>
                 </View>
-                <View style={styles.brandTextContainer}>
-                    <Text style={styles.brandText}>Enjoy Life in Style with Tropical Bros laid back lifestyle golf and beachwear. We deliver the highest quality products with the coolest designs at the most competitive prices.  Stay Tropical. </Text>
-                </View>
-                </View>
+                
+                }
+                
                 <Leaderboard 
                     data={allUsers} 
                     sortBy='masters2022Score' 
@@ -268,6 +324,9 @@ const styles = StyleSheet.create({
         paddingBottom: 10,
         paddingTop: 5,
         marginLeft: "5%",
+    },
+    noContestContainer: {
+        flex: 1,
     },
     titleContainer: {
         flexDirection: 'row',
@@ -336,6 +395,7 @@ const styles = StyleSheet.create({
     },
     linkText: {
         color: 'blue',
+        fontSize: 14,
     },
     brandTextContainer: {
         justifyContent: 'center',
@@ -347,6 +407,7 @@ const styles = StyleSheet.create({
 const mapStateToProps = (store) => ({
     allUsers: store.userState.allUsers,
     currentUser: store.userState.currentUser,
+    contestStatus: store.userState.contestStatus,
 })
 
 export default connect(mapStateToProps)(Contest);

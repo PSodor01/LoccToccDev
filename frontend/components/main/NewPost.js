@@ -12,15 +12,15 @@ import * as ImagePicker from 'expo-image-picker';
 import Animated from 'react-native-reanimated';
 import BottomSheet from 'reanimated-bottom-sheet';
 
-import {AdMobBanner} from 'expo-ads-admob'
 import Constants from 'expo-constants'
 import * as Analytics from 'expo-firebase-analytics';
 
 import firebase from 'firebase'
 require("firebase/firestore")
 require("firebase/firebase-storage")
+import { connect } from 'react-redux'
 
-const AddPostScreen = ({ route, props }) => {
+function AddPostScreen(props) {
 
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -29,29 +29,37 @@ const AddPostScreen = ({ route, props }) => {
   const [userData, setUserData] = useState(null);
   const [gifs, setGifs] = useState([]);
   const [term, updateTerm] = useState('');
+  const [userTagList, setUserTagList] = useState(null);
+  const [userTokenList, setUserTokenList] = useState(null);
+  const [isUserTagged, setIsUserTagged] = useState(false)
+  const [gifMode, setGifMode] = useState(null);
+  const [allUsers, setAllUsers] = useState([]);
+  const [search, setSearch] = useState('');
 
-  const { gameId, homeTeam, awayTeam, gameDate } = route.params;
+  const { gameId, homeTeam, awayTeam, gameDate } = props.route.params;
 
   const getUser = async() => {
     const currentUser = await firebase.firestore()
-    .collection('users')
-    .doc(firebase.auth().currentUser.uid)
-    .get()
-    .then((documentSnapshot) => {
-    if( documentSnapshot.exists ) {
-        setUserData(documentSnapshot.data());
-    }
-    })
+      .collection('users')
+      .doc(firebase.auth().currentUser.uid)
+      .get()
+      .then((documentSnapshot) => {
+        if( documentSnapshot.exists ) {
+            setUserData(documentSnapshot.data());
+        }
+      })
     }  
 
     useEffect(() => {
       getUser();
+      Analytics.logEvent('screen_view', { screen_name: 'NewPost' })
     },[]);
 
     useEffect(() => {
-      Analytics.logEvent('screen_view', { screen_name: 'NewPost' })
-    }, [])
-    
+        
+      setAllUsers(props.allUsers)
+      
+  }, [props.allUsers])
 
   const takePhotoFromCamera = () => {
     ImagePicker.openCamera({
@@ -101,6 +109,66 @@ const AddPostScreen = ({ route, props }) => {
       setImage(null);
   }
 
+  const removeTaggedUser = () => {
+    Analytics.logEvent('removeTaggedUserFromPost', {});
+
+    setUserTagList(null);
+    setUserTokenList(null);
+    setIsUserTagged([null])
+  }
+
+
+  const setGifFunction = () => {
+    setGifMode(true)
+  }
+
+  const setTagFunction = () => {
+    setGifMode(false)
+  }
+
+  const tagUsersFunction = (name, token) => {
+    Analytics.logEvent('addUsersToTagList', {});
+    
+        const userTagList = name
+        setUserTagList(userTagList)
+        setUserTokenList(token)
+        setIsUserTagged(true)
+
+  }
+
+  const sendNotificationForTag = async () => {
+    if (userTokenList) {
+        const taggerName = props.currentUser.name
+        const name = userTagList
+        const token = userTokenList
+        if (awayTeam  != undefined) {const notification = '(' + name + '): ' + taggerName + ' tagged you in a post on the ' + awayTeam + "/" + homeTeam + " game"
+          sendNotification(notification, token)
+          console.log(token)}
+          else {const notification = '(' + name + '): ' + taggerName + ' tagged you in a post'
+          sendNotification(notification, token)}
+        //const users = await firebase.firestore().collection("users").get();
+        //users.docs.map((user) => sendNotification(user.data().token))
+    }
+  }
+
+  const sendNotification = async (notification, token) => {
+    const message = {
+        to: token,
+        sound: 'default',
+        body: notification ? notification : '',
+    };
+    
+    await fetch('https://exp.host/--/api/v2/push/send', {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Accept-encoding': 'gzip, deflate',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(message),
+    });
+  }
+
   const savePostData = (downloadURL) => {
 
     Analytics.logEvent('newPost', {});
@@ -117,7 +185,8 @@ const AddPostScreen = ({ route, props }) => {
           likesCount: 0,
           fadesCount: 0,
           comments: 0,
-          downloadURL
+          downloadURL,
+          userTagList: userTagList
         }).then(() => {
           console.log('Post Added!');
           Alert.alert(
@@ -131,6 +200,12 @@ const AddPostScreen = ({ route, props }) => {
       })).catch((error) => {
         console.log(error)
     })
+      firebase.firestore()
+        .collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .update({
+            postsCount: firebase.firestore.FieldValue.increment(1),
+        })
 
     }
 
@@ -152,7 +227,9 @@ const AddPostScreen = ({ route, props }) => {
                 .update({
                     gamePostsCount: firebase.firestore.FieldValue.increment(1)
                 })
+
               }
+            
               else {
                   
                   const gameVotes = 
@@ -171,11 +248,12 @@ const AddPostScreen = ({ route, props }) => {
                         gamePostsCount: 1,
 
                       })
+                  
               }
           })
   }
 
-    const uploadImage = async () => {
+  const uploadImage = async () => {
       if( image == null ) {
         const downloadURL = "blank"
         savePostData(downloadURL);
@@ -238,12 +316,12 @@ const AddPostScreen = ({ route, props }) => {
         fetchGifs();
     }
 
-    renderInner = () => (
+    renderGifInner = () => (
         <View style={styles.panel}>
             <FlatList
                 data={gifs}
                 renderItem={({item}) => ( 
-                    <View style={styles.containerImage}>
+                    <View>
                         <TouchableOpacity onPress={()=>{pickGif(item.images.original.url)}}>
                             <Image
                             style={styles.image}
@@ -263,7 +341,7 @@ const AddPostScreen = ({ route, props }) => {
         </View>
       );
     
-      renderHeader = () => (
+      renderGifHeader = () => (
         <View style={styles.header}>
           <View style={styles.panelHeader}>
             <View style={styles.panelHandle} />
@@ -272,6 +350,7 @@ const AddPostScreen = ({ route, props }) => {
                 <TextInput
                     placeholder="Search GIPHY"
                     style={styles.textInput}
+                    clearButtonMode={'while-editing'}
                     onChangeText={(text) => onEdit(text)}
                 />
             </View>
@@ -279,47 +358,162 @@ const AddPostScreen = ({ route, props }) => {
         </View>
       );
 
+      renderTagInner = () => (
+        <View style={styles.panel}>
+            <FlatList
+                data = {allUsers.sort((a, b) => a.name.localeCompare(b.name))}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={searchItemView}
+                    
+            />
+          <TouchableOpacity
+            style={styles.panelButton}
+            onPress={() => this.bs.current.snapTo(1)}>
+            <Text style={styles.panelButtonTitle}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    
+      renderTagHeader = () => (
+        <View style={styles.header}>
+          <View style={styles.panelHeader}>
+            <View style={styles.panelHandle} />
+            <Text>Choose a friend below to tag in your post!</Text>
+            <Text> </Text>
+            <View style={styles.searchSection}>
+                <FontAwesome5 name="search-dollar" color="grey" size={20} paddingRight={5} />
+                <TextInput
+                    style={styles.textInput}
+                    placeholder="Type to find friends..."
+                    clearButtonMode={'while-editing'}
+                    value={search}
+                    onChangeText={(text) => searchFilter(text)}
+                />
+            </View>
+          </View>
+        </View>
+      );
+
+      const searchItemView = ({item}) => {
+        return (
+          <View>
+          {item.id == 'L3PlC2PXHYMYHsrdUtaS6tr7Ij13' || item.id == '74hAr9c5tYcERhqgyVbcwrPEr083' ?
+              null :
+
+              <View style={styles.feedItem}>
+                  <TouchableOpacity style={styles.postLeftContainer}
+                      onPress={() => {tagUsersFunction(item.name, item.token); this.bs.current.snapTo(1)}}>
+                      <Image 
+                          style={styles.profilePhotoPostContainer}
+                          source={{uri: item.name ? item.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                      />
+                      <Text style={styles.searchResultsText}>{item.name}</Text>
+                  </TouchableOpacity>
+              </View> }
+          </View>
+          
+      )
+    }
+
+    const taggedNameList = ({item}) => {
+      return (
+        <View>
+            <View>
+                <Text>@{item.name}</Text>
+            </View>
+        </View>
+        
+    )
+  }
+
+    const searchFilter = (text) => {
+        if (text) {
+            const newData = allUsers.filter((item) => {
+                const itemData = item.name ? item.name.toUpperCase() : ''.toUpperCase();
+
+                const textData = text.toUpperCase();
+                return itemData.indexOf(textData) > -1
+
+                
+            });
+            setAllUsers(newData)
+            setSearch(text)
+        } else {
+            setAllUsers(props.allUsers)
+            setSearch(text)
+        }
+    }
+
     bs = React.createRef();
     fall = new Animated.Value(1);
 
   return (
         <View style={styles.container}>
+        {gifMode == true ? 
           <BottomSheet 
               ref={this.bs}
               snapPoints={[550, -5]}
-              renderContent={this.renderInner}
-              renderHeader={this.renderHeader}
+              renderContent={this.renderGifInner}
+              renderHeader={this.renderGifHeader}
               initialSnap={1}
               callbackNode={this.fall}
               enabledGestureInteraction={true}       
           />
-          <Animated.View style={{margin: 15, 
+        :
+          <BottomSheet 
+              ref={this.bs}
+              snapPoints={[550, -5]}
+              renderContent={this.renderTagInner}
+              renderHeader={this.renderTagHeader}
+              initialSnap={1}
+              callbackNode={this.fall}
+              enabledGestureInteraction={true}       
+          />
+        }
+          
+          <Animated.View style={{margin: 10, 
           opacity: Animated.add(0.1, Animated.multiply(this.fall, 1.0)),
           }}>
             {awayTeam ? <Text style={styles.gameText}>{awayTeam} vs {homeTeam}</Text> : null}
-            <View style={styles.typePostContainer}>
-              <Image 
-                    style={styles.profilePhotoPostContainer}
-                    source={{uri: userData ? userData.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
-              />
-              <TextInput
-                  placeholder="Know your stuff? Share your lock..."
-                  style={styles.postTextInput}
-                  numberOfLines={4}
-                  multiline={true}
-                  maxLength={1000}
-                  value={post}
-                  onChangeText={(content) => setPost(content)}
-              />
+            <View>
+              <View style={styles.typePostContainer}>
+                <Image 
+                      style={styles.profilePhotoPostContainer}
+                      source={{uri: userData ? userData.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                />
+                <TextInput
+                    placeholder="Know your stuff? Share your lock..."
+                    style={styles.postTextInput}
+                    numberOfLines={4}
+                    multiline={true}
+                    maxLength={1000}
+                    value={post}
+                    onChangeText={(content) => setPost(content)}
+                />
+              </View>
+              {isUserTagged == true ?
+              <View style={styles.tagListContainer}>
+                <Text style={{ fontWeight: 'bold' }}>Tagged friends: </Text>
+                <Text style={{ color: '#0033cc', fontWeight: 'bold' }}>@{userTagList}</Text>
+                <TouchableOpacity onPress={() => {removeTaggedUser()}}>
+                    <Feather name="x-circle" size={16} color ="red" />
+                </TouchableOpacity>
+              </View>
+              :
+                null}
+              
 
             </View>
             <View style={styles.addCommentButton}>
                 <View style={styles.galleryContainer}>
-                  <TouchableOpacity onPress={() => this.bs.current.snapTo(0)}>
+                  <TouchableOpacity onPress={() => {this.bs.current.snapTo(0); setGifFunction()}}>
                       <MaterialCommunityIcons name="gif" size={24} justifyContent='center' alignItems='center' color="#86898B"/>
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => {pickImage()}}>
                       <MaterialCommunityIcons name="camera" size={24} justifyContent='center' alignItems='center'  color="#86898B"/>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => {this.bs.current.snapTo(0); setTagFunction()}}>
+                      <FontAwesome5 name="user-tag" size={24} justifyContent='center' alignItems='center'  color="#86898B"/>
                   </TouchableOpacity>
                 </View>
                 <View style={styles.postButtonContainer}>
@@ -330,7 +524,7 @@ const AddPostScreen = ({ route, props }) => {
                   
                   :
                  
-                  <TouchableOpacity onPress={() => {uploadImage(); increasePostsCount()}} style={styles.postButton}>
+                  <TouchableOpacity onPress={() => {uploadImage(); increasePostsCount(); sendNotificationForTag()}} style={styles.postButton}>
                       <Text style={styles.shareText}>POST</Text>
                   </TouchableOpacity>
                 }
@@ -360,8 +554,6 @@ const AddPostScreen = ({ route, props }) => {
     
   );
 };
-
-export default AddPostScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -393,6 +585,13 @@ profilePhotoPostContainer: {
   borderRadius: 40,
   marginRight: "2%",
 },
+profilePhotoPostContainer: {
+  backgroundColor: "#e1e2e6",
+  width: 40,
+  height: 40,
+  borderRadius: 40,
+  marginRight: "2%",
+},
 shareText: {
   fontSize: 16,
   fontWeight: "bold",
@@ -420,7 +619,7 @@ galleryContainer: {
   marginLeft: "5%",
   flex: 1,
   justifyContent: 'space-between',
-  marginRight: "35%",
+  marginRight: "25%",
 },
 postButtonContainer: {
   paddingRight: "10%",
@@ -520,9 +719,35 @@ xButton: {
 postTextInput: {
   width: Dimensions.get('window').width * .80,
 },
+feedItem:{
+  padding:6,
+  marginVertical:2,
+  marginHorizontal:5,
+  borderBottomWidth: 1,
+  borderBottomColor: "#e1e2e6",
+  flexDirection: 'row',
+},
+postLeftContainer: {
+  flexDirection: "row",
+},
+tagListContainer: {
+  flexDirection: "row",
+},
+searchResultsText: {
+  padding: 5,
+  alignSelf: 'center',
+  marginLeft: "5%",
+},
 adView: {
   alignItems: 'center',
   justifyContent: 'center',
 },
 
 })
+
+const mapStateToProps = (store) => ({
+  allUsers: store.userState.allUsers,
+  currentUser: store.userState.currentUser,
+})
+
+export default connect(mapStateToProps)(AddPostScreen);

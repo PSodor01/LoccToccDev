@@ -47,7 +47,7 @@ function game(props) {
     useEffect(() => {
             fetchData()
             Analytics.logEvent('screen_view', { screen_name: 'Game' })
-
+        
     }, [props.blocking, props.liked, props.faded, props.route.params.postId, props.users])
 
     useEffect(() => {
@@ -265,31 +265,7 @@ function game(props) {
         });
     }
 
-    const sendNotificationForLike = async (uid) => {
-        const users = await firebase
-            .firestore()
-            .collection("users")
-            .doc(uid)
-            .get()
-            .then((snapshot) => {
-                if (snapshot.exists) {
-                    let data = snapshot.data();
-
-                    const token = data.token
-
-                    if (token != undefined) {
-                        const likeName = props.currentUser.name
-                        const notification = likeName + ' hammered your post'
-                        sendNotification(notification, token)
-                    } else {
-                    }
-                }
-                else {
-                }
-            })
-    };
-
-    const sendNotificationForFade = async (uid) => {
+    const sendNotificationForLike = async (uid, name) => {
         const users = await firebase
             .firestore()
             .collection("users")
@@ -303,8 +279,38 @@ function game(props) {
 
                     if (token != undefined) {
                         const likedName = props.currentUser.name
-                        const notification = likedName + ' faded your post'
-                        sendNotification(notification, token)
+                        if (awayTeam  != undefined) {const notification = '(' + name + '): ' + likedName + ' liked your post on the ' + awayTeam + "/" + homeTeam + " game"
+                            sendNotification(notification, token)}
+                            else {const notification = '(' + name + '): ' + likedName + ' liked your post'
+                            sendNotification(notification, token)}
+                    } else {
+                    }
+                }
+                else {
+                }
+            })
+
+    };
+
+    const sendNotificationForFade = async (uid, name) => {
+        const users = await firebase
+            .firestore()
+            .collection("users")
+            .doc(uid)
+            .get()
+            .then((snapshot) => {
+                if (snapshot.exists) {
+                    let data = snapshot.data();
+
+                    const token = data.token
+
+                    if (token != undefined) {
+                        const likedName = props.currentUser.name
+                        if (awayTeam != undefined) {const notification = '(' + name + '): ' + likedName + ' faded your post on the ' + awayTeam + "/" + homeTeam + " game"
+                            sendNotification(notification, token)}
+                            else {const notification = '(' + name + '): ' + likedName + ' faded your post'
+                            sendNotification(notification, token)}
+                        
                     } else {
                     }
                 }
@@ -597,6 +603,7 @@ function game(props) {
                     <View style={styles.postContentContainer}>
                         {item.caption != null ? <Text style={styles.captionText}>{item.caption}</Text> : null}
                         {item.downloadURL != "blank" ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
+                        {item.userTagList != null ? <Text style={{ color: '#0033cc', fontWeight: 'bold' }}>@{item.userTagList}</Text> : null}
                     </View>
                     <View style={styles.postFooterContainer}>
                         { item.liked == true ?
@@ -651,7 +658,7 @@ function game(props) {
                         }
                         <TouchableOpacity
                             style={styles.commentsContainer}
-                            onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.user.uid, posterId: item.user.uid, posterName: item.user.name, postCreation: item.creation, postCaption: item.caption, posterImg: item.user.userImg, postImg: item.downloadURL })}>
+                            onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.user.uid, posterId: item.user.uid, posterName: item.user.name, postCreation: item.creation, postCaption: item.caption, posterImg: item.user.userImg, postImg: item.downloadURL, awayTeam: awayTeam, homeTeam: homeTeam })}>
                             <Ionicons name={"chatbubble-outline"} size={20} color={"grey"} marginRight={10} />
                             <Text style={styles.likeNumber}>{item.comments}</Text>
                         </TouchableOpacity>

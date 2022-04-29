@@ -30,7 +30,7 @@ function Comment(props, route) {
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    const { posterId, posterName, posterImg, postCreation, postCaption, postImg } = props.route.params;
+    const { posterId, posterName, posterImg, postCreation, postCaption, postImg, awayTeam, homeTeam } = props.route.params;
 
     const getUser = async() => {
         const currentUser = await firebase.firestore()
@@ -168,7 +168,7 @@ function Comment(props, route) {
                         {postImg != "blank" ? <Image source={{uri: postImg}} style={styles.postImage}/> : null}
                     </View>
                     <View style={styles.postButtonContainer}>
-                        <TouchableOpacity onPress={() => navigation.navigate("NewComment", { posterName: posterName, postId: postId, uid: props.route.params.uid })} style={styles.postButton}>
+                        <TouchableOpacity onPress={() => navigation.navigate("NewComment", { posterName: posterName, postId: postId, uid: props.route.params.uid, awayTeam: awayTeam, homeTeam: homeTeam })} style={styles.postButton}>
                             <Text style={styles.shareText}>Reply</Text>
                         </TouchableOpacity>
                     </View>

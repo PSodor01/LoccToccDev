@@ -271,7 +271,7 @@ function Profile(props) {
 
                     if (token != undefined) {
                         const followName = props.currentUser.name
-                        const notification = followName + ' started following you'
+                        const notification = '(' + user.name + '): ' + followName + ' started following you'
                         sendNotification(notification, token)
                     } else {
                     }
@@ -487,6 +487,7 @@ function Profile(props) {
                                 <View style={styles.postContentContainer}>
                                     {item.caption != null ? <Text style={styles.captionText}>{item.caption}</Text> : null}
                                     {item.downloadURL != "blank" ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
+                                    {item.userTagList != null ? <Text style={{ color: '#0033cc', fontWeight: 'bold' }}>@{item.userTagList}</Text> : null}
                                 </View>
                                 <View style={styles.postFooterContainer}>
                                     <View style={styles.likeContainer}>

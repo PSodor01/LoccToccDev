@@ -254,7 +254,7 @@ function Feed(props) {
         });
     }
 
-    const sendNotificationForLike = async (uid) => {
+    const sendNotificationForLike = async (uid, name) => {
         const users = await firebase
             .firestore()
             .collection("users")
@@ -268,8 +268,8 @@ function Feed(props) {
                     
  
                     if (token != undefined) {
-                        const likeName = props.currentUser.name
-                        const notification = likeName + ' hammered your post'
+                        const likedName = props.currentUser.name
+                        const notification = '(' + name + '): ' +  likedName + ' hammered your post'
                         sendNotification(notification, token)
                     } else {
                     }
@@ -279,7 +279,7 @@ function Feed(props) {
             })
     };
 
-    const sendNotificationForFade = async (uid) => {
+    const sendNotificationForFade = async (uid, name) => {
         const users = await firebase
             .firestore()
             .collection("users")
@@ -293,7 +293,7 @@ function Feed(props) {
 
                     if (token != undefined) {
                         const likedName = props.currentUser.name
-                        const notification = likedName + ' faded your post'
+                        const notification = '(' + name + '): ' + likedName + ' faded your post'
                         sendNotification(notification, token)
                     } else {
                     }
@@ -398,6 +398,7 @@ function Feed(props) {
                             <View style={styles.postContentContainer}>
                                 {item.caption != null ? <Text style={styles.captionText}>{item.caption}</Text> : null}
                                 {item.downloadURL != "blank" ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
+                                {item.userTagList != null ? <Text style={{ color: '#0033cc', fontWeight: 'bold' }}>@{item.userTagList}</Text> : null}
                             </View>
                             <View style={styles.postFooterContainer}>
                 { item.liked == true ?
@@ -495,6 +496,7 @@ function Feed(props) {
                             <View style={styles.postContentContainer}>
                                 {item.caption != null ? <Text style={styles.captionText}>{item.caption}</Text> : null}
                                 {item.downloadURL != "blank" ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
+                                {item.userTagList != null ? <Text style={{ color: '#0033cc', fontWeight: 'bold' }}>@{item.userTagList}</Text> : null}
                             </View>
                             <View style={styles.postFooterContainer}>
                 { item.liked == true ?

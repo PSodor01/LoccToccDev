@@ -15,6 +15,7 @@ import { USER_STATE_CHANGE,
     FUTURE_GAMES_STATE_CHANGE,
     NHL_GAMES_STATE_CHANGE, 
     ALL_POSTS_STATE_CHANGE,
+    CONTEST_STATUS_STATE_CHANGE,
     CLEAR_DATA
     } from '../constants/index'
 import firebase from 'firebase'
@@ -151,7 +152,6 @@ export function fetchAllPosts(uid) {
                     const id = doc.id;
                     return { id, ...data }
                 })
-                console.log(allPosts)
                 dispatch({ type: ALL_POSTS_STATE_CHANGE, allPosts });
                 for(let i = 0; i < allPosts.length; i++){
                 }
@@ -286,6 +286,25 @@ export function fetchFutureGames() {
                 for(let i = 0; i < futureGames.length; i++){
                 }
             })
+    })
+}
+
+export function fetchContestStatus() {
+    return ((dispatch) => {
+        firebase.firestore()
+            .collection("contest")
+            .doc('oKeXGH8M6mmdawUvxADp')
+            .get()
+            .then((snapshot) => {
+                if (snapshot.exists) {
+                    let contestStatus = snapshot.data();
+
+                    dispatch({ type: CONTEST_STATUS_STATE_CHANGE, contestStatus})
+                }
+                else {
+                }
+            })
+                
     })
 }
 
