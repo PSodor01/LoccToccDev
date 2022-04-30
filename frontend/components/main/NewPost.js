@@ -52,7 +52,7 @@ function AddPostScreen(props) {
 
     useEffect(() => {
       getUser();
-      Analytics.logEvent('screen_view', { screen_name: 'NewPost' })
+      Analytics.logEvent('screen_view', { screen_name: 'NewPost', user_name: props.currentUser.name })
     },[]);
 
     useEffect(() => {
@@ -75,7 +75,7 @@ function AddPostScreen(props) {
 
   const pickImage = async () => {
 
-    Analytics.logEvent('addPictureToPost', {});
+    Analytics.logEvent('addPictureToPost', {user_name: props.currentUser.name});
 
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -92,7 +92,7 @@ function AddPostScreen(props) {
 
   const pickGif = (url) => {
 
-    Analytics.logEvent('addGifToPost', {});
+    Analytics.logEvent('addGifToPost', {user_name: props.currentUser.name});
 
     let result =  (url);
     console.log(result);
@@ -104,13 +104,13 @@ function AddPostScreen(props) {
   };
 
   const removeImage = () => {
-    Analytics.logEvent('removeImageFromPost', {});
+    Analytics.logEvent('removeImageFromPost', {user_name: props.currentUser.name});
 
       setImage(null);
   }
 
   const removeTaggedUser = () => {
-    Analytics.logEvent('removeTaggedUserFromPost', {});
+    Analytics.logEvent('removeTaggedUserFromPost', {user_name: props.currentUser.name});
 
     setUserTagList(null);
     setUserTokenList(null);
@@ -127,7 +127,7 @@ function AddPostScreen(props) {
   }
 
   const tagUsersFunction = (name, token) => {
-    Analytics.logEvent('addUsersToTagList', {});
+    Analytics.logEvent('addUsersToTagList', {user_name: props.currentUser.name});
     
         const userTagList = name
         setUserTagList(userTagList)
@@ -171,7 +171,7 @@ function AddPostScreen(props) {
 
   const savePostData = (downloadURL) => {
 
-    Analytics.logEvent('newPost', {});
+    Analytics.logEvent('newPost', {user_name: props.currentUser.name});
 
     firebase.firestore()
         .collection('posts')

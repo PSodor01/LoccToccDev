@@ -21,7 +21,7 @@ function Search(props) {
     useEffect(() => {
         
         setAllUsers(props.allUsers)
-        Analytics.logEvent('screen_view', { screen_name: 'Search' })
+        Analytics.logEvent('screen_view', { screen_name: 'Search', user_name: props.currentUser.name })
 
         console.log(props.allUsers)
         
@@ -73,7 +73,7 @@ function Search(props) {
             setBrowse(false)
         } else {
             setBrowse(true)
-            Analytics.logEvent('seeAllUsersSearch', {});
+            Analytics.logEvent('seeAllUsersSearch', {user_name: props.currentUser.name});
         }
     }
 
@@ -202,6 +202,7 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = (store) => ({
     allUsers: store.userState.allUsers,
+    currentUser: store.userState.currentUser,
 })
 
 export default connect(mapStateToProps)(Search);

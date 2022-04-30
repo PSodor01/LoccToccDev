@@ -25,7 +25,7 @@ function Profile(props) {
 
         fetchData()
 
-        Analytics.logEvent('screen_view', { screen_name: 'Profile' })
+        Analytics.logEvent('screen_view', { screen_name: 'Profile', user_name: props.currentUser.name })
 
     }, [props.route.params.uid, props.following, props.blocking])
 
@@ -115,7 +115,7 @@ function Profile(props) {
                 follower: firebase.auth().currentUser.uid,
             })
 
-        Analytics.logEvent('followUser', {});
+        Analytics.logEvent('followUser', {user_name: props.currentUser.name});
     }
 
     const onUnfollow = () => {
@@ -126,7 +126,7 @@ function Profile(props) {
             .doc(props.route.params.uid)
             .delete()
 
-        Analytics.logEvent('unfollowUser', {});
+        Analytics.logEvent('unfollowUser', {user_name: props.currentUser.name});
     }
 
     const increaseFollowerCount = () => {
@@ -182,7 +182,7 @@ function Profile(props) {
                 );
               })
 
-        Analytics.logEvent('blockUser', {});
+        Analytics.logEvent('blockUser', {user_name: props.currentUser.name});
     }
 
     const unBlockUser = () => {
@@ -193,7 +193,7 @@ function Profile(props) {
             .doc(props.route.params.uid)
             .delete()
 
-        Analytics.logEvent('unblockUser', {});
+        Analytics.logEvent('unblockUser', {user_name: props.currentUser.name});
     }
 
     const blockAndUnfollowHandler = () => {
@@ -283,7 +283,7 @@ function Profile(props) {
 
     const handleReportPostEmail = () => {
 
-        Analytics.logEvent('reportPost', {});
+        Analytics.logEvent('reportPost', {user_name: props.currentUser.name});
 
 
         const to = ['ReportPost@locctocc.com'] // string or array of email addresses
@@ -332,7 +332,7 @@ function Profile(props) {
                 postsCount: firebase.firestore.FieldValue.increment(-1)
             })
 
-        Analytics.logEvent('deletePost', {});
+        Analytics.logEvent('deletePost', {user_name: props.currentUser.name});
 
 
             

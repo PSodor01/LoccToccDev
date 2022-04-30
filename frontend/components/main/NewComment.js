@@ -46,7 +46,7 @@ function NewCommentScreen(props, route) {
     }
     
     useEffect(() => {
-      Analytics.logEvent('screen_view', { screen_name: 'NewComment' })
+      Analytics.logEvent('screen_view', { screen_name: 'NewComment', user_name: props.currentUser.name })
   }, [])
     
     useEffect(() => {
@@ -98,7 +98,7 @@ function NewCommentScreen(props, route) {
 
     const onCommentSend = (downloadURL) => {
 
-      Analytics.logEvent('newComment', {});
+      Analytics.logEvent('newComment', {user_name: props.currentUser.name});
 
         firebase.firestore()
             .collection('posts')
@@ -187,7 +187,7 @@ function NewCommentScreen(props, route) {
 
       const pickImage = async () => {
 
-        Analytics.logEvent('addPictureToComment', {});
+        Analytics.logEvent('addPictureToComment', {user_name: props.currentUser.name});
 
         let result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -204,7 +204,7 @@ function NewCommentScreen(props, route) {
 
       const pickGif = (url) => {
 
-        Analytics.logEvent('addGifToComment', {});
+        Analytics.logEvent('addGifToComment', {user_name: props.currentUser.name});
 
 
         let result =  (url);
@@ -218,7 +218,7 @@ function NewCommentScreen(props, route) {
     
       const removeImage = () => {
 
-        Analytics.logEvent('removeImageFromComment', {});
+        Analytics.logEvent('removeImageFromComment', {user_name: props.currentUser.name});
 
         setImage(null);
       }
@@ -399,7 +399,8 @@ function NewCommentScreen(props, route) {
       };
 
       const mapStateToProps = (store) => ({
-        users: store.usersState.users
+        users: store.usersState.users,
+        currentUser: store.userState.currentUser,
     })
     const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUsersData }, dispatch);
 

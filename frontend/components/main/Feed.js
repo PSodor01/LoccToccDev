@@ -36,7 +36,7 @@ function Feed(props) {
         fetchData()
         setCurrentUserFollowingCount(props.currentUser.followingCount)
 
-        Analytics.logEvent('screen_view', { screen_name: 'Feed' })
+        Analytics.logEvent('screen_view', { screen_name: 'Feed', user_name: props.currentUser.name })
 
     }, [props.blocking, props.faded, props.liked, props.following, props.currentUser])
 
@@ -117,7 +117,7 @@ function Feed(props) {
             .doc(postId)
             .set({})
 
-        Analytics.logEvent('hammerPost', {});
+        Analytics.logEvent('hammerPost', {user_name: props.currentUser.name});
     }
 
     const deleteLike = (postId, userId) => {
@@ -138,7 +138,7 @@ function Feed(props) {
             .doc(postId)
             .set({})
 
-        Analytics.logEvent('fadePost', {});
+        Analytics.logEvent('fadePost', {user_name: props.currentUser.name});
     }
 
     const deleteFade = (postId) => {
@@ -310,7 +310,7 @@ function Feed(props) {
 
     const handleReportPostEmail = () => {
 
-        Analytics.logEvent('reportPost', {});
+        Analytics.logEvent('reportPost', {user_name: props.currentUser.name});
 
         const to = ['ReportPost@locctocc.com'] // string or array of email addresses
         email(to, {
@@ -354,7 +354,7 @@ function Feed(props) {
             setFollowCriteria(false)
         } else {
             setFollowCriteria(true)
-            Analytics.logEvent('filterPostsFriends', {});
+            Analytics.logEvent('filterPostsFriends', {user_name: props.currentUser.name});
         }
     }
 

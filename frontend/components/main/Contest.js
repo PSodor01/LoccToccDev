@@ -38,7 +38,7 @@ function Contest(props) {
         const myScore = props.allUsers.filter(user => user.name == props.currentUser.name);
         setMyScore(myScore)
 
-        Analytics.logEvent('screen_view', { screen_name: 'Contest' })
+        Analytics.logEvent('screen_view', { screen_name: 'Contest', user_name: props.currentUser.name })
 
     }, [props.allUsers, props.currentUser, props.contestStatus])
 
@@ -56,12 +56,12 @@ function Contest(props) {
     )}
 
     const countInfoClicks = () => {
-        Analytics.logEvent('contestInfoClicks', {});
+        Analytics.logEvent('contestInfoClicks', {user_name: props.currentUser.name});
     }
 
     const countLocctoccWebsiteClicks = () => {
 
-        Analytics.logEvent('websiteClicks', {});
+        Analytics.logEvent('websiteClicks', {user_name: props.currentUser.name});
 
 
         firebase.firestore()
@@ -81,7 +81,7 @@ function Contest(props) {
 
     const countLocctoccInstagramClicks = () => {
 
-        Analytics.logEvent('instagramClicks', {});
+        Analytics.logEvent('instagramClicks', {user_name: props.currentUser.name});
 
         firebase.firestore()
             .collection("brandClicks")

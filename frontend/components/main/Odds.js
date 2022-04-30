@@ -57,7 +57,7 @@ function Odds(props) {
             setSport('NBA')
         }
 
-        Analytics.logEvent('screen_view', { screen_name: 'Odds' })
+        Analytics.logEvent('screen_view', { screen_name: 'Odds', user_name: props.currentUser.name })
         
     }, [ props.nhlGames, props.nbaGames, props.mlbGames, props.eplGames, props.futureGames, props.trendingGames])
 
@@ -245,7 +245,7 @@ function Odds(props) {
         const users = await firebase.firestore().collection("users").get();
         users.docs.map((user) => sendNotification(user.data().token))
 
-        Analytics.logEvent('sendNotificationToAllUsers', {})
+        Analytics.logEvent('sendNotificationToAllUsers', {user_name: props.currentUser.name})
 
     };
 
@@ -282,7 +282,7 @@ function Odds(props) {
             setBrowse(false)
         } else {
             setBrowse(true)
-            Analytics.logEvent('searchGames', {
+            Analytics.logEvent('searchGames', {user_name: props.currentUser.name
             });
         }
     }

@@ -46,7 +46,7 @@ function game(props) {
 
     useEffect(() => {
             fetchData()
-            Analytics.logEvent('screen_view', { screen_name: 'Game' })
+            Analytics.logEvent('screen_view', { screen_name: 'Game', user_name: props.currentUser.name })
         
     }, [props.blocking, props.liked, props.faded, props.route.params.postId, props.users])
 
@@ -127,7 +127,7 @@ function game(props) {
             .doc(postId)
             .set({})
 
-        Analytics.logEvent('hammerPost', {});
+        Analytics.logEvent('hammerPost', {user_name: props.currentUser.name});
             
     }
 
@@ -149,7 +149,7 @@ function game(props) {
             .doc(postId)
             .set({})
 
-        Analytics.logEvent('fadePost', {});
+        Analytics.logEvent('fadePost', {user_name: props.currentUser.name});
     }
 
     const deleteFade = (postId) => {
@@ -322,7 +322,7 @@ function game(props) {
 
     const gameVote = () => {
 
-        Analytics.logEvent('gameVote', {});
+        Analytics.logEvent('gameVote', {user_name: props.currentUser.name});
 
         firebase.firestore()
             .collection("votes")
@@ -512,7 +512,7 @@ function game(props) {
 
     const handleReportPostEmail = (name, caption) => {
 
-        Analytics.logEvent('reportPost', {});
+        Analytics.logEvent('reportPost', {user_name: props.currentUser.name});
 
         const to = ['ReportPost@locctocc.com'] // string or array of email addresses
         email(to, {
@@ -556,7 +556,7 @@ function game(props) {
             setSortCriteria(false)
         } else {
             setSortCriteria(true)
-            Analytics.logEvent('sortPosts', {});
+            Analytics.logEvent('sortPosts', {user_name: props.currentUser.name});
         }
     }
 
@@ -565,7 +565,7 @@ function game(props) {
             setListAllPlayers(false)
         } else {
             setListAllPlayers(true)
-            Analytics.logEvent('seeAllPlayers', {});
+            Analytics.logEvent('seeAllPlayers', {user_name: props.currentUser.name});
         }
     }
 
