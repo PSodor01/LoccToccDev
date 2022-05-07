@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Platform, Alert, FlatList, StyleSheet, Dimensions, ActivityIndicator, TextInput, TouchableOpacity, Image, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView} from 'react-native';
 
 import { Feather } from "@expo/vector-icons";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 
 import { useNavigation } from '@react-navigation/native';
@@ -507,7 +507,7 @@ function AddPostScreen(props) {
             <View style={styles.addCommentButton}>
                 <View style={styles.galleryContainer}>
                   <TouchableOpacity onPress={() => {this.bs.current.snapTo(0); setGifFunction()}}>
-                      <MaterialCommunityIcons name="gif" size={24} justifyContent='center' alignItems='center' color="#86898B"/>
+                      <MaterialIcons name="gif" size={28} justifyContent='center' alignItems='center' color="#86898B"/>
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => {pickImage()}}>
                       <MaterialCommunityIcons name="camera" size={24} justifyContent='center' alignItems='center'  color="#86898B"/>
