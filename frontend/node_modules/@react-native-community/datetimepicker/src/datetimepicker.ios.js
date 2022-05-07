@@ -10,22 +10,23 @@
  * @flow strict-local
  */
 import RNDateTimePicker from './picker';
-import {toMilliseconds} from './utils';
-import {IOS_DISPLAY, MODE_DATE} from './constants';
+import {sharedPropsValidation, toMilliseconds} from './utils';
+import {IOS_DISPLAY, ANDROID_MODE, EVENT_TYPE_SET} from './constants';
 import invariant from 'invariant';
-import React, {useEffect, useState} from 'react';
+import * as React from 'react';
 import {getPickerHeightStyle} from './layoutUtilsIOS';
 import {Platform, StyleSheet} from 'react-native';
 
 import type {
-  Event,
+  NativeEventIOS,
   NativeRef,
   IOSNativeProps,
   DatePickerOptions,
   IOSDisplay,
 } from './types';
+import type {DateTimePickerEvent} from './types';
 
-const getDisplaySafe = (display: IOSDisplay) => {
+const getDisplaySafe = (display: IOSDisplay): IOSDisplay => {
   const majorVersionIOS = parseInt(Platform.Version, 10);
   if (display === IOS_DISPLAY.inline && majorVersionIOS < 14) {
     // inline is available since 14.0
@@ -48,25 +49,29 @@ export default function Picker({
   minimumDate,
   style,
   testID,
-  mode,
   minuteInterval,
   timeZoneOffsetInMinutes,
   textColor,
+  accentColor,
   themeVariant,
   onChange,
+  mode = ANDROID_MODE.date,
+  display: providedDisplay = IOS_DISPLAY.default,
   disabled = false,
-  ...otherProps
-}: IOSNativeProps) {
-  const [heightStyle, setHeightStyle] = useState(undefined);
-  const _picker: NativeRef = React.useRef();
-  const display = getDisplaySafe(otherProps.display);
+}: IOSNativeProps): React.Node {
+  sharedPropsValidation({value});
 
-  useEffect(
+  const [heightStyle, setHeightStyle] = React.useState(undefined);
+  const _picker: NativeRef = React.useRef(null);
+  const display = getDisplaySafe(providedDisplay);
+
+  React.useEffect(
     function ensureNativeIsInSyncWithJS() {
       const {current} = _picker;
 
       if (value && onChange && current) {
         const timestamp = value.getTime();
+        // $FlowFixMe Cannot call `current.setNativeProps` because property `setNativeProps` is missing in `AbstractComponent` [1].
         current.setNativeProps({
           date: timestamp,
         });
@@ -75,7 +80,7 @@ export default function Picker({
     [onChange, value],
   );
 
-  useEffect(
+  React.useEffect(
     function ensureCorrectHeight() {
       const height = getPickerHeightStyle(display, mode);
       if (height instanceof Promise) {
@@ -87,15 +92,14 @@ export default function Picker({
     [display, mode],
   );
 
-  const _onChange = (event: Event) => {
+  const _onChange = (event: NativeEventIOS) => {
     const timestamp = event.nativeEvent.timestamp;
-    let date;
+    // $FlowFixMe Cannot assign object literal to `unifiedEvent` because number [1] is incompatible with undefined [2] in property `nativeEvent.timestamp`.
+    const unifiedEvent: DateTimePickerEvent = {...event, type: EVENT_TYPE_SET};
 
-    if (timestamp) {
-      date = new Date(timestamp);
-    }
+    const date = timestamp !== undefined ? new Date(timestamp) : undefined;
 
-    onChange && onChange(event, date);
+    onChange && onChange(unifiedEvent, date);
   };
 
   invariant(value, 'A date or time should be specified as `value`.');
@@ -109,6 +113,7 @@ export default function Picker({
   toMilliseconds(dates, 'value', 'minimumDate', 'maximumDate');
 
   return (
+    // $FlowFixMe - dozen of flow errors
     <RNDateTimePicker
       testID={testID}
       ref={_picker}
@@ -122,16 +127,12 @@ export default function Picker({
       timeZoneOffsetInMinutes={timeZoneOffsetInMinutes}
       onChange={_onChange}
       textColor={textColor}
+      accentColor={accentColor}
       themeVariant={themeVariant}
       onStartShouldSetResponder={() => true}
       onResponderTerminationRequest={() => false}
       displayIOS={display}
-      disabled={disabled === true}
+      enabled={disabled !== true}
     />
   );
 }
-
-Picker.defaultProps = {
-  mode: MODE_DATE,
-  display: IOS_DISPLAY.default,
-};

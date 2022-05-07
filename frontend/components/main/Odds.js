@@ -13,7 +13,7 @@ import moment from 'moment'
 
 import {AdMobBanner} from 'expo-ads-admob'
 import * as Analytics from 'expo-firebase-analytics';
-import * as StoreReview from 'expo-store-review';
+//import * as StoreReview from 'expo-store-review';
 
 
 import firebase from 'firebase'
@@ -173,7 +173,7 @@ function Odds(props) {
                 }
             })
         }
-        setmlbGames(props.mmaGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))
+        setmmaGames(props.mmaGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))
 
         for (let i = 0; i < props.eplGames.length; i++) {
 

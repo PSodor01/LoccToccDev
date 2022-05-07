@@ -3,37 +3,41 @@
  * @flow strict-local
  */
 
-import type {SyntheticEvent} from 'CoreEventTypes';
-import type {NativeComponent} from 'ReactNative';
-import type {ViewProps} from 'ViewPropTypes';
+import type {SyntheticEvent} from 'react-native/Libraries/Types/CoreEventTypes';
+import type {HostComponent} from 'react-native';
+import type {ViewProps} from 'react-native/Libraries/Components/View/ViewPropTypes';
 import type {ElementRef} from 'react';
-import type {ColorValue} from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
+import type {ColorValue} from 'react-native/Libraries/StyleSheet/StyleSheet';
 import {
   ANDROID_MODE,
   ANDROID_DISPLAY,
   DAY_OF_WEEK,
   IOS_DISPLAY,
   IOS_MODE,
+  WINDOWS_MODE,
+  ANDROID_EVT_TYPE,
 } from './constants';
 
 export type IOSDisplay = $Keys<typeof IOS_DISPLAY>;
 export type IOSMode = $Keys<typeof IOS_MODE>;
 type AndroidMode = $Keys<typeof ANDROID_MODE>;
+type WindowsMode = $Keys<typeof WINDOWS_MODE>;
 type Display = $Keys<typeof ANDROID_DISPLAY>;
+type AndroidEvtTypes = $Keys<typeof ANDROID_EVT_TYPE>;
 type MinuteInterval = ?(1 | 2 | 3 | 4 | 5 | 6 | 10 | 12 | 15 | 20 | 30);
 
-export type Event = SyntheticEvent<
-  $ReadOnly<{|
-    timestamp: number,
-  |}>,
->;
+export type NativeEventIOS = SyntheticEvent<{|
+  timestamp: number,
+|}>;
 
-export type AndroidEvent = {|
-  type: string,
-  nativeEvent: {|
+export type DateTimePickerEvent = {
+  type: AndroidEvtTypes,
+  nativeEvent: {
     timestamp?: number,
-  |},
-|};
+    ...
+  },
+  ...
+};
 
 type BaseOptions = {|
   /**
@@ -47,7 +51,7 @@ type BaseOptions = {|
    * This is called when the user changes the date or time in the UI.
    * The first argument is an Event, the second a selected Date.
    */
-  onChange?: ?(event: Event, date?: Date) => void,
+  onChange?: ?(event: DateTimePickerEvent, date?: Date) => void,
 |};
 
 type DateOptions = {|
@@ -116,6 +120,14 @@ export type IOSNativeProps = $ReadOnly<{|
   textColor?: ?ColorValue,
 
   /**
+   * The date picker accent color.
+   *
+   * Sets the color of the selected, date and navigation icons.
+   * Has no effect for display 'spinner'.
+   */
+  accentColor?: ?ColorValue,
+
+  /**
    * Override theme variant used by iOS native picker
    */
   themeVariant?: 'dark' | 'light',
@@ -126,9 +138,9 @@ export type IOSNativeProps = $ReadOnly<{|
   display?: IOSDisplay,
 
   /**
-   * Is this picker disabled?
+   * Is this picker enabled?
    */
-  disabled?: boolean,
+  enabled: boolean,
 |}>;
 
 export type AndroidNativeProps = $ReadOnly<{|
@@ -159,8 +171,8 @@ export type AndroidNativeProps = $ReadOnly<{|
    */
   minuteInterval?: MinuteInterval,
 
-  onChange: (event: AndroidEvent, date?: Date) => void,
   neutralButtonLabel?: string,
+  onError?: (Error) => void,
 |}>;
 
 export type DatePickerOptions = {|
@@ -183,7 +195,7 @@ export type DateTimePickerResult = $ReadOnly<{|
   minute: number,
 |}>;
 
-export type RCTDateTimePickerNative = Class<NativeComponent<IOSNativeProps>>;
+export type RCTDateTimePickerNative = Class<HostComponent<IOSNativeProps>>;
 export type NativeRef = {
   current: ElementRef<RCTDateTimePickerNative> | null,
 };
@@ -196,7 +208,7 @@ export type WindowsDatePickerChangeEvent = {|
 
 export type WindowsNativeProps = $ReadOnly<{|
   ...BaseProps,
-  onChange?: (event: WindowsDatePickerChangeEvent, date: Date) => void,
+  mode: WindowsMode,
 
   placeholderText?: string,
   dateFormat?:
@@ -208,7 +220,7 @@ export type WindowsNativeProps = $ReadOnly<{|
     | '{dayofweek.abbreviated(2)}'
     | '{dayofweek.abbreviated(3)}'
     | '{dayofweek.full}',
-  firstDayOfWeek?: DAY_OF_WEEK,
+  firstDayOfWeek?: typeof DAY_OF_WEEK,
   timeZoneOffsetInSeconds?: number,
   is24Hour?: boolean,
   minuteInterval?: number,
