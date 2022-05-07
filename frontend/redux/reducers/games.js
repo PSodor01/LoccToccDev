@@ -4,7 +4,8 @@ import { NFL_GAMES_STATE_CHANGE,
     NCAAB_GAMES_STATE_CHANGE, 
     GOLF_GAMES_STATE_CHANGE, 
     MLB_GAMES_STATE_CHANGE, 
-    EPL_GAMES_STATE_CHANGE, 
+    EPL_GAMES_STATE_CHANGE,
+    MMA_GAMES_STATE_CHANGE,
     FUTURE_GAMES_STATE_CHANGE,
     NHL_GAMES_STATE_CHANGE, 
     CLEAR_DATA 
@@ -16,6 +17,7 @@ const initialState = {
     mlbGames: [],
     ncaabGames: [],
     eplGames: [],
+    mmaGames: [],
     nhlGames: [],
     nbaGames: [],
     golfGames: [],
@@ -148,5 +150,19 @@ export const nhlGames = (state = initialState, action) => {
             return state;
     }
 }
+
+export const mmaGames = (state = initialState, action) => {
+    switch (action.type) {
+        case MMA_GAMES_STATE_CHANGE:
+            return {
+                ...state,
+                mmaGames: action.mmaGames
+            }
+        case CLEAR_DATA:
+            return initialState
+        default:
+            return state;
+    }
+} 
 
 

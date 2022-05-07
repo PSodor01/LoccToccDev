@@ -11,6 +11,7 @@ import { USER_STATE_CHANGE,
     NBA_GAMES_STATE_CHANGE, 
     NCAAB_GAMES_STATE_CHANGE,
     EPL_GAMES_STATE_CHANGE,
+    MMA_GAMES_STATE_CHANGE,
     GOLF_GAMES_STATE_CHANGE,
     FUTURE_GAMES_STATE_CHANGE,
     NHL_GAMES_STATE_CHANGE, 
@@ -250,6 +251,24 @@ export function fetchEPLGames() {
                 })
                 dispatch({ type: EPL_GAMES_STATE_CHANGE, eplGames });
                 for(let i = 0; i < eplGames.length; i++){
+                }
+            })
+    })
+}
+
+export function fetchMMAGames() {
+    return ((dispatch) => {
+        firebase.firestore()
+            .collection("mma")
+            .orderBy('gameDate', 'desc')
+            .onSnapshot((snapshot) => {
+                let mmaGames = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    return { id, ...data }
+                })
+                dispatch({ type: MMA_GAMES_STATE_CHANGE, mmaGames });
+                for(let i = 0; i < mmaGames.length; i++){
                 }
             })
     })

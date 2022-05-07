@@ -279,9 +279,9 @@ function game(props) {
 
                     if (token != undefined) {
                         const likedName = props.currentUser.name
-                        if (awayTeam  != undefined) {const notification = '(' + name + '): ' + likedName + ' liked your post on the ' + awayTeam + "/" + homeTeam + " game"
+                        if (awayTeam  != undefined) {const notification = '(' + name + '): ' + likedName + ' hammered your post on the ' + awayTeam + "/" + homeTeam + " game"
                             sendNotification(notification, token)}
-                            else {const notification = '(' + name + '): ' + likedName + ' liked your post'
+                            else {const notification = '(' + name + '): ' + likedName + ' hammered your post'
                             sendNotification(notification, token)}
                     } else {
                     }
@@ -903,7 +903,11 @@ function game(props) {
                                 }
                             </View>
                             <View style={styles.totalItem}>
-                                <Text style={styles.spreadText}>O {over}</Text>
+                                {sport == 'mma_mixed_martial_arts' ?
+                                <Text style={styles.spreadText}>{over}</Text>
+                                :
+                                <Text style={styles.spreadText}>{over}</Text>
+                                }
                                 {overOdds > 0 ? 
                                     <Text style={styles.oddsTopRowText}>+{overOdds}</Text> 
                                     : <Text style={styles.oddsTopRowText}>{overOdds}</Text>
@@ -954,7 +958,11 @@ function game(props) {
                                 
                             </View>
                             <View style={styles.totalItem}>
-                                <Text style={styles.spreadText}>U {under}</Text> 
+                                {sport == 'mma_mixed_martial_arts' ?
+                                <Text style={styles.spreadText}>{under}</Text>
+                                :
+                                <Text style={styles.spreadText}>{under}</Text>
+                                }
                                 {underOdds > 0 ?
                                     <Text style={styles.oddsBottomRowText}>+{underOdds}</Text>
                                     : <Text style={styles.oddsBottomRowText}>{underOdds}</Text>
@@ -1002,13 +1010,7 @@ function game(props) {
             }
 
 
-            <View style={styles.adView}>
-                <AdMobBanner
-                    bannerSize="banner"
-                    adUnitID={adUnitID}// Real ID: 8519029912093094/5150749785, test ID: 3940256099942544/2934735716
-                    servePersonalizedAds // true or false
-                />
-            </View>
+            
             <TouchableOpacity
                 activeOpacity={0.8}
                 style={styles.button}

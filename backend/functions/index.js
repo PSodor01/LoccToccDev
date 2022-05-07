@@ -695,7 +695,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
 
   exports.getGolfGameData = functions.pubsub.schedule('every 5 minutes').onRun(async() => {
     try {
-      const response = await axios.get('https://api.the-odds-api.com/v4/sports/golf_masters_tournament_winner/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&Format=american&dateFormat=iso')
+      const response = await axios.get('https://api.the-odds-api.com/v4/sports/golf_pga_championship_winner/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&Format=american&dateFormat=iso')
         .then(result => {
           result.data.forEach(game => {
 
@@ -718,7 +718,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
   
     })
 
-  exports.getFuturesData = functions.pubsub.schedule('every 5 minutes').onRun(async() => {
+  exports.getFuturesData = functions.pubsub.schedule('every 20 minutes').onRun(async() => {
     try {
       const response = await axios.get('https://api.the-odds-api.com/v4/sports/americanfootball_nfl_super_bowl_winner/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&Format=american&dateFormat=iso')
         .then(result => {
@@ -825,6 +825,56 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
   
     })
 
+  exports.getMMAGameData = functions.pubsub.schedule('every 20 minutes').onRun(async() => {
+    try {
+      const response = await axios.get('https://api.the-odds-api.com/v4/sports/mma_mixed_martial_arts/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&Format=american&dateFormat=iso')
+      .then(result => {
+        result.data.forEach(game => {
+
+          if (game.bookmakers.findIndex((item) => item.key === 'draftkings') > -1) {
+            let i = game.bookmakers.findIndex((item) => item.key === 'draftkings')
+            if (game.away_team == game.bookmakers[0].markets[0].outcomes[0].name) {
+
+              const writeResult = admin
+              .firestore()
+              .collection("mma")
+              .doc(game.id)
+              .set({
+                gameId: game.id,
+                sport: game.sport_key,
+                gameDate: game.commence_time,
+                awayTeam: game.away_team,
+                homeTeam: game.home_team,
+                awayMoneyline: game.bookmakers[i].markets[0].outcomes[0].price > 2 ? Math.round((game.bookmakers[i].markets[0].outcomes[0].price -1)*100) : Math.round(-100/(game.bookmakers[i].markets[0].outcomes[0].price -1)),
+                homeMoneyline: game.bookmakers[i].markets[0].outcomes[1].price > 2 ? Math.round((game.bookmakers[i].markets[0].outcomes[1].price -1)*100) : Math.round(-100/(game.bookmakers[i].markets[0].outcomes[1].price -1)),
+            }, { merge:true });
+  
+            } else {
+              const writeResult = admin
+              .firestore()
+              .collection("mma")
+              .doc(game.id)
+              .set({
+                gameId: game.id,
+                sport: game.sport_key,
+                gameDate: game.commence_time,
+                awayTeam: game.away_team,
+                homeTeam: game.home_team,
+                awayMoneyline: game.bookmakers[i].markets[0].outcomes[1].price > 2 ? Math.round((game.bookmakers[i].markets[0].outcomes[1].price -1)*100) : Math.round(-100/(game.bookmakers[i].markets[0].outcomes[1].price -1)),
+                homeMoneyline: game.bookmakers[i].markets[0].outcomes[0].price > 2 ? Math.round((game.bookmakers[i].markets[0].outcomes[0].price -1)*100) : Math.round(-100/(game.bookmakers[i].markets[0].outcomes[0].price -1)),
+            }, { merge:true });
+  
+            }
+          } else {
+            return
+
+          }
+        })
+      })
+  }catch(err) {console.error(err.message)}
+  
+    })
+
   exports.deleteNFLGameData = functions.pubsub.schedule('00 11 * * *').timeZone('America/New_York').onRun(async() => {
     try {
       const writeResult = admin
@@ -924,6 +974,23 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
       const writeResult = admin
           .firestore()
           .collection('nhl')
+          .get()
+          .then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            doc.ref.delete({});
+          });
+        });
+
+      
+  }catch(err) {console.error(err.message)}
+
+  })
+
+  exports.deleteMMAGameData = functions.pubsub.schedule('00 11 * * *').timeZone('America/New_York').onRun(async() => {
+    try {
+      const writeResult = admin
+          .firestore()
+          .collection('mma')
           .get()
           .then((querySnapshot) => {
           querySnapshot.forEach((doc) => {

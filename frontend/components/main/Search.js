@@ -23,8 +23,6 @@ function Search(props) {
         setAllUsers(props.allUsers)
         Analytics.logEvent('screen_view', { screen_name: 'Search', user_name: props.currentUser.name })
 
-        console.log(props.allUsers)
-        
     }, [props.allUsers])
 
     
