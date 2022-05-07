@@ -20,6 +20,7 @@
     "@react-navigation/material-bottom-tabs": "^5.2.16",
     "@react-navigation/native": "^5.9.4",
     "@react-navigation/stack": "^5.14.4",
+    "eas-cli": "^0.52.0",
     "expo": "^42.0.0",
     "expo-ads-admob": "~10.1.2",
     "expo-camera": "~11.2.2",
@@ -27,10 +28,13 @@
     "expo-firebase-analytics": "~4.1.0",
     "expo-firebase-core": "^4.1.1",
     "expo-image-picker": "~10.2.2",
+    "expo-linking": "~2.3.1",
     "expo-notifications": "~0.12.3",
     "expo-permissions": "^12.1.1",
     "expo-status-bar": "~1.0.4",
+    "expo-store-review": "~4.1.0",
     "expo-system-ui": "^1.1.1",
+    "expo-updates": "~0.8.2",
     "firebase": "8.2.3",
     "moment": "^2.29.1",
     "react": "16.13.1",
@@ -64,10 +68,7 @@
     "reanimated-bottom-sheet": "^1.0.0-alpha.22",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
-    "unimodules-permissions-interface": "^6.1.0",
-    "expo-updates": "~0.8.2",
-    "expo-store-review": "~4.1.0",
-    "expo-linking": "~2.3.1"
+    "unimodules-permissions-interface": "^6.1.0"
   },
   "devDependencies": {
     "@babel/core": "~7.9.0",
