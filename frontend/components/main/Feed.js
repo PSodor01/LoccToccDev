@@ -240,7 +240,8 @@ function Feed(props) {
         const message = {
             to: token,
             sound: 'default',
-            body: notification ? notification : 'Empty Notification',
+            body: notification ? notification : '',
+            badge: 1,
         };
         
         await fetch('https://exp.host/--/api/v2/push/send', {
@@ -589,7 +590,7 @@ function Feed(props) {
                     style={styles.sortButton}
                     onPress={() => {followingFunction()}}>
                     <Text style={styles.sortText}>See All: </Text>
-                    <Ionicons name={"lock-open-outline"} size={16} color={"#B3B6B7"} marginRight={10}/>
+                    <Ionicons name={"lock-open-outline"} size={12} color={"#33A8FF"} marginRight={10}/>
                 </TouchableOpacity>
             </View> 
             :
@@ -597,8 +598,8 @@ function Feed(props) {
                 <TouchableOpacity
                     style={styles.sortButton}
                     onPress={() => {followingFunction()}}>
-                    <Text style={styles.sortText}>Friends: </Text>
-                    <Ionicons name={"lock-closed-outline"} size={16} color={"#B3B6B7"} marginRight={10}/>
+                    <Text style={styles.sortText}>Friends Only: </Text>
+                    <Ionicons name={"lock-closed-outline"} size={12} color={"#33A8FF"} marginRight={10}/>
                 </TouchableOpacity>
             </View> }
             {currentUserFollowingCount == '0' && followCriteria == false ?
@@ -741,7 +742,8 @@ const styles = StyleSheet.create({
         marginHorizontal: "2%",
     },
     sortText: {
-        color: '#B3B6B7' 
+        color: '#33A8FF',
+        fontSize: 12
     },
     sortButton: {
         flexDirection: 'row',

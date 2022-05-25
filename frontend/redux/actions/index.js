@@ -238,24 +238,6 @@ export function fetchNHLGames() {
     })
 }
 
-export function fetchEPLGames() {
-    return ((dispatch) => {
-        firebase.firestore()
-            .collection("epl")
-            .orderBy('gameDate', 'desc')
-            .onSnapshot((snapshot) => {
-                let eplGames = snapshot.docs.map(doc => {
-                    const data = doc.data();
-                    const id = doc.id;
-                    return { id, ...data }
-                })
-                dispatch({ type: EPL_GAMES_STATE_CHANGE, eplGames });
-                for(let i = 0; i < eplGames.length; i++){
-                }
-            })
-    })
-}
-
 export function fetchMMAGames() {
     return ((dispatch) => {
         firebase.firestore()
@@ -269,6 +251,24 @@ export function fetchMMAGames() {
                 })
                 dispatch({ type: MMA_GAMES_STATE_CHANGE, mmaGames });
                 for(let i = 0; i < mmaGames.length; i++){
+                }
+            })
+    })
+}
+
+/*export function fetchEPLGames() {
+    return ((dispatch) => {
+        firebase.firestore()
+            .collection("epl")
+            .orderBy('gameDate', 'desc')
+            .onSnapshot((snapshot) => {
+                let eplGames = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    return { id, ...data }
+                })
+                dispatch({ type: EPL_GAMES_STATE_CHANGE, eplGames });
+                for(let i = 0; i < eplGames.length; i++){
                 }
             })
     })
@@ -289,7 +289,7 @@ export function fetchGolfGames() {
                 }
             })
     })
-}
+} */
 
 export function fetchFutureGames() {
     return ((dispatch) => {

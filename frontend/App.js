@@ -6,7 +6,6 @@ import { View, ActivityIndicator, StyleSheet, Text, TouchableOpacity, Alert } fr
 import { FontAwesome5 } from "@expo/vector-icons";
 
 import * as firebase from 'firebase'
-import * as Analytics from 'expo-firebase-analytics';
 
 
 import { Provider } from 'react-redux'
@@ -39,6 +38,7 @@ import { DrawerContent } from './components/Drawer'
 
 import LandingScreen from './components/auth/Landing'
 import RegisterScreen from './components/auth/Register'
+import OnboardingScreen from './components/main/Onboarding'
 import LoginScreen from './components/auth/Login'
 import ResetPasswordScreen from './components/auth/ResetPassword'
 import MainScreen from './components/Main'
@@ -462,6 +462,19 @@ export class App extends Component {
         
       );
     }
+
+    /*if (!loggedIn) {
+      return (
+          <NavigationContainer>
+            <Stack.Navigator initialRouteName="Onboarding">
+              <Stack.Screen name="Onboarding" component={OnboardingScreen}
+                options={{ headerShown: false }}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
+        
+      );
+    }*/
 
     return (
         <Provider store={store}>

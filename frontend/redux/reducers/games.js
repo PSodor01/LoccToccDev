@@ -2,9 +2,7 @@ import { NFL_GAMES_STATE_CHANGE,
     NBA_GAMES_STATE_CHANGE,
     NCAAF_GAMES_STATE_CHANGE, 
     NCAAB_GAMES_STATE_CHANGE, 
-    GOLF_GAMES_STATE_CHANGE, 
     MLB_GAMES_STATE_CHANGE, 
-    EPL_GAMES_STATE_CHANGE,
     MMA_GAMES_STATE_CHANGE,
     FUTURE_GAMES_STATE_CHANGE,
     NHL_GAMES_STATE_CHANGE, 
@@ -16,11 +14,9 @@ const initialState = {
     ncaafGames: [],
     mlbGames: [],
     ncaabGames: [],
-    eplGames: [],
     mmaGames: [],
     nhlGames: [],
     nbaGames: [],
-    golfGames: [],
     futureGames: [],
 }
 
@@ -86,35 +82,6 @@ export const mlbGames = (state = initialState, action) => {
             return {
                 ...state,
                 mlbGames: action.mlbGames
-            }
-        case CLEAR_DATA:
-            return initialState
-        default:
-            return state;
-    }
-}
-
-
-export const eplGames = (state = initialState, action) => {
-    switch (action.type) {
-        case EPL_GAMES_STATE_CHANGE:
-            return {
-                ...state,
-                eplGames: action.eplGames
-            }
-        case CLEAR_DATA:
-            return initialState
-        default:
-            return state;
-    }
-}
-
-export const golfGames = (state = initialState, action) => {
-    switch (action.type) {
-        case GOLF_GAMES_STATE_CHANGE:
-            return {
-                ...state,
-                golfGames: action.golfGames
             }
         case CLEAR_DATA:
             return initialState

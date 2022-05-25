@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import email from 'react-native-email'
 
 import Icon from 'react-native-vector-icons/Ionicons';
-import Ionicons from 'react-native-vector-icons/Ionicons'
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 
 import moment from 'moment';
 
@@ -29,25 +29,12 @@ function Comment(props, route) {
     const [text, setText] = useState("")
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [hidePost, setHidePost] = useState(false);
 
     const { posterId, posterName, posterImg, postCreation, postCaption, postImg, awayTeam, homeTeam } = props.route.params;
 
-    const getUser = async() => {
-        const currentUser = await firebase.firestore()
-        .collection('users')
-        .doc(firebase.auth().currentUser.uid)
-        .get()
-        .then((documentSnapshot) => {
-        if( documentSnapshot.exists ) {
-            setUserData(documentSnapshot.data());
-        }
-        })
-        }  
-    
-
     useEffect(() => {
         fetchData()
-        getUser()
         
     }, [props.route.params.postId, props.users])
 
@@ -135,6 +122,14 @@ function Comment(props, route) {
         )
     }
 
+    const expandComments = () => {
+        if (hidePost == true) {
+            setHidePost(false)
+        } else {
+            setHidePost(true)
+        }
+    }
+
     const EmptyListMessage = () => {
         return (
           // Flat List Item
@@ -163,14 +158,32 @@ function Comment(props, route) {
                         <Text style={styles.profileNameFeedText}>{posterName}</Text>
                         <Text style={styles.postTimeContainer}>{moment(postCreation.toDate()).fromNow()}</Text>
                     </View>
-                    <View style={styles.postContentContainer}>
-                        {postCaption != null ? <Text style={styles.captionText}>{postCaption}</Text> : null}
-                        {postImg != "blank" ? <Image source={{uri: postImg}} style={styles.postImage}/> : null}
-                    </View>
+                    {hidePost == false ?
+                        <View style={styles.postContentContainer}>
+                            {postCaption != null ? <Text style={styles.captionText}>{postCaption}</Text> : null}
+                            {postImg != "blank" ? <Image source={{uri: postImg}} style={styles.postImage}/> : null}
+                        </View>
+                    :
+                        null
+                    }
+                    
                     <View style={styles.postButtonContainer}>
-                        <TouchableOpacity onPress={() => navigation.navigate("NewComment", { posterName: posterName, postId: postId, uid: props.route.params.uid, awayTeam: awayTeam, homeTeam: homeTeam })} style={styles.postButton}>
-                            <Text style={styles.shareText}>Reply</Text>
-                        </TouchableOpacity>
+                        <View style={styles.commentButtons}>
+                        {hidePost == false ?
+                            <TouchableOpacity onPress={() => {expandComments()}} >
+                                <FontAwesome5 name={"chevron-up"} size={20} color={"#33A8FF"} marginRight={10} />
+                            </TouchableOpacity>
+                        :
+                            <TouchableOpacity onPress={() => {expandComments()}} >
+                                <FontAwesome5 name={"chevron-down"} size={20} color={"#33A8FF"} marginRight={10} />
+                            </TouchableOpacity>
+                        }
+                            
+                            <Text>    </Text>
+                            <TouchableOpacity onPress={() => navigation.navigate("NewComment", { posterName: posterName, postId: postId, uid: props.route.params.uid, awayTeam: awayTeam, homeTeam: homeTeam })} style={styles.postButton}>
+                                <Text style={styles.shareText}>Reply</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
             </View>
@@ -197,8 +210,9 @@ function Comment(props, route) {
                                     <Text style={styles.postTimeContainer}>{moment(item.creation.toDate()).fromNow()}</Text>
                                 </View>
                                 <View style={styles.postContentContainer}>
-                                    {item.text != null ? <Text style={styles.captionText}>{item.text}</Text> : null}
+                                    {item.text != "" ? <Text style={styles.captionText}>{item.text}</Text> : null}
                                     {item.downloadURL != "blank" ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
+                                    {item.userTagList != null ? <Text style={{ color: '#0033cc', fontWeight: 'bold' }}>@{item.userTagList}</Text> : null}
                                 </View>
                                 <View style={styles.postFooterContainer}>
                                     <TouchableOpacity
@@ -231,7 +245,7 @@ function Comment(props, route) {
 
 
 const mapStateToProps = (store) => ({
-    users: store.usersState.users
+    users: store.usersState.users,
 })
 const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUsersData }, dispatch);
 
@@ -389,6 +403,10 @@ emptyListStyle: {
     fontSize: 18,
     textAlign: 'justify',
     marginHorizontal: "5%",
+},
+commentButtons: {
+    flexDirection: 'row',
+    alignSelf: 'flex-end',
 },
 adView: {
     alignItems: 'center',

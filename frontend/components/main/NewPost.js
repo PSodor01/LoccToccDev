@@ -156,6 +156,7 @@ function AddPostScreen(props) {
         to: token,
         sound: 'default',
         body: notification ? notification : '',
+        badge: 1,
     };
     
     await fetch('https://exp.host/--/api/v2/push/send', {
@@ -414,17 +415,6 @@ function AddPostScreen(props) {
           
       )
     }
-
-    const taggedNameList = ({item}) => {
-      return (
-        <View>
-            <View>
-                <Text>@{item.name}</Text>
-            </View>
-        </View>
-        
-    )
-  }
 
     const searchFilter = (text) => {
         if (text) {

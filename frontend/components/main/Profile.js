@@ -243,7 +243,8 @@ function Profile(props) {
         const message = {
             to: token,
             sound: 'default',
-            body: notification ? notification : 'Empty Notification',
+            body: notification ? notification : '',
+            badge: 1,
         };
         
         await fetch('https://exp.host/--/api/v2/push/send', {

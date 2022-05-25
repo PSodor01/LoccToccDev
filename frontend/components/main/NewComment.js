@@ -30,6 +30,12 @@ function NewCommentScreen(props, route) {
     const [userData, setUserData] = useState(null);
     const [gifs, setGifs] = useState([]);
     const [term, updateTerm] = useState('');
+    const [userTagList, setUserTagList] = useState(null);
+    const [userTokenList, setUserTokenList] = useState(null);
+    const [isUserTagged, setIsUserTagged] = useState(false);
+    const [gifMode, setGifMode] = useState(null);
+    const [allUsers, setAllUsers] = useState([]);
+    const [search, setSearch] = useState('');
 
     const { posterName, postId, uid, awayTeam, homeTeam} = props.route.params;
 
@@ -51,8 +57,13 @@ function NewCommentScreen(props, route) {
     
     useEffect(() => {
         getUser();
-        console.log(awayTeam, homeTeam)
     },[]);
+
+    useEffect(() => {
+        
+      setAllUsers(props.allUsers)
+      
+    }, [props.allUsers])
 
     useEffect(() => {
 
@@ -111,7 +122,8 @@ function NewCommentScreen(props, route) {
                 text,
                 creation: firebase.firestore.FieldValue.serverTimestamp(),
                 likes: 0,
-                downloadURL
+                downloadURL,
+                userTagList: userTagList
             })
             .then(() => {
                 console.log('Comment Added!');
@@ -144,6 +156,7 @@ function NewCommentScreen(props, route) {
           to: token,
           sound: 'default',
           body: notification ? notification : '',
+          badge: 1,
         };
         
         await fetch('https://exp.host/--/api/v2/push/send', {
@@ -223,6 +236,47 @@ function NewCommentScreen(props, route) {
         setImage(null);
       }
 
+      const removeTaggedUser = () => {
+        Analytics.logEvent('removeTaggedUserFromPost', {user_name: props.currentUser.name});
+    
+        setUserTagList(null);
+        setUserTokenList(null);
+        setIsUserTagged([null])
+      }
+
+      const setGifFunction = () => {
+        setGifMode(true)
+      }
+    
+      const setTagFunction = () => {
+        setGifMode(false)
+      }
+
+      const tagUsersFunction = (name, token) => {
+        Analytics.logEvent('addUsersToTagList', {user_name: props.currentUser.name});
+        
+            const userTagList = name
+            setUserTagList(userTagList)
+            setUserTokenList(token)
+            setIsUserTagged(true)
+    
+      }
+
+      const sendNotificationForTag = async () => {
+        if (userTokenList) {
+            const taggerName = props.currentUser.name
+            const name = userTagList
+            const token = userTokenList
+            if (awayTeam  != undefined) {const notification = '(' + name + '): ' + taggerName + ' tagged you in a comment on the ' + awayTeam + "/" + homeTeam + " game"
+              sendNotification(notification, token)
+              console.log(token)}
+              else {const notification = '(' + name + '): ' + taggerName + ' tagged you in a comment'
+              sendNotification(notification, token)}
+            //const users = await firebase.firestore().collection("users").get();
+            //users.docs.map((user) => sendNotification(user.data().token))
+        }
+      }
+
       const uploadImage = async () => {
         if( image == null ) {
           const downloadURL = "blank"
@@ -287,7 +341,7 @@ function NewCommentScreen(props, route) {
               fetchGifs();
           }
       
-          renderInner = () => (
+          renderGifInner = () => (
               <View style={styles.panel}>
                   <FlatList
                       data={gifs}
@@ -312,7 +366,7 @@ function NewCommentScreen(props, route) {
               </View>
             );
           
-            renderHeader = () => (
+            renderGifHeader = () => (
               <View style={styles.header}>
                 <View style={styles.panelHeader}>
                   <View style={styles.panelHandle} />
@@ -327,21 +381,108 @@ function NewCommentScreen(props, route) {
                 </View>
               </View>
             );
+
+            renderTagInner = () => (
+              <View style={styles.panel}>
+                  <FlatList
+                      data = {allUsers.sort((a, b) => a.name.localeCompare(b.name))}
+                      keyExtractor={(item, index) => index.toString()}
+                      renderItem={searchItemView}
+                          
+                  />
+                <TouchableOpacity
+                  style={styles.panelButton}
+                  onPress={() => this.bs.current.snapTo(1)}>
+                  <Text style={styles.panelButtonTitle}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            );
+          
+            renderTagHeader = () => (
+              <View style={styles.header}>
+                <View style={styles.panelHeader}>
+                  <View style={styles.panelHandle} />
+                  <Text>Choose a friend below to tag in your post!</Text>
+                  <Text> </Text>
+                  <View style={styles.searchSection}>
+                      <FontAwesome5 name="search-dollar" color="grey" size={20} paddingRight={5} />
+                      <TextInput
+                          style={styles.textInput}
+                          placeholder="Type to find friends..."
+                          clearButtonMode={'while-editing'}
+                          value={search}
+                          onChangeText={(text) => searchFilter(text)}
+                      />
+                  </View>
+                </View>
+              </View>
+            );
+      
+            const searchItemView = ({item}) => {
+              return (
+                <View>
+                {item.id == 'L3PlC2PXHYMYHsrdUtaS6tr7Ij13' || item.id == '74hAr9c5tYcERhqgyVbcwrPEr083' ?
+                    null :
+      
+                    <View style={styles.feedItem}>
+                        <TouchableOpacity style={styles.postLeftContainer}
+                            onPress={() => {tagUsersFunction(item.name, item.token); this.bs.current.snapTo(1)}}>
+                            <Image 
+                                style={styles.profilePhotoPostContainer}
+                                source={{uri: item.name ? item.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                            />
+                            <Text style={styles.searchResultsText}>{item.name}</Text>
+                        </TouchableOpacity>
+                    </View> }
+                </View>
+                
+            )
+          }
+
+          const searchFilter = (text) => {
+            if (text) {
+                const newData = allUsers.filter((item) => {
+                    const itemData = item.name ? item.name.toUpperCase() : ''.toUpperCase();
+    
+                    const textData = text.toUpperCase();
+                    return itemData.indexOf(textData) > -1
+    
+                    
+                });
+                setAllUsers(newData)
+                setSearch(text)
+            } else {
+                setAllUsers(props.allUsers)
+                setSearch(text)
+            }
+        }
       
           bs = React.createRef();
           fall = new Animated.Value(1);
       
         return (
               <KeyboardAvoidingView style={styles.container}>
+              {gifMode == true ? 
                 <BottomSheet 
-                  ref={this.bs}
-                  snapPoints={[450, -5]}
-                  renderContent={this.renderInner}
-                  renderHeader={this.renderHeader}
-                  initialSnap={1}
-                  callbackNode={this.fall}
-                  enabledGestureInteraction={true}       
+                    ref={this.bs}
+                    snapPoints={[550, -5]}
+                    renderContent={this.renderGifInner}
+                    renderHeader={this.renderGifHeader}
+                    initialSnap={1}
+                    callbackNode={this.fall}
+                    enabledGestureInteraction={true}       
                 />
+              :
+                <BottomSheet 
+                    ref={this.bs}
+                    snapPoints={[550, -5]}
+                    renderContent={this.renderTagInner}
+                    renderHeader={this.renderTagHeader}
+                    initialSnap={1}
+                    callbackNode={this.fall}
+                    enabledGestureInteraction={true}       
+                />
+              }
                 <Animated.View style={{margin: 15, 
                 opacity: Animated.add(0.1, Animated.multiply(this.fall, 1.0)),
                 }}>
@@ -352,26 +493,39 @@ function NewCommentScreen(props, route) {
                       source={{uri: userData ? userData.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
                     />  
                     <TextInput
-                    placeholder="Type your comment here..."
-                    style={styles.postTextInput}
-                    numberOfLines={4}
-                    multiline={true}
-                    maxLength={1000}
-                    onChangeText={(text) => setText(text)}
+                      placeholder="Type your comment here..."
+                      style={styles.postTextInput}
+                      numberOfLines={4}
+                      multiline={true}
+                      maxLength={1000}
+                      onChangeText={(text) => setText(text)}
                     />
         
                   </View>
+                  {isUserTagged == true ?
+                  <View style={styles.tagListContainer}>
+                    <Text style={{ fontWeight: 'bold' }}>Tagged friends: </Text>
+                    <Text style={{ color: '#0033cc', fontWeight: 'bold' }}>@{userTagList}</Text>
+                    <TouchableOpacity onPress={() => {removeTaggedUser()}}>
+                        <Feather name="x-circle" size={16} color ="red" />
+                    </TouchableOpacity>
+                  </View>
+                  :
+                    null}
                   <View style={styles.addCommentButton}>
                       <View style={styles.galleryContainer}>
-                          <TouchableOpacity onPress={() => this.bs.current.snapTo(0)}>
+                          <TouchableOpacity onPress={() => {this.bs.current.snapTo(0); setGifFunction()}}>
                             <MaterialIcons name="gif" size={28} justifyContent='center' alignItems='center' color="#86898B"/>
                           </TouchableOpacity>
                           <TouchableOpacity onPress={() => {pickImage()}}>
                               <MaterialCommunityIcons name="camera" size={24} justifyContent='center' alignItems='center'  color="#86898B"/>
                           </TouchableOpacity>
+                          <TouchableOpacity onPress={() => {this.bs.current.snapTo(0); setTagFunction()}}>
+                              <FontAwesome5 name="user-tag" size={24} justifyContent='center' alignItems='center'  color="#86898B"/>
+                          </TouchableOpacity>
                       </View>
                       <View style={styles.postButtonContainer}>
-                          <TouchableOpacity onPress={() => {uploadImage(); onCommentCount(); sendNotificationForComment()}} style={styles.postButton}>
+                          <TouchableOpacity onPress={() => {uploadImage(); onCommentCount(); sendNotificationForComment(); sendNotificationForTag()}} style={styles.postButton}>
                               <Text style={styles.shareText}>POST</Text>
                           </TouchableOpacity>
                       </View>
@@ -401,6 +555,7 @@ function NewCommentScreen(props, route) {
       const mapStateToProps = (store) => ({
         users: store.usersState.users,
         currentUser: store.userState.currentUser,
+        allUsers: store.userState.allUsers,
     })
     const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUsersData }, dispatch);
 
@@ -464,7 +619,7 @@ galleryContainer: {
   marginLeft: "5%",
   flex: 1,
   justifyContent: 'space-between',
-  marginRight: "35%",
+  marginRight: "25%",
 },
 postButtonContainer: {
   paddingRight: "10%",
@@ -560,6 +715,27 @@ xButton: {
 },
 postTextInput: {
   width: Dimensions.get('window').width * .80,
-}
+},
+tagListContainer: {
+  flexDirection: "row",
+},
+searchResultsText: {
+  padding: 5,
+  alignSelf: 'center',
+  marginLeft: "5%",
+},
+feedItem:{
+  padding:6,
+  marginVertical:2,
+  marginHorizontal:5,
+  borderBottomWidth: 1,
+  borderBottomColor: "#e1e2e6",
+  flexDirection: 'row',
+},
+postLeftContainer: {
+  flexDirection: "row",
+},
   
-  });
+  })
+
+

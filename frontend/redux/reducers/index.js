@@ -11,10 +11,8 @@ const Reducers = combineReducers({
     mlbGamesState: mlbGames,
     ncaabGamesState: ncaabGames,
     nbaGamesState: nbaGames,
-    eplGamesState: eplGames,
     nhlGamesState: nhlGames,
     mmaGamesState: mmaGames,
-    golfGamesState: golfGames,
     futureGamesState: futureGames,
 })
 

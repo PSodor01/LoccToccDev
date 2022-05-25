@@ -252,6 +252,7 @@ function game(props) {
             to: token,
             sound: 'default',
             body: notification ? notification : '',
+            badge: 1,
         };
         
         await fetch('https://exp.host/--/api/v2/push/send', {
@@ -981,12 +982,12 @@ function game(props) {
                 <Text style={styles.sortText}>Sort: </Text>
                 <TouchableOpacity 
                     onPress={() => {sortFunction()}}>
-                    <Foundation name={"clock"} size={20} color={"#B3B6B7"} />
+                    <Foundation name={"clock"} size={20} color={"#33A8FF"} />
                 </TouchableOpacity>
                 <Text style={styles.sortText}> or </Text>
                 <TouchableOpacity 
                     onPress={() => {sortFunction()}}>
-                    <MaterialCommunityIcons name={"arrow-vertical-lock"} size={20} color={"#B3B6B7"} />
+                    <MaterialCommunityIcons name={"arrow-vertical-lock"} size={20} color={"#33A8FF"} />
                 </TouchableOpacity>
             </View>
             {sortCriteria == true ? 
@@ -1008,9 +1009,13 @@ function game(props) {
                 renderItem={renderItem}
             />
             }
-
-
-            
+            <View style={styles.adView}>
+                <AdMobBanner
+                    bannerSize="banner"
+                    adUnitID={adUnitID} // 
+                    servePersonalizedAds // true or false
+                />
+            </View>
             <TouchableOpacity
                 activeOpacity={0.8}
                 style={styles.button}
@@ -1018,6 +1023,7 @@ function game(props) {
             >
                 <MaterialCommunityIcons name={"plus"} size={30} color="white" />
             </TouchableOpacity>
+            
         </View>
             
         )
@@ -1213,7 +1219,7 @@ const styles = StyleSheet.create({
         marginHorizontal: "2%",
     },
     sortText: {
-        color: '#B3B6B7' 
+        color: '#33A8FF' 
     },
     voteContainer: {
         flexDirection: 'row',
@@ -1272,7 +1278,6 @@ const mapStateToProps = (store) => ({
     faded: store.userState.faded,
     feed: store.usersState.feed,
     usersFollowingLoaded: store.usersState.usersFollowingLoaded,
-    golfGames: store.golfGamesState.golfGames,
     futureGames: store.futureGamesState.futureGames,
 })
 const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUsersData }, dispatch);
