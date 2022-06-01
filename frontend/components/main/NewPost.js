@@ -206,6 +206,7 @@ function AddPostScreen(props) {
         .doc(firebase.auth().currentUser.uid)
         .update({
             postsCount: firebase.firestore.FieldValue.increment(1),
+            nbanhl2022Score: firebase.firestore.FieldValue.increment(10)
         })
 
     }

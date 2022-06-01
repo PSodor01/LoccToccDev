@@ -15,6 +15,8 @@ import {AdMobBanner} from 'expo-ads-admob'
 import * as Analytics from 'expo-firebase-analytics';
 import * as StoreReview from 'expo-store-review';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 import firebase from 'firebase'
 require("firebase/firestore")
@@ -41,19 +43,36 @@ function Odds(props) {
     const [notification, setNotification] = useState('');
     const [notificationCriteria, setNotificationCriteria] = useState(false);
     const [bannerId, setBannerId] = useState('') //test id: 3940256099942544/2934735716
+    const [isFirstLaunch, setIsFirstLaunch] = useState(null)
     
     useEffect(() => {
         setBannerId('ca-app-pub-8519029912093094/2973755922')
 
         Analytics.setUserId(firebase.auth().currentUser.uid);
+        Analytics.logEvent('screen_view', { screen_name: 'Odds', user_name: props.currentUser.name });
 
         resetBadgeCount()
 
-        //if (StoreReview.hasAction()) {
-        //    StoreReview.requestReview();
-        //  }
-
     }, [])
+
+    useEffect(() => {
+        AsyncStorage.getItem('alreadyLaunched').then(value => {
+            if(value == null ) {
+                AsyncStorage.setItem('alreadyLaunched', 'true');
+                setIsFirstLaunch(true)
+                Analytics.logEvent('firstLaunch', {user_name: props.currentUser.name});
+
+            } else {
+                setIsFirstLaunch(false);
+                if (StoreReview.hasAction()) {
+                        StoreReview.requestReview();
+                  }
+            }
+        });
+
+    }, []);
+    
+    
 
     useEffect(() => {
         fetchData()
@@ -65,11 +84,9 @@ function Odds(props) {
             setSport('NBA')
         }
 
-        Analytics.logEvent('screen_view', { screen_name: 'Odds', user_name: props.currentUser.name })
-        
     }, [ props.nhlGames, props.nbaGames, props.mlbGames, props.mmaGames, props.futureGames, props.trendingGames])
 
-   /* useEffect(() => {
+   useEffect(() => {
 
         firebase.firestore()
         .collection('users')
@@ -77,17 +94,17 @@ function Odds(props) {
         .get()
         .then((snapshot) => {
             if (snapshot.exists) {
-                if (snapshot.data().masters2022Score > -100000) {
+                if (snapshot.data().nbanhl2022Score > -100000) {
 
                 } else{
                     firebase.firestore()
                     .collection("users")
                     .doc(firebase.auth().currentUser.uid)
-                    .set({masters2022Score: 150}, { merge:true });
+                    .set({nbanhl2022Score: 150}, { merge:true });
                 }
             }
         })
-    }, []) */
+    }, [])
 
     
     const fetchData = () => {
@@ -1092,9 +1109,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
       },
-    
-    
-    
     
 })
 

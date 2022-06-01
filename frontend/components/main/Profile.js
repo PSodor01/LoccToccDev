@@ -137,6 +137,13 @@ function Profile(props) {
                 followerCount: firebase.firestore.FieldValue.increment(1)
             })
 
+        firebase.firestore()
+            .collection("users")
+            .doc(props.route.params.uid)
+            .update({
+                nbanhl2022Score: firebase.firestore.FieldValue.increment(10)
+            })
+
     }
 
     const increaseFollowingCount = () => {
@@ -145,6 +152,13 @@ function Profile(props) {
             .doc(firebase.auth().currentUser.uid)
             .update({
                 followingCount: firebase.firestore.FieldValue.increment(1)
+            })
+
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                nbanhl2022Score: firebase.firestore.FieldValue.increment(25)
             })
 
     }
@@ -156,6 +170,13 @@ function Profile(props) {
             .update({
                 followerCount: firebase.firestore.FieldValue.increment(-1)
             })
+
+        firebase.firestore()
+            .collection("users")
+            .doc(props.route.params.uid)
+            .update({
+                nbanhl2022Score: firebase.firestore.FieldValue.increment(-10)
+            })
         
     }
 
@@ -165,6 +186,13 @@ function Profile(props) {
             .doc(firebase.auth().currentUser.uid)
             .update({
                 followingCount: firebase.firestore.FieldValue.increment(-1)
+            })
+
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                nbanhl2022Score: firebase.firestore.FieldValue.increment(-25)
             })
 
     }

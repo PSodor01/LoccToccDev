@@ -8,6 +8,7 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import * as firebase from 'firebase'
 
 
+
 import { Provider } from 'react-redux'
 import { createStore, applyMiddleware } from 'redux'
 import rootReducer from './redux/reducers'
@@ -401,6 +402,25 @@ const MainStackScreen = ({navigation, props}) => (
             
           }}
         />
+        <MainStack.Screen name="Onboarding" component={OnboardingScreen}
+        options={{
+            headerTitle: () => (
+              <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+                  <Text style={styles.headerName}>locctocc </Text>
+                  <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
+              </View>
+            ),
+            headerLeft: () => (
+              <TouchableOpacity 
+              style={{ alignItems: "flex-end", marginLeft:16 }}
+              onPress={() => navigation.goBack()}
+              >
+              <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+            </TouchableOpacity>
+            )
+          }} />
+
+        
   </MainStack.Navigator>
 )
 
@@ -411,9 +431,11 @@ export class App extends Component {
     this.state = {
       loaded: false,
     }
+
   }
 
   componentDidMount() {
+
     firebase.auth().onAuthStateChanged((user) => {
       if (!user) {
         this.setState({
@@ -428,6 +450,7 @@ export class App extends Component {
       }
     })
   }
+
   render() {
     const { loggedIn, loaded } = this.state;
     if (!loaded) {

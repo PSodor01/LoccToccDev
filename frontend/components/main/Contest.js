@@ -32,8 +32,8 @@ function Contest(props) {
             setContestLive(false)
         }
 
-        const contestParticipants = props.allUsers.filter(user => user.masters2022Score != null);
-        setAllUsers(contestParticipants.sort((a, b) => parseFloat(b.masters2022Score) - parseFloat(a.masters2022Score)).slice(0, 50))
+        const contestParticipants = props.allUsers.filter(user => user.nbanhl2022Score != null);
+        setAllUsers(contestParticipants.sort((a, b) => parseFloat(b.nbanhl2022Score) - parseFloat(a.nbanhl2022Score)).slice(0, 50))
 
         const myScore = props.allUsers.filter(user => user.name == props.currentUser.name);
         setMyScore(myScore)
@@ -42,16 +42,16 @@ function Contest(props) {
 
     }, [props.allUsers, props.currentUser, props.contestStatus])
 
-    useEffect(() => {
+    /*useEffect(() => {
 
         interstitial()
 
-    }, [])
+    }, []) */
 
     const renderMyScore = ({item}) => {
         return (
             <View>
-                <Text style={styles.subTitleText}>{item.masters2022Score}</Text>
+                <Text style={styles.subTitleText}>{item.nbanhl2022Score}</Text>
             </View>
     )}
 
@@ -75,26 +75,43 @@ function Contest(props) {
             .collection("users")
             .doc(firebase.auth().currentUser.uid)
             .update({
-                masters2022Score: firebase.firestore.FieldValue.increment(10)
+                nbanhl2022Score: firebase.firestore.FieldValue.increment(10)
             })
     }
 
     const countLocctoccInstagramClicks = () => {
 
-        Analytics.logEvent('instagramClicks', {user_name: props.currentUser.name});
-
-        firebase.firestore()
-            .collection("brandClicks")
-            .doc('tropicalBros')
-            .update({
-                instagram: firebase.firestore.FieldValue.increment(1)
-            })
+        Analytics.logEvent('locctoccInstagramClicks', {user_name: props.currentUser.name});
 
         firebase.firestore()
             .collection("users")
             .doc(firebase.auth().currentUser.uid)
             .update({
-                masters2022Score: firebase.firestore.FieldValue.increment(10)
+                nbanhl2022Score: firebase.firestore.FieldValue.increment(1)
+            })
+    }
+
+    const countLocctoccTwitterClicks = () => {
+
+        Analytics.logEvent('locctoccTwitterClicks', {user_name: props.currentUser.name});
+
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                nbanhl2022Score: firebase.firestore.FieldValue.increment(1)
+            })
+    }
+
+    const countLocctoccTiktokClicks = () => {
+
+        Analytics.logEvent('locctoccTiktokClicks', {user_name: props.currentUser.name});
+
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                nbanhl2022Score: firebase.firestore.FieldValue.increment(1)
             })
     }
 
@@ -110,6 +127,7 @@ function Contest(props) {
                 <Text></Text>
             </View>
             <View style={{textAlign: 'justify'}}>
+                <Text>- Contest will run through the end of the NBA finals</Text>
                 <Text>- Post your locks and engage with other members of the community to participate</Text>
                 <Text>- Earn points by posting and collecting hammers, lose points for fades</Text>
                 <Text>- Cash prizes will be announced for each contest</Text>
@@ -159,6 +177,64 @@ function Contest(props) {
         }
     } 
 
+    /*<View style={styles.headerContainer}>
+        <View style={styles.titleContainer}>
+            <View>
+                <Image 
+                    style={{ width: 130, height: 100, marginBottom: 5, marginRight: 10, }}
+                    source={require('../../assets/locctocclogo.png')}
+                />
+            </View>
+            <View>
+                <View style={styles.titleContainer}>
+                    <Text style={styles.titleText}>CASH PRIZES: $200  </Text>
+                    <TouchableOpacity onPress={() => {this.bs.current.snapTo(0); countInfoClicks()}}
+                    >
+                        <FontAwesome5 name="info-circle" size={18} justifyContent='center' alignItems='center' color="#2e64e5"/>
+                    </TouchableOpacity>
+                </View>
+                <View style={styles.infoContainer}>
+                    <Text style={styles.subTitleText}>My Score: </Text>
+                    <FlatList
+                        data ={myScore}
+                        renderItem={renderMyScore}
+                    />
+                </View>
+                <View style={styles.infoContainer}>
+                    <Text style={styles.subTitleText}> </Text>
+                </View>
+                <View style={styles.infoContainer}>
+                    <Text style={styles.subTitleText}>Presented by:</Text>
+                </View>
+                <View style={styles.infoContainer}>
+                    <TouchableOpacity
+                        style={styles.linkText}>
+                            <Text style={styles.linkText}
+                        onPress={() => {
+                        countWebsiteClicks()
+                        Linking.openURL('https://tropicalbros.com');
+                        }}>
+                        www.TROPICALBROS.com</Text>
+                    </TouchableOpacity>
+                </View>
+                <View style={styles.infoContainer}>
+                    <TouchableOpacity
+                        style={styles.linkText}>
+                            <Text style={styles.linkText}
+                        onPress={() => {
+                        countInstagramClicks()
+                        Linking.openURL('https://www.instagram.com/tropical.bros/');
+                        }}>
+                        Follow!</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </View>
+        <View style={styles.brandTextContainer}>
+            <Text style={styles.brandText}>Enjoy Life in Style with Tropical Bros laid back lifestyle golf and beachwear. We deliver the highest quality products with the coolest designs at the most competitive prices.  Stay Tropical. </Text>
+        </View>
+    </View> */
+
    
     
     return (
@@ -176,60 +252,64 @@ function Contest(props) {
                 
                 {contestLive == true ?
                 <View style={styles.headerContainer}>
-                    <View style={styles.titleContainer}>
+                    <View>
                         <View>
-                            <Image 
-                                style={{ width: 130, height: 100, marginBottom: 5, marginRight: 10, }}
-                                source={require('../../assets/tropBrosLogo.png')}
-                            />
+                            <Text style={styles.titleText}>Leaderboard </Text>
                         </View>
                         <View>
                             <View style={styles.titleContainer}>
-                                <Text style={styles.titleText}>CASH PRIZES: $200  </Text>
+                                <Text style={styles.subTitleText}>CASH PRIZES: $200  </Text>
                                 <TouchableOpacity onPress={() => {this.bs.current.snapTo(0); countInfoClicks()}}
                                 >
                                     <FontAwesome5 name="info-circle" size={18} justifyContent='center' alignItems='center' color="#2e64e5"/>
                                 </TouchableOpacity>
                             </View>
                             <View style={styles.infoContainer}>
-                                <Text style={styles.subTitleText}>My Score: </Text>
+                                <Text style={styles.infoText}>My Score: </Text>
                                 <FlatList
                                     data ={myScore}
                                     renderItem={renderMyScore}
                                 />
                             </View>
                             <View style={styles.infoContainer}>
-                                <Text style={styles.subTitleText}> </Text>
+                                <Text style={styles.infoText}> </Text>
                             </View>
                             <View style={styles.infoContainer}>
-                                <Text style={styles.subTitleText}>Presented by:</Text>
+                                <Text style={styles.infoText}>Follow us for all the latest updates:</Text>
                             </View>
-                            <View style={styles.infoContainer}>
-                                <TouchableOpacity
-                                    style={styles.linkText}>
-                                        <Text style={styles.linkText}
-                                    onPress={() => {
-                                    countWebsiteClicks()
-                                    Linking.openURL('https://tropicalbros.com');
-                                    }}>
-                                    www.TROPICALBROS.com</Text>
-                                </TouchableOpacity>
-                            </View>
-                            <View style={styles.infoContainer}>
-                                <TouchableOpacity
-                                    style={styles.linkText}>
-                                        <Text style={styles.linkText}
-                                    onPress={() => {
-                                    countInstagramClicks()
-                                    Linking.openURL('https://www.instagram.com/tropical.bros/');
-                                    }}>
-                                    Follow!</Text>
-                                </TouchableOpacity>
+                            <View style={styles.titleContainer}>
+                                <View style={styles.infoContainer}>
+                                    <TouchableOpacity
+                                        style={styles.linkText}
+                                        onPress={() => {
+                                        countLocctoccInstagramClicks()
+                                        Linking.openURL('https://www.instagram.com/locctocc/');
+                                        }}>
+                                        <FontAwesome5 name="instagram" size={24} justifyContent='center' alignItems='center' color="#E1306C"/>
+                                    </TouchableOpacity>
+                                </View>
+                                <View style={styles.infoContainer}>
+                                    <TouchableOpacity
+                                        style={styles.linkText}
+                                        onPress={() => {
+                                        countLocctoccTwitterClicks()
+                                        Linking.openURL('https://twitter.com/LoccTocc');
+                                        }}>
+                                        <FontAwesome5 name="twitter" size={24} justifyContent='center' alignItems='center' color="#1DA1F2"/>
+                                    </TouchableOpacity>
+                                </View>
+                                <View style={styles.infoContainer}>
+                                    <TouchableOpacity
+                                        style={styles.linkText}
+                                        onPress={() => {
+                                        countLocctoccTiktokClicks()
+                                        Linking.openURL('https://www.tiktok.com/@locctocc');
+                                        }}>
+                                        <FontAwesome5 name="tiktok" size={24} justifyContent='center' alignItems='center' color="#000"/>
+                                    </TouchableOpacity>
+                                </View>
                             </View>
                         </View>
-                    </View>
-                    <View style={styles.brandTextContainer}>
-                        <Text style={styles.brandText}>Enjoy Life in Style with Tropical Bros laid back lifestyle golf and beachwear. We deliver the highest quality products with the coolest designs at the most competitive prices.  Stay Tropical. </Text>
                     </View>
                 </View>
                 :
@@ -243,10 +323,10 @@ function Contest(props) {
                                 </TouchableOpacity>
                             </View>
                             <View style={styles.infoContainer}>
-                                <Text style={styles.subTitleText}>New contests coming soon! Check back here and follow us on social media for updates!</Text>
+                                <Text style={styles.infoText}>New contests coming soon! Check back here and follow us on social media for updates!</Text>
                             </View>
                             <View style={styles.infoContainer}>
-                                <Text style={styles.subTitleText}> </Text>
+                                <Text style={styles.infoText}> </Text>
                             </View>
                             <View style={styles.infoContainer}>
                                 <TouchableOpacity
@@ -271,7 +351,7 @@ function Contest(props) {
                                 </TouchableOpacity>
                             </View>
                             <View style={styles.infoContainer}>
-                                <Text style={styles.subTitleText}>Previous contest leaderboard:</Text>
+                                <Text style={styles.infoText}>Previous contest leaderboard:</Text>
                             </View>
                         </View>
                     </View>
@@ -281,7 +361,7 @@ function Contest(props) {
                 
                 <Leaderboard 
                     data={allUsers} 
-                    sortBy='masters2022Score' 
+                    sortBy='nbanhl2022Score' 
                     labelBy='name'
                     icon='userImg'
                     />
@@ -310,12 +390,18 @@ const styles = StyleSheet.create({
 
     },
     titleText: {
-        fontSize: 16,
+        fontSize: 18,
         color: 'black',
         fontWeight: 'bold',
         textTransform: 'uppercase'
     },
     subTitleText: {
+        fontSize: 16,
+        color: 'black',
+        fontWeight: 'bold',
+        textTransform: 'uppercase'
+    },
+    infoText: {
         fontSize: 14,
         color: 'black',    
         fontWeight: 'bold', 

@@ -731,7 +731,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
                 .doc(game.bookmakers[0].markets[0].outcomes[i].name)
                 .set({
                   playerName: game.bookmakers[0].markets[0].outcomes[i].name,
-                  playerOdds: Math.round((game.bookmakers[0].markets[0].outcomes[i].price -1) * 100),
+                  playerOdds: game.bookmakers[0].markets[0].outcomes[i].price > 2 ? Math.round((game.bookmakers[0].markets[0].outcomes[i].price -1)*100) : Math.round(-100/(game.bookmakers[0].markets[0].outcomes[i].price -1)),
                   gameId: game.id,
                   sport: 'NFL - Suberbowl Champion',
                   
@@ -755,7 +755,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
                 .doc(game.bookmakers[j].markets[0].outcomes[i].name)
                 .set({
                   playerName: game.bookmakers[j].markets[0].outcomes[i].name,
-                  playerOdds: Math.round((game.bookmakers[j].markets[0].outcomes[i].price -1) * 100),
+                  playerOdds: game.bookmakers[0].markets[0].outcomes[i].price > 2 ? Math.round((game.bookmakers[0].markets[0].outcomes[j].price -1)*100) : Math.round(-100/(game.bookmakers[0].markets[0].outcomes[j].price -1)),
                   gameId: game.id,
                   sport: 'MLB - World Series Winner',
                   
@@ -782,7 +782,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
                 .doc(game.bookmakers[0].markets[0].outcomes[i].name)
                 .set({
                   playerName: game.bookmakers[0].markets[0].outcomes[i].name,
-                  playerOdds: Math.round((game.bookmakers[0].markets[0].outcomes[i].price -1) * 100),
+                  playerOdds: game.bookmakers[0].markets[0].outcomes[i].price > 2 ? Math.round((game.bookmakers[0].markets[0].outcomes[i].price -1)*100) : Math.round(-100/(game.bookmakers[0].markets[0].outcomes[i].price -1)),
                   gameId: game.id,
                   sport: 'NBA - Championship',
                   
@@ -806,7 +806,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
                 .doc(game.bookmakers[j].markets[0].outcomes[i].name)
                 .set({
                   playerName: game.bookmakers[j].markets[0].outcomes[i].name,
-                  playerOdds: Math.round((game.bookmakers[j].markets[0].outcomes[i].price -1) * 100),
+                  playerOdds: game.bookmakers[0].markets[0].outcomes[i].price > 2 ? Math.round((game.bookmakers[0].markets[0].outcomes[i].price -1)*100) : Math.round(-100/(game.bookmakers[0].markets[0].outcomes[i].price -1)),
                   gameId: game.id,
                   sport: 'NHL - Stanley Cup Winner',
                   

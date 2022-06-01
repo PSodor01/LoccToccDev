@@ -127,7 +127,6 @@ export class Register extends Component {
                         followingCount: 0,
                         postsCount: 0,
                     })
-                console.log(result)
             })
             .catch(error => {   
                 alert(error.message)

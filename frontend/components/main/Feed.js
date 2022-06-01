@@ -171,6 +171,20 @@ function Feed(props) {
                 likesCount: firebase.firestore.FieldValue.increment(1)
             })
 
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                nbanhl2022Score: firebase.firestore.FieldValue.increment(10)
+            })
+
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .update({
+                nbanhl2022Score: firebase.firestore.FieldValue.increment(25)
+            })
+
     }
 
     const onDislikePress = (userId, postId) => {
@@ -191,6 +205,20 @@ function Feed(props) {
             .collection("likes")
             .doc(firebase.auth().currentUser.uid)
             .delete()
+
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                nbanhl2022Score: firebase.firestore.FieldValue.increment(-10)
+            })
+
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .update({
+                nbanhl2022Score: firebase.firestore.FieldValue.increment(-25)
+            })
 
     }
 
@@ -213,6 +241,20 @@ function Feed(props) {
             .doc(firebase.auth().currentUser.uid)
             .set({})
 
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                nbanhl2022Score: firebase.firestore.FieldValue.increment(-50)
+            })
+
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .update({
+                nbanhl2022Score: firebase.firestore.FieldValue.increment(-50)
+            })
+
     }
 
     const onUnfadePress = (userId, postId) => {
@@ -233,6 +275,20 @@ function Feed(props) {
             .collection("fades")
             .doc(firebase.auth().currentUser.uid)
             .delete()
+
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                nbanhl2022Score: firebase.firestore.FieldValue.increment(50)
+            })
+
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .update({
+                nbanhl2022Score: firebase.firestore.FieldValue.increment(50)
+            })
 
     }
 

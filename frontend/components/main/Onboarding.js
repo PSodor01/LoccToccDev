@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from 'react'
-import { View, Text, Button, Image, StyleSheet } from 'react-native'
+import { View, Text, Button, Image, StyleSheet, TouchableOpacity } from 'react-native'
 
 import Onboarding from 'react-native-onboarding-swiper';
+
+import * as Analytics from 'expo-firebase-analytics';
+
+import firebase from 'firebase'
+require("firebase/firestore")
+require("firebase/firebase-storage")
+
+import { connect } from 'react-redux'
+
 /*import AsyncStorage from '@react-native-community/async-storage'
 
 const [isFirstLaunch, setIsFirstLaunch] = useState(null)
@@ -17,20 +26,9 @@ useEffect(() => {
     });
 }, []);
 
-if( isFirstLaunch == null ) {
-    return null;
-} else if ( isFirstLaunch == true ) {
-    return (
-        //put what you want here (app store review)
-        <View>
+*/
 
-        </View>
-    )
-} else {
-    return null
-} */
-
-const Dots = ({selected}) => {
+/*const Dots = ({selected}) => {
     let backgroundColor;
 
     backgroundColor = selected ? 'rgba(0, 0, 0.8)' : 'rgba(0, 0, 0.3)'
@@ -45,7 +43,7 @@ const Dots = ({selected}) => {
             }}
         </View>
     )
-}
+} */
 
 const Skip = (...props) => (
     <Button 
@@ -78,39 +76,79 @@ const OnboardingScreen = ({navigation}) => {
         NextButtonComponent={Next}
         SkipButtonComponent={Skip}
         DoneButtonComponent={Done}
-        DotComponent={Dots}
+        //DotComponent={Dots}
         onSkip={() => navigation.replace("Login")}
         onDone={() => navigation.navigate("Login")}
         pages={[
             {
                 backgroundColor: '#009387',
-                image: <Image source={require('../../assets/locctocclogo.png')} />,
+                image: <Image 
+                    source={require('../../assets/betOpenlyLogo.png')} 
+                    style={styles.imageStyle}
+                    />,
                 title: 'Welcome to the community',
                 subtitle: 'See live odds and scores for your sport of choice',
             },
             {
                 backgroundColor: '#fff',
-                image: <Image source={require('../../assets/locctocclogo.png')} />,
-                title: 'Onboarding 2',
-                subtitle: 'Done with React Native Onboarding Swiper',
+                image: <Image source={require('../../assets/betOpenlyLogo.png')} />,
+                title: 'Odds',
+                subtitle: 'See live odds and scores for your sport of choice',
+            },
+            {
+                backgroundColor: '#009387',
+                image: <Image 
+                    source={require('../../assets/howToGame.jpg')} 
+                    style={styles.imageStyle}
+                />,
+                title: 'Drill Down to a Single Game',
+                subtitle: 'See all the locks for that event',
+            },
+            {
+                backgroundColor: '#009387',
+                image: <Image 
+                    source={require('../../assets/howToGame.jpg')} 
+                    style={styles.imageStyle}
+                />,
+                title: 'new post',
+                subtitle: 'See all the locks for that event',
             },
             {
                 backgroundColor: '#fff',
-                image: <Image source={require('../../assets/locctocclogo.png')} />,
-                title: 'Onboarding 3',
-                subtitle: 'Done with React Native Onboarding Swiper',
+                image: <Image 
+                    source={require('../../assets/howToPost.jpg')} 
+                    style={styles.imageStyle}
+                />,
+                title: 'feed',
+                subtitle: 'See posts from your friends or from all users',
+            },
+            {
+                backgroundColor: '#009387',
+                image: <Image source={require('../../assets/betOpenlyLogo.png')} />,
+                title: 'Profile',
+                subtitle: 'See posts from your friends or from all users',
             },
         ]}
         />
     );
 };
 
-export default OnboardingScreen
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center'
-    }
+    },
+    imageStyle: {
+        width: "70%",
+        height: "50%",
+      },
 })
+
+const mapStateToProps = (store) => ({
+
+    currentUser: store.userState.currentUser,
+
+})
+
+export default connect(mapStateToProps)(OnboardingScreen);
