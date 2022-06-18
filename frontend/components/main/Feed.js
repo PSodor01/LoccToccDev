@@ -170,21 +170,6 @@ function Feed(props) {
             .update({
                 likesCount: firebase.firestore.FieldValue.increment(1)
             })
-
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                nbanhl2022Score: firebase.firestore.FieldValue.increment(10)
-            })
-
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                nbanhl2022Score: firebase.firestore.FieldValue.increment(25)
-            })
-
     }
 
     const onDislikePress = (userId, postId) => {
@@ -206,20 +191,6 @@ function Feed(props) {
             .doc(firebase.auth().currentUser.uid)
             .delete()
 
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                nbanhl2022Score: firebase.firestore.FieldValue.increment(-10)
-            })
-
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                nbanhl2022Score: firebase.firestore.FieldValue.increment(-25)
-            })
-
     }
 
     const onFadePress = (userId, postId) => {
@@ -240,21 +211,6 @@ function Feed(props) {
             .collection("fades")
             .doc(firebase.auth().currentUser.uid)
             .set({})
-
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                nbanhl2022Score: firebase.firestore.FieldValue.increment(-50)
-            })
-
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                nbanhl2022Score: firebase.firestore.FieldValue.increment(-50)
-            })
-
     }
 
     const onUnfadePress = (userId, postId) => {
@@ -275,21 +231,6 @@ function Feed(props) {
             .collection("fades")
             .doc(firebase.auth().currentUser.uid)
             .delete()
-
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                nbanhl2022Score: firebase.firestore.FieldValue.increment(50)
-            })
-
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                nbanhl2022Score: firebase.firestore.FieldValue.increment(50)
-            })
-
     }
 
     const sendNotification = async (notification, token) => {
@@ -450,6 +391,7 @@ function Feed(props) {
                         <View style={styles.postRightContainer}>
                             <View style={styles.postHeaderContainer}>
                                 {item.user ? <Text style={styles.profileNameFeedText}>{item.user.name}</Text> : null}
+                                
                                 <Text style={styles.postTimeContainer}>{moment(item.creation.toDate()).fromNow()}</Text>
                             </View>
                             <View style={styles.postContentContainer}>

@@ -1,5 +1,4 @@
 import { NFL_GAMES_STATE_CHANGE, 
-    NBA_GAMES_STATE_CHANGE,
     NCAAF_GAMES_STATE_CHANGE, 
     NCAAB_GAMES_STATE_CHANGE, 
     MLB_GAMES_STATE_CHANGE, 
@@ -16,7 +15,6 @@ const initialState = {
     ncaabGames: [],
     mmaGames: [],
     nhlGames: [],
-    nbaGames: [],
     futureGames: [],
 }
 
@@ -26,20 +24,6 @@ export const nflGames = (state = initialState, action) => {
             return {
                 ...state,
                 nflGames: action.nflGames
-            }
-        case CLEAR_DATA:
-            return initialState
-        default:
-            return state;
-    }
-}
-
-export const nbaGames = (state = initialState, action) => {
-    switch (action.type) {
-        case NBA_GAMES_STATE_CHANGE:
-            return {
-                ...state,
-                nbaGames: action.nbaGames
             }
         case CLEAR_DATA:
             return initialState

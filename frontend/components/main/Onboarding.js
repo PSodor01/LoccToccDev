@@ -83,7 +83,7 @@ const OnboardingScreen = ({navigation}) => {
             {
                 backgroundColor: '#009387',
                 image: <Image 
-                    source={require('../../assets/betOpenlyLogo.png')} 
+                    source={require('../../assets/locctocclogo.png')} 
                     style={styles.imageStyle}
                     />,
                 title: 'Welcome to the community',
@@ -135,13 +135,10 @@ const OnboardingScreen = ({navigation}) => {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center'
     },
     imageStyle: {
         width: "70%",
-        height: "50%",
+        height: "70%",
       },
 })
 

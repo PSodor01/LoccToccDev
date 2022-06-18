@@ -595,8 +595,8 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
       .then(result => {
         result.data.forEach(game => {
 
-          if (game.bookmakers.findIndex((item) => item.key === 'lowvig') > -1) {
-            let i = game.bookmakers.findIndex((item) => item.key === 'lowvig')
+          if (game.bookmakers.findIndex((item) => item.key === 'draftkings') > -1) {
+            let i = game.bookmakers.findIndex((item) => item.key === 'draftkings')
             if (game.away_team == game.bookmakers[0].markets[0].outcomes[0].name) {
 
               const writeResult = admin
@@ -755,7 +755,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
                 .doc(game.bookmakers[j].markets[0].outcomes[i].name)
                 .set({
                   playerName: game.bookmakers[j].markets[0].outcomes[i].name,
-                  playerOdds: game.bookmakers[0].markets[0].outcomes[i].price > 2 ? Math.round((game.bookmakers[0].markets[0].outcomes[j].price -1)*100) : Math.round(-100/(game.bookmakers[0].markets[0].outcomes[j].price -1)),
+                  playerOdds: game.bookmakers[j].markets[0].outcomes[i].price > 2 ? Math.round((game.bookmakers[j].markets[0].outcomes[i].price -1)*100) : Math.round(-100/(game.bookmakers[j].markets[0].outcomes[i].price -1)),
                   gameId: game.id,
                   sport: 'MLB - World Series Winner',
                   
@@ -806,7 +806,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
                 .doc(game.bookmakers[j].markets[0].outcomes[i].name)
                 .set({
                   playerName: game.bookmakers[j].markets[0].outcomes[i].name,
-                  playerOdds: game.bookmakers[0].markets[0].outcomes[i].price > 2 ? Math.round((game.bookmakers[0].markets[0].outcomes[i].price -1)*100) : Math.round(-100/(game.bookmakers[0].markets[0].outcomes[i].price -1)),
+                  playerOdds: game.bookmakers[j].markets[0].outcomes[i].price > 2 ? Math.round((game.bookmakers[j].markets[0].outcomes[i].price -1)*100) : Math.round(-100/(game.bookmakers[j].markets[0].outcomes[i].price -1)),
                   gameId: game.id,
                   sport: 'NHL - Stanley Cup Winner',
                   

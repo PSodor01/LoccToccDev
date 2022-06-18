@@ -8,7 +8,7 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import firebase from 'firebase'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { fetchUser, fetchUserFollowing, fetchUserBlocking, fetchAllUsers, fetchAllPosts, fetchLikes, fetchFades, fetchMLBGames, fetchNBAGames, fetchMMAGames, fetchFutureGames, fetchNHLGames, fetchContestStatus, clearData } from '../redux/actions/index'
+import { fetchUser, fetchUserFollowing, fetchUserBlocking, fetchAllUsers, fetchAllPosts, fetchLikes, fetchFades, fetchMLBGames, fetchMMAGames, fetchFutureGames, fetchNHLGames, fetchContestStatus, clearData } from '../redux/actions/index'
 
 import FeedScreen from './main/Feed'
 import ProfileScreen from './main/Profile'
@@ -62,7 +62,6 @@ export class Main extends Component {
         this.props.fetchFades();
         this.props.fetchAllUsers();
         this.props.fetchAllPosts();
-        this.props.fetchNBAGames();
         this.props.fetchMLBGames();
         this.props.fetchFutureGames();
         this.props.fetchNHLGames();
@@ -144,11 +143,10 @@ const mapStateToProps = (store) => ({
     currentUser: store.userState.currentUser,
     ncaabGames: store.ncaabGamesState.ncaabGames,
     nhlGames: store.nhlGamesState.nhlGames,
-    nbaGames: store.nbaGamesState.nbaGames,
     mmaGames: store.mmaGamesState.mmaGames,
     mlbGames: store.mlbGamesState.mlbGames,
     futureGames: store.futureGamesState.futureGames,
 })
-const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUser, fetchUserFollowing, fetchAllUsers, fetchAllPosts, fetchUserBlocking, fetchLikes, fetchFades, fetchMLBGames, fetchNBAGames, fetchMMAGames, fetchFutureGames, fetchNHLGames, fetchContestStatus, clearData }, dispatch);
+const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUser, fetchUserFollowing, fetchAllUsers, fetchAllPosts, fetchUserBlocking, fetchLikes, fetchFades, fetchMLBGames, fetchMMAGames, fetchFutureGames, fetchNHLGames, fetchContestStatus, clearData }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchProps)(Main);

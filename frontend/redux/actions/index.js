@@ -184,24 +184,6 @@ export function fetchUsersData(uid, getPosts) {
     })
 }
 
-export function fetchNBAGames() {
-    return ((dispatch) => {
-        firebase.firestore()
-            .collection("nba")
-            .orderBy('gameDate', 'desc')
-            .onSnapshot((snapshot) => {
-                let nbaGames = snapshot.docs.map(doc => {
-                    const data = doc.data();
-                    const id = doc.id;
-                    return { id, ...data }
-                })
-                dispatch({ type: NBA_GAMES_STATE_CHANGE, nbaGames });
-                for(let i = 0; i < nbaGames.length; i++){
-                }
-            })
-    })
-}
-
 export function fetchMLBGames() {
     return ((dispatch) => {
         firebase.firestore()

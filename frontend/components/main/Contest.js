@@ -33,7 +33,7 @@ function Contest(props) {
         }
 
         const contestParticipants = props.allUsers.filter(user => user.nbanhl2022Score != null);
-        setAllUsers(contestParticipants.sort((a, b) => parseFloat(b.nbanhl2022Score) - parseFloat(a.nbanhl2022Score)).slice(0, 50))
+        setAllUsers(contestParticipants.sort((a, b) => parseFloat(b.nbanhl2022Score) - parseFloat(a.nbanhl2022Score)).slice(0, 100))
 
         const myScore = props.allUsers.filter(user => user.name == props.currentUser.name);
         setMyScore(myScore)

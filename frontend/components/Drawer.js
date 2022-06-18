@@ -124,6 +124,7 @@ export function DrawerContent(props) {
                             label="Our Partners"
                             onPress={() => {props.navigation.navigate('Partners')}}
                         />
+                    
                         <DrawerItem 
                             icon={({color, size}) => (
                                 <MaterialIcons 

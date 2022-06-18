@@ -184,20 +184,6 @@ function game(props) {
                 likesCount: firebase.firestore.FieldValue.increment(1)
             })
 
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                nbanhl2022Score: firebase.firestore.FieldValue.increment(10)
-            })
-
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                nbanhl2022Score: firebase.firestore.FieldValue.increment(25)
-            })
-
     }
 
     const onDislikePress = (userId, postId) => {
@@ -218,20 +204,6 @@ function game(props) {
             .collection("likes")
             .doc(firebase.auth().currentUser.uid)
             .delete()
-
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                nbanhl2022Score: firebase.firestore.FieldValue.increment(-10)
-            })
-
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                nbanhl2022Score: firebase.firestore.FieldValue.increment(-25)
-            })
     }
 
     const onFadePress = (userId, postId) => {
@@ -252,20 +224,6 @@ function game(props) {
             .collection("fades")
             .doc(firebase.auth().currentUser.uid)
             .set({})
-
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                nbanhl2022Score: firebase.firestore.FieldValue.increment(-50)
-            })
-
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                nbanhl2022Score: firebase.firestore.FieldValue.increment(-50)
-            })
 
     }
 
@@ -288,20 +246,6 @@ function game(props) {
             .doc(firebase.auth().currentUser.uid)
             .delete()
         
-
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                nbanhl2022Score: firebase.firestore.FieldValue.increment(50)
-            })
-
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                nbanhl2022Score: firebase.firestore.FieldValue.increment(50)
-            })
     }
 
     const sendNotification = async (notification, token) => {

@@ -30,13 +30,15 @@ function Comment(props, route) {
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [hidePost, setHidePost] = useState(false);
+    const [allUsers, setAllUsers] = useState([]);
 
     const { posterId, posterName, posterImg, postCreation, postCaption, postImg, awayTeam, homeTeam } = props.route.params;
 
     useEffect(() => {
         fetchData()
+        setAllUsers(props.allUsers)
         
-    }, [props.route.params.postId, props.users])
+    }, [props.route.params.postId, props.users, props.allUsers])
 
     useEffect(() => {
         
@@ -125,8 +127,10 @@ function Comment(props, route) {
     const expandComments = () => {
         if (hidePost == true) {
             setHidePost(false)
+            Analytics.logEvent('uncollapsePostonComments', {user_name: props.currentUser.name})
         } else {
             setHidePost(true)
+            Analytics.logEvent('collapsePostonComments', {user_name: props.currentUser.name})
         }
     }
 
@@ -246,6 +250,8 @@ function Comment(props, route) {
 
 const mapStateToProps = (store) => ({
     users: store.usersState.users,
+    allUsers: store.userState.allUsers,
+    currentUser: store.userState.currentUser,
 })
 const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUsersData }, dispatch);
 
