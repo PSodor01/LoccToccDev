@@ -575,6 +575,14 @@ function Feed(props) {
 
     const navigation = useNavigation();
 
+    /* <View style={styles.adView}>
+                <AdMobBanner
+                    bannerSize="banner"
+                    adUnitID={adUnitID} 
+                    servePersonalizedAds // true or false
+                />
+            </View> */
+
     return (
         <View style={styles.containerGallery}>
             <View style={styles.bannerAdContainer}>
@@ -622,15 +630,7 @@ function Feed(props) {
                 renderItem={renderItem}
 
             /> }
-            <View style={styles.adView}>
-                <AdMobBanner
-                    bannerSize="banner"
-                    adUnitID={adUnitID} // Real ID: 8519029912093094/5453808592, test ID: 3940256099942544/2934735716
-                    servePersonalizedAds // true or false
-                />
-            </View>
-            
-
+    
         </View>
             
 

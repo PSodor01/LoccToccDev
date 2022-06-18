@@ -680,6 +680,14 @@ function game(props) {
         )}
       
     const navigation = useNavigation();
+
+    /* <View style={styles.adView}>
+                <AdMobBanner
+                    bannerSize="banner"
+                    adUnitID={adUnitID} 
+                    servePersonalizedAds // true or false
+                />
+            </View> */
     
     return (
         <View style={styles.container}>
@@ -1010,13 +1018,7 @@ function game(props) {
                 renderItem={renderItem}
             />
             }
-            <View style={styles.adView}>
-                <AdMobBanner
-                    bannerSize="banner"
-                    adUnitID={adUnitID} // 
-                    servePersonalizedAds // true or false
-                />
-            </View>
+
             <TouchableOpacity
                 activeOpacity={0.8}
                 style={styles.button}

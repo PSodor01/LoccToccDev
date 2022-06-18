@@ -82,6 +82,13 @@ function Search(props) {
     // Is a real device and running in production.
     const adUnitID = Constants.isDevice && !__DEV__ ? productionID : testID;
 
+    /* <View style={styles.adView}>
+                <AdMobBanner
+                    bannerSize="banner"
+                    adUnitID={adUnitID} 
+                    servePersonalizedAds // true or false
+                />
+            </View> */
    
     
     return (
@@ -121,15 +128,6 @@ function Search(props) {
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={ItemView}
             /> }
-
-            <View style={styles.adView}>
-                <AdMobBanner
-                    bannerSize="banner"
-                    adUnitID={adUnitID} // Real ID: 8519029912093094/1666835736, test ID: 3940256099942544/2934735716
-                    servePersonalizedAds // true or false
-                />
-            </View>
-
             
         </View>
         

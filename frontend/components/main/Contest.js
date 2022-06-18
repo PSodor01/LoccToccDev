@@ -235,7 +235,13 @@ function Contest(props) {
         </View>
     </View> */
 
-   
+   /* <View style={styles.adView}>
+                <AdMobBanner
+                    bannerSize="banner"
+                    adUnitID={adUnitID} 
+                    servePersonalizedAds // true or false
+                />
+            </View> */
     
     return (
         <View style={styles.textInputContainer}>
@@ -328,28 +334,39 @@ function Contest(props) {
                             <View style={styles.infoContainer}>
                                 <Text style={styles.infoText}> </Text>
                             </View>
-                            <View style={styles.infoContainer}>
-                                <TouchableOpacity
-                                    style={styles.linkText}>
-                                        <Text style={styles.linkText}
-                                    onPress={() => {
-                                    countLocctoccWebsiteClicks()
-                                    Linking.openURL('https://www.instagram.com/locctocc/');
-                                    }}>
-                                    Instagram</Text>
-                                </TouchableOpacity>
+                            <View style={styles.titleContainer}>
+                                <View style={styles.infoContainer}>
+                                    <TouchableOpacity
+                                        style={styles.linkText}
+                                        onPress={() => {
+                                        countLocctoccInstagramClicks()
+                                        Linking.openURL('https://www.instagram.com/locctocc/');
+                                        }}>
+                                        <FontAwesome5 name="instagram" size={24} justifyContent='center' alignItems='center' color="#E1306C"/>
+                                    </TouchableOpacity>
+                                </View>
+                                <View style={styles.infoContainer}>
+                                    <TouchableOpacity
+                                        style={styles.linkText}
+                                        onPress={() => {
+                                        countLocctoccTwitterClicks()
+                                        Linking.openURL('https://twitter.com/LoccTocc');
+                                        }}>
+                                        <FontAwesome5 name="twitter" size={24} justifyContent='center' alignItems='center' color="#1DA1F2"/>
+                                    </TouchableOpacity>
+                                </View>
+                                <View style={styles.infoContainer}>
+                                    <TouchableOpacity
+                                        style={styles.linkText}
+                                        onPress={() => {
+                                        countLocctoccTiktokClicks()
+                                        Linking.openURL('https://www.tiktok.com/@locctocc');
+                                        }}>
+                                        <FontAwesome5 name="tiktok" size={24} justifyContent='center' alignItems='center' color="#000"/>
+                                    </TouchableOpacity>
+                                </View>
                             </View>
-                            <View style={styles.infoContainer}>
-                                <TouchableOpacity
-                                    style={styles.linkText}>
-                                        <Text style={styles.linkText}
-                                    onPress={() => {
-                                    countLocctoccInstagramClicks()
-                                    Linking.openURL('https://twitter.com/LoccTocc');
-                                    }}>
-                                    Twitter</Text>
-                                </TouchableOpacity>
-                            </View>
+                            
                             <View style={styles.infoContainer}>
                                 <Text style={styles.infoText}>Previous contest leaderboard:</Text>
                             </View>
@@ -365,13 +382,7 @@ function Contest(props) {
                     labelBy='name'
                     icon='userImg'
                     />
-                <View style={styles.adView}>
-                    <AdMobBanner
-                        bannerSize="banner"
-                        adUnitID={adBannerUnitID} // Real ID: 8519029912093094/1666835736, test ID: 3940256099942544/2934735716
-                        servePersonalizedAds // true or false
-                    />
-                </View>
+                
             </Animated.View>
         </View>
         

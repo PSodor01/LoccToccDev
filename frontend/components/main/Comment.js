@@ -147,6 +147,14 @@ function Comment(props, route) {
 
     const navigation = useNavigation();
 
+    /* <View style={styles.adView}>
+                <AdMobBanner
+                    bannerSize="banner"
+                    adUnitID={adUnitID} 
+                    servePersonalizedAds // true or false
+                />
+            </View> */
+
     return (
         <View style={styles.container}>
             <View style={styles.originalPostContainer}>
@@ -236,13 +244,7 @@ function Comment(props, route) {
                     
                 )}
             />
-            <View style={styles.adView}>
-                <AdMobBanner
-                    bannerSize="banner"
-                    adUnitID={adUnitID} // Real ID: 8519029912093094/9708977287, test ID: 3940256099942544/2934735716
-                    servePersonalizedAds // true or false
-                />
-            </View>
+          
         </View>
     )
 }

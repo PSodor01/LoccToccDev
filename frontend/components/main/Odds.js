@@ -709,6 +709,14 @@ function Odds(props) {
         )
     }
 
+    /* <View style={styles.adView}>
+                <AdMobBanner
+                    bannerSize="banner"
+                    adUnitID={adUnitID} 
+                    servePersonalizedAds // true or false
+                />
+            </View> */
+
     return (
         <View style={styles.container}>
             {firebase.auth().currentUser.uid == 'U6u9pFuuwLVEn97z76a07WHK1V63' ?
@@ -840,13 +848,7 @@ function Odds(props) {
     
             />
             }
-            <View style={styles.adView}>
-                <AdMobBanner
-                    bannerSize="banner"
-                    adUnitID={adUnitID} 
-                    servePersonalizedAds // true or false
-                />
-            </View>
+           
             
          
         </View>
