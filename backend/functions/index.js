@@ -875,7 +875,234 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
   
     })
 
-  exports.deleteNFLGameData = functions.pubsub.schedule('00 11 * * *').timeZone('America/New_York').onRun(async() => {
+  exports.getFormula1TeamData = functions.pubsub.schedule('every 2 minutes').onRun(async() => {
+    const options = {
+      method: 'GET',
+      redirect: 'follow',
+      headers: {
+        'x-rapidapi-key': '2354874cc8e479f89b4d769daf9de0df',
+        'x-rapidapi-host': 'v1.formula-1.api-sports.io'
+      },
+    };
+
+    try {
+      const response = await axios.get("https://v1.formula-1.api-sports.io//rankings/teams?season=2022", options)
+      .then(result => {
+
+          for (let i = 0; i < result.data.response.length; i++){
+            const writeResult = admin
+              .firestore()
+              .collection("formula1")
+              .doc("info")
+              .collection('teams')
+              .doc(result.data.response[i].team.name)
+              .set({
+                currentSeasonRank: result.data.response[i].position,
+                name: result.data.response[i].team.name,
+                logo: result.data.response[i].team.logo,
+                currentSeasonPoints: result.data.response[i].points,
+            }, { merge:true });           
+        }
+             
+      })
+    }catch(err) {console.error(err.message)}
+
+    try {
+      const response = await axios.get("https://v1.formula-1.api-sports.io/teams  ", options)
+      .then(result => {
+
+          for (let i = 0; i < result.data.response.length; i++){
+            const writeResult = admin
+              .firestore()
+              .collection("formula1")
+              .doc("info")
+              .collection('teams')
+              .doc(result.data.response[i].name)
+              .set({
+                base: result.data.response[i].base,
+                first_team_entry: result.data.response[i].first_team_entry,
+                world_championships: result.data.response[i].world_championships,
+                highest_race_finish: result.data.response[i].highest_race_finish.position,
+                pole_positions: result.data.response[i].pole_positions,
+                fastest_laps: result.data.response[i].fastest_laps,
+                president: result.data.response[i].president,
+                director: result.data.response[i].director,
+                chassis: result.data.response[i].chassis,
+                engine: result.data.response[i].engine,
+                tyres: result.data.response[i].tyres,
+
+            }, { merge:true });           
+        }
+             
+      })
+    }catch(err) {console.error(err.message)}
+
+   
+
+  })
+
+  exports.getFormula1RaceData = functions.pubsub.schedule('every 2 minutes').onRun(async() => {
+    const options = {
+      method: 'GET',
+      redirect: 'follow',
+      headers: {
+        'x-rapidapi-key': '2354874cc8e479f89b4d769daf9de0df',
+        'x-rapidapi-host': 'v1.formula-1.api-sports.io'
+      },
+    };
+
+    try {
+      const response = await axios.get("https://v1.formula-1.api-sports.io/races?next=1&type=Race", options)
+      .then(result => {
+        let raceId = result.data.response[0].id
+
+        try {
+          const response = axios.get("https://v1.formula-1.api-sports.io/races?id=" + raceId, options)
+          .then(result => {
+    
+              for (let i = 0; i < result.data.response.length; i++){
+                const writeResult = admin
+                  .firestore()
+                  .collection("formula1")
+                  .doc("info")
+                  .collection('races')
+                  .doc("currentRace")
+                  .set({
+                    raceType: result.data.response[i].type,
+                    gameId: result.data.response[i].id + 'abc',
+                    sport: 'formula1',
+                    gameDate: result.data.response[i].date,
+                    raceName: result.data.response[i].competition.name,
+                    raceCountry: result.data.response[i].competition.location.country,
+                    raceCity: result.data.response[i].competition.location.city,
+                    trackName: result.data.response[i].circuit.name,
+                    trackImage: result.data.response[i].circuit.image,
+                    currentLap: result.data.response[i].laps.current,
+                    totalLaps: result.data.response[i].laps.total,
+                    fastestLapDriver: result.data.response[i].fastest_lap.driver.id,
+                    raceDistance: result.data.response[i].distance,
+                    weather: result.data.response[i].weather,
+                    status: result.data.response[i].status,
+                    currentRace: true
+    
+                }, { merge:true });           
+            }
+                 
+          })
+        }catch(err) {console.error(err.message)}
+
+        try {
+          const response = axios.get("https://v1.formula-1.api-sports.io/rankings/races?race=" + raceId, options)
+          .then(result => {
+              for (let i = 0; i < result.data.response.length; i++){
+                const writeResult = admin
+                  .firestore()
+                  .collection("formula1")
+                  .doc("info")
+                  .collection('races')
+                  .doc(result.data.response[i].driver.name)
+                  .set({
+                    driverId: result.data.response[i].driver.id,
+                    driverName: result.data.response[i].driver.name,
+                    driverImage: result.data.response[i].driver.image,
+                    driverTeam: result.data.response[i].team.name,
+                    driverPosition: result.data.response[i].position,
+                    time: result.data.response[i].time,
+                    pits: result.data.response[i].pits,
+    
+                }, { merge:true });           
+            }
+                 
+          })
+        }catch(err) {console.error(err.message)}
+      })
+    }catch(err) {console.error(err.message)}
+
+  })
+
+  exports.getFormula1DriverData = functions.pubsub.schedule('every 2 minutes').onRun(async() => {
+    const options = {
+      method: 'GET',
+      redirect: 'follow',
+      headers: {
+        'x-rapidapi-key': '2354874cc8e479f89b4d769daf9de0df',
+        'x-rapidapi-host': 'v1.formula-1.api-sports.io'
+      },
+    };
+
+    try {
+      const response = await axios.get("https://v1.formula-1.api-sports.io/drivers?id=82", options)
+      .then(result => {
+
+          for (let i = 0; i < result.data.response.length; i++){
+            const writeResult = admin
+              .firestore()
+              .collection("formula1")
+              .doc("info")
+              .collection('drivers')
+              .doc(result.data.response[i].name)
+              .set({
+                nationality: result.data.response[i].nationality,
+                country: result.data.response[i].country.name,
+                birthdate: result.data.response[i].birthdate,
+                birthplace: result.data.response[i].birthplace,
+                numberRaces: result.data.response[i].grands_prix_entered,
+                world_championships: result.data.response[i].world_championships,
+                highest_race_finish: result.data.response[i].highest_race_finish.position,
+                highest_grid_position: result.data.response[i].highest_grid_position,
+                careerPoints: result.data.response[i].career_points,
+
+            }, { merge:true });           
+        }
+             
+      })
+    }catch(err) {console.error(err.message)}
+
+   
+
+  })
+
+  exports.getFormula1DriverData = functions.pubsub.schedule('every 2 minutes').onRun(async() => {
+    const options = {
+      method: 'GET',
+      redirect: 'follow',
+      headers: {
+        'x-rapidapi-key': '2354874cc8e479f89b4d769daf9de0df',
+        'x-rapidapi-host': 'v1.formula-1.api-sports.io'
+      },
+    };
+
+    try {
+      const response = await axios.get("https://v1.formula-1.api-sports.io//rankings/drivers?season=2022", options)
+      .then(result => {
+
+          for (let i = 0; i < result.data.response.length; i++){
+            const writeResult = admin
+              .firestore()
+              .collection("formula1")
+              .doc("info")
+              .collection('drivers')
+              .doc(result.data.response[i].driver.name)
+              .set({
+                driverId: result.data.response[i].driver.id,
+                driverName: result.data.response[i].driver.name,
+                driverRank: result.data.response[i].position,
+                abbr: result.data.response[i].driver.abbr,
+                driverNumber: result.data.response[i].driver.number,
+                driverImage: result.data.response[i].driver.image,
+                driverTeam: result.data.response[i].team.name,
+                currentSeasonPoints: result.data.response[i].points,
+
+            }, { merge:true });           
+        }
+             
+      })
+    }catch(err) {console.error(err.message)}
+  })
+
+  
+
+  exports.deleteNFLGameData = functions.pubsub.schedule('59 10 * * *').timeZone('America/New_York').onRun(async() => {
     try {
       const writeResult = admin
           .firestore()
@@ -892,7 +1119,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
 
   })
 
-  exports.deleteMLBGameData = functions.pubsub.schedule('00 11 * * *').timeZone('America/New_York').onRun(async() => {
+  exports.deleteMLBGameData = functions.pubsub.schedule('59 10 * * *').timeZone('America/New_York').onRun(async() => {
     try {
       const writeResult = admin
           .firestore()
@@ -907,7 +1134,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
 
   })
 
-  exports.deleteNCAAFGameData = functions.pubsub.schedule('00 11 * * *').timeZone('America/New_York').onRun(async() => {
+  exports.deleteNCAAFGameData = functions.pubsub.schedule('59 10 * * *').timeZone('America/New_York').onRun(async() => {
     try {
       const writeResult = admin
           .firestore()
@@ -922,7 +1149,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
 
   })
 
-  exports.deleteNBAGameData = functions.pubsub.schedule('00 11 * * *').timeZone('America/New_York').onRun(async() => {
+  exports.deleteNBAGameData = functions.pubsub.schedule('59 10 * * *').timeZone('America/New_York').onRun(async() => {
     try {
       const writeResult = admin
           .firestore()
@@ -939,7 +1166,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
 
   })
 
-  exports.deleteNCAABGameData = functions.pubsub.schedule('00 11 * * *').timeZone('America/New_York').onRun(async() => {
+  exports.deleteNCAABGameData = functions.pubsub.schedule('59 10 * * *').timeZone('America/New_York').onRun(async() => {
     try {
       const writeResult = admin
           .firestore()
@@ -954,7 +1181,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
 
   })
 
-  exports.deleteEPLGameData = functions.pubsub.schedule('00 8 * * *').timeZone('America/New_York').onRun(async() => {
+  exports.deleteEPLGameData = functions.pubsub.schedule('59 10 * * *').timeZone('America/New_York').onRun(async() => {
     try {
       const writeResult = admin
           .firestore()
@@ -969,7 +1196,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
 
   })
 
-  exports.deleteNHLGameData = functions.pubsub.schedule('00 11 * * *').timeZone('America/New_York').onRun(async() => {
+  exports.deleteNHLGameData = functions.pubsub.schedule('59 10 * * *').timeZone('America/New_York').onRun(async() => {
     try {
       const writeResult = admin
           .firestore()
@@ -986,7 +1213,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 5 minutes').onRun(as
 
   })
 
-  exports.deleteMMAGameData = functions.pubsub.schedule('00 11 * * *').timeZone('America/New_York').onRun(async() => {
+  exports.deleteMMAGameData = functions.pubsub.schedule('59 10 * * *').timeZone('America/New_York').onRun(async() => {
     try {
       const writeResult = admin
           .firestore()

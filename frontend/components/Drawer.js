@@ -6,7 +6,7 @@ import { DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import Feather from 'react-native-vector-icons/Feather';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -151,6 +151,16 @@ export function DrawerContent(props) {
                     )}
                     label="Contact Us"
                     onPress={() => {props.navigation.navigate('ContactUs')}}
+                />
+                <DrawerItem 
+                    icon={({color, size}) => (
+                        <Feather
+                        name="settings"
+                        color={color}
+                        size={size}/>
+                    )}
+                    label="Settings"
+                    onPress={() => {props.navigation.navigate('Settings')}}
                 />
                 <DrawerItem 
                     icon={({color, size}) => (

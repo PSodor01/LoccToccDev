@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { StyleSheet, View, Text, Image, FlatList, TouchableOpacity, Alert, Share } from 'react-native'
+import { StyleSheet, View, Text, Linking, Image, FlatList, TouchableOpacity, Alert, Share } from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons';
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Foundation from 'react-native-vector-icons/Foundation'
@@ -23,6 +23,7 @@ import { fetchUsersData } from '../../redux/actions/index'
 
 import {AdMobBanner} from 'expo-ads-admob'
 import Constants from 'expo-constants'
+import game from './game';
 
 
 function Feed(props) {
@@ -38,7 +39,26 @@ function Feed(props) {
 
         Analytics.logEvent('screen_view', { screen_name: 'Feed', user_name: props.currentUser.name })
 
+        var myHeaders = new Headers();
+        myHeaders.append("x-rapidapi-key", "2354874cc8e479f89b4d769daf9de0df");
+        myHeaders.append("x-rapidapi-host", "v1.formula-1.api-sports.io");
+
+        var requestOptions = {
+            method: 'GET',
+            headers: myHeaders,
+            redirect: 'follow'
+        };
+
+        fetch("https://v1.formula-1.api-sports.io/races?season=2022/?type=Race", requestOptions)
+        
+            .then(result => result.text())
+            .then(result => console.log(result))
+            .catch(error => console.log('error', error));
+
     }, [props.blocking, props.faded, props.liked, props.following, props.currentUser])
+
+    
+        
 
     const fetchData = () => {
 
@@ -305,6 +325,12 @@ function Feed(props) {
     const productionID = 'ca-app-pub-8519029912093094/5453808592';
     // Is a real device and running in production.
     const adUnitID = Constants.isDevice && !__DEV__ ? productionID : testID;
+
+    const openAdLink = () => {
+
+        Analytics.logEvent('adClick', {user_name: props.currentUser.name});
+            
+    }
 
     const handleReportPostEmail = () => {
 
@@ -630,6 +656,14 @@ function Feed(props) {
                 renderItem={renderItem}
 
             /> }
+
+            <TouchableOpacity style={styles.adView}
+                onPress={() => { Linking.openURL('https://bit.ly/3uAOAIh'); openAdLink()}} >
+                <Image 
+                    style={{ width: "95%", height: 40 }}
+                    source={require('../../assets/fantasyJocksBanner.jpg')}
+                />
+            </TouchableOpacity>
     
         </View>
             

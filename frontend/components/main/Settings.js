@@ -1,22 +1,28 @@
 import React, { useState, useEffect } from 'react'
-import { StyleSheet, Switch, TouchableOpacity, View, Text } from 'react-native'
+import { StyleSheet, Switch, TouchableOpacity, View, Text, Alert } from 'react-native'
+
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 import * as Notifications from 'expo-notifications'
 import * as Permissions from 'expo-permissions'
 import Constants from 'expo-constants'
 
+import * as Analytics from 'expo-firebase-analytics';
+
 import firebase from 'firebase'
 require("firebase/firestore")
 require("firebase/firebase-storage")
 
-const SettingsScreen = () => {
+import { connect } from 'react-redux'
+
+const SettingsScreen = (props) => {
 
     const [switchValue, setSwitchValue] = useState(false);
     const [notificationValue, setNotificationValue] = useState();
 
     useEffect(() => {
 
-        firebase.firestore()
+        /*firebase.firestore()
         .collection("users")
         .doc('3THx5eaT6BRJreb2JensMsjRv3O2')
         .get()
@@ -29,7 +35,9 @@ const SettingsScreen = () => {
             else {
                 setNotificationValue(false)
             }
-        })
+        })*/
+
+        Analytics.logEvent('screen_view', { screen_name: 'Settings', user_name: props.currentUser.name });
         
     }, [])
 
@@ -39,6 +47,31 @@ const SettingsScreen = () => {
         setSwitchValue(value)
         
     };
+
+    const deleteAccount = () => {
+        firebase.auth().currentUser?.delete();
+
+        Analytics.logEvent('deleteAccount', {user_name: props.currentUser.name});
+            
+    }
+
+    const deleteAccountHandler = () => {
+        Alert.alert(
+            'Delete Account?',
+            'This action is permanent, all of your posts and account information will be deleted.',
+
+            [
+                { text: 'Delete', onPress: () => deleteAccount()},
+                {
+                    text: 'Cancel',
+                    onPress: () => {},
+                    style: 'cancel',
+                },
+            ],
+            { cancelable: true }
+
+        )
+    }
 
     const notificationFunction = async () => {
         if (notificationValue == true) {
@@ -99,31 +132,14 @@ const SettingsScreen = () => {
     }
 
     return (
-        <View style={styles.mainContainer}>
-            <View style={styles.container}>
-                <Text style={styles.titleText}>Notifications</Text>
-                {notificationValue == true ?
-                    <TouchableOpacity 
-                        style={styles.toggleButtonOn}
-                        onPress={() => {notificationFunction()}}>
-                        <Text style={styles.buttonTextOn}>ON</Text>
-                    </TouchableOpacity>
-                    :
-                    <TouchableOpacity 
-                        style={styles.toggleButtonOff}
-                        onPress={() => {notificationFunction()}}>
-                        <Text style={styles.buttonTextOff}>OFF</Text>
-                    </TouchableOpacity>
-                }
-                
-            </View>
-            <View style={styles.container}>
-                <Text style={styles.titleText}>Dark Mode</Text>
-                <Text style={styles.comingSoonText}>Coming Soon!</Text>
-                <Switch 
-                    onValueChange={toggleSwitch}
-                    value={switchValue}
-                />
+        <View style={styles.container}>
+            <View style={styles.documentRow}>
+                <TouchableOpacity
+                    style={styles.buttonContainer}
+                    onPress={deleteAccountHandler}>
+                    <AntDesign name={"deleteuser"} size={16} color={"black"}/>
+                    <Text>    Delete Account</Text>
+                </TouchableOpacity>
             </View>
         </View>
         
@@ -137,16 +153,19 @@ const styles = StyleSheet.create({
         backgroundColor: "#fff",
     },
     container: {
-        backgroundColor: '#fff',
-        marginBottom: 20,
-        borderBottomWidth: 1,
-        borderBottomColor: "#e1e2e6",
-        marginLeft: "2%",
+        flex: 1,
+        backgroundColor: "#ffffff",
+    },
+    buttonContainer: {
         flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginHorizontal: '8%',
-        paddingVertical: '4%'
+        padding: 10,
+    },
+    documentRow: {
+        flexDirection: 'row',
+        padding: 10,
+        marginRight: "5%",
+        borderBottomColor: "#e1e2e6",
+        borderBottomWidth: 1,
     },
     titleText: {
         fontSize: 16,
@@ -193,4 +212,9 @@ const styles = StyleSheet.create({
     
 })
 
-export default SettingsScreen;
+const mapStateToProps = (store) => ({
+    currentUser: store.userState.currentUser,
+
+})
+
+export default connect(mapStateToProps)(SettingsScreen);

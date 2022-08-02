@@ -70,6 +70,7 @@ export class Register extends Component {
             createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
             aboutMe: '',
             location: '',
+            signUpCode: '',
             userImg: null,
             checked: false,
 
@@ -111,7 +112,7 @@ export class Register extends Component {
     }
 
     async onSignUp() {
-        const { email, password, name, aboutMe, location, userImg, createdAt } = this.state;
+        const { email, password, name, aboutMe, location, signUpCode, userImg, createdAt } = this.state;
         firebase.auth().createUserWithEmailAndPassword(email, password)
             .then((result) => {
                 firebase.firestore().collection("users")
@@ -121,6 +122,7 @@ export class Register extends Component {
                         email,
                         aboutMe,
                         location,
+                        signUpCode,
                         userImg,
                         createdAt,
                         followerCount: 0,
@@ -202,6 +204,14 @@ export class Register extends Component {
                         />
                         : null
                         }
+                        <TextInput  
+                            style={styles.textInput}
+                            placeholder="Sign Up Code?"
+                            maxLength={15}
+                            autoCorrect={false}
+                            secureTextEntry={false}
+                            onChangeText={(signUpCode) => this.setState({ signUpCode })}
+                        />
                         
                         
                         <View style={styles.agreementContainer}>

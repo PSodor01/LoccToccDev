@@ -4,6 +4,10 @@ import { NFL_GAMES_STATE_CHANGE,
     MLB_GAMES_STATE_CHANGE, 
     MMA_GAMES_STATE_CHANGE,
     FUTURE_GAMES_STATE_CHANGE,
+    FORMULA1_TEAMS_STATE_CHANGE,
+    FORMULA1_RACES_STATE_CHANGE,
+    FORMULA1_DRIVERS_STATE_CHANGE,
+    FORMULA1_RANKINGS_STATE_CHANGE,
     NHL_GAMES_STATE_CHANGE, 
     CLEAR_DATA 
 } from "../constants"
@@ -16,6 +20,10 @@ const initialState = {
     mmaGames: [],
     nhlGames: [],
     futureGames: [],
+    formula1Teams: [],
+    formula1Drivers: [],
+    formula1Races: [],
+    formula1Rankings: [],
 }
 
 export const nflGames = (state = initialState, action) => {
@@ -80,6 +88,62 @@ export const futureGames = (state = initialState, action) => {
             return {
                 ...state,
                 futureGames: action.futureGames
+            }
+        case CLEAR_DATA:
+            return initialState
+        default:
+            return state;
+    }
+}
+
+export const formula1Teams = (state = initialState, action) => {
+    switch (action.type) {
+        case FORMULA1_TEAMS_STATE_CHANGE:
+            return {
+                ...state,
+                formula1Teams: action.formula1Teams
+            }
+        case CLEAR_DATA:
+            return initialState
+        default:
+            return state;
+    }
+}
+
+export const formula1Races = (state = initialState, action) => {
+    switch (action.type) {
+        case FORMULA1_RACES_STATE_CHANGE:
+            return {
+                ...state,
+                formula1Races: action.formula1Races
+            }
+        case CLEAR_DATA:
+            return initialState
+        default:
+            return state;
+    }
+}
+
+export const formula1Drivers = (state = initialState, action) => {
+    switch (action.type) {
+        case FORMULA1_DRIVERS_STATE_CHANGE:
+            return {
+                ...state,
+                formula1Drivers: action.formula1Drivers
+            }
+        case CLEAR_DATA:
+            return initialState
+        default:
+            return state;
+    }
+}
+
+export const formula1Rankings = (state = initialState, action) => {
+    switch (action.type) {
+        case FORMULA1_RANKINGS_STATE_CHANGE:
+            return {
+                ...state,
+                formula1Rankings: action.formula1Rankings
             }
         case CLEAR_DATA:
             return initialState

@@ -34,13 +34,13 @@ function game(props) {
     const [loading, setLoading] = useState(true);
     const [sortCriteria, setSortCriteria] = useState(true);
     const [listAllPlayers, setListAllPlayers] = useState(false);
-    const [shareCriteria, setShareCriteria] = useState(false);
     const [shareId, setShareId] = useState('')
     const [awayVote, setAwayVote] = useState("");
     const [homeVote, setHomeVote] = useState("");
     const [drawVote, setDrawVote] = useState("");
     const [golfGames, setGolfGames] = useState([]);
     const [futureGames, setFutureGames] = useState([]);
+    const [formula1Races, setFormula1Races] = useState([]);
 
     const {gameId, gameDate, homeTeam, awayTeam, homeMoneyline, awayMoneyline, homeSpread, awaySpread, homeSpreadOdds, awaySpreadOdds, over, overOdds, under, underOdds, drawMoneyline, sport} = props.route.params;
 
@@ -53,6 +53,7 @@ function game(props) {
     useEffect(() => {
         setGolfGames(props.golfGames)
         setFutureGames(props.futureGames)
+        setFormula1Races(props.formula1Races)
     }, [])
 
     const fetchData = () => {
@@ -128,8 +129,6 @@ function game(props) {
             .set({})
 
         Analytics.logEvent('hammerPost', {user_name: props.currentUser.name});
-
-        
             
     }
 
@@ -573,11 +572,26 @@ function game(props) {
 
     const shareFunction = (postId) => {
             setShareId(postId)
-            console.log(shareId)
+            //let shareGamePost = gamePosts.filter(sharePost => sharePost.id == shareId);
+
+            var shareGamePost = [];
+            console.log(postId)
+
+            if ("XQhF2iqR3IiPtaPsCtKh" == postId) {
+                console.log("yes")
+            } else {
+                console.log("no")
+            }
+
+            for (var i = 0; i < gamePosts.length ; i++) {
+                if (gamePosts[i].id == shareId) {
+                    shareGamePost.push(gamePosts[i]);
+                }
+            }
+
+            setGamePosts(shareGamePost)
     }
     
-
-
     const renderItem = ({item}) => {
         return (
             <View>
@@ -730,6 +744,61 @@ function game(props) {
 
                     :
 
+                    sport == 'formula1' ?
+                    <View>
+                        <View style={styles.teamContainer} >
+                            <View style={styles.headerView}>
+                                <Text style={styles.detailsHeader}>Race</Text>
+                            </View>
+                            <View style={styles.detailsView}>
+                                <Text style={styles.detailsText}>{props.formula1Races.raceName}</Text>
+                            </View>
+                        </View>
+                        <View style={styles.teamContainer} >
+                            <View style={styles.headerView}>
+                                <Text style={styles.detailsHeader}>Track</Text>
+                            </View>
+                            <View style={styles.detailsView}>
+                                <Text style={styles.detailsText}>{props.formula1Races.trackName}</Text>
+                            </View>
+                        </View>
+                        <View style={styles.teamContainer} >
+                            <View style={styles.headerView}>
+                                <Text style={styles.detailsHeader}>City</Text>
+                            </View>
+                            <View style={styles.detailsView}>
+                                <Text style={styles.detailsText}>{props.formula1Races.raceCity}</Text>
+                            </View>
+                        </View>
+                        <View style={styles.teamContainer} >
+                            <View style={styles.headerView}>
+                                <Text style={styles.detailsHeader}>Country</Text>
+                            </View>
+                            <View style={styles.detailsView}>
+                                <Text style={styles.detailsText}>{props.formula1Races.raceCountry}</Text>
+                            </View>
+                        </View>
+                        <View style={styles.teamContainer} >
+                            <View style={styles.headerView}>
+                                <Text style={styles.detailsHeader}>Distance</Text>
+                            </View>
+                            <View style={styles.detailsView}>
+                                <Text style={styles.detailsText}>{props.formula1Races.raceDistance}</Text>
+                            </View>
+                        </View>
+                        <View style={styles.teamContainer} >
+                            <View style={styles.headerView}>
+                                <Text style={styles.detailsHeader}>Total Laps</Text>
+                            </View>
+                            <View style={styles.detailsView}>
+                                <Text style={styles.detailsText}>{props.formula1Races.totalLaps}</Text>
+                            </View>
+                        </View>
+                    </View>
+                    
+
+                    :
+
                     sport == 'US Masters Tournament Lines - Winner' ?
                     listAllPlayers == false ?
                     <FlatList 
@@ -737,7 +806,10 @@ function game(props) {
                         style={styles.feed}
                         renderItem={renderListItem}
                     />
+
                     :
+
+                    
                     <FlatList 
                         data = {golfGames.sort((a, b) => parseFloat(a.playerOdds) - parseFloat(b.playerOdds))}
                         style={styles.feed}
@@ -1268,6 +1340,49 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 12,
     },
+    formula1Container: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: '80%'
+    },
+    formula1TeamContainer: {
+        paddingHorizontal: 10
+    },
+    listFormula1Text: {
+        fontSize: 14,
+    },
+    detailsText: {
+        fontSize: 12,
+    },
+    detailsHeader: {
+        fontSize: 12,
+        textTransform: 'uppercase',
+        color: 'grey'
+    },
+    headerText: {
+        fontSize: 16,
+        
+    },
+    headerContainer: {
+        alignItems: 'left'
+    },
+    borderView: {
+        borderBottomColor: '#CACFD2',
+        borderBottomWidth: 1,
+    },
+    detailsView:{
+        
+    },
+    headerView:{
+        width: '35%'
+    },
+    teamContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingBottom: '1%',
+        paddingLeft: 4
+    },
     
     
 })
@@ -1282,6 +1397,7 @@ const mapStateToProps = (store) => ({
     feed: store.usersState.feed,
     usersFollowingLoaded: store.usersState.usersFollowingLoaded,
     futureGames: store.futureGamesState.futureGames,
+    formula1Races: store.formula1RacesState.formula1Races,
 })
 const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUsersData }, dispatch);
 

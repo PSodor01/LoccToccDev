@@ -2,7 +2,7 @@
   "expo": {
     "name": "locctocc",
     "slug": "locctocc",
-    "version": "1.1.14",
+    "version": "1.1.15",
     "orientation": "portrait",
     "icon": "./assets/locctocclogo.png",
     "splash": {
@@ -27,14 +27,15 @@
         "UIRequiresFullScreen": true
       },
       "config": {
-        "googleMobileAdsAppId": "ca-app-pub-8519029912093094~3459984543" 
+        "googleMobileAdsAppId": "ca-app-pub-8519029912093094~3459984543"
       }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/locctocclogo.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.psodor01.locctocc"
     },
     "web": {
       "favicon": "./assets/favicon.png",

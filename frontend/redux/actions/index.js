@@ -14,6 +14,10 @@ import { USER_STATE_CHANGE,
     MMA_GAMES_STATE_CHANGE,
     GOLF_GAMES_STATE_CHANGE,
     FUTURE_GAMES_STATE_CHANGE,
+    FORMULA1_TEAMS_STATE_CHANGE,
+    FORMULA1_RACES_STATE_CHANGE,
+    FORMULA1_DRIVERS_STATE_CHANGE,
+    FORMULA1_RANKINGS_STATE_CHANGE,
     NHL_GAMES_STATE_CHANGE, 
     ALL_POSTS_STATE_CHANGE,
     CONTEST_STATUS_STATE_CHANGE,
@@ -286,6 +290,83 @@ export function fetchFutureGames() {
                 dispatch({ type: FUTURE_GAMES_STATE_CHANGE, futureGames });
                 for(let i = 0; i < futureGames.length; i++){
                 }
+            })
+    })
+}
+
+export function fetchFormula1Teams() {
+    return ((dispatch) => {
+        firebase.firestore()
+            .collection("formula1")
+            .doc("info")
+            .collection("teams")
+            .orderBy('currentSeasonRank', 'asc')
+            .onSnapshot((snapshot) => {
+                let formula1Teams = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    return { id, ...data }
+                })
+                dispatch({ type: FORMULA1_TEAMS_STATE_CHANGE, formula1Teams });
+                
+            })
+    })
+}
+
+export function fetchFormula1Races() {
+    return ((dispatch) => {
+        firebase.firestore()
+            .collection("formula1")
+            .doc("info")
+            .collection("races")
+            .doc("currentRace")
+            .get()
+            .then((snapshot) => {
+                if (snapshot.exists) {
+                    let formula1Races = snapshot.data();
+
+                    dispatch({  type: FORMULA1_RACES_STATE_CHANGE, formula1Races})
+                }
+                else {
+                }
+            })
+    })
+}
+
+export function fetchFormula1Drivers() {
+    return ((dispatch) => {
+        firebase.firestore()
+            .collection("formula1")
+            .doc("info")
+            .collection("drivers")
+            .orderBy('driverRank', 'asc')
+            .onSnapshot((snapshot) => {
+                let formula1Drivers = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    return { id, ...data }
+                })
+                dispatch({ type: FORMULA1_DRIVERS_STATE_CHANGE, formula1Drivers });
+                
+            })
+    })
+}
+
+export function fetchFormula1Rankings() {
+    return ((dispatch) => {
+        firebase.firestore()
+            .collection("formula1")
+            .doc("info")
+            .collection("races")
+            .orderBy('driverPosition', 'asc')
+            .onSnapshot((snapshot) => {
+                let formula1Rankings = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    return { id, ...data }
+                })
+                dispatch({ type: FORMULA1_RANKINGS_STATE_CHANGE, formula1Rankings });
+                
             })
     })
 }

@@ -64,6 +64,8 @@ import LikesList from './components/main/LikesList'
 import FadesList from './components/main/FadesList'
 import Odds from './components/main/Odds'
 import game from './components/main/game'
+import TeamDetails from './components/main/TeamDetails'
+import Standings from './components/main/Standings'
 import MessagesButton from './components/buttons/MessagesButton'
 
 
@@ -106,6 +108,14 @@ const MainStackScreen = ({navigation, props}) => (
             onPress={() => navigation.openDrawer()}
             >
             <FontAwesome5 name="bars" size={24} color="#fff" />
+          </TouchableOpacity>
+        ),
+        headerRight: () => (
+          <TouchableOpacity 
+            style={{ alignItems: "flex-end", marginRight:16 }}
+            onPress={() => navigation.navigate('Onboarding')}
+            >
+            <FontAwesome5 name="info-circle" size={24} color="#fff" />
           </TouchableOpacity>
         ),
         
@@ -326,6 +336,44 @@ const MainStackScreen = ({navigation, props}) => (
           
         }}
           />
+      <MainStack.Screen name="TeamDetails" component={TeamDetails}
+        options={{
+          headerTitle: () => (
+            <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+                <Text style={styles.headerName}>locctocc </Text>
+                <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
+            </View>
+          ),
+          headerLeft: () => (
+            <TouchableOpacity 
+            style={{ alignItems: "flex-end", marginLeft:16 }}
+            onPress={() => navigation.goBack()}
+            >
+            <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+          </TouchableOpacity>
+          ),
+          
+        }}
+          />
+      <MainStack.Screen name="Standings" component={Standings}
+      options={{
+        headerTitle: () => (
+          <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+              <Text style={styles.headerName}>locctocc </Text>
+              <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
+          </View>
+        ),
+        headerLeft: () => (
+          <TouchableOpacity 
+          style={{ alignItems: "flex-end", marginLeft:16 }}
+          onPress={() => navigation.goBack()}
+          >
+          <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+        </TouchableOpacity>
+        ),
+        
+      }}
+        />
       <MainStack.Screen name="Following" component={FollowingScreen}
         options={{
           headerTitle: () => (

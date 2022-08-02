@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Alert, TextInput, Dimensions, FlatList, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, Alert, Linking, Image, TextInput, Dimensions, FlatList, TouchableOpacity, ScrollView } from 'react-native';
 
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -36,6 +36,11 @@ function Odds(props) {
     const [eplGames, seteplGames] = useState([]);
     const [golfGames, setGolfGames] = useState([]);
     const [futureGames, setFutureGames] = useState([]);
+    const [formula1Teams, setFormula1Teams] = useState([]);
+    const [formula1Races, setFormula1Races] = useState([]);
+    const [formula1Drivers, setFormula1Drivers] = useState([]);
+    const [formula1Rankings, setFormula1Rankings] = useState([]);
+    const [formula1RaceLive, setFormula1RaceLive] = useState(false);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [sport, setSport] = useState('');
@@ -77,7 +82,7 @@ function Odds(props) {
 
     useEffect(() => {
         fetchData()
-        if ( sport == 'NHL' || sport == 'EPL' || sport == 'UFC' || sport == 'PGA' || sport == 'Futures' || sport == 'Trending') {
+        if ( sport == 'NHL' || sport == 'EPL' || sport == 'UFC' || sport == 'PGA' || sport == 'Futures' || sport == 'Formula 1' ||sport == 'Trending') {
 
         } 
         else {
@@ -85,7 +90,7 @@ function Odds(props) {
             setSport('MLB')
         }
 
-    }, [ props.nhlGames, props.mlbGames, props.mmaGames, props.futureGames  ])
+    }, [ props.nhlGames, props.mlbGames, props.mmaGames, props.futureGames, props.formula1Teams, props.formula1Races, props.formula1Drivers, props.formula1Rankings ])
 
    useEffect(() => {
 
@@ -191,6 +196,11 @@ function Odds(props) {
         setmmaGames(props.mmaGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))
 
         setFutureGames(props.futureGames)
+        setFormula1Teams(props.formula1Teams)
+        setFormula1Races(props.formula1Races)
+        setFormula1Drivers(props.formula1Drivers)
+        setFormula1Rankings(props.formula1Rankings)
+        if (props.formula1Rankings.length > 2 ) {setFormula1RaceLive(true)}
 
         trendingFunction(mlbGames, nhlGames, mmaGames)
         setLoading(false)
@@ -214,8 +224,8 @@ function Odds(props) {
     
     const updateApp = async () => {
 
-        await Updates.fetchUpdateAsync();
-        Updates.reloadAsync();
+        await Updates.fetchUpdateAsync()
+        Updates.reloadAsync() 
         
     }
 
@@ -302,7 +312,6 @@ function Odds(props) {
 
     };
 
-
     const searchNFLFilter = (text) => {
         if (text) {
             const newData = sportGames.filter((item) => {
@@ -325,6 +334,7 @@ function Odds(props) {
             if (sport == 'EPL') {setSportGames(props.eplGames)}
             if (sport == 'PGA') {setSportGames(props.golfGames)}
             if (sport == 'Futures') {setSportGames(props.futureGames)}
+            if (sport == 'Formula 1') {setSportGames(props.formula1Races)}
             if(sport == 'Trending') {setSportGames(trendingGames)}
             setSearch(text)
         }
@@ -351,26 +361,28 @@ function Odds(props) {
     }
     
     const setSportFunction = (sport) => {
-        if (sport == 'Trending') {setSportGames(trendingGames); Analytics.logEvent('selectTrendingGames', { user_name: props.currentUser.name }); setSport('Trending');}
-        if (sport == 'NFL') {setSportGames(props.nflGames); Analytics.logEvent('selectNFLGames', {user_name: props.currentUser.name}); setSport('NFL');}
-        if (sport == 'NBA') {setSportGames(props.nbaGames); Analytics.logEvent('selectNBAGames', {user_name: props.currentUser.name}); setSport('NBA');}
-        if (sport == 'NHL') {setSportGames(props.nhlGames); Analytics.logEvent('selectNHLGames', {user_name: props.currentUser.name}); setSport('NHL');}
-        if (sport == 'NCAAB') {setSportGames(props.ncaabGames); Analytics.logEvent('selectNCAABGames', {user_name: props.currentUser.name}); setSport('NCAAB');}
-        if (sport == 'EPL') {setSportGames(props.eplGames); Analytics.logEvent('selectEPLGames', {user_name: props.currentUser.name}); setSport('EPL');}
-        if (sport == 'MLB') {setSportGames(props.mlbGames); Analytics.logEvent('selectMLBGames', {user_name: props.currentUser.name}); setSport('MLB');}
-        if (sport == 'UFC') {setSportGames(props.mmaGames); Analytics.logEvent('selectUFCGames', {user_name: props.currentUser.name}); setSport('UFC');}
-        if (sport == 'PGA') {setSportGames(props.golfGames); Analytics.logEvent('selectGolfGames', {user_name: props.currentUser.name}); setSport('PGA');}
-        if (sport == 'Futures') {setSportGames(props.futureGames); Analytics.logEvent('selectFuturesGames', {user_name: props.currentUser.name}); setSport('Futures');}
+        if (sport == 'Trending') {setSportGames(trendingGames); Analytics.logEvent('selectTrendingGames', { user_name: props.currentUser.name }); Analytics.logEvent('screen_view', { screen_name: 'Odds', user_name: props.currentUser.name }); setSport('Trending');}
+        if (sport == 'NFL') {setSportGames(props.nflGames); Analytics.logEvent('selectNFLGames', {user_name: props.currentUser.name}); Analytics.logEvent('screen_view', { screen_name: 'Odds', user_name: props.currentUser.name }); setSport('NFL');}
+        if (sport == 'NBA') {setSportGames(props.nbaGames); Analytics.logEvent('selectNBAGames', {user_name: props.currentUser.name}); Analytics.logEvent('screen_view', { screen_name: 'Odds', user_name: props.currentUser.name }); setSport('NBA');}
+        if (sport == 'NHL') {setSportGames(props.nhlGames); Analytics.logEvent('selectNHLGames', {user_name: props.currentUser.name}); Analytics.logEvent('screen_view', { screen_name: 'Odds', user_name: props.currentUser.name }); setSport('NHL');}
+        if (sport == 'NCAAB') {setSportGames(props.ncaabGames); Analytics.logEvent('selectNCAABGames', {user_name: props.currentUser.name}); Analytics.logEvent('screen_view', { screen_name: 'Odds', user_name: props.currentUser.name }); setSport('NCAAB');}
+        if (sport == 'EPL') {setSportGames(props.eplGames); Analytics.logEvent('selectEPLGames', {user_name: props.currentUser.name}); Analytics.logEvent('screen_view', { screen_name: 'Odds', user_name: props.currentUser.name }); setSport('EPL');}
+        if (sport == 'MLB') {setSportGames(props.mlbGames); Analytics.logEvent('selectMLBGames', {user_name: props.currentUser.name}); Analytics.logEvent('screen_view', { screen_name: 'Odds', user_name: props.currentUser.name }); setSport('MLB');}
+        if (sport == 'UFC') {setSportGames(props.mmaGames); Analytics.logEvent('selectUFCGames', {user_name: props.currentUser.name}); Analytics.logEvent('screen_view', { screen_name: 'Odds', user_name: props.currentUser.name }); setSport('UFC');}
+        if (sport == 'PGA') {setSportGames(props.golfGames); Analytics.logEvent('selectGolfGames', {user_name: props.currentUser.name}); Analytics.logEvent('screen_view', { screen_name: 'Odds', user_name: props.currentUser.name }); setSport('PGA');}
+        if (sport == 'Futures') {setSportGames(props.futureGames); Analytics.logEvent('selectFuturesGames', {user_name: props.currentUser.name}); Analytics.logEvent('screen_view', { screen_name: 'Odds', user_name: props.currentUser.name }); setSport('Futures');}
+        if (sport == 'Formula 1') {setSportGames(props.formula1Races); Analytics.logEvent('selectFormula1Games', {user_name: props.currentUser.name}); Analytics.logEvent('screen_view', { screen_name: 'Odds', user_name: props.currentUser.name }); setSport('Formula 1');}
     }
 
     const nbaIcon = (<Icon name="basketball-outline" color="#ee6730" size={16}/>);
-    const mlbIcon = (<Icon name="baseball-outline" color="red" size={16}/>);
+    const mlbIcon = (<Icon name="baseball-outline" color="blue" size={16}/>);
     const nflIcon = (<Icon name="american-football" color="#825736" size={16}/>);
     const nhlIcon = (<MaterialCommunityIcons name="hockey-sticks" color="#B87333" size={16}/>);
     const ncaabIcon = (<MaterialCommunityIcons name="basketball-hoop-outline" color="#800000" size={16}/>);
     const eplIcon = (<MaterialCommunityIcons name="soccer" color="black" size={16}/>);
     const golfIcon = (<MaterialCommunityIcons name="golf" color="green" size={16}/>);
     const futureIcon = (<MaterialCommunityIcons name="alien" color="#6CC417" size={16}/>);
+    const formula1Icon = (<Icon name="car-sport" color="red" size={16}/>);
     const trendingIcon = (<MaterialCommunityIcons name="trending-up" color="#009387" size={16}/>);
     const propsIcon = (<MaterialCommunityIcons name= "trophy" color="#ffd700" size={16}/>)
     const mmaIcon = (<MaterialCommunityIcons name="boxing-glove" color="#0000FF" size={16}/>);
@@ -387,9 +399,9 @@ function Odds(props) {
             icon: mlbIcon
         },
         {
-            sport: 'NHL',
+            sport: 'Formula 1',
             id: '3',
-            icon: nhlIcon
+            icon: formula1Icon
         },
         {
             sport: 'UFC',
@@ -435,6 +447,12 @@ function Odds(props) {
     // Is a real device and running in production.
     const adUnitID = Constants.isDevice && !__DEV__ ? bannerId : testID;
 
+    const openAdLink = () => {
+
+        Analytics.logEvent('adClick', {user_name: props.currentUser.name});
+            
+    }
+
     /*const theRandomNumber = Math.floor(Math.random() * 3) + 1
         if (theRandomNumber == 4) {
             interstitial()
@@ -479,7 +497,7 @@ function Odds(props) {
                         <View>
                             {item.gamePostsCount > 4 ?
                                 <View style={styles.gameDateContainer}>
-                                    <Text style={styles.dateText}>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
+                                        
                                     <View style={styles.pepperContainer}>
                                         <FontAwesome5 name={"pepper-hot"} size={16} color={"#B81D13"}/>
                                         <FontAwesome5 name={"pepper-hot"} size={16} color={"#B81D13"}/>
@@ -779,12 +797,17 @@ function Odds(props) {
 
             {sportGames == futureGames  ?
             <View style={styles.gameHeaderContainer}>
-                    <Text style={styles.gameHeaderText}>Team Futures - Champion</Text>
+                <Text style={styles.gameHeaderText}>Team Futures - Champion</Text>
             </View>
             :
             sportGames == golfGames  ?
             <View style={styles.gameHeaderContainer}>
-                    <Text style={styles.gameHeaderText}>US Masters Tournament Lines - Winner</Text>
+                <Text style={styles.gameHeaderText}>US Masters Tournament Lines - Winner</Text>
+            </View>
+            :
+            sportGames == props.formula1Races  ?
+            <View style={styles.formula1HeaderContainer}>
+                <Text style={styles.gameHeaderText}>Current Race</Text>
             </View>
             :
             
@@ -814,7 +837,7 @@ function Odds(props) {
             />
             :
             
-            sportGames == props.eplGames ?
+            /*sportGames == props.eplGames ?
             <FlatList 
                 data = {sportGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate))}
                 style={styles.feed}
@@ -829,8 +852,8 @@ function Odds(props) {
                 style={styles.feed}
                 renderItem={renderListItem}
     
-            />
-            :
+            /> 
+            :*/
 
             sportGames == props.futureGames  ?
             <FlatList 
@@ -841,6 +864,252 @@ function Odds(props) {
             />
             :
 
+            sportGames == props.formula1Races  ?
+            <ScrollView style={styles.feed}>
+                <TouchableOpacity
+                        onPress={() => props.navigation.navigate('game', {gameId: props.formula1Races.gameId, gameDate: props.formula1Races.gameDate, sport: props.formula1Races.sport })}>
+                    <View style={styles.fakeButtonContainer}>
+                        <Text style={styles.fakeButton}>See Locks {'>'}{'>'}</Text>
+                    </View>
+                    <View style={styles.teamContainer} >
+                        <View style={styles.headerView}>
+                            <Text style={styles.detailsHeader}>Race</Text>
+                        </View>
+                        <View style={styles.detailsView}>
+                            <Text style={styles.detailsText}>{props.formula1Races.raceName}</Text>
+                        </View>
+                    </View>
+                    <View style={styles.teamContainer} >
+                        <View style={styles.headerView}>
+                            <Text style={styles.detailsHeader}>Track</Text>
+                        </View>
+                        <View style={styles.detailsView}>
+                            <Text style={styles.detailsText}>{props.formula1Races.trackName}</Text>
+                        </View>
+                    </View>
+                    <View style={styles.teamContainer} >
+                        <View style={styles.headerView}>
+                            <Text style={styles.detailsHeader}>City</Text>
+                        </View>
+                        <View style={styles.detailsView}>
+                            <Text style={styles.detailsText}>{props.formula1Races.raceCity}</Text>
+                        </View>
+                    </View>
+                    <View style={styles.teamContainer} >
+                        <View style={styles.headerView}>
+                            <Text style={styles.detailsHeader}>Country</Text>
+                        </View>
+                        <View style={styles.detailsView}>
+                            <Text style={styles.detailsText}>{props.formula1Races.raceCountry}</Text>
+                        </View>
+                    </View>
+                    <View style={styles.teamContainer} >
+                        <View style={styles.headerView}>
+                            <Text style={styles.detailsHeader}>Distance</Text>
+                        </View>
+                        <View style={styles.detailsView}>
+                            <Text style={styles.detailsText}>{props.formula1Races.raceDistance}</Text>
+                        </View>
+                    </View>
+                    <View style={styles.teamContainer} >
+                        <View style={styles.headerView}>
+                            <Text style={styles.detailsHeader}>Total Laps</Text>
+                        </View>
+                        <View style={styles.detailsView}>
+                            <Text style={styles.detailsText}>{props.formula1Races.totalLaps}</Text>
+                        </View>
+                    </View>
+                </TouchableOpacity>
+
+                    {formula1RaceLive == false ?
+                    null
+                    :
+                    <View>
+                        <Text></Text>
+                        <View style={styles.borderView}></View>
+                        <Text></Text>
+                        <TouchableOpacity
+                             onPress={() => props.navigation.navigate('Standings', {standingsType: 'liveRace'})}>
+                            <View style={styles.formula1HeaderContainer}>
+                                <Text style={styles.standingsHeaderText}>{props.formula1Races.raceName} Standings</Text>
+                                <Text style={styles.fakeButton}>See All {'>'}{'>'}</Text>
+                            </View>
+                            <View style={styles.formula1Container}>
+                                <View style={styles.formula1RankContainer}>
+                                    <Text style={styles.listFormula1Text}>{props.formula1Rankings[0].driverPosition}</Text>
+                                </View>
+                                <View style={styles.formula1LogoContainer}>
+                                    <Image 
+                                        style={styles.driverLogoContainer}
+                                        source={{uri: props.formula1Rankings[0].driverImage}}
+                                    />
+                                </View>
+                                <View style={styles.formula1TeamContainer}>
+                                    <Text style={styles.listFormula1Text}>{props.formula1Rankings[0].driverName}</Text>
+                                </View>
+                            </View>
+                            <View style={styles.formula1Container}>
+                                <View style={styles.formula1RankContainer}>
+                                    <Text style={styles.listFormula1Text}>{props.formula1Rankings[1].driverPosition}</Text>
+                                </View>
+                                <View style={styles.formula1LogoContainer}>
+                                    <Image 
+                                        style={styles.driverLogoContainer}
+                                        source={{uri: props.formula1Rankings[1].driverImage}}
+                                    />
+                                </View>
+                                <View style={styles.formula1TeamContainer}>
+                                    <Text style={styles.listFormula1Text}>{props.formula1Rankings[1].driverName}</Text>
+                                </View>
+                            </View>
+                            <View style={styles.formula1Container}>
+                                <View style={styles.formula1RankContainer}>
+                                    <Text style={styles.listFormula1Text}>{props.formula1Rankings[2].driverPosition}</Text>
+                                </View>
+                                <View style={styles.formula1LogoContainer}>
+                                    <Image 
+                                        style={styles.driverLogoContainer}
+                                        source={{uri: props.formula1Rankings[2].driverImage}}
+                                    />
+                                </View>
+                                <View style={styles.formula1TeamContainer}>
+                                    <Text style={styles.listFormula1Text}>{props.formula1Rankings[2].driverName}</Text>
+                                </View>
+                            </View>   
+                        </TouchableOpacity>
+                        
+                    </View>
+                    
+                    }
+                <Text></Text>
+                <View style={styles.borderView}></View>
+                <Text></Text>
+                <View style={styles.formula1HeaderContainer}>
+                    <Text style={styles.standingsHeaderText}>Constructor Standings</Text>
+                    <Text style={styles.fakeButton}>See All {'>'}{'>'}</Text>
+                </View>
+                <TouchableOpacity
+                    onPress={() => props.navigation.navigate('Standings', {standingsType: 'constructor'})}>
+                    <View style={styles.formula1Container}>
+                        <View style={styles.formula1RankContainer}>
+                            <Text style={styles.listFormula1Text}>{props.formula1Teams[0].currentSeasonRank}</Text>
+                        </View>
+                        <View style={styles.formula1LogoContainer}>
+                            <Image 
+                                style={styles.teamLogoContainer}
+                                source={{uri: props.formula1Teams[0].logo}}
+                            />
+                        </View>
+                        <View style={styles.formula1TeamContainer}>
+                            <Text style={styles.listFormula1Text}>{props.formula1Teams[0].name}</Text>
+                        </View>
+                        <View style={styles.formula1PointsContainer}>
+                            <Text style={styles.listFormula1Text}>{props.formula1Teams[0].currentSeasonPoints}</Text>
+                        </View>
+                    </View>
+                    <View style={styles.formula1Container}>
+                        <View style={styles.formula1RankContainer}>
+                            <Text style={styles.listFormula1Text}>{props.formula1Teams[1].currentSeasonRank}</Text>
+                        </View>
+                        <View style={styles.formula1LogoContainer}>
+                            <Image 
+                                style={styles.teamLogoContainer}
+                                source={{uri: props.formula1Teams[1].logo}}
+                            />
+                        </View>
+                        <View style={styles.formula1TeamContainer}>
+                            <Text style={styles.listFormula1Text}>{props.formula1Teams[1].name}</Text>
+                        </View>
+                        <View style={styles.formula1PointsContainer}>
+                            <Text style={styles.listFormula1Text}>{props.formula1Teams[1].currentSeasonPoints}</Text>
+                        </View>
+                    </View>
+                    <View style={styles.formula1Container}>
+                        <View style={styles.formula1RankContainer}>
+                            <Text style={styles.listFormula1Text}>{props.formula1Teams[2].currentSeasonRank}</Text>
+                        </View>
+                        <View style={styles.formula1LogoContainer}>
+                            <Image 
+                                style={styles.teamLogoContainer}
+                                source={{uri: props.formula1Teams[2].logo}}
+                            />
+                        </View>
+                        <View style={styles.formula1TeamContainer}>
+                            <Text style={styles.listFormula1Text}>{props.formula1Teams[2].name}</Text>
+                        </View>
+                        <View style={styles.formula1PointsContainer}>
+                            <Text style={styles.listFormula1Text}>{props.formula1Teams[2].currentSeasonPoints}</Text>
+                        </View>
+                    </View>
+                </TouchableOpacity>
+                
+                <Text></Text>
+                <View style={styles.borderView}></View>
+                <Text></Text>
+                <TouchableOpacity
+                    onPress={() => props.navigation.navigate('Standings', {standingsType: 'driver'})}>
+                    <View style={styles.formula1HeaderContainer}>
+                        <Text style={styles.standingsHeaderText}>Driver Standings</Text>
+                        <Text style={styles.fakeButton}>See All {'>'}{'>'}</Text>
+                    </View>
+                <View style={styles.formula1Container}>
+                    <View style={styles.formula1RankContainer}>
+                        <Text style={styles.listFormula1Text}>{props.formula1Drivers[0].driverRank}</Text>
+                    </View>
+                    <View style={styles.formula1LogoContainer}>
+                        <Image 
+                            style={styles.driverLogoContainer}
+                            source={{uri: props.formula1Drivers[0].driverImage}}
+                        />
+                    </View>
+                    <View style={styles.formula1TeamContainer}>
+                        <Text style={styles.listFormula1Text}>{props.formula1Drivers[0].driverName}</Text>
+                    </View>
+                    <View style={styles.formula1PointsContainer}>
+                        <Text style={styles.listFormula1Text}>{props.formula1Drivers[0].currentSeasonPoints}</Text>
+                    </View>
+                </View>
+                <View style={styles.formula1Container}>
+                    <View style={styles.formula1RankContainer}>
+                        <Text style={styles.listFormula1Text}>{props.formula1Drivers[1].driverRank}</Text>
+                    </View>
+                    <View style={styles.formula1LogoContainer}>
+                        <Image 
+                            style={styles.driverLogoContainer}
+                            source={{uri: props.formula1Drivers[1].driverImage}}
+                        />
+                    </View>
+                    <View style={styles.formula1TeamContainer}>
+                        <Text style={styles.listFormula1Text}>{props.formula1Drivers[1].driverName}</Text>
+                    </View>
+                    <View style={styles.formula1PointsContainer}>
+                        <Text style={styles.listFormula1Text}>{props.formula1Drivers[1].currentSeasonPoints}</Text>
+                    </View>
+                </View>
+                <View style={styles.formula1Container}>
+                    <View style={styles.formula1RankContainer}>
+                        <Text style={styles.listFormula1Text}>{props.formula1Drivers[2].driverRank}</Text>
+                    </View>
+                    <View style={styles.formula1LogoContainer}>
+                        <Image 
+                            style={styles.driverLogoContainer}
+                            source={{uri: props.formula1Drivers[2].driverImage}}
+                        />
+                    </View>
+                    <View style={styles.formula1TeamContainer}>
+                        <Text style={styles.listFormula1Text}>{props.formula1Drivers[2].driverName}</Text>
+                    </View>
+                    <View style={styles.formula1PointsContainer}>
+                        <Text style={styles.listFormula1Text}>{props.formula1Drivers[2].currentSeasonPoints}</Text>
+                    </View>
+                </View>   
+            </TouchableOpacity>
+                
+                
+
+            </ScrollView>
+            :
+
             <FlatList 
                 data = {sportGames}
                 style={styles.feed}
@@ -848,12 +1117,16 @@ function Odds(props) {
     
             />
             }
+            <TouchableOpacity style={styles.adView}
+                onPress={() => { Linking.openURL('https://bit.ly/3uAOAIh'); openAdLink()}} >
+                <Image 
+                    style={{ width: "95%", height: 40}}
+                    source={require('../../assets/fantasyJocksBanner.jpg')}
+                />
+            </TouchableOpacity>
+                
            
-            
-         
         </View>
-        
-        
     );
     
 }
@@ -994,6 +1267,13 @@ const styles = StyleSheet.create({
         marginLeft: '2%',
         paddingBottom: 2,
     },
+    formula1HeaderContainer: {
+        justifyContent: 'space-between',
+        flexDirection: 'row',
+        marginLeft: '2%',
+        marginRight: '10%',
+        paddingBottom: 2,
+    },
     teamHeader: {
         width: "50%",
     },
@@ -1118,8 +1398,89 @@ const styles = StyleSheet.create({
     StatusWrapper: {
         justifyContent: 'center',
         alignItems: 'center',
-      },
-    
+    },
+    teamLogoContainer: {
+        width: 80,
+        height: 40,
+    },
+    driverLogoContainer: {
+        width: 80,
+        height: 60,
+    },
+    formula1Container: {
+        flexDirection: 'row',
+    },
+    formula1TeamContainer: {
+        width: '50%',
+        justifyContent: 'center'
+    },
+    formula1RankContainer: {
+        width: '10%',
+        justifyContent: 'center',
+        marginLeft: 4
+    },
+    formula1LogoContainer: {
+        width: '30%',
+        justifyContent: 'center'
+    },
+    formula1PointsContainer: {
+        width: '10%',
+        justifyContent: 'center'
+    },
+
+    listFormula1Text: {
+        fontSize: 14,
+    },
+    detailsText: {
+        fontSize: 12,
+    },
+    detailsHeader: {
+        fontSize: 12,
+        textTransform: 'uppercase',
+        color: 'grey'
+    },
+    headerText: {
+        fontSize: 16,
+        
+    },
+    headerContainer: {
+        alignItems: 'left'
+    },
+    borderView: {
+        borderBottomColor: '#CACFD2',
+        borderBottomWidth: 1,
+    },
+    detailsView:{
+        
+    },
+    headerView:{
+        width: '35%'
+    },
+    teamContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingBottom: '1%',
+        paddingLeft: 4
+    },
+    teamLogo: {
+        width: "100%",
+        height: "100%",
+    },
+    standingsHeaderContainer: {
+        paddingBottom: 8,
+        marginLeft: '2%',
+    },
+    standingsHeaderText: {
+        fontWeight: 'bold',
+    },
+    fakeButton: {
+        color: '#0033cc',
+        fontSize: 12,
+    },
+    fakeButtonContainer: {
+        alignItems: 'flex-end',
+        marginRight: "10%",
+    }
 })
 
 const mapStateToProps = (store) => ({
@@ -1129,6 +1490,10 @@ const mapStateToProps = (store) => ({
     nhlGames: store.nhlGamesState.nhlGames,
     mmaGames: store.mmaGamesState.mmaGames,
     futureGames: store.futureGamesState.futureGames,
+    formula1Teams: store.formula1TeamsState.formula1Teams,
+    formula1Races: store.formula1RacesState.formula1Races,
+    formula1Drivers: store.formula1DriversState.formula1Drivers,
+    formula1Rankings: store.formula1RankingsState.formula1Rankings,
     allUsers: store.userState.allUsers,
     currentUser: store.userState.currentUser,
 
