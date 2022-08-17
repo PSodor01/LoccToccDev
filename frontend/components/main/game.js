@@ -1,5 +1,5 @@
 import React, { Component, useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Alert, ActivityIndicator, FlatList, TouchableOpacity, Image } from 'react-native';
+import { Text, View, StyleSheet, Alert, ActivityIndicator, Linking, FlatList, TouchableOpacity, Image } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -510,6 +510,12 @@ function game(props) {
     const productionID = 'ca-app-pub-8519029912093094/5150749785';
     // Is a real device and running in production.
     const adUnitID = Constants.isDevice && !__DEV__ ? productionID : testID;
+
+    const openAdLink = () => {
+
+        Analytics.logEvent('adClick', {user_name: props.currentUser.name, adPartner: 'fantasyJocks'});
+            
+    }
 
     const handleReportPostEmail = (name, caption) => {
 
@@ -1090,6 +1096,14 @@ function game(props) {
                 renderItem={renderItem}
             />
             }
+
+            <TouchableOpacity style={styles.adView}
+                onPress={() => { Linking.openURL('https://bit.ly/3uAOAIh'); openAdLink()}} >
+                <Image 
+                    style={{ width: "95%", height: 40}}
+                    source={require('../../assets/fantasyJocksBanner.jpg')}
+                />
+            </TouchableOpacity>
 
             <TouchableOpacity
                 activeOpacity={0.8}

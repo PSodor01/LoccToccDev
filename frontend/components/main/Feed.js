@@ -328,7 +328,7 @@ function Feed(props) {
 
     const openAdLink = () => {
 
-        Analytics.logEvent('adClick', {user_name: props.currentUser.name});
+        Analytics.logEvent('adClick', {user_name: props.currentUser.name, adPartner: 'fantasyJocks'});
             
     }
 

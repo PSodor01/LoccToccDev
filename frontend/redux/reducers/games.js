@@ -9,6 +9,7 @@ import { NFL_GAMES_STATE_CHANGE,
     FORMULA1_DRIVERS_STATE_CHANGE,
     FORMULA1_RANKINGS_STATE_CHANGE,
     NHL_GAMES_STATE_CHANGE, 
+    EPL_GAMES_STATE_CHANGE,
     CLEAR_DATA 
 } from "../constants"
 
@@ -19,6 +20,7 @@ const initialState = {
     ncaabGames: [],
     mmaGames: [],
     nhlGames: [],
+    eplGames: [],
     futureGames: [],
     formula1Teams: [],
     formula1Drivers: [],
@@ -74,6 +76,20 @@ export const mlbGames = (state = initialState, action) => {
             return {
                 ...state,
                 mlbGames: action.mlbGames
+            }
+        case CLEAR_DATA:
+            return initialState
+        default:
+            return state;
+    }
+}
+
+export const eplGames = (state = initialState, action) => {
+    switch (action.type) {
+        case EPL_GAMES_STATE_CHANGE:
+            return {
+                ...state,
+                eplGames: action.eplGames
             }
         case CLEAR_DATA:
             return initialState
@@ -144,20 +160,6 @@ export const formula1Rankings = (state = initialState, action) => {
             return {
                 ...state,
                 formula1Rankings: action.formula1Rankings
-            }
-        case CLEAR_DATA:
-            return initialState
-        default:
-            return state;
-    }
-}
-
-export const nhlGames = (state = initialState, action) => {
-    switch (action.type) {
-        case NHL_GAMES_STATE_CHANGE:
-            return {
-                ...state,
-                nhlGames: action.nhlGames
             }
         case CLEAR_DATA:
             return initialState

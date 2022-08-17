@@ -28,9 +28,9 @@ import { connect } from 'react-redux'
 function Odds(props) {
 
     const [sportGames, setSportGames] = useState([]);
-    const [nhlGames, setnhlGames] = useState([]);
+    const [nflGames, setnflGames] = useState([]);
     const [mmaGames, setmmaGames] = useState([]);
-    const [ncaabGames, setncaabGames] = useState([]);
+    const [ncaafGames, setncaafGames] = useState([]);
     const [nbaGames, setnbaGames] = useState([]);
     const [mlbGames, setmlbGames] = useState([]);
     const [eplGames, seteplGames] = useState([]);
@@ -82,7 +82,7 @@ function Odds(props) {
 
     useEffect(() => {
         fetchData()
-        if ( sport == 'NHL' || sport == 'EPL' || sport == 'UFC' || sport == 'PGA' || sport == 'Futures' || sport == 'Formula 1' ||sport == 'Trending') {
+        if ( sport == 'NFL' || sport == 'NCAAF' || sport == 'EPL' || sport == 'UFC' || sport == 'PGA' || sport == 'Futures' || sport == 'Formula 1' ||sport == 'Trending') {
 
         } 
         else {
@@ -90,7 +90,7 @@ function Odds(props) {
             setSport('MLB')
         }
 
-    }, [ props.nhlGames, props.mlbGames, props.mmaGames, props.futureGames, props.formula1Teams, props.formula1Races, props.formula1Drivers, props.formula1Rankings ])
+    }, [ props.nflGames, props.ncaafGames, props.eplGames, props.mlbGames, props.mmaGames, props.futureGames, props.formula1Teams, props.formula1Races, props.formula1Drivers, props.formula1Rankings ])
 
    useEffect(() => {
 
@@ -130,8 +130,8 @@ function Odds(props) {
 
     const fetchData = () => {
 
-        function trendingFunction(mlbGames, nhlGames, mmaGames) {
-            let trendingGames = mlbGames.concat(nhlGames, mmaGames)
+        function trendingFunction(mlbGames, nflGames, ncaafGames, mmaGames) {
+            let trendingGames = mlbGames.concat(nflGames, ncaafGames, mmaGames)
             setTrendingGames(trendingGames)
         }
 
@@ -155,25 +155,45 @@ function Odds(props) {
         }
         setmlbGames(props.mlbGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))
 
-        for (let i = 0; i < props.nhlGames.length; i++) {
+        for (let i = 0; i < props.nflGames.length; i++) {
 
             firebase.firestore()
             .collection("votes")
-            .doc(props.nhlGames[i].gameId)
+            .doc(props.nflGames[i].gameId)
             .collection("gameVotes")
             .doc("info")
             .get()
             .then((snapshot) => {
                 if (snapshot.exists) {
                     let gameMiscData = snapshot.data();
-                    props.nhlGames[i].gamePostsCount = gameMiscData.gamePostsCount
+                    props.nflGames[i].gamePostsCount = gameMiscData.gamePostsCount
                 }
                 else {
-                    props.nhlGames[i].gamePostsCount = 0
+                    props.nflGames[i].gamePostsCount = 0
                 }
             })
         }
-        setnhlGames(props.nhlGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))
+        setnflGames(props.nflGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))
+
+        for (let i = 0; i < props.ncaafGames.length; i++) {
+
+            firebase.firestore()
+            .collection("votes")
+            .doc(props.ncaafGames[i].gameId)
+            .collection("gameVotes")
+            .doc("info")
+            .get()
+            .then((snapshot) => {
+                if (snapshot.exists) {
+                    let gameMiscData = snapshot.data();
+                    props.ncaafGames[i].gamePostsCount = gameMiscData.gamePostsCount
+                }
+                else {
+                    props.ncaafGames[i].gamePostsCount = 0
+                }
+            })
+        }
+        setncaafGames(props.ncaafGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))
 
         for (let i = 0; i < props.mmaGames.length; i++) {
 
@@ -195,6 +215,26 @@ function Odds(props) {
         }
         setmmaGames(props.mmaGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))
 
+        for (let i = 0; i < props.eplGames.length; i++) {
+
+            firebase.firestore()
+            .collection("votes")
+            .doc(props.eplGames[i].gameId)
+            .collection("gameVotes")
+            .doc("info")
+            .get()
+            .then((snapshot) => {
+                if (snapshot.exists) {
+                    let gameMiscData = snapshot.data();
+                    props.eplGames[i].gamePostsCount = gameMiscData.gamePostsCount
+                }
+                else {
+                    props.eplGames[i].gamePostsCount = 0
+                }
+            })
+        }
+        seteplGames(props.eplGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))
+
         setFutureGames(props.futureGames)
         setFormula1Teams(props.formula1Teams)
         setFormula1Races(props.formula1Races)
@@ -202,7 +242,7 @@ function Odds(props) {
         setFormula1Rankings(props.formula1Rankings)
         if (props.formula1Rankings.length > 2 ) {setFormula1RaceLive(true)}
 
-        trendingFunction(mlbGames, nhlGames, mmaGames)
+        trendingFunction(mlbGames, nflGames, ncaafGames, mmaGames)
         setLoading(false)
 
     }
@@ -327,8 +367,8 @@ function Odds(props) {
             setSearch(text)
 
         } else {
-            if (sport == 'NBA') {setSportGames(props.nbaGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))} 
-            if (sport == 'NHL') {setSportGames(props.nhlGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))} 
+            if (sport == 'NCAAF') {setSportGames(props.ncaafGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))} 
+            if (sport == 'NFL') {setSportGames(props.nflGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))} 
             if (sport == 'MLB') {setSportGames(props.mlbGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))}
             if (sport == 'MMA') {setSportGames(props.mmaGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))} 
             if (sport == 'EPL') {setSportGames(props.eplGames)}
@@ -365,7 +405,7 @@ function Odds(props) {
         if (sport == 'NFL') {setSportGames(props.nflGames); Analytics.logEvent('selectNFLGames', {user_name: props.currentUser.name}); Analytics.logEvent('screen_view', { screen_name: 'Odds', user_name: props.currentUser.name }); setSport('NFL');}
         if (sport == 'NBA') {setSportGames(props.nbaGames); Analytics.logEvent('selectNBAGames', {user_name: props.currentUser.name}); Analytics.logEvent('screen_view', { screen_name: 'Odds', user_name: props.currentUser.name }); setSport('NBA');}
         if (sport == 'NHL') {setSportGames(props.nhlGames); Analytics.logEvent('selectNHLGames', {user_name: props.currentUser.name}); Analytics.logEvent('screen_view', { screen_name: 'Odds', user_name: props.currentUser.name }); setSport('NHL');}
-        if (sport == 'NCAAB') {setSportGames(props.ncaabGames); Analytics.logEvent('selectNCAABGames', {user_name: props.currentUser.name}); Analytics.logEvent('screen_view', { screen_name: 'Odds', user_name: props.currentUser.name }); setSport('NCAAB');}
+        if (sport == 'NCAAF') {setSportGames(props.ncaafGames); Analytics.logEvent('selectNCAAFGames', {user_name: props.currentUser.name}); Analytics.logEvent('screen_view', { screen_name: 'Odds', user_name: props.currentUser.name }); setSport('NCAAF');}
         if (sport == 'EPL') {setSportGames(props.eplGames); Analytics.logEvent('selectEPLGames', {user_name: props.currentUser.name}); Analytics.logEvent('screen_view', { screen_name: 'Odds', user_name: props.currentUser.name }); setSport('EPL');}
         if (sport == 'MLB') {setSportGames(props.mlbGames); Analytics.logEvent('selectMLBGames', {user_name: props.currentUser.name}); Analytics.logEvent('screen_view', { screen_name: 'Odds', user_name: props.currentUser.name }); setSport('MLB');}
         if (sport == 'UFC') {setSportGames(props.mmaGames); Analytics.logEvent('selectUFCGames', {user_name: props.currentUser.name}); Analytics.logEvent('screen_view', { screen_name: 'Odds', user_name: props.currentUser.name }); setSport('UFC');}
@@ -375,8 +415,9 @@ function Odds(props) {
     }
 
     const nbaIcon = (<Icon name="basketball-outline" color="#ee6730" size={16}/>);
-    const mlbIcon = (<Icon name="baseball-outline" color="blue" size={16}/>);
+    const mlbIcon = (<Icon name="baseball-outline" color="red" size={16}/>);
     const nflIcon = (<Icon name="american-football" color="#825736" size={16}/>);
+    const ncaafIcon = (<MaterialCommunityIcons name="football-helmet" color="navy" size={16}/>);
     const nhlIcon = (<MaterialCommunityIcons name="hockey-sticks" color="#B87333" size={16}/>);
     const ncaabIcon = (<MaterialCommunityIcons name="basketball-hoop-outline" color="#800000" size={16}/>);
     const eplIcon = (<MaterialCommunityIcons name="soccer" color="black" size={16}/>);
@@ -399,18 +440,33 @@ function Odds(props) {
             icon: mlbIcon
         },
         {
-            sport: 'Formula 1',
+            sport: 'NFL',
             id: '3',
+            icon: nflIcon
+        },
+        {
+            sport: 'NCAAF',
+            id: '4',
+            icon: ncaafIcon
+        },
+        {
+            sport: 'Formula 1',
+            id: '5',
             icon: formula1Icon
         },
         {
+            sport: 'EPL',
+            id: '6',
+            icon: eplIcon
+        },
+        {
             sport: 'UFC',
-            id: '4',
+            id: '7',
             icon: mmaIcon
         },
         {
             sport: 'Futures',
-            id: '5',
+            id: '8',
             icon: futureIcon
         },
       ];
@@ -497,6 +553,7 @@ function Odds(props) {
                         <View>
                             {item.gamePostsCount > 4 ?
                                 <View style={styles.gameDateContainer}>
+                                    <Text style={styles.dateText}>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
                                         
                                     <View style={styles.pepperContainer}>
                                         <FontAwesome5 name={"pepper-hot"} size={16} color={"#B81D13"}/>
@@ -656,6 +713,19 @@ function Odds(props) {
                                         : <Text style={styles.spreadText}>{item.awayMoneyline}</Text>
                                     }
                                 </View> 
+                                <View style={styles.spreadItem}>
+                                </View>
+                                <View style={styles.totalItem}>
+                                    {item.sport == 'mma_mixed_martial_arts' ?
+                                    <Text style={styles.spreadText}>{item.over}</Text>
+                                    :
+                                    <Text style={styles.spreadText}>O {item.over}</Text>
+                                    } 
+                                    {item.overOdds > 0 ?
+                                        <Text style={styles.oddsBottomRowText}>+{item.overOdds}</Text>
+                                        : <Text style={styles.oddsBottomRowText}>{item.overOdds}</Text>
+                                    }
+                                </View>
                             </View>
                             <View style={styles.eplAwayGameInfoContainer}>
                                 <View style={styles.teamItem}>
@@ -668,6 +738,21 @@ function Odds(props) {
                                         : <Text style={styles.spreadText}>{item.homeMoneyline}</Text>
                                     }
                                 </View>
+                                <View style={styles.spreadItem}>
+                                    <Text style={styles.spreadText}></Text>
+                                </View>
+                                <View style={styles.totalItem}>
+                                    {item.sport == 'mma_mixed_martial_arts' ?
+                                    <Text style={styles.spreadText}>{item.over}</Text>
+                                    :
+                                    <Text style={styles.spreadText}>U {item.over}</Text>
+                                    } 
+                                    {item.underOdds > 0 ?
+                                        <Text style={styles.oddsBottomRowText}>+{item.underOdds}</Text>
+                                        : <Text style={styles.oddsBottomRowText}>{item.underOdds}</Text>
+                                    }
+                                </View>
+                                
                             </View>
                             <View style={styles.eplHomeGameInfoContainer}>
                                 <View style={styles.teamItem}>
@@ -679,7 +764,9 @@ function Odds(props) {
                                         : <Text style={styles.spreadText}>{item.drawMoneyline}</Text>
                                     }
                                 </View>
+                                
                             </View>
+                            
                         </View>
                     </TouchableOpacity>
                 </View>
@@ -837,7 +924,7 @@ function Odds(props) {
             />
             :
             
-            /*sportGames == props.eplGames ?
+            sportGames == props.eplGames ?
             <FlatList 
                 data = {sportGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate))}
                 style={styles.feed}
@@ -845,7 +932,7 @@ function Odds(props) {
     
             />
             :
-
+            /*
             sportGames == props.golfGames  ?
             <FlatList 
                 data = {sportGames.sort((a, b) => parseFloat(a.playerOdds) - parseFloat(b.playerOdds))}
@@ -1117,13 +1204,7 @@ function Odds(props) {
     
             />
             }
-            <TouchableOpacity style={styles.adView}
-                onPress={() => { Linking.openURL('https://bit.ly/3uAOAIh'); openAdLink()}} >
-                <Image 
-                    style={{ width: "95%", height: 40}}
-                    source={require('../../assets/fantasyJocksBanner.jpg')}
-                />
-            </TouchableOpacity>
+           
                 
            
         </View>
@@ -1163,11 +1244,11 @@ const styles = StyleSheet.create({
         marginVertical:4,
         marginRight: 2,
         marginLeft: 2,
+        alignItems: 'center',
         justifyContent: 'center',
         borderTopWidth: .8,
         borderTopColor: "#ccc",
         backgroundColor: "#ffffff",
-
     },
     listGameContainer: {
         padding: 12,
@@ -1188,9 +1269,6 @@ const styles = StyleSheet.create({
     },
     eplAwayGameInfoContainer: { 
         flexDirection: 'row',
-        borderBottomColor: "#e1e2e6",
-        borderBottomWidth: 1,
-        paddingVertical: 6,
     },
     homeGameInfoContainer: { 
         flexDirection: 'row',
@@ -1226,6 +1304,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingRight: 2,
+
     },
     teamNameItem: {
         width: "90%",
@@ -1486,8 +1565,9 @@ const styles = StyleSheet.create({
 const mapStateToProps = (store) => ({
     ncaafGames: store.ncaafGamesState.ncaafGames,
     mlbGames: store.mlbGamesState.mlbGames,
+    eplGames: store.eplGamesState.eplGames,
     ncaabGames: store.ncaabGamesState.ncaabGames,
-    nhlGames: store.nhlGamesState.nhlGames,
+    nflGames: store.nflGamesState.nflGames,
     mmaGames: store.mmaGamesState.mmaGames,
     futureGames: store.futureGamesState.futureGames,
     formula1Teams: store.formula1TeamsState.formula1Teams,

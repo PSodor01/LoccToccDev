@@ -15,9 +15,9 @@ import firebase from 'firebase'
 require("firebase/firestore")
 require("firebase/firebase-storage")
 
+import { connect } from 'react-redux'
 
-
-const EditProfileScreen = () => {
+function EditProfileScreen(props) {
     const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
     const [hasCameraPermission, setHasCameraPermission] = useState(null);
     const [camera, setCamera] = useState(null);
@@ -42,7 +42,7 @@ const EditProfileScreen = () => {
 
     const handleUpdate = async() => {
 
-      Analytics.logEvent('submitEditProfile', {});
+      Analytics.logEvent('submitEditProfile', { user_name: props.currentUser.name});
 
         let imgUrl = await uploadImage();
 
@@ -132,7 +132,7 @@ const EditProfileScreen = () => {
     useEffect(() => {
         getUser();
 
-        Analytics.logEvent('screen_view', { screen_name: 'EditProfile' })
+        Analytics.logEvent('screen_view', { screen_name: 'EditProfile',  user_name: props.currentUser.name })
     },[]);
 
     useEffect(() => {
@@ -157,7 +157,7 @@ const EditProfileScreen = () => {
     
       const pickImage = async () => {
 
-        Analytics.logEvent('changeProfilePicture', {});
+        Analytics.logEvent('changeProfilePicture', { user_name: props.currentUser.name});
 
         let result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -332,9 +332,6 @@ const EditProfileScreen = () => {
     )
 }
     
-
-export default EditProfileScreen;
-
 const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -432,3 +429,10 @@ const styles = StyleSheet.create({
     },
   });
 
+  const mapStateToProps = (store) => ({
+    currentUser: store.userState.currentUser,
+
+
+})
+
+export default connect(mapStateToProps)(EditProfileScreen);

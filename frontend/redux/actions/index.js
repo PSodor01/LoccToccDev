@@ -206,19 +206,37 @@ export function fetchMLBGames() {
     })
 }
 
-export function fetchNHLGames() {
+export function fetchNFLGames() {
     return ((dispatch) => {
         firebase.firestore()
-            .collection("nhl")
+            .collection("nfl")
             .orderBy('gameDate', 'desc')
             .onSnapshot((snapshot) => {
-                let nhlGames = snapshot.docs.map(doc => {
+                let nflGames = snapshot.docs.map(doc => {
                     const data = doc.data();
                     const id = doc.id;
                     return { id, ...data }
                 })
-                dispatch({ type: NHL_GAMES_STATE_CHANGE, nhlGames });
-                for(let i = 0; i < nhlGames.length; i++){
+                dispatch({ type: NFL_GAMES_STATE_CHANGE, nflGames });
+                for(let i = 0; i < nflGames.length; i++){
+                }
+            })
+    })
+}
+
+export function fetchNCAAFGames() {
+    return ((dispatch) => {
+        firebase.firestore()
+            .collection("ncaaf")
+            .orderBy('gameDate', 'desc')
+            .onSnapshot((snapshot) => {
+                let ncaafGames = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    return { id, ...data }
+                })
+                dispatch({ type: NCAAF_GAMES_STATE_CHANGE, ncaafGames });
+                for(let i = 0; i < ncaafGames.length; i++){
                 }
             })
     })
@@ -242,7 +260,7 @@ export function fetchMMAGames() {
     })
 }
 
-/*export function fetchEPLGames() {
+export function fetchEPLGames() {
     return ((dispatch) => {
         firebase.firestore()
             .collection("epl")
@@ -260,7 +278,7 @@ export function fetchMMAGames() {
     })
 }
 
-export function fetchGolfGames() {
+/*export function fetchGolfGames() {
     return ((dispatch) => {
         firebase.firestore()
             .collection("golf")
