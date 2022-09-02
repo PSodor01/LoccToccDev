@@ -73,6 +73,7 @@ export class Register extends Component {
             signUpCode: '',
             userImg: null,
             checked: false,
+            lastLogin: '',
 
         }
 
@@ -112,7 +113,7 @@ export class Register extends Component {
     }
 
     async onSignUp() {
-        const { email, password, name, aboutMe, location, signUpCode, userImg, createdAt } = this.state;
+        const { email, password, name, aboutMe, location, signUpCode, userImg, createdAt, lastLogin } = this.state;
         firebase.auth().createUserWithEmailAndPassword(email, password)
             .then((result) => {
                 firebase.firestore().collection("users")
@@ -128,6 +129,7 @@ export class Register extends Component {
                         followerCount: 0,
                         followingCount: 0,
                         postsCount: 0,
+                        lastLogin: firebase.firestore.Timestamp.fromDate(new Date()),
                     })
             })
             .catch(error => {   
@@ -142,38 +144,22 @@ export class Register extends Component {
             <DismissKeyboard>
                 <View style={styles.mainContainer}>
                     <View style={styles.topContainer}>
-                        <View style={styles.circleContainer}>
-                            <View style={styles.leftCircle}></View>
-                            <View style={styles.rightCircle}></View>
-                        </View>
                     <TouchableOpacity 
-                        style= {{marginTop: "12.5%", marginLeft: '7.5%'}}
+                        style= {{marginTop: "15%", marginLeft: '5%'}}
                         onPress={() => this.props.navigation.goBack()}
                         >
                         <FontAwesome5 name="chevron-left" size={24} color="#009387" />
                     </TouchableOpacity>
-                    <View style= {{flexDirection: 'row', marginTop: '30%',justifyContent: 'center'}}>
-                        <Text style={styles.loadingLogo}>locctocc </Text>
-                        <FontAwesome5 name="comment-dollar" color="#009387" size={30} />
-                    </View>
                     <View style={styles.appTextContainer}>
-                        <Text style={{
-                            fontSize: 26,
-                            fontWeight: 'bold',
-                            color: "#009387",
-                        }}> New here?
-                        </Text>
-                        <Text style={{
-                            fontSize: 18,
-                            color: "#009387",
-                        }}> Join the family
-                        </Text>
+                        <Text style={{fontSize: 24, color: "#009387",}}> New here?</Text>
+                        <Text style={{fontSize: 16, color: "#009387"}}> Join the family</Text>
                     </View>
                 </View>
-                    <View style={styles.textInputContainer}>
+                    <View>
                         <TextInput
                             style={styles.textInput}
                             placeholder="Username"
+                            placeholderTextColor= "navy"
                             maxLength={30}
                             autoCorrect={false}
                             onChangeText={(name) => this.setState({ name })}
@@ -181,6 +167,7 @@ export class Register extends Component {
                         <TextInput 
                             style={styles.textInput}
                             placeholder="Email"
+                            placeholderTextColor= "navy"
                             autoCorrect={false}
                             onChangeText={(email) => this.setState({ email })}
                             keyboardType="email-address"
@@ -188,6 +175,7 @@ export class Register extends Component {
                         <TextInput  
                             style={styles.textInput}
                             placeholder="Password"
+                            placeholderTextColor= "navy"
                             maxLength={15}
                             autoCorrect={false}
                             secureTextEntry={true}
@@ -207,6 +195,7 @@ export class Register extends Component {
                         <TextInput  
                             style={styles.textInput}
                             placeholder="Sign Up Code?"
+                            placeholderTextColor= "navy"
                             maxLength={15}
                             autoCorrect={false}
                             secureTextEntry={false}
@@ -281,35 +270,11 @@ export class Register extends Component {
 };
 
 const styles = StyleSheet.create({
-    leftCircle: {
-        backgroundColor: "#0066cc",
-        width: 200,
-        height: 200,
-        borderRadius: 200,
-        left: -50,
-        right: -50,
-        top: -50,
-    },
-    rightCircle: {
-        backgroundColor: "#009387",
-        width: 400,
-        height: 400,
-        borderRadius: 200,
-        left: 100,
-        right: 200,
-        top: -400,
-    },
-    circleContainer: {
-        flex: 1,
-        top: -50,
-    },
-    topContainer: {
-    },
     textInput: {
         height: 40,
         marginRight: "15%",
         marginLeft: "15%",
-        marginBottom: "2%",
+        marginBottom: "4%",
         paddingHorizontal: 30,
         borderColor: "#009387",
         borderWidth: 1,
@@ -355,19 +320,13 @@ const styles = StyleSheet.create({
     },
     appTextContainer: {
         alignItems: "center",
-        paddingBottom: 20,
+        paddingTop: "10%",
+        paddingBottom: "10%",
     },
     mainContainer: {
         backgroundColor: "#ffffff",
         flex: 1,
     },
-    headerName: {
-        alignSelf: 'center',
-        color: "#009387",
-        fontWeight: "bold",
-        fontSize: 28,
-        fontStyle: 'italic'
-    }, 
     disclaimerContainer: {
         alignSelf: 'center',
     },
@@ -376,12 +335,6 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         width: "70%",
     },
-    loadingLogo: {
-        color: "#009387",
-        fontWeight: "bold",
-        fontSize: 30,
-        fontStyle: 'italic'
-    }, 
     datePicker: {
         alignItems: 'center',
         marginBottom: 20,

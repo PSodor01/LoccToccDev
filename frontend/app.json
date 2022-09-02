@@ -6,9 +6,9 @@
     "orientation": "portrait",
     "icon": "./assets/locctocclogo.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/locctocclogo.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#009387"
     },
     "updates": {
       "fallbackToCacheTimeout": 0

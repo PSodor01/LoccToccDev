@@ -33,7 +33,6 @@ export class Login extends Component {
         const { email, password } = this.state;
         firebase.auth().signInWithEmailAndPassword(email, password)
             .then((result) => {
-                console.log(result)
             })
             .catch(error => {   
                 alert(error.message);
@@ -56,47 +55,34 @@ export class Login extends Component {
             <DismissKeyboard>
                 <View style={styles.mainContainer}>
                     <View style={styles.topContainer}>
-                        <View style={styles.circleContainer}>
-                            <View style={styles.leftCircle}></View>
-                            <View style={styles.rightCircle}></View>
-                        </View>
                         <TouchableOpacity 
-                            style={{ alignItems: "flex-start", marginLeft: '7.5%', top: -50 }}
+                            style= {{marginTop: "15%", marginLeft: '5%'}}
                             onPress={() => this.props.navigation.goBack()}
                             >
                             <FontAwesome5 name="chevron-left" size={24} color="#009387" />
                         </TouchableOpacity>
-                        <View style={{ justifyContent: 'center', flexDirection: 'row', paddingTop: 40, paddingBottom: 20,}}>
-                            <Text style={styles.loadingLogo}>locctocc </Text>
-                            <FontAwesome5 name="comment-dollar" color="#009387" size={30} />
-                        </View>
                         <View style={styles.appTextContainer}>
-                            <Text style={{
-                                fontSize: 26,
-                                fontWeight: 'bold',
-                                color: "#009387",
-                            }}> Welcome back.
-                            </Text>
-                            <Text style={{
-                                fontSize: 18,
-                                color: "#009387",
-                            }}> Here we go again
-                            </Text>
+                            <Text style={{fontSize: 24, color: "#009387",}}> Welcome back.</Text>
+                            <Text style={{fontSize: 16, color: "#009387"}}> Here we go again</Text>
                         </View>
                     </View>
                     <View style={styles.textInputContainer}>
                         <TextInput
                             style={styles.textInput}
                             placeholder="Email"
+                            placeholderTextColor= "navy"
                             onChangeText={(email) => this.setState({ email })}
                             keyboardType="email-address"
                         />
                         <TextInput
                             style={styles.textInput}
                             placeholder="Password"
+                            placeholderTextColor= "navy"
                             secureTextEntry={true}
                             onChangeText={(password) => this.setState({ password })}
                         />
+                        <Text style={styles.forgotPasswordText}></Text>
+                        <Text style={styles.forgotPasswordText}></Text>
                         <TouchableOpacity 
                             style={styles.forgotPasswordButton}
                             onPress={() => this.props.navigation.navigate("ResetPassword")}
@@ -107,7 +93,6 @@ export class Login extends Component {
                             <Fontisto name={"email"} color={"blue"} />
                             <Text style={styles.linkText}>  Support</Text>
                         </TouchableOpacity> 
-
                         <TouchableOpacity
                             onPress={() => this.onSignUp()}
                             title="Sign In"
@@ -115,7 +100,6 @@ export class Login extends Component {
                                 <Text style={styles.appButtonText}> Sign In </Text>
                         </TouchableOpacity>
                         <View style={styles.disclaimerContainer}>
-                            
                             <Text style={styles.disclaimerText}>
                                 If you or someone you know has a gambling problem
                             </Text>
@@ -143,9 +127,6 @@ const styles = StyleSheet.create({
         borderRadius: 20,
 
     },
-    textInputContainer: {
-        flex: 1,
-    },
     appButtonContainer: {
         borderColor: "#009387",
         borderWidth: 1,
@@ -169,51 +150,18 @@ const styles = StyleSheet.create({
     },
     appTextContainer: {
         alignItems: "center",
-        paddingBottom: 40,
-    },
-    
-    logo: {
-        width: 125,
-        height: 125,
-        borderRadius: 40,
-        alignSelf: 'center',
-        overflow: 'hidden',
-    },
-    logoContainer: {
-        flex: 1,
-        marginBottom: "10%",
-    },
-    leftCircle: {
-        backgroundColor: "#0066cc",
-        width: 200,
-        height: 200,
-        borderRadius: 200,
-        left: -50,
-        right: -50,
-        top: -50,
-    },
-    rightCircle: {
-        backgroundColor: "#009387",
-        width: 400,
-        height: 400,
-        borderRadius: 200,
-        left: 100,
-        right: 200,
-        top: -400,
-    },
-    circleContainer: {
-        flex: 1,
-        top: -50,
+        paddingTop: "10%",
+        paddingBottom: "10%",
     },
     topContainer: {
-        flex: 1,
+        paddingBottom: "10%",
     },
     mainContainer: {
         flex: 1,
         backgroundColor: "#ffffff",
     },
     disclaimerContainer: {
-        flex: 1,
+        paddingTop: "10%",
         alignSelf: 'center',
     },
     disclaimerText: {
@@ -221,12 +169,6 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         width: "70%",
     },
-    loadingLogo: {
-        color: "#009387",
-        fontWeight: "bold",
-        fontSize: 30,
-        fontStyle: 'italic'
-    }, 
     forgotPasswordButton: {
         alignItems: 'center'
     },

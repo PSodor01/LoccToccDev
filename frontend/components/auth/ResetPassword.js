@@ -4,6 +4,7 @@ import { StyleSheet, ActivityIndicator, View, Text, Alert, Button, TextInput, To
 import { FontAwesome5 } from "@expo/vector-icons";
 
 import firebase from 'firebase'
+require('firebase/firestore')
 
 export default function ResetPasswordScreen({ navigation }) {
 
@@ -22,6 +23,8 @@ export default function ResetPasswordScreen({ navigation }) {
             );
         }
     };
+
+
 
     return (
         <View style={styles.container}>
@@ -42,7 +45,7 @@ export default function ResetPasswordScreen({ navigation }) {
                         <TextInput
                             style={styles.textInput}
                             placeholder='Your Email'
-                            
+                            placeholderTextColor= "navy"
                             value={email}
                             onChangeText={setEmail}
                         />

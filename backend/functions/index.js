@@ -67,7 +67,7 @@ exports.testLike = functions.firestore.document('/likes/{userId}/userLikes/{post
   })
 
 
-exports.getMLBGameData = functions.pubsub.schedule('every 5 minutes').onRun(async() => {
+exports.getMLBGameData = functions.pubsub.schedule('every 2 minutes').onRun(async() => {
   try {
     const response = await axios.get('https://api.the-odds-api.com/v4/sports/baseball_mlb/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso')
     .then(result => {
@@ -171,7 +171,7 @@ exports.getMLBScoresData = functions.pubsub.schedule('every 2 minutes').onRun(as
 
 })
 
-exports.getNFLGameData = functions.pubsub.schedule('every 30 minutes').onRun(async() => {
+exports.getNFLGameData = functions.pubsub.schedule('every 2 minutes').onRun(async() => {
   try {
     const response = await axios.get('https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso')
       .then(result => {
@@ -233,14 +233,52 @@ exports.getNFLGameData = functions.pubsub.schedule('every 30 minutes').onRun(asy
 
   })
 
-exports.getNCAAFGameData = functions.pubsub.schedule('every 30 minutes').onRun(async() => {
+  exports.getNFLScoresData = functions.pubsub.schedule('every 2 minutes').onRun(async() => {
+    try {
+      const response = await axios.get('https://api.the-odds-api.com/v4/sports/americanfootball_nfl/scores/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&dateFormat=iso')
+      .then(result => {
+        result.data.forEach(game => {
+  
+          if (game.away_team == game.scores[0].name) {
+  
+            const writeResult = admin
+            .firestore()
+            .collection("nfl")
+            .doc(game.id)
+            .set({
+              awayScore: game.scores[0].score,
+              homeScore: game.scores[1].score,
+              
+            }, { merge:true });
+  
+          } else {
+            const writeResult = admin
+            .firestore()
+            .collection("nfl")
+            .doc(game.id)
+            .set({
+              awayScore: game.scores[1].score,
+              homeScore: game.scores[0].score,
+             
+          }, { merge:true });
+  
+          }
+  
+          
+        })
+      })
+  }catch(err) {console.error(err.message)}
+  
+  })
+
+exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(async() => {
   try {
     const response = await axios.get('https://api.the-odds-api.com/v4/sports/americanfootball_ncaaf/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso')
       .then(result => {
         result.data.forEach(game => {
 
-          if (game.bookmakers.findIndex((item) => item.key === 'draftkings') > -1) {
-            let i = game.bookmakers.findIndex((item) => item.key === 'draftkings')
+          if (game.bookmakers.findIndex((item) => item.key === 'fanduel') > -1) {
+            let i = game.bookmakers.findIndex((item) => item.key === 'fanduel')
             if (game.away_team == game.bookmakers[0].markets[0].outcomes[0].name) {
   
               const writeResult = admin
@@ -253,8 +291,9 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 30 minutes').onRun(a
                 gameDate: game.commence_time,
                 awayTeam: game.away_team,
                 homeTeam: game.home_team,
+                sportsbook: game.bookmakers[i].key,
                 awayMoneyline: game.bookmakers[i].markets[0].outcomes[0].price,
-                homeMoneyline: game.bookmakers[i].markets[0].outcomes[1].price,
+                homeMoneyline: game.bookmakers[i].markets[0].outcomes[1].price, 
                 awaySpread: game.bookmakers[i].markets[1].outcomes[0].point,
                 homeSpread: game.bookmakers[i].markets[1].outcomes[1].point,
                 awaySpreadOdds: game.bookmakers[i].markets[1].outcomes[0].price,
@@ -276,6 +315,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 30 minutes').onRun(a
                 gameDate: game.commence_time,
                 awayTeam: game.away_team,
                 homeTeam: game.home_team,
+                sportsbook: game.bookmakers[i].key,
                 awayMoneyline: game.bookmakers[i].markets[0].outcomes[1].price,
                 homeMoneyline: game.bookmakers[i].markets[0].outcomes[0].price,
                 awaySpread: game.bookmakers[i].markets[1].outcomes[1].point,
@@ -297,6 +337,44 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 30 minutes').onRun(a
       })
   }catch(err) {console.error(err.message)}
 
+  })
+
+  exports.getNCAAFScoresData = functions.pubsub.schedule('every 2 minutes').onRun(async() => {
+    try {
+      const response = await axios.get('https://api.the-odds-api.com/v4/sports/americanfootball_ncaaf/scores/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&dateFormat=iso')
+      .then(result => {
+        result.data.forEach(game => {
+  
+          if (game.away_team == game.scores[0].name) {
+  
+            const writeResult = admin
+            .firestore()
+            .collection("ncaaf")
+            .doc(game.id)
+            .set({
+              awayScore: game.scores[0].score,
+              homeScore: game.scores[1].score,
+              
+            }, { merge:true });
+  
+          } else {
+            const writeResult = admin
+            .firestore()
+            .collection("ncaaf")
+            .doc(game.id)
+            .set({
+              awayScore: game.scores[1].score,
+              homeScore: game.scores[0].score,
+             
+          }, { merge:true });
+  
+          }
+  
+          
+        })
+      })
+  }catch(err) {console.error(err.message)}
+  
   })
 
   exports.getNBAGameData = functions.pubsub.schedule('every 5 minutes').onRun(async() => {
@@ -505,7 +583,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 30 minutes').onRun(a
   
   })
 
-  exports.getEPLGameData = functions.pubsub.schedule('every 15 minutes').onRun(async() => {
+  exports.getEPLGameData = functions.pubsub.schedule('every 5 minutes').onRun(async() => {
     try {
       const response = await axios.get('https://api.the-odds-api.com/v4/sports/soccer_epl/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,totals&oddsFormat=american&dateFormat=iso')
       .then(result => {

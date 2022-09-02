@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { Component } from 'react';
 
-import { View, ActivityIndicator, StyleSheet, Text, TouchableOpacity, Alert } from 'react-native'
+import { View, ActivityIndicator, StyleSheet, Text, TouchableOpacity, Alert, Image } from 'react-native'
 
 import { FontAwesome5 } from "@expo/vector-icons";
 
@@ -503,10 +503,8 @@ export class App extends Component {
     const { loggedIn, loaded } = this.state;
     if (!loaded) {
       return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <View style={{ flexDirection: 'row' }}>
-            <Text style={styles.loadingLogo}>locctocc </Text>
-            <FontAwesome5 name="comment-dollar" color="#009387" size={26} />
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center'  }}>
+          <View>
           </View>
           <ActivityIndicator/>
         </View>

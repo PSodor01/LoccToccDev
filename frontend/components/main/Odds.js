@@ -505,7 +505,7 @@ function Odds(props) {
 
     const openAdLink = () => {
 
-        Analytics.logEvent('adClick', {user_name: props.currentUser.name});
+        Analytics.logEvent('adClick', {user_name: props.currentUser.name, adPartner: 'snackMagic'});
             
     }
 
@@ -1203,10 +1203,16 @@ function Odds(props) {
                 renderItem={renderItem}
     
             />
+
+            
             }
-           
-                
-           
+            <TouchableOpacity style={styles.adView}
+                onPress={() => { Linking.openURL('https://www.snackmagic.com/?grsf=613qvn'); openAdLink()}} >
+                <Image 
+                    style={{ width: "95%", height: 40 }}
+                    source={require('../../assets/snackMagicBanner.jpg')}
+                />
+            </TouchableOpacity>
         </View>
     );
     

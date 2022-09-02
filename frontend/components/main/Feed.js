@@ -39,22 +39,6 @@ function Feed(props) {
 
         Analytics.logEvent('screen_view', { screen_name: 'Feed', user_name: props.currentUser.name })
 
-        var myHeaders = new Headers();
-        myHeaders.append("x-rapidapi-key", "2354874cc8e479f89b4d769daf9de0df");
-        myHeaders.append("x-rapidapi-host", "v1.formula-1.api-sports.io");
-
-        var requestOptions = {
-            method: 'GET',
-            headers: myHeaders,
-            redirect: 'follow'
-        };
-
-        fetch("https://v1.formula-1.api-sports.io/races?season=2022/?type=Race", requestOptions)
-        
-            .then(result => result.text())
-            .then(result => console.log(result))
-            .catch(error => console.log('error', error));
-
     }, [props.blocking, props.faded, props.liked, props.following, props.currentUser])
 
     

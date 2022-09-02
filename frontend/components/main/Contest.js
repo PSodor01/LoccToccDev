@@ -64,55 +64,28 @@ function Contest(props) {
         Analytics.logEvent('websiteClicks', {user_name: props.currentUser.name});
 
 
-        firebase.firestore()
-            .collection("brandClicks")
-            .doc('tropicalBros')
-            .update({
-                website: firebase.firestore.FieldValue.increment(1),
-            })
-
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                nbanhl2022Score: firebase.firestore.FieldValue.increment(10)
-            })
+     
     }
 
     const countLocctoccInstagramClicks = () => {
 
         Analytics.logEvent('locctoccInstagramClicks', {user_name: props.currentUser.name});
 
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                nbanhl2022Score: firebase.firestore.FieldValue.increment(1)
-            })
+        
     }
 
     const countLocctoccTwitterClicks = () => {
 
         Analytics.logEvent('locctoccTwitterClicks', {user_name: props.currentUser.name});
 
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                nbanhl2022Score: firebase.firestore.FieldValue.increment(1)
-            })
+        
     }
 
     const countLocctoccTiktokClicks = () => {
 
         Analytics.logEvent('locctoccTiktokClicks', {user_name: props.currentUser.name});
 
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                nbanhl2022Score: firebase.firestore.FieldValue.increment(1)
-            })
+     
     }
 
     renderInner = () => (

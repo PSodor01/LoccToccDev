@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { StyleSheet, View, Text, Image, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native'
 
 import Icon from 'react-native-vector-icons/Ionicons';
+import Foundation from 'react-native-vector-icons/Foundation'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
 import { useNavigation } from '@react-navigation/native';
 import email from 'react-native-email'
@@ -27,10 +29,32 @@ function Profile(props) {
 
         Analytics.logEvent('screen_view', { screen_name: 'Profile', user_name: props.currentUser.name })
 
-    }, [props.route.params.uid, props.following, props.blocking])
+    }, [props.route.params.uid, props.following, props.blocking, props.faded, props.liked])
 
     const fetchData = () => {
         const { currentUser, posts } = props;
+
+        function matchLikesToPosts(posts) {
+            for (let i = 0; i < posts.length; i++) {
+
+                if (props.faded.indexOf(posts[i].id) > -1) {
+                    posts[i].faded = true
+                } else {
+                    posts[i].faded = false
+                }
+
+                if (props.liked.indexOf(posts[i].id) > -1) {
+                    posts[i].liked = true
+                } else {
+                    posts[i].liked = false
+                }
+                
+            }
+            setUserPosts(posts)
+            setLoading(false)
+            
+
+        }   
     
         if (props.route.params.uid === firebase.auth().currentUser.uid) {
             setUser(currentUser);
@@ -39,6 +63,7 @@ function Profile(props) {
                 .doc(firebase.auth().currentUser.uid)
                 .collection("userPosts")
                 .orderBy("creation", "desc")
+                .limit(50)
                 .get()
                 .then((snapshot) => {
                     let posts = snapshot.docs.map(doc => {
@@ -46,14 +71,9 @@ function Profile(props) {
                         const id = doc.id;
                         return { id, ...data }
                     })
-                    posts.sort(function (x, y) {
-                        return y.creation - x.creation;
-                    })
-                    setUserPosts(posts)
-                    setLoading(false);
+                    matchLikesToPosts(posts)
                     
                 })
-            setUserPosts(posts)
             setLoading(false);
         }
         else {
@@ -75,6 +95,7 @@ function Profile(props) {
                 .doc(props.route.params.uid)
                 .collection("userPosts")
                 .orderBy("creation", "desc")
+                .limit(50)
                 .get()
                 .then((snapshot) => {
                     let posts = snapshot.docs.map(doc => {
@@ -85,8 +106,7 @@ function Profile(props) {
                     posts.sort(function (x, y) {
                         return y.creation - x.creation;
                     })
-                    setUserPosts(posts)
-                    setLoading(false);
+                    matchLikesToPosts(posts)
                     
                 })
         }
@@ -102,6 +122,10 @@ function Profile(props) {
         } else {
             setBlocking(false);
         }
+
+        
+        
+
     }
 
     const onFollow = () => {
@@ -278,6 +302,179 @@ function Profile(props) {
             })
     };
 
+    const sendNotificationForLike = async () => {
+        const users = await firebase
+            .firestore()
+            .collection("users")
+            .doc(props.route.params.uid)
+            .get()
+            .then((snapshot) => {
+                if (snapshot.exists) {
+                    let data = snapshot.data();
+
+                    const token = data.token
+                    
+ 
+                    if (token != undefined) {
+                        const likedName = props.currentUser.name
+                        const notification = '(' + user.name + '): ' +  likedName + ' hammered your post'
+                        sendNotification(notification, token)
+                    } else {
+                    }
+                }
+                else {
+                }
+            })
+    };
+
+    const sendNotificationForFade = async () => {
+        const users = await firebase
+            .firestore()
+            .collection("users")
+            .doc(props.route.params.uid)
+            .get()
+            .then((snapshot) => {
+                if (snapshot.exists) {
+                    let data = snapshot.data();
+
+                    const token = data.token
+
+                    if (token != undefined) {
+                        const likedName = props.currentUser.name
+                        const notification = '(' + user.name + '): ' + likedName + ' faded your post'
+                        sendNotification(notification, token)
+                    } else {
+                    }
+                }
+                else {
+                }
+            })
+    };
+
+    const storeLike = (postId) => {
+        firebase.firestore()
+            .collection("likes")
+            .doc(firebase.auth().currentUser.uid)
+            .collection("userLikes")
+            .doc(postId)
+            .set({})
+
+        Analytics.logEvent('hammerPost', {user_name: props.currentUser.name});
+    }
+
+    const deleteLike = (postId) => {
+        firebase.firestore()
+            .collection("likes")
+            .doc(firebase.auth().currentUser.uid)
+            .collection("userLikes")
+            .doc(postId)
+            .delete({})
+        
+    }
+
+    const storeFade = (postId) => {
+        firebase.firestore()
+            .collection("fades")
+            .doc(firebase.auth().currentUser.uid)
+            .collection("userFades")
+            .doc(postId)
+            .set({})
+
+        Analytics.logEvent('fadePost', {user_name: props.currentUser.name});
+    }
+
+    const deleteFade = (postId) => {
+        firebase.firestore()
+            .collection("fades")
+            .doc(firebase.auth().currentUser.uid)
+            .collection("userFades")
+            .doc(postId)
+            .delete({})
+
+    }
+
+    const onLikePress = (postId) => {
+
+        firebase.firestore()
+            .collection("posts")
+            .doc(props.route.params.uid)
+            .collection("userPosts")
+            .doc(postId)
+            .collection("likes")
+            .doc(firebase.auth().currentUser.uid)
+            .set({})
+
+        firebase.firestore()
+            .collection("posts")
+            .doc(props.route.params.uid)
+            .collection("userPosts")
+            .doc(postId)
+            .update({
+                likesCount: firebase.firestore.FieldValue.increment(1)
+            })
+    }
+
+    const onDislikePress = (postId) => {
+        firebase.firestore()
+            .collection("posts")
+            .doc(props.route.params.uid)
+            .collection("userPosts")
+            .doc(postId)
+            .update({
+                likesCount: firebase.firestore.FieldValue.increment(-1)
+            })
+
+        firebase.firestore()
+            .collection("posts")
+            .doc(props.route.params.uid)
+            .collection("userPosts")
+            .doc(postId)
+            .collection("likes")
+            .doc(firebase.auth().currentUser.uid)
+            .delete()
+
+    }
+
+    const onFadePress = (postId) => {
+        firebase.firestore()
+            .collection("posts")
+            .doc(props.route.params.uid)
+            .collection("userPosts")
+            .doc(postId)
+            .update({
+                fadesCount: firebase.firestore.FieldValue.increment(1)
+            })
+
+        firebase.firestore()
+            .collection("posts")
+            .doc(props.route.params.uid)
+            .collection("userPosts")
+            .doc(postId)
+            .collection("fades")
+            .doc(firebase.auth().currentUser.uid)
+            .set({})
+    }
+
+    const onUnfadePress = (postId) => {
+        firebase.firestore()
+            .collection("posts")
+            .doc(props.route.params.uid)
+            .collection("userPosts")
+            .doc(postId)
+            .update({
+                fadesCount: firebase.firestore.FieldValue.increment(-1)
+            })
+
+        firebase.firestore()
+            .collection("posts")
+            .doc(props.route.params.uid)
+            .collection("userPosts")
+            .doc(postId)
+            .collection("fades")
+            .doc(firebase.auth().currentUser.uid)
+            .delete()
+    }
+
     const handleReportPostEmail = () => {
 
         Analytics.logEvent('reportPost', {user_name: props.currentUser.name});
@@ -330,9 +527,6 @@ function Profile(props) {
             })
 
         Analytics.logEvent('deletePost', {user_name: props.currentUser.name});
-
-
-            
     })
     }
 
@@ -487,10 +681,56 @@ function Profile(props) {
                                     {item.userTagList != null ? <Text style={{ color: '#0033cc', fontWeight: 'bold' }}>@{item.userTagList}</Text> : null}
                                 </View>
                                 <View style={styles.postFooterContainer}>
+                                { item.liked == true ?
                                     <View style={styles.likeContainer}>
-                                        <Icon name={"hammer-outline"} size={20} color={"grey"} />
-                                        <Text style={styles.likeNumber}>{item.likesCount}</Text>
+                                        <TouchableOpacity
+                                            onPress={() => {onDislikePress(item.id); deleteLike(item.id)}} >
+                                            <Ionicons name={"hammer"} size={20} color={"black"} />
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            onPress={() => props.navigation.navigate('LikesList', {userId: item.creator, postId: item.id})} >
+                                            <Text style={styles.likeNumber}>{item.likesCount}</Text>
+                                        </TouchableOpacity>
                                     </View>
+                                    
+                                    :
+                                    
+                                    <View style={styles.likeContainer}>
+                                        <TouchableOpacity
+                                            onPress={() => {onLikePress(item.id); storeLike(item.id); sendNotificationForLike()}}> 
+                                            <Ionicons name={"hammer-outline"}  size={20} color={"grey"}/>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            onPress={() => props.navigation.navigate('LikesList', {userId: item.creator, postId: item.id})} >
+                                            <Text style={styles.likeNumber}>{item.likesCount}</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                    }
+                                    { item.faded == true ?
+                                    <View style={styles.likeContainer}>
+                                        <TouchableOpacity
+                                            onPress={() => {onUnfadePress(item.id); deleteFade(item.id)}} >
+                                            <Foundation name={"skull"} size={20} color={"black"} />
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            onPress={() => props.navigation.navigate('FadesList', {userId: item.creator, postId: item.id})} >
+                                            <Text style={styles.likeNumber}>{item.fadesCount}</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                    
+                                    :
+                                    
+                                    <View style={styles.likeContainer}>
+                                        <TouchableOpacity
+                                            onPress={() => {onFadePress(item.id); storeFade(item.id); sendNotificationForFade()}}> 
+                                            <Foundation name={"skull"}  size={20} color={"#B3B6B7"}/>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            onPress={() => props.navigation.navigate('FadesList', {userId: item.creator, postId: item.id})} >
+                                            <Text style={styles.likeNumber}>{item.fadesCount}</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                    }
                                     <TouchableOpacity
                                         style={styles.commentsContainer}
                                         onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.creator, posterId: item.creator, posterName: user.name, postCreation: item.creation, postCaption: item.caption, posterImg: user.userImg, postImg: item.downloadURL })}>
@@ -712,5 +952,7 @@ const mapStateToProps = (store) => ({
     currentUser: store.userState.currentUser,
     following: store.userState.following,
     blocking: store.userState.blocking,
+    liked: store.userState.liked,
+    faded: store.userState.faded,
 })
 export default connect(mapStateToProps, null)(Profile);
