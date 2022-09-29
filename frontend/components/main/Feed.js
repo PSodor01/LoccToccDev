@@ -22,8 +22,7 @@ import { bindActionCreators } from 'redux'
 import { fetchUsersData } from '../../redux/actions/index'
 
 import {AdMobBanner} from 'expo-ads-admob'
-import Constants from 'expo-constants'
-import game from './game';
+import * as Device from 'expo-device';
 
 
 function Feed(props) {
@@ -31,6 +30,7 @@ function Feed(props) {
     const [allPosts, setAllPosts] = useState([]);
     const [followCriteria, setFollowCriteria] = useState(false)
     const [currentUserFollowingCount, setCurrentUserFollowingCount] = useState('')
+    const [adMobLive, setAdMobLive] = useState();
     
 
      useEffect(() => {
@@ -41,7 +41,15 @@ function Feed(props) {
 
     }, [props.blocking, props.faded, props.liked, props.following, props.currentUser])
 
-    
+    useEffect(() => {
+
+        if (props.contestStatus.adMobLive == true) {
+            setAdMobLive(true)
+        } else {
+            setAdMobLive(false)
+        }
+
+    }, [props.contestStatus])
         
 
     const fetchData = () => {
@@ -306,9 +314,9 @@ function Feed(props) {
     };
 
     const testID = 'ca-app-pub-3940256099942544/2934735716';
-    const productionID = 'ca-app-pub-8519029912093094/5453808592';
+    const productionID = 'ca-app-pub-8519029912093094/6476007612';
     // Is a real device and running in production.
-    const adUnitID = Constants.isDevice && !__DEV__ ? productionID : testID;
+    const adUnitID = Device.isDevice && !__DEV__ ? productionID : testID;
 
     const openAdLink = () => {
 
@@ -406,7 +414,11 @@ function Feed(props) {
                             </View>
                             <View style={styles.postContentContainer}>
                                 {item.caption != null ? <Text style={styles.captionText}>{item.caption}</Text> : null}
-                                {item.downloadURL != "blank" ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
+                                {item.downloadURL != "blank" ?
+                                    <View style={styles.postPictureContainer}>
+                                        <Image resizeMode={"cover"} source={{uri: item.downloadURL}} style={styles.postImage}/> 
+                                    </View>
+                                 : null}
                                 {item.userTagList != null ? <Text style={{ color: '#0033cc', fontWeight: 'bold' }}>@{item.userTagList}</Text> : null}
                             </View>
                             <View style={styles.postFooterContainer}>
@@ -504,7 +516,11 @@ function Feed(props) {
                             </View>
                             <View style={styles.postContentContainer}>
                                 {item.caption != null ? <Text style={styles.captionText}>{item.caption}</Text> : null}
-                                {item.downloadURL != "blank" ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
+                                {item.downloadURL != "blank" ?
+                                    <View style={styles.postPictureContainer}>
+                                        <Image resizeMode={"cover"} source={{uri: item.downloadURL}} style={styles.postImage}/> 
+                                    </View>
+                                 : null}
                                 {item.userTagList != null ? <Text style={{ color: '#0033cc', fontWeight: 'bold' }}>@{item.userTagList}</Text> : null}
                             </View>
                             <View style={styles.postFooterContainer}>
@@ -586,12 +602,19 @@ function Feed(props) {
     const navigation = useNavigation();
 
     /* <View style={styles.adView}>
-                <AdMobBanner
-                    bannerSize="banner"
-                    adUnitID={adUnitID} 
-                    servePersonalizedAds // true or false
-                />
-            </View> */
+            <AdMobBanner
+                bannerSize="banner"
+                adUnitID={adUnitID} 
+                servePersonalizedAds // true or false
+            />
+        </View>
+        <TouchableOpacity style={styles.adView}
+            onPress={() => { Linking.openURL('https://bit.ly/3uAOAIh'); openAdLink()}} >
+            <Image 
+                style={{ width: "95%", height: 40 }}
+                source={require('../../assets/fantasyJocksBanner.jpg')}
+            />
+        </TouchableOpacity>*/
 
     return (
         <View style={styles.containerGallery}>
@@ -641,14 +664,18 @@ function Feed(props) {
 
             /> }
 
-            <TouchableOpacity style={styles.adView}
-                onPress={() => { Linking.openURL('https://bit.ly/3uAOAIh'); openAdLink()}} >
-                <Image 
-                    style={{ width: "95%", height: 40 }}
-                    source={require('../../assets/fantasyJocksBanner.jpg')}
+            
+            {adMobLive ?
+            <View style={styles.adView}>
+                <AdMobBanner
+                    bannerSize="banner"
+                    adUnitID={adUnitID} 
+                    servePersonalizedAds // true or false
                 />
-            </TouchableOpacity>
-    
+            </View> 
+            :
+            <View></View>
+            }
         </View>
             
 
@@ -686,13 +713,18 @@ const styles = StyleSheet.create({
         marginRight: "5%",
     },
     postContentContainer: {
-        flex: 1,
-        width: "85%",
-        marginLeft: "2%",
+        width: "95%",
+        marginLeft: "3%",
+    },
+    postPictureContainer: {
+        width: 250,
+        height: 200,
+        aspectRatio: 1 * 1.4
     },
     postImage: {
+        resizeMode: "contain",
         width: "100%",
-        height: 250,
+        height: "100%",
     },
     captionText: {
         paddingBottom: 5,
@@ -721,7 +753,7 @@ const styles = StyleSheet.create({
 
     },
     postRightContainer: {
-        width: "100%",
+        flex: 1,
     },
     likeContainer: {
         flexDirection: 'row',
@@ -781,6 +813,7 @@ const mapStateToProps = (store) => ({
     liked: store.userState.liked,
     faded: store.userState.faded,
     users: store.usersState.users,
+    contestStatus: store.userState.contestStatus,
 
 })
 

@@ -8,6 +8,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import * as Notifications from 'expo-notifications'
 import * as Permissions from 'expo-permissions'
 import Constants from 'expo-constants'
+import * as Device from 'expo-device';
 import * as Updates from 'expo-updates';
 
 import moment from 'moment'
@@ -48,23 +49,32 @@ function Odds(props) {
     const [trendingGames, setTrendingGames] = useState([]);
     const [notification, setNotification] = useState('');
     const [notificationCriteria, setNotificationCriteria] = useState(false);
-    const [bannerId, setBannerId] = useState('') //test id: 3940256099942544/2934735716
     const [isFirstLaunch, setIsFirstLaunch] = useState(null)
+    const [adMobLive, setAdMobLive] = useState();
     
     useEffect(() => {
-        setBannerId('ca-app-pub-8519029912093094/2973755922')
 
         Analytics.setUserId(firebase.auth().currentUser.uid);
         Analytics.logEvent('screen_view', { screen_name: 'Odds', user_name: props.currentUser.name });
 
         resetBadgeCount()
-
+        
     }, [])
+
+    useEffect(() => {
+
+        if (props.contestStatus.adMobLive == true) {
+            setAdMobLive(true)
+        } else {
+            setAdMobLive(false)
+        }
+
+    }, [props.contestStatus])
 
     useEffect(() => {
         AsyncStorage.getItem('alreadyLaunched').then(value => {
             if(value == null ) {
-                AsyncStorage.setItem('alreadyLaunched', 'true');
+                AsyncStorage.setItem('alreadyLaunched', 'true');    
                 setIsFirstLaunch(true)
                 Analytics.logEvent('firstLaunch', {user_name: props.currentUser.name});
 
@@ -82,15 +92,15 @@ function Odds(props) {
 
     useEffect(() => {
         fetchData()
-        if ( sport == 'NFL' || sport == 'NCAAF' || sport == 'EPL' || sport == 'UFC' || sport == 'PGA' || sport == 'Futures' || sport == 'Formula 1' ||sport == 'Trending') {
+        if ( sport == 'MLB' || sport == 'NCAAF' || sport == 'EPL' || sport == 'UFC' || sport == 'PGA' || sport == 'Futures' || sport == 'Formula 1' ||sport == 'Trending') {
 
         } 
         else {
-            setSportGames(props.mlbGames)
-            setSport('MLB')
+            setSportGames(props.nflGames)
+            setSport('NFL')
         }
 
-    }, [ props.nflGames, props.ncaafGames, props.eplGames, props.mlbGames, props.mmaGames, props.futureGames, props.formula1Teams, props.formula1Races, props.formula1Drivers, props.formula1Rankings ])
+    }, [ props.nflGames, props.ncaafGames, props.mlbGames, props.mmaGames, props.futureGames, props.formula1Teams, props.formula1Races, props.formula1Drivers, props.formula1Rankings ])
 
    useEffect(() => {
 
@@ -130,8 +140,8 @@ function Odds(props) {
 
     const fetchData = () => {
 
-        function trendingFunction(mlbGames, nflGames, ncaafGames, mmaGames) {
-            let trendingGames = mlbGames.concat(nflGames, ncaafGames, mmaGames)
+        function trendingFunction(nflGames, mlbGames, ncaafGames, mmaGames) {
+            let trendingGames = nflGames.concat(ncaafGames, mlbGames, mmaGames)
             setTrendingGames(trendingGames)
         }
 
@@ -215,25 +225,6 @@ function Odds(props) {
         }
         setmmaGames(props.mmaGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))
 
-        for (let i = 0; i < props.eplGames.length; i++) {
-
-            firebase.firestore()
-            .collection("votes")
-            .doc(props.eplGames[i].gameId)
-            .collection("gameVotes")
-            .doc("info")
-            .get()
-            .then((snapshot) => {
-                if (snapshot.exists) {
-                    let gameMiscData = snapshot.data();
-                    props.eplGames[i].gamePostsCount = gameMiscData.gamePostsCount
-                }
-                else {
-                    props.eplGames[i].gamePostsCount = 0
-                }
-            })
-        }
-        seteplGames(props.eplGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))
 
         setFutureGames(props.futureGames)
         setFormula1Teams(props.formula1Teams)
@@ -435,19 +426,19 @@ function Odds(props) {
             icon: trendingIcon
         },
         {
-            sport: 'MLB',
-            id: '2',
-            icon: mlbIcon
-        },
-        {
             sport: 'NFL',
-            id: '3',
+            id: '2',
             icon: nflIcon
         },
         {
             sport: 'NCAAF',
-            id: '4',
+            id: '3',
             icon: ncaafIcon
+        },
+        {
+            sport: 'MLB',
+            id: '4',
+            icon: mlbIcon
         },
         {
             sport: 'Formula 1',
@@ -455,18 +446,13 @@ function Odds(props) {
             icon: formula1Icon
         },
         {
-            sport: 'EPL',
-            id: '6',
-            icon: eplIcon
-        },
-        {
             sport: 'UFC',
-            id: '7',
+            id: '6',
             icon: mmaIcon
         },
         {
             sport: 'Futures',
-            id: '8',
+            id: '7',
             icon: futureIcon
         },
       ];
@@ -500,8 +486,9 @@ function Odds(props) {
       ];
 
     const testID = 'ca-app-pub-3940256099942544/2934735716';
+    const productionID = 'ca-app-pub-8519029912093094/5201658236';
     // Is a real device and running in production.
-    const adUnitID = Constants.isDevice && !__DEV__ ? bannerId : testID;
+    const adUnitID = Device.isDevice && !__DEV__ ? productionID : testID;
 
     const openAdLink = () => {
 
@@ -815,12 +802,19 @@ function Odds(props) {
     }
 
     /* <View style={styles.adView}>
-                <AdMobBanner
-                    bannerSize="banner"
-                    adUnitID={adUnitID} 
-                    servePersonalizedAds // true or false
-                />
-            </View> */
+            <AdMobBanner
+                bannerSize="banner"
+                adUnitID={adUnitID} 
+                servePersonalizedAds // true or false
+            />
+        </View> 
+        <TouchableOpacity style={styles.adView}
+            onPress={() => { Linking.openURL('https://www.snackmagic.com/?grsf=613qvn'); openAdLink()}} >
+            <Image 
+                style={{ width: "95%", height: 40 }}
+                source={require('../../assets/snackMagicBanner.jpg')}
+            />
+        </TouchableOpacity>*/
 
     return (
         <View style={styles.container}>
@@ -964,6 +958,14 @@ function Odds(props) {
                         </View>
                         <View style={styles.detailsView}>
                             <Text style={styles.detailsText}>{props.formula1Races.raceName}</Text>
+                        </View>
+                    </View>
+                    <View style={styles.teamContainer} >
+                        <View style={styles.headerView}>
+                            <Text style={styles.detailsHeader}>Date</Text>
+                        </View>
+                        <View style={styles.detailsView}>
+                            <Text style={styles.detailsText}>{moment(props.formula1Races.gameDate).format('MMMM Do, h:mma')}</Text>
                         </View>
                     </View>
                     <View style={styles.teamContainer} >
@@ -1206,13 +1208,19 @@ function Odds(props) {
 
             
             }
-            <TouchableOpacity style={styles.adView}
-                onPress={() => { Linking.openURL('https://www.snackmagic.com/?grsf=613qvn'); openAdLink()}} >
-                <Image 
-                    style={{ width: "95%", height: 40 }}
-                    source={require('../../assets/snackMagicBanner.jpg')}
+            {adMobLive ?
+            <View style={styles.adView}>
+                <AdMobBanner
+                    bannerSize="banner"
+                    adUnitID={adUnitID} 
+                    servePersonalizedAds // true or false
                 />
-            </TouchableOpacity>
+            </View> 
+            :
+            <View></View>
+            }
+            
+            
         </View>
     );
     
@@ -1571,7 +1579,6 @@ const styles = StyleSheet.create({
 const mapStateToProps = (store) => ({
     ncaafGames: store.ncaafGamesState.ncaafGames,
     mlbGames: store.mlbGamesState.mlbGames,
-    eplGames: store.eplGamesState.eplGames,
     ncaabGames: store.ncaabGamesState.ncaabGames,
     nflGames: store.nflGamesState.nflGames,
     mmaGames: store.mmaGamesState.mmaGames,
@@ -1582,6 +1589,7 @@ const mapStateToProps = (store) => ({
     formula1Rankings: store.formula1RankingsState.formula1Rankings,
     allUsers: store.userState.allUsers,
     currentUser: store.userState.currentUser,
+    contestStatus: store.userState.contestStatus,
 
 
 })

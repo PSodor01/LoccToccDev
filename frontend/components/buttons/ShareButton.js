@@ -10,12 +10,21 @@
     
     const ShareButton = () => {
         const viewRef = useRef();
-        const shareDummyImage = async () => {
+        const shareFunction = async () => {
             try {
                 const uri = await captureRef(viewRef, {
                     format: 'png',
                     quality: 0.7
                 });
+                if(showInstagramStory){
+                    await Share.shareSingle({
+                        stickerImage: uri,
+                        method: Share.InstagramStories.SHARE_STICKER_IMAGE,
+                        social: Share.Social.INSTAGRAM_STORIES,
+                        backgroundBottomColor: '#FF0000',
+                        backgroundTopCOlor: '#FF0000',
+                    })
+                }
                 await Share.share({ url: uri });
             } catch(err) { 
                 console.error(err);

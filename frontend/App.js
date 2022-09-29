@@ -44,6 +44,7 @@ import LoginScreen from './components/auth/Login'
 import ResetPasswordScreen from './components/auth/ResetPassword'
 import MainScreen from './components/Main'
 import CommentScreen from './components/main/Comment'
+import SocialShare from './components/main/SocialShare'
 import NewPostScreen from './components/main/NewPost'
 import NewCommentScreen from './components/main/NewComment'
 import EditProfileScreen from './components/main/EditProfile'
@@ -160,6 +161,23 @@ const MainStackScreen = ({navigation, props}) => (
             <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
                 <Text style={styles.headerName}>locctocc </Text>
                 <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
+            </View>
+          ),
+          headerLeft: () => (
+            <TouchableOpacity 
+            style={{ alignItems: "flex-end", marginLeft:16 }}
+            onPress={() => navigation.goBack()}
+            >
+            <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+          </TouchableOpacity>
+          ),
+          
+        }}
+      />
+      <MainStack.Screen name="SocialShare" component={SocialShare} 
+        options={{
+          headerTitle: () => (
+            <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
             </View>
           ),
           headerLeft: () => (

@@ -168,6 +168,15 @@ function Comment(props, route) {
                 <View style={styles.postRightContainer}>
                     <View style={styles.postHeaderContainer}>
                         <Text style={styles.profileNameFeedText}>{posterName}</Text>
+                        {hidePost == false ?
+                            <TouchableOpacity onPress={() => {expandComments()}} >
+                                <FontAwesome5 name={"chevron-up"} size={20} color={"#33A8FF"} marginRight={10} />
+                            </TouchableOpacity>
+                        :
+                            <TouchableOpacity onPress={() => {expandComments()}} >
+                                <FontAwesome5 name={"chevron-down"} size={20} color={"#33A8FF"} marginRight={10} />
+                            </TouchableOpacity>
+                        }
                         <Text style={styles.postTimeContainer}>{moment(postCreation.toDate()).fromNow()}</Text>
                     </View>
                     {hidePost == false ?
@@ -181,15 +190,7 @@ function Comment(props, route) {
                     
                     <View style={styles.postButtonContainer}>
                         <View style={styles.commentButtons}>
-                        {hidePost == false ?
-                            <TouchableOpacity onPress={() => {expandComments()}} >
-                                <FontAwesome5 name={"chevron-up"} size={20} color={"#33A8FF"} marginRight={10} />
-                            </TouchableOpacity>
-                        :
-                            <TouchableOpacity onPress={() => {expandComments()}} >
-                                <FontAwesome5 name={"chevron-down"} size={20} color={"#33A8FF"} marginRight={10} />
-                            </TouchableOpacity>
-                        }
+                        
                             
                             <Text>    </Text>
                             <TouchableOpacity onPress={() => navigation.navigate("NewComment", { posterName: posterName, postId: postId, uid: props.route.params.uid, awayTeam: awayTeam, homeTeam: homeTeam })} style={styles.postButton}>

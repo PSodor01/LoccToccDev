@@ -1,5 +1,5 @@
 import React, { Component, useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Alert, ActivityIndicator, Linking, FlatList, TouchableOpacity, Image } from 'react-native';
+import { Text, View, StyleSheet, Alert, ActivityIndicator, Linking, FlatList, TouchableOpacity, Image, Platform} from 'react-native';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -9,7 +9,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import moment from 'moment'
 
 import { AdMobBanner } from 'expo-ads-admob'
-import Constants from 'expo-constants'
+import * as Device from 'expo-device';
 
 import { useNavigation } from '@react-navigation/native';
 
@@ -34,13 +34,14 @@ function game(props) {
     const [loading, setLoading] = useState(true);
     const [sortCriteria, setSortCriteria] = useState(true);
     const [listAllPlayers, setListAllPlayers] = useState(false);
-    const [shareId, setShareId] = useState('')
     const [awayVote, setAwayVote] = useState("");
     const [homeVote, setHomeVote] = useState("");
     const [drawVote, setDrawVote] = useState("");
     const [golfGames, setGolfGames] = useState([]);
     const [futureGames, setFutureGames] = useState([]);
     const [formula1Races, setFormula1Races] = useState([]);
+    const [adMobLive, setAdMobLive] = useState();
+
 
     const {gameId, gameDate, homeTeam, awayTeam, homeMoneyline, awayMoneyline, homeSpread, awaySpread, homeSpreadOdds, awaySpreadOdds, over, overOdds, under, underOdds, drawMoneyline, sport} = props.route.params;
 
@@ -55,6 +56,18 @@ function game(props) {
         setFutureGames(props.futureGames)
         setFormula1Races(props.formula1Races)
     }, [])
+
+    useEffect(() => {
+
+        if (props.contestStatus.adMobLive == true) {
+            setAdMobLive(true)
+        } else {
+            setAdMobLive(false)
+        }
+
+    }, [props.contestStatus])
+        
+    
 
     const fetchData = () => {
         function matchUserToGamePost(gamePosts) {
@@ -507,9 +520,9 @@ function game(props) {
     }
 
     const testID = 'ca-app-pub-3940256099942544/2934735716';
-    const productionID = 'ca-app-pub-8519029912093094/5150749785';
+    const productionID = 'ca-app-pub-8519029912093094/8554579884';
     // Is a real device and running in production.
-    const adUnitID = Constants.isDevice && !__DEV__ ? productionID : testID;
+    const adUnitID = Device.isDevice && !__DEV__ ? productionID : testID;
 
     const openAdLink = () => {
 
@@ -576,27 +589,7 @@ function game(props) {
         }
     }
 
-    const shareFunction = (postId) => {
-            setShareId(postId)
-            //let shareGamePost = gamePosts.filter(sharePost => sharePost.id == shareId);
-
-            var shareGamePost = [];
-            console.log(postId)
-
-            if ("XQhF2iqR3IiPtaPsCtKh" == postId) {
-                console.log("yes")
-            } else {
-                console.log("no")
-            }
-
-            for (var i = 0; i < gamePosts.length ; i++) {
-                if (gamePosts[i].id == shareId) {
-                    shareGamePost.push(gamePosts[i]);
-                }
-            }
-
-            setGamePosts(shareGamePost)
-    }
+    
     
     const renderItem = ({item}) => {
         return (
@@ -624,7 +617,11 @@ function game(props) {
                     </View>
                     <View style={styles.postContentContainer}>
                         {item.caption != null ? <Text style={styles.captionText}>{item.caption}</Text> : null}
-                        {item.downloadURL != "blank" ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
+                        {item.downloadURL != "blank" ?
+                                    <View style={styles.postPictureContainer}>
+                                        <Image resizeMode={"cover"} source={{uri: item.downloadURL}} style={styles.postImage}/> 
+                                    </View>
+                                 : null}
                         {item.userTagList != null ? <Text style={{ color: '#0033cc', fontWeight: 'bold' }}>@{item.userTagList}</Text> : null}
                     </View>
                     <View style={styles.postFooterContainer}>
@@ -685,6 +682,13 @@ function game(props) {
                             <Text style={styles.likeNumber}>{item.comments}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
+                            style={styles.commentsContainer}
+                            onPress={() => props.navigation.navigate('SocialShare', {gameId: gameId, gameDate: gameDate, homeTeam: homeTeam, awayTeam: awayTeam, homeSpread: homeSpread, awaySpread: awaySpread, homeSpreadOdds: homeSpreadOdds, awaySpreadOdds: awaySpreadOdds, awayMoneyline: awayMoneyline, homeMoneyline: homeMoneyline, over: over, overOdds: overOdds, under: under, underOdds: underOdds, sport: sport,
+                                posterName: item.user.name, postCreation: item.creation, postCaption: item.caption, posterImg: item.user.userImg, postImg: item.downloadURL, userTagList: item.userTagList, likesCount: item.likesCount, fadesCount: item.fadesCount, comment: item.comments
+                                })}>
+                            <Ionicons name={"share-outline"} size={20} color={"grey"} marginRight={10} />
+                        </TouchableOpacity>
+                        <TouchableOpacity
                             style={styles.flagContainer}
                             onPress={() => reportPostHandler({name: item.user.name, caption: item.caption})}>
                             <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
@@ -702,12 +706,19 @@ function game(props) {
     const navigation = useNavigation();
 
     /* <View style={styles.adView}>
-                <AdMobBanner
-                    bannerSize="banner"
-                    adUnitID={adUnitID} 
-                    servePersonalizedAds // true or false
-                />
-            </View> */
+            <AdMobBanner
+                bannerSize="banner"
+                adUnitID={adUnitID} 
+                servePersonalizedAds // true or false
+            />
+        </View> 
+        <TouchableOpacity style={styles.adView}
+            onPress={() => { Linking.openURL('https://bit.ly/3uAOAIh'); openAdLink()}} >
+            <Image 
+                style={{ width: "95%", height: 40}}
+                source={require('../../assets/fantasyJocksBanner.jpg')}
+            />
+        </TouchableOpacity>*/
     
     return (
         <View style={styles.container}>
@@ -1059,10 +1070,6 @@ function game(props) {
                         </View>
                     </View>
                     }
-                    
-                    
-                    
-                    
                 </View>                    
             </View> 
             <View style={styles.sortContainer}>
@@ -1097,13 +1104,18 @@ function game(props) {
             />
             }
 
-            <TouchableOpacity style={styles.adView}
-                onPress={() => { Linking.openURL('https://bit.ly/3uAOAIh'); openAdLink()}} >
-                <Image 
-                    style={{ width: "95%", height: 40}}
-                    source={require('../../assets/fantasyJocksBanner.jpg')}
+            
+            {adMobLive ?
+            <View style={styles.adView}>
+                <AdMobBanner
+                    bannerSize="banner"
+                    adUnitID={adUnitID} 
+                    servePersonalizedAds // true or false
                 />
-            </TouchableOpacity>
+            </View> 
+            :
+            <View></View>
+            }
 
             <TouchableOpacity
                 activeOpacity={0.8}
@@ -1223,9 +1235,15 @@ const styles = StyleSheet.create({
         borderBottomColor: "#e1e2e6",
         flexDirection: 'row',
     },
+    postPictureContainer: {
+        width: 250,
+        height: 200,
+        aspectRatio: 1 * 1.4
+    },
     postImage: {
+        resizeMode: "contain",
         width: "100%",
-        height: 250,
+        height: "100%",
     },
     captionText: {
         paddingBottom: 5,
@@ -1412,6 +1430,7 @@ const mapStateToProps = (store) => ({
     usersFollowingLoaded: store.usersState.usersFollowingLoaded,
     futureGames: store.futureGamesState.futureGames,
     formula1Races: store.formula1RacesState.formula1Races,
+    contestStatus: store.userState.contestStatus,
 })
 const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUsersData }, dispatch);
 
