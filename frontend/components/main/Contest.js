@@ -6,7 +6,6 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import Animated from 'react-native-reanimated';
 import BottomSheet from 'reanimated-bottom-sheet';
 
-import {AdMobBanner, AdMobInterstitial} from 'expo-ads-admob'
 import Constants from 'expo-constants'
 
 import Leaderboard from 'react-native-leaderboard';

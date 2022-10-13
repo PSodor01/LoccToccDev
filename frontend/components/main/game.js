@@ -8,7 +8,6 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import moment from 'moment'
 
-import { AdMobBanner } from 'expo-ads-admob'
 import * as Device from 'expo-device';
 
 import { useNavigation } from '@react-navigation/native';
@@ -618,10 +617,10 @@ function game(props) {
                     <View style={styles.postContentContainer}>
                         {item.caption != null ? <Text style={styles.captionText}>{item.caption}</Text> : null}
                         {item.downloadURL != "blank" ?
-                                    <View style={styles.postPictureContainer}>
-                                        <Image resizeMode={"cover"} source={{uri: item.downloadURL}} style={styles.postImage}/> 
-                                    </View>
-                                 : null}
+                            <View style={styles.postPictureContainer}>
+                                <Image resizeMode={"cover"} source={{uri: item.downloadURL}} style={styles.postImage}/> 
+                            </View>
+                            : null}
                         {item.userTagList != null ? <Text style={{ color: '#0033cc', fontWeight: 'bold' }}>@{item.userTagList}</Text> : null}
                     </View>
                     <View style={styles.postFooterContainer}>
@@ -1107,11 +1106,7 @@ function game(props) {
             
             {adMobLive ?
             <View style={styles.adView}>
-                <AdMobBanner
-                    bannerSize="banner"
-                    adUnitID={adUnitID} 
-                    servePersonalizedAds // true or false
-                />
+              
             </View> 
             :
             <View></View>

@@ -9,7 +9,6 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 
 import moment from 'moment';
 
-import {AdMobBanner} from 'expo-ads-admob'
 import Constants from 'expo-constants'
 
 import ShareButton from '../buttons/ShareButton'

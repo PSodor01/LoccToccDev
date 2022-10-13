@@ -21,7 +21,6 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { fetchUsersData } from '../../redux/actions/index'
 
-import {AdMobBanner} from 'expo-ads-admob'
 import * as Device from 'expo-device';
 
 
@@ -667,11 +666,7 @@ function Feed(props) {
             
             {adMobLive ?
             <View style={styles.adView}>
-                <AdMobBanner
-                    bannerSize="banner"
-                    adUnitID={adUnitID} 
-                    servePersonalizedAds // true or false
-                />
+               
             </View> 
             :
             <View></View>

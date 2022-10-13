@@ -13,7 +13,6 @@ import * as Updates from 'expo-updates';
 
 import moment from 'moment'
 
-import {AdMobBanner} from 'expo-ads-admob'
 import * as Analytics from 'expo-firebase-analytics';
 import * as StoreReview from 'expo-store-review';
 
@@ -33,6 +32,7 @@ function Odds(props) {
     const [mmaGames, setmmaGames] = useState([]);
     const [ncaafGames, setncaafGames] = useState([]);
     const [nbaGames, setnbaGames] = useState([]);
+    const [nhlGames, setnhlGames] = useState([]);
     const [mlbGames, setmlbGames] = useState([]);
     const [eplGames, seteplGames] = useState([]);
     const [golfGames, setGolfGames] = useState([]);
@@ -92,7 +92,7 @@ function Odds(props) {
 
     useEffect(() => {
         fetchData()
-        if ( sport == 'MLB' || sport == 'NCAAF' || sport == 'EPL' || sport == 'UFC' || sport == 'PGA' || sport == 'Futures' || sport == 'Formula 1' ||sport == 'Trending') {
+        if ( sport == 'MLB' || sport == 'NBA' || sport == 'NHL' || sport == 'NCAAF' || sport == 'EPL' || sport == 'UFC' || sport == 'PGA' || sport == 'Futures' || sport == 'Formula 1' ||sport == 'Trending') {
 
         } 
         else {
@@ -100,7 +100,7 @@ function Odds(props) {
             setSport('NFL')
         }
 
-    }, [ props.nflGames, props.ncaafGames, props.mlbGames, props.mmaGames, props.futureGames, props.formula1Teams, props.formula1Races, props.formula1Drivers, props.formula1Rankings ])
+    }, [ props.nflGames, props.ncaafGames, props.mlbGames, props.nbaGames, props.nhlGames, props.mmaGames, props.futureGames, props.formula1Teams, props.formula1Races, props.formula1Drivers, props.formula1Rankings ])
 
    useEffect(() => {
 
@@ -140,8 +140,8 @@ function Odds(props) {
 
     const fetchData = () => {
 
-        function trendingFunction(nflGames, mlbGames, ncaafGames, mmaGames) {
-            let trendingGames = nflGames.concat(ncaafGames, mlbGames, mmaGames)
+        function trendingFunction(nflGames, mlbGames, ncaafGames, nbaGames, nhlGames, mmaGames) {
+            let trendingGames = nflGames.concat(ncaafGames, mlbGames, nbaGames, nhlGames, mmaGames)
             setTrendingGames(trendingGames)
         }
 
@@ -184,6 +184,46 @@ function Odds(props) {
             })
         }
         setnflGames(props.nflGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))
+
+        for (let i = 0; i < props.nbaGames.length; i++) {
+
+            firebase.firestore()
+            .collection("votes")
+            .doc(props.nbaGames[i].gameId)
+            .collection("gameVotes")
+            .doc("info")
+            .get()
+            .then((snapshot) => {
+                if (snapshot.exists) {
+                    let gameMiscData = snapshot.data();
+                    props.nbaGames[i].gamePostsCount = gameMiscData.gamePostsCount
+                }
+                else {
+                    props.nbaGames[i].gamePostsCount = 0
+                }
+            })
+        }
+        setnbaGames(props.nbaGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))
+
+        for (let i = 0; i < props.nhlGames.length; i++) {
+
+            firebase.firestore()
+            .collection("votes")
+            .doc(props.nhlGames[i].gameId)
+            .collection("gameVotes")
+            .doc("info")
+            .get()
+            .then((snapshot) => {
+                if (snapshot.exists) {
+                    let gameMiscData = snapshot.data();
+                    props.nhlGames[i].gamePostsCount = gameMiscData.gamePostsCount
+                }
+                else {
+                    props.nhlGames[i].gamePostsCount = 0
+                }
+            })
+        }
+        setnhlGames(props.nhlGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))
 
         for (let i = 0; i < props.ncaafGames.length; i++) {
 
@@ -233,7 +273,7 @@ function Odds(props) {
         setFormula1Rankings(props.formula1Rankings)
         if (props.formula1Rankings.length > 2 ) {setFormula1RaceLive(true)}
 
-        trendingFunction(mlbGames, nflGames, ncaafGames, mmaGames)
+        trendingFunction(mlbGames, nflGames, ncaafGames, nbaGames, nhlGames, mmaGames)
         setLoading(false)
 
     }
@@ -317,7 +357,7 @@ function Odds(props) {
             to: token,
             sound: 'default',
             title: 'locctocc',
-            body: notification ? notification : 'Empty Notification',
+            body: notification ? notification : '',
             badge: 1,
         };
         
@@ -361,6 +401,8 @@ function Odds(props) {
             if (sport == 'NCAAF') {setSportGames(props.ncaafGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))} 
             if (sport == 'NFL') {setSportGames(props.nflGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))} 
             if (sport == 'MLB') {setSportGames(props.mlbGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))}
+            if (sport == 'NBA') {setSportGames(props.nbaGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))}
+            if (sport == 'NHL') {setSportGames(props.nhlGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))}
             if (sport == 'MMA') {setSportGames(props.mmaGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))} 
             if (sport == 'EPL') {setSportGames(props.eplGames)}
             if (sport == 'PGA') {setSportGames(props.golfGames)}
@@ -378,8 +420,7 @@ function Odds(props) {
             setBrowse(false)
         } else {
             setBrowse(true)
-            Analytics.logEvent('searchGames', {user_name: props.currentUser.name
-            });
+            Analytics.logEvent('searchGames', {user_name: props.currentUser.name});
         }
     }
 
@@ -441,18 +482,28 @@ function Odds(props) {
             icon: mlbIcon
         },
         {
-            sport: 'Formula 1',
+            sport: 'NBA',
             id: '5',
+            icon: nbaIcon
+        },
+        {
+            sport: 'NHL',
+            id: '6',
+            icon: nhlIcon
+        },
+        {
+            sport: 'Formula 1',
+            id: '7',
             icon: formula1Icon
         },
         {
             sport: 'UFC',
-            id: '6',
+            id: '8',
             icon: mmaIcon
         },
         {
             sport: 'Futures',
-            id: '7',
+            id: '9',
             icon: futureIcon
         },
       ];
@@ -1210,11 +1261,7 @@ function Odds(props) {
             }
             {adMobLive ?
             <View style={styles.adView}>
-                <AdMobBanner
-                    bannerSize="banner"
-                    adUnitID={adUnitID} 
-                    servePersonalizedAds // true or false
-                />
+               
             </View> 
             :
             <View></View>
@@ -1581,6 +1628,8 @@ const mapStateToProps = (store) => ({
     mlbGames: store.mlbGamesState.mlbGames,
     ncaabGames: store.ncaabGamesState.ncaabGames,
     nflGames: store.nflGamesState.nflGames,
+    nbaGames: store.nbaGamesState.nbaGames,
+    nhlGames: store.nhlGamesState.nhlGames,
     mmaGames: store.mmaGamesState.mmaGames,
     futureGames: store.futureGamesState.futureGames,
     formula1Teams: store.formula1TeamsState.formula1Teams,

@@ -7,7 +7,6 @@ import * as Analytics from 'expo-firebase-analytics';
 
 import moment from 'moment';
 
-import {AdMobBanner} from 'expo-ads-admob'
 import Constants from 'expo-constants'
 
 require("firebase/firestore")

@@ -51,6 +51,15 @@
           "measurementId": "G-4YXWQRXEF1"
         }
       }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "cfaff4e2-7ba8-4d48-868c-73fdebb6521e"
+      }
     }
+  },
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-8519029912093094~3459984543",
+    "ios_app_id": "ca-app-pub-8519029912093094~3459984543"
   }
 }

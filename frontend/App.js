@@ -49,7 +49,7 @@ import NewPostScreen from './components/main/NewPost'
 import NewCommentScreen from './components/main/NewComment'
 import EditProfileScreen from './components/main/EditProfile'
 import Feed from './components/main/Feed'
-import Research from './components/main/Research'
+import merch from './components/main/Merch'
 import Search from './components/main/Search'
 import Contest from './components/main/Contest'
 import Profile from './components/main/Profile'
@@ -68,6 +68,7 @@ import game from './components/main/game'
 import TeamDetails from './components/main/TeamDetails'
 import Standings from './components/main/Standings'
 import MessagesButton from './components/buttons/MessagesButton'
+import Merch from './components/main/Merch';
 
 
 const Stack = createStackNavigator();
@@ -136,7 +137,7 @@ const MainStackScreen = ({navigation, props}) => (
           />
       <MainStack.Screen name="Search" component={Search}/>
       <MainStack.Screen name="Contest" component={Contest}/>
-      <MainStack.Screen name="Research" component={Research}/>
+      <MainStack.Screen name="Merch" component={Merch}/>
       <MainStack.Screen name="Profile" component={Profile}
         options={{
           headerTitle: () => (
