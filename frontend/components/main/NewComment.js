@@ -495,6 +495,7 @@ function NewCommentScreen(props, route) {
                     />  
                     <TextInput
                       placeholder="Type your comment here..."
+                      placeholderTextColor= "navy"
                       style={styles.postTextInput}
                       numberOfLines={4}
                       multiline={true}

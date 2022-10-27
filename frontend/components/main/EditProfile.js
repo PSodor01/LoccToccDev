@@ -277,7 +277,7 @@ function EditProfileScreen(props) {
                     <FontAwesome name="user-o" size={20} />
                     <TextInput 
                         placeholder="Name"
-                        placeholderTextColor="#666666"
+                        placeholderTextColor= "navy"
                         autoCorrect={false}
                         value={userData ? userData.name : ''}
                         onChangeText={(txt) => setUserData({...userData, name: txt})}
@@ -288,7 +288,7 @@ function EditProfileScreen(props) {
                     <FontAwesome name="envelope-o" size={20} />
                     <TextInput 
                         placeholder="Email"
-                        placeholderTextColor="#666666"
+                        placeholderTextColor= "navy"
                         keyboardType='email-address'
                         autoCorrect={false}
                         value={userData ? userData.email : ''}
@@ -300,7 +300,7 @@ function EditProfileScreen(props) {
                     <FontAwesome name="user-o" size={20} />
                     <TextInput 
                         placeholder="About Me"
-                        placeholderTextColor="#666666"
+                        placeholderTextColor= "navy"
                         value={userData ? userData.aboutMe : ''}
                         onChangeText={(txt) => setUserData({...userData, aboutMe: txt})}
                         style={styles.textInput}
@@ -310,7 +310,7 @@ function EditProfileScreen(props) {
                     <FontAwesome name="globe" size={20} />
                     <TextInput 
                         placeholder="Location"
-                        placeholderTextColor="#666666"
+                        placeholderTextColor= "navy"
                         value={userData ? userData.location : ''}
                         onChangeText={(txt) => setUserData({...userData, location: txt})}
                         style={styles.textInput}

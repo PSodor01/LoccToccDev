@@ -73,8 +73,8 @@ exports.getMLBGameData = functions.pubsub.schedule('every 2 minutes').onRun(asyn
     .then(result => {
       result.data.forEach(game => {
 
-        if (game.bookmakers.findIndex((item) => item.key === 'fanduel') > -1) {
-          let i = game.bookmakers.findIndex((item) => item.key === 'fanduel')
+        if (game.bookmakers.findIndex((item) => item.key === 'draftkings') > -1) {
+          let i = game.bookmakers.findIndex((item) => item.key === 'draftkings')
           if (game.away_team == game.bookmakers[0].markets[0].outcomes[0].name) {
 
             const writeResult = admin
@@ -177,56 +177,62 @@ exports.getNFLGameData = functions.pubsub.schedule('every 2 minutes').onRun(asyn
       .then(result => {
         result.data.forEach(game => {
 
-          if (game.away_team == game.bookmakers[0].markets[0].outcomes[0].name) {
-
-            const writeResult = admin
-            .firestore()
-            .collection("nfl")
-            .doc(game.id)
-            .set({
-              gameId: game.id,
-              sport: game.sport_key,
-              gameDate: game.commence_time,
-              awayTeam: game.away_team,
-              homeTeam: game.home_team,
-              awayMoneyline: game.bookmakers[0].markets[0].outcomes[0].price,
-              homeMoneyline: game.bookmakers[0].markets[0].outcomes[1].price,
-              awaySpread: game.bookmakers[0].markets[1].outcomes[0].point,
-              homeSpread: game.bookmakers[0].markets[1].outcomes[1].point,
-              awaySpreadOdds: game.bookmakers[0].markets[1].outcomes[0].price,
-              homeSpreadOdds: game.bookmakers[0].markets[1].outcomes[1].price,
-              over: game.bookmakers[0].markets[2].outcomes[0].point,
-              under: game.bookmakers[0].markets[2].outcomes[1].point,
-              overOdds: game.bookmakers[0].markets[2].outcomes[0].price,
-              underOdds: game.bookmakers[0].markets[2].outcomes[1].price,
-          }, { merge:true });
-
+          if (game.bookmakers.findIndex((item) => item.key === 'draftkings') > -1) {
+            let i = game.bookmakers.findIndex((item) => item.key === 'draftkings')
+            if (game.away_team == game.bookmakers[0].markets[0].outcomes[0].name) {
+  
+              const writeResult = admin
+              .firestore()
+              .collection("nfl")
+              .doc(game.id)
+              .set({
+                gameId: game.id,
+                sport: game.sport_key,
+                gameDate: game.commence_time,
+                awayTeam: game.away_team,
+                homeTeam: game.home_team,
+                sportsbook: game.bookmakers[i].key,
+                awayMoneyline: game.bookmakers[i].markets[0].outcomes[0].price,
+                homeMoneyline: game.bookmakers[i].markets[0].outcomes[1].price, 
+                awaySpread: game.bookmakers[i].markets[1].outcomes[0].point,
+                homeSpread: game.bookmakers[i].markets[1].outcomes[1].point,
+                awaySpreadOdds: game.bookmakers[i].markets[1].outcomes[0].price,
+                homeSpreadOdds: game.bookmakers[i].markets[1].outcomes[1].price,
+                over: game.bookmakers[i].markets[2].outcomes[0].point,
+                under: game.bookmakers[i].markets[2].outcomes[1].point,
+                overOdds: game.bookmakers[i].markets[2].outcomes[0].price,
+                underOdds: game.bookmakers[i].markets[2].outcomes[1].price,
+            }, { merge:true });
+  
+            } else {
+              const writeResult = admin
+              .firestore()
+              .collection("nfl")
+              .doc(game.id)
+              .set({
+                gameId: game.id,
+                sport: game.sport_key,
+                gameDate: game.commence_time,
+                awayTeam: game.away_team,
+                homeTeam: game.home_team,
+                sportsbook: game.bookmakers[i].key,
+                awayMoneyline: game.bookmakers[i].markets[0].outcomes[1].price,
+                homeMoneyline: game.bookmakers[i].markets[0].outcomes[0].price,
+                awaySpread: game.bookmakers[i].markets[1].outcomes[1].point,
+                homeSpread: game.bookmakers[i].markets[1].outcomes[0].point,
+                awaySpreadOdds: game.bookmakers[i].markets[1].outcomes[1].price,
+                homeSpreadOdds: game.bookmakers[i].markets[1].outcomes[0].price,
+                over: game.bookmakers[i].markets[2].outcomes[0].point,
+                under: game.bookmakers[i].markets[2].outcomes[1].point,
+                overOdds: game.bookmakers[i].markets[2].outcomes[0].price,
+                underOdds: game.bookmakers[i].markets[2].outcomes[1].price,
+            }, { merge:true });
+  
+            }
           } else {
-            const writeResult = admin
-            .firestore()
-            .collection("nfl")
-            .doc(game.id)
-            .set({
-              gameId: game.id,
-              sport: game.sport_key,
-              gameDate: game.commence_time,
-              awayTeam: game.away_team,
-              homeTeam: game.home_team,
-              awayMoneyline: game.bookmakers[0].markets[0].outcomes[1].price,
-              homeMoneyline: game.bookmakers[0].markets[0].outcomes[0].price,
-              awaySpread: game.bookmakers[0].markets[1].outcomes[1].point,
-              homeSpread: game.bookmakers[0].markets[1].outcomes[0].point,
-              awaySpreadOdds: game.bookmakers[0].markets[1].outcomes[1].price,
-              homeSpreadOdds: game.bookmakers[0].markets[1].outcomes[0].price,
-              over: game.bookmakers[0].markets[2].outcomes[0].point,
-              under: game.bookmakers[0].markets[2].outcomes[1].point,
-              overOdds: game.bookmakers[0].markets[2].outcomes[0].price,
-              underOdds: game.bookmakers[0].markets[2].outcomes[1].price,
-          }, { merge:true });
-
+            return
+  
           }
-
-          
         })
       })
   }catch(err) {console.error(err.message)}
@@ -277,8 +283,8 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
       .then(result => {
         result.data.forEach(game => {
 
-          if (game.bookmakers.findIndex((item) => item.key === 'fanduel') > -1) {
-            let i = game.bookmakers.findIndex((item) => item.key === 'fanduel')
+          if (game.bookmakers.findIndex((item) => item.key === 'williamhill_us') > -1) {
+            let i = game.bookmakers.findIndex((item) => item.key === 'williamhill_us')
             if (game.away_team == game.bookmakers[0].markets[0].outcomes[0].name) {
   
               const writeResult = admin
@@ -683,7 +689,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
   
   })
 
-  exports.getNHLGameData = functions.pubsub.schedule('every 5 minutes').onRun(async() => {
+  exports.getNHLGameData = functions.pubsub.schedule('every 2 minutes').onRun(async() => {
     try {
       const response = await axios.get('https://api.the-odds-api.com/v4/sports/icehockey_nhl/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso')
       .then(result => {

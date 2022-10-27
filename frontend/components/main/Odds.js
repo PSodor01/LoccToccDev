@@ -381,6 +381,7 @@ function Odds(props) {
         Analytics.logEvent('sendNotificationToAllUsers', {user_name: props.currentUser.name})
 
 
+
     };
 
     const searchNFLFilter = (text) => {

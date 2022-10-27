@@ -296,12 +296,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     alignSelf: 'center',
   },
-  placeholderText: {
-      marginLeft: "2%",
-      alignSelf: 'center',
-      paddingHorizontal: 10,
-      width: "90%",
-  },
   feedItem:{
     padding:6,
     marginVertical:5,

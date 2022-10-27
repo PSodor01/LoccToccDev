@@ -479,6 +479,7 @@ function AddPostScreen(props) {
                 />
                 <TextInput
                     placeholder="Know your stuff? Share your lock..."
+                    placeholderTextColor= "navy"
                     style={styles.postTextInput}
                     numberOfLines={4}
                     multiline={true}
@@ -581,12 +582,8 @@ profilePhotoPostContainer: {
   borderRadius: 40,
   marginRight: "2%",
 },
-profilePhotoPostContainer: {
-  backgroundColor: "#e1e2e6",
-  width: 40,
-  height: 40,
-  borderRadius: 40,
-  marginRight: "2%",
+postTextInput: {
+  width: Dimensions.get('window').width * .80,
 },
 shareText: {
   fontSize: 16,
@@ -711,9 +708,6 @@ searchSection: {
 xButton: {
   alignItems: 'flex-end',
   paddingTop: 2,
-},
-postTextInput: {
-  width: Dimensions.get('window').width * .80,
 },
 feedItem:{
   padding:6,
