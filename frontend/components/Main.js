@@ -8,12 +8,13 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import firebase from 'firebase'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { fetchUser, fetchUserFollowing, fetchUserBlocking, fetchAllUsers, fetchAllPosts, fetchLikes, fetchFades, fetchMLBGames, fetchMMAGames, fetchFutureGames, fetchFormula1Teams, fetchFormula1Races, fetchFormula1Drivers, fetchFormula1Rankings, fetchNFLGames,  fetchNHLGames, fetchNBAGames, fetchNCAAFGames, fetchContestStatus, clearData } from '../redux/actions/index'
+import { fetchUser, fetchUserFollowing, fetchUserBlocking, fetchUserNotifications, fetchAllUsers, fetchAllPosts, fetchLikes, fetchFades, fetchMLBGames, fetchMMAGames, fetchFutureGames, fetchFormula1Teams, fetchFormula1Races, fetchFormula1Drivers, fetchFormula1Rankings, fetchNFLGames,  fetchNHLGames, fetchNBAGames, fetchNCAAFGames, fetchContestStatus, clearData } from '../redux/actions/index'
 
 import FeedScreen from './main/Feed'
 import ProfileScreen from './main/Profile'
 import ContestScreen from './main/Contest'
 import Merch from './main/Merch'
+import Notifications from './main/Notifications'
 import SearchScreen from './main/Search'
 import Odds from './main/Odds'
 
@@ -56,6 +57,7 @@ export class Main extends Component {
         this.props.fetchUser();
         this.props.fetchUserFollowing();
         this.props.fetchUserBlocking();
+        this.props.fetchUserNotifications();
         this.props.fetchLikes();
         this.props.fetchFades();
         this.props.fetchAllUsers();
@@ -99,14 +101,14 @@ export class Main extends Component {
                     }}
                     />
                 <Tab.Screen 
-                    name="Contest" 
-                    component={ContestScreen} 
+                    name="Notifications" 
+                    component={Notifications} 
                     navigation={this.props.navigation}
                     options={{
-                        tabBarLabel: 'Leaders',
+                        tabBarLabel: 'Notifications',
                         tabBarColor: '#009387',
                         tabBarIcon: ({ color, size }) => (
-                            <MaterialCommunityIcons name="trophy" color="#ffd700" size={26} />
+                            <MaterialCommunityIcons name="heart-outline" color={color} size={26} />
                         ),
                     }} /> 
 
@@ -162,6 +164,6 @@ const mapStateToProps = (store) => ({
     formula1Rankings: store.formula1RankingsState.formula1Rankings,
 
 })
-const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUser, fetchUserFollowing, fetchAllUsers, fetchAllPosts, fetchUserBlocking, fetchLikes, fetchFades, fetchMLBGames, fetchMMAGames, fetchFutureGames, fetchFormula1Teams, fetchFormula1Races, fetchFormula1Drivers, fetchFormula1Rankings, fetchNFLGames, fetchNBAGames, fetchNHLGames, fetchNCAAFGames, fetchContestStatus, clearData }, dispatch);
+const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUser, fetchUserFollowing, fetchUserNotifications, fetchAllUsers, fetchAllPosts, fetchUserBlocking, fetchLikes, fetchFades, fetchMLBGames, fetchMMAGames, fetchFutureGames, fetchFormula1Teams, fetchFormula1Races, fetchFormula1Drivers, fetchFormula1Rankings, fetchNFLGames, fetchNBAGames, fetchNHLGames, fetchNCAAFGames, fetchContestStatus, clearData }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchProps)(Main);

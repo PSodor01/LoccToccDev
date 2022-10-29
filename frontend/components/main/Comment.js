@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native'
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Linking, Image, Alert } from 'react-native'
 
 import { useNavigation } from '@react-navigation/native';
 import email from 'react-native-email'
@@ -41,7 +41,7 @@ function Comment(props, route) {
 
     useEffect(() => {
         
-        Analytics.logEvent('screen_view', { screen_name: 'Comment' })
+        Analytics.logEvent('screen_view', { screen_name: 'Comment',  user_name: props.currentUser.name })
     
     }, [])
 
@@ -92,6 +92,12 @@ function Comment(props, route) {
     const productionID = 'ca-app-pub-8519029912093094/9708977287';
     // Is a real device and running in production.
     const adUnitID = Constants.isDevice && !__DEV__ ? productionID : testID;
+
+    const openAdLink = () => {
+
+        Analytics.logEvent('adClick', {user_name: props.currentUser.name, adPartner: 'Sporttrade'});
+            
+    }
 
     const handleReportPostEmail = () => {
 
@@ -244,6 +250,13 @@ function Comment(props, route) {
                     
                 )}
             />
+            <TouchableOpacity style={styles.adView}
+                onPress={() => { Linking.openURL('https://sporttrade.onelink.me/evxw/LoccTocc'); openAdLink()}} >
+                <Image 
+                    style={{ width: "95%", height: 50 }}
+                    source={require('../../assets/sporttradeBanner.png')}
+                />
+            </TouchableOpacity>
           
         </View>
     )

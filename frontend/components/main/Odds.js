@@ -544,7 +544,7 @@ function Odds(props) {
 
     const openAdLink = () => {
 
-        Analytics.logEvent('adClick', {user_name: props.currentUser.name, adPartner: 'snackMagic'});
+        Analytics.logEvent('adClick', {user_name: props.currentUser.name, adPartner: 'Sporttrade'});
             
     }
 
@@ -1260,13 +1260,15 @@ function Odds(props) {
 
             
             }
-            {adMobLive ?
-            <View style={styles.adView}>
-               
-            </View> 
-            :
-            <View></View>
-            }
+            <TouchableOpacity style={styles.adView}
+                onPress={() => { Linking.openURL('https://sporttrade.onelink.me/evxw/LoccTocc'); openAdLink()}} >
+                <Image 
+                    style={{ width: "95%", height: 50 }}
+                    source={require('../../assets/sporttradeBanner.png')}
+                />
+            </TouchableOpacity>
+         
+            
             
             
         </View>

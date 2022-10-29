@@ -4,6 +4,7 @@ import { USER_STATE_CHANGE,
     LIKES_STATE_CHANGE, 
     FADES_STATE_CHANGE, 
     USER_FOLLOWING_STATE_CHANGE, 
+    USER_NOTIFICATIONS_STATE_CHANGE,
     USERS_DATA_STATE_CHANGE, 
     NFL_GAMES_STATE_CHANGE, 
     NCAAF_GAMES_STATE_CHANGE, 
@@ -83,6 +84,25 @@ export function fetchUserBlocking() {
                 dispatch({ type: USER_BLOCKING_STATE_CHANGE, blocking });
                 for(let i = 0; i < blocking.length; i++){
                 }
+            })
+    })
+}
+
+export function fetchUserNotifications() {
+    return ((dispatch) => {
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .collection("notifications")
+            .orderBy('creation', 'desc')
+            .onSnapshot((snapshot) => {
+                let userNotifications = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    return { id, ...data }
+                })
+                dispatch({ type: USER_NOTIFICATIONS_STATE_CHANGE, userNotifications });
+              
             })
     })
 }

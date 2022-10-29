@@ -1,8 +1,8 @@
 {
   "expoServerNgrokUrl": "https://44-ysb.psodor01.frontend.exp.direct",
   "packagerNgrokUrl": "https://44-ysb.psodor01.frontend.exp.direct",
-  "ngrokPid": 10196,
-  "expoServerPort": null,
+  "ngrokPid": 780,
+  "expoServerPort": 19000,
   "packagerPort": 19000,
   "packagerPid": null,
   "webpackServerPort": null,

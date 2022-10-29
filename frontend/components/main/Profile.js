@@ -140,6 +140,19 @@ function Profile(props) {
             })
 
         Analytics.logEvent('followUser', {user_name: props.currentUser.name});
+
+        const followName = props.currentUser.name
+        firebase.firestore()
+            .collection("users")
+            .doc(props.route.params.uid)
+            .collection("notifications")
+            .add({
+                notificationType: "follow",
+                creation: firebase.firestore.FieldValue.serverTimestamp(),
+                otherUserId: firebase.auth().currentUser.uid,
+                otherUsername: followName,
+                notificationText: ' started following you',
+              })
     }
 
     const onUnfollow = () => {
@@ -412,6 +425,19 @@ function Profile(props) {
             .update({
                 likesCount: firebase.firestore.FieldValue.increment(1)
             })
+
+        const likedName = props.currentUser.name
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .collection("notifications")
+            .add({
+                notificationType: "hammer",
+                creation: firebase.firestore.FieldValue.serverTimestamp(),
+                otherUserId: firebase.auth().currentUser.uid,
+                otherUsername: likedName,
+                notificationText: ' hammered your post',
+              })
     }
 
     const onDislikePress = (postId) => {
@@ -432,6 +458,19 @@ function Profile(props) {
             .collection("likes")
             .doc(firebase.auth().currentUser.uid)
             .delete()
+
+        const likedName = props.currentUser.name
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .collection("notifications")
+            .add({
+                notificationType: "fade",
+                creation: firebase.firestore.FieldValue.serverTimestamp(),
+                otherUserId: firebase.auth().currentUser.uid,
+                otherUsername: likedName,
+                notificationText: ' faded your post',
+                })
 
     }
 

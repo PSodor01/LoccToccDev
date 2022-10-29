@@ -1,7 +1,8 @@
 import { USER_STATE_CHANGE, 
     ALL_USERS_STATE_CHANGE, 
     ALL_POSTS_STATE_CHANGE, 
-    USER_FOLLOWING_STATE_CHANGE, 
+    USER_FOLLOWING_STATE_CHANGE,
+    USER_NOTIFICATIONS_STATE_CHANGE,
     LIKES_STATE_CHANGE, 
     FADES_STATE_CHANGE, 
     USER_BLOCKING_STATE_CHANGE, 
@@ -11,6 +12,7 @@ import { USER_STATE_CHANGE,
 const initialState = {
     currentUser: [],
     following: [],
+    userNotifications: [],
     blocking: [],
     liked: [],
     faded: [],
@@ -36,6 +38,11 @@ export const user = (state = initialState, action) => {
             return {
                 ...state,
                 blocking: action.blocking
+            }
+        case USER_NOTIFICATIONS_STATE_CHANGE:
+            return {
+                ...state,
+                userNotifications: action.userNotifications
             }
         case LIKES_STATE_CHANGE:
             return {

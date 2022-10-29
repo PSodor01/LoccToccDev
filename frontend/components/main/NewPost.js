@@ -30,6 +30,7 @@ function AddPostScreen(props) {
   const [gifs, setGifs] = useState([]);
   const [term, updateTerm] = useState('');
   const [userTagList, setUserTagList] = useState(null);
+  const [userTagId, setUserTagId] = useState(null);
   const [userTokenList, setUserTokenList] = useState(null);
   const [isUserTagged, setIsUserTagged] = useState(false)
   const [gifMode, setGifMode] = useState(null);
@@ -113,6 +114,7 @@ function AddPostScreen(props) {
     Analytics.logEvent('removeTaggedUserFromPost', {user_name: props.currentUser.name});
 
     setUserTagList(null);
+    setUserTagId(null);
     setUserTokenList(null);
     setIsUserTagged([null])
   }
@@ -126,11 +128,12 @@ function AddPostScreen(props) {
     setGifMode(false)
   }
 
-  const tagUsersFunction = (name, token) => {
+  const tagUsersFunction = (name, token, id) => {
     Analytics.logEvent('addUsersToTagList', {user_name: props.currentUser.name});
     
         const userTagList = name
         setUserTagList(userTagList)
+        setUserTagId(id)
         setUserTokenList(token)
         setIsUserTagged(true)
 
@@ -143,7 +146,7 @@ function AddPostScreen(props) {
         const token = userTokenList
         if (awayTeam  != undefined) {const notification = '(' + name + '): ' + taggerName + ' tagged you in a post on the ' + awayTeam + "/" + homeTeam + " game"
           sendNotification(notification, token)
-          console.log(token)}
+          }
           else {const notification = '(' + name + '): ' + taggerName + ' tagged you in a post'
           sendNotification(notification, token)}
         //const users = await firebase.firestore().collection("users").get();
@@ -258,6 +261,39 @@ function AddPostScreen(props) {
                   
               }
           })
+  }
+
+  const storeNotificationForTag = async () => {
+
+    console.log(userTagId)
+    
+    if (awayTeam  != undefined) {
+      const likedName = props.currentUser.name
+      firebase.firestore()
+        .collection("users")
+        .doc(userTagId)
+        .collection("notifications")
+        .add({
+            notificationType: "tag",
+            creation: firebase.firestore.FieldValue.serverTimestamp(),
+            otherUserId: firebase.auth().currentUser.uid,
+            otherUsername: likedName,
+            notificationText: ' tagged you in a post on the ' + awayTeam + "/" + homeTeam + " game"
+            })
+    } else {
+      const likedName = props.currentUser.name
+      firebase.firestore()
+        .collection("users")
+        .doc(userTagId)
+        .collection("notifications")
+        .add({
+            notificationType: "tag",
+            creation: firebase.firestore.FieldValue.serverTimestamp(),
+            otherUserId: firebase.auth().currentUser.uid,
+            otherUsername: likedName,
+            notificationText: ' tagged you in a post',
+            })
+    }
   }
 
   const uploadImage = async () => {
@@ -409,7 +445,7 @@ function AddPostScreen(props) {
 
               <View style={styles.feedItem}>
                   <TouchableOpacity style={styles.postLeftContainer}
-                      onPress={() => {tagUsersFunction(item.name, item.token); this.bs.current.snapTo(1)}}>
+                      onPress={() => {tagUsersFunction(item.name, item.token, item.id); this.bs.current.snapTo(1)}}>
                       <Image 
                           style={styles.profilePhotoPostContainer}
                           source={{uri: item.name ? item.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
@@ -521,7 +557,7 @@ function AddPostScreen(props) {
                   
                   :
                  
-                  <TouchableOpacity onPress={() => {uploadImage(); increasePostsCount(); sendNotificationForTag()}} style={styles.postButton}>
+                  <TouchableOpacity onPress={() => {uploadImage(); increasePostsCount(); sendNotificationForTag(); storeNotificationForTag()}} style={styles.postButton}>
                       <Text style={styles.shareText}>POST</Text>
                   </TouchableOpacity>
                 }

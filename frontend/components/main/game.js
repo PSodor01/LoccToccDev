@@ -195,6 +195,19 @@ function game(props) {
                 likesCount: firebase.firestore.FieldValue.increment(1)
             })
 
+        const likedName = props.currentUser.name
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .collection("notifications")
+            .add({
+                notificationType: "hammer",
+                creation: firebase.firestore.FieldValue.serverTimestamp(),
+                otherUserId: firebase.auth().currentUser.uid,
+                otherUsername: likedName,
+                notificationText: ' hammered your post on the ' + awayTeam + "/" + homeTeam + " game",
+              })
+
     }
 
     const onDislikePress = (userId, postId) => {
@@ -235,6 +248,19 @@ function game(props) {
             .collection("fades")
             .doc(firebase.auth().currentUser.uid)
             .set({})
+
+        const likedName = props.currentUser.name
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .collection("notifications")
+            .add({
+                notificationType: "fade",
+                creation: firebase.firestore.FieldValue.serverTimestamp(),
+                otherUserId: firebase.auth().currentUser.uid,
+                otherUsername: likedName,
+                notificationText: ' faded your post on the ' + awayTeam + "/" + homeTeam + " game",
+              })
 
     }
 
@@ -279,6 +305,7 @@ function game(props) {
     }
 
     const sendNotificationForLike = async (uid, name) => {
+        
         const users = await firebase
             .firestore()
             .collection("users")
@@ -302,8 +329,9 @@ function game(props) {
                 else {
                 }
             })
-
-    };
+        
+        
+        };
 
     const sendNotificationForFade = async (uid, name) => {
         const users = await firebase
@@ -525,7 +553,7 @@ function game(props) {
 
     const openAdLink = () => {
 
-        Analytics.logEvent('adClick', {user_name: props.currentUser.name, adPartner: 'fantasyJocks'});
+        Analytics.logEvent('adClick', {user_name: props.currentUser.name, adPartner: 'Sporttrade'});
             
     }
 
@@ -1104,13 +1132,13 @@ function game(props) {
             }
 
             
-            {adMobLive ?
-            <View style={styles.adView}>
-              
-            </View> 
-            :
-            <View></View>
-            }
+            <TouchableOpacity style={styles.adView}
+                onPress={() => { Linking.openURL('https://sporttrade.onelink.me/evxw/LoccTocc'); openAdLink()}} >
+                <Image 
+                    style={{ width: "95%", height: 50 }}
+                    source={require('../../assets/sporttradeBanner.png')}
+                />
+            </TouchableOpacity>
 
             <TouchableOpacity
                 activeOpacity={0.8}

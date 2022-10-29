@@ -181,6 +181,19 @@ function Feed(props) {
             .update({
                 likesCount: firebase.firestore.FieldValue.increment(1)
             })
+
+        const likedName = props.currentUser.name
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .collection("notifications")
+            .add({
+                notificationType: "hammer",
+                creation: firebase.firestore.FieldValue.serverTimestamp(),
+                otherUserId: firebase.auth().currentUser.uid,
+                otherUsername: likedName,
+                notificationText: ' hammered your post',
+              })
     }
 
     const onDislikePress = (userId, postId) => {
@@ -201,7 +214,6 @@ function Feed(props) {
             .collection("likes")
             .doc(firebase.auth().currentUser.uid)
             .delete()
-
     }
 
     const onFadePress = (userId, postId) => {
@@ -222,6 +234,19 @@ function Feed(props) {
             .collection("fades")
             .doc(firebase.auth().currentUser.uid)
             .set({})
+
+        const likedName = props.currentUser.name
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .collection("notifications")
+            .add({
+                notificationType: "fade",
+                creation: firebase.firestore.FieldValue.serverTimestamp(),
+                otherUserId: firebase.auth().currentUser.uid,
+                otherUsername: likedName,
+                notificationText: ' faded your post',
+                })
     }
 
     const onUnfadePress = (userId, postId) => {
@@ -319,7 +344,7 @@ function Feed(props) {
 
     const openAdLink = () => {
 
-        Analytics.logEvent('adClick', {user_name: props.currentUser.name, adPartner: 'fantasyJocks'});
+        Analytics.logEvent('adClick', {user_name: props.currentUser.name, adPartner: 'Sporttrade'});
             
     }
 
@@ -664,13 +689,13 @@ function Feed(props) {
             /> }
 
             
-            {adMobLive ?
-            <View style={styles.adView}>
-               
-            </View> 
-            :
-            <View></View>
-            }
+            <TouchableOpacity style={styles.adView}
+                onPress={() => { Linking.openURL('https://sporttrade.onelink.me/evxw/LoccTocc'); openAdLink()}} >
+                <Image 
+                    style={{ width: "95%", height: 50 }}
+                    source={require('../../assets/sporttradeBanner.png')}
+                />
+            </TouchableOpacity>
         </View>
             
 
@@ -727,7 +752,7 @@ const styles = StyleSheet.create({
     postHeaderContainer: {
         flexDirection: 'row',
         flex: 1,
-        width: "85%",
+        width: "95%",
         paddingBottom: 4,
         marginLeft: "2%",
         justifyContent: 'space-between'
