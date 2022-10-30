@@ -278,7 +278,7 @@ function AddPostScreen(props) {
             creation: firebase.firestore.FieldValue.serverTimestamp(),
             otherUserId: firebase.auth().currentUser.uid,
             otherUsername: likedName,
-            notificationText: ' tagged you in a post on the ' + awayTeam + "/" + homeTeam + " game"
+            notificationText: 'tagged you in a post on the ' + awayTeam + "/" + homeTeam + " game"
             })
     } else {
       const likedName = props.currentUser.name
@@ -291,7 +291,7 @@ function AddPostScreen(props) {
             creation: firebase.firestore.FieldValue.serverTimestamp(),
             otherUserId: firebase.auth().currentUser.uid,
             otherUsername: likedName,
-            notificationText: ' tagged you in a post',
+            notificationText: 'tagged you in a post',
             })
     }
   }

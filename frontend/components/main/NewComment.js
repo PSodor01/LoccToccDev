@@ -162,7 +162,7 @@ function NewCommentScreen(props, route) {
                 creation: firebase.firestore.FieldValue.serverTimestamp(),
                 otherUserId: firebase.auth().currentUser.uid,
                 otherUsername: likedName,
-                notificationText: likedName + ' commented on your post on the ' + awayTeam + "/" + homeTeam + " game"
+                notificationText: 'commented on your post on the ' + awayTeam + "/" + homeTeam + " game"
                 })
         } else {
           const likedName = props.currentUser.name
@@ -175,7 +175,7 @@ function NewCommentScreen(props, route) {
                 creation: firebase.firestore.FieldValue.serverTimestamp(),
                 otherUserId: firebase.auth().currentUser.uid,
                 otherUsername: likedName,
-                notificationText: likedName + ' commented on your post',
+                notificationText: 'commented on your post',
                 })
         }
       }
@@ -323,7 +323,7 @@ function NewCommentScreen(props, route) {
                 creation: firebase.firestore.FieldValue.serverTimestamp(),
                 otherUserId: firebase.auth().currentUser.uid,
                 otherUsername: likedName,
-                notificationText: ' tagged you in a comment on the ' + awayTeam + "/" + homeTeam + " game"
+                notificationText: 'tagged you in a comment on the ' + awayTeam + "/" + homeTeam + " game"
                 })
         } else {
           const likedName = props.currentUser.name
@@ -336,7 +336,7 @@ function NewCommentScreen(props, route) {
                 creation: firebase.firestore.FieldValue.serverTimestamp(),
                 otherUserId: firebase.auth().currentUser.uid,
                 otherUsername: likedName,
-                notificationText: ' tagged you in a comment',
+                notificationText: 'tagged you in a comment',
                 })
         }
       }

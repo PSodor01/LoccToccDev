@@ -205,7 +205,7 @@ function game(props) {
                 creation: firebase.firestore.FieldValue.serverTimestamp(),
                 otherUserId: firebase.auth().currentUser.uid,
                 otherUsername: likedName,
-                notificationText: ' hammered your post on the ' + awayTeam + "/" + homeTeam + " game",
+                notificationText: 'hammered your post on the ' + awayTeam + "/" + homeTeam + " game",
               })
 
     }
@@ -259,7 +259,7 @@ function game(props) {
                 creation: firebase.firestore.FieldValue.serverTimestamp(),
                 otherUserId: firebase.auth().currentUser.uid,
                 otherUsername: likedName,
-                notificationText: ' faded your post on the ' + awayTeam + "/" + homeTeam + " game",
+                notificationText: 'faded your post on the ' + awayTeam + "/" + homeTeam + " game",
               })
 
     }

@@ -82,7 +82,7 @@ function Notifications(props) {
                     </View>
                     <View style={styles.mainContainer}>
                         <View style={styles.notificationContainer}>
-                            <Text style={styles.notificationText}>{item.otherUsername} {item.notificationText} </Text>
+                            <Text style={styles.notificationText}><Text style={styles.usernameText}>{item.otherUsername}</Text> {item.notificationText} </Text>
                         </View>
                         <View style={styles.notificationContainer}>
                             <Text style={styles.postTimeText}>{moment(item.creation.toDate()).fromNow()}</Text>
@@ -175,6 +175,9 @@ const styles = StyleSheet.create({
     },
     notificationText: {
         fontSize: 14,
+    },
+    usernameText: {
+        fontWeight: 'bold',
     },
     postTimeText: {
         fontSize: 10,

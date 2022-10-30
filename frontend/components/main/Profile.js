@@ -151,7 +151,7 @@ function Profile(props) {
                 creation: firebase.firestore.FieldValue.serverTimestamp(),
                 otherUserId: firebase.auth().currentUser.uid,
                 otherUsername: followName,
-                notificationText: ' started following you',
+                notificationText: 'started following you',
               })
     }
 
@@ -436,7 +436,7 @@ function Profile(props) {
                 creation: firebase.firestore.FieldValue.serverTimestamp(),
                 otherUserId: firebase.auth().currentUser.uid,
                 otherUsername: likedName,
-                notificationText: ' hammered your post',
+                notificationText: 'hammered your post',
               })
     }
 
@@ -469,7 +469,7 @@ function Profile(props) {
                 creation: firebase.firestore.FieldValue.serverTimestamp(),
                 otherUserId: firebase.auth().currentUser.uid,
                 otherUsername: likedName,
-                notificationText: ' faded your post',
+                notificationText: 'faded your post',
                 })
 
     }

@@ -192,7 +192,7 @@ function Feed(props) {
                 creation: firebase.firestore.FieldValue.serverTimestamp(),
                 otherUserId: firebase.auth().currentUser.uid,
                 otherUsername: likedName,
-                notificationText: ' hammered your post',
+                notificationText: 'hammered your post',
               })
     }
 
@@ -245,7 +245,7 @@ function Feed(props) {
                 creation: firebase.firestore.FieldValue.serverTimestamp(),
                 otherUserId: firebase.auth().currentUser.uid,
                 otherUsername: likedName,
-                notificationText: ' faded your post',
+                notificationText: 'faded your post',
                 })
     }
 
