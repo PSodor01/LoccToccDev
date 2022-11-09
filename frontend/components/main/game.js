@@ -708,6 +708,9 @@ function game(props) {
                             <Ionicons name={"chatbubble-outline"} size={20} color={"grey"} marginRight={10} />
                             <Text style={styles.likeNumber}>{item.comments}</Text>
                         </TouchableOpacity>
+                        {sport == 'formula1' ? 
+                        null
+                        :
                         <TouchableOpacity
                             style={styles.commentsContainer}
                             onPress={() => props.navigation.navigate('SocialShare', {gameId: gameId, gameDate: gameDate, homeTeam: homeTeam, awayTeam: awayTeam, homeSpread: homeSpread, awaySpread: awaySpread, homeSpreadOdds: homeSpreadOdds, awaySpreadOdds: awaySpreadOdds, awayMoneyline: awayMoneyline, homeMoneyline: homeMoneyline, over: over, overOdds: overOdds, under: under, underOdds: underOdds, sport: sport,
@@ -715,6 +718,7 @@ function game(props) {
                                 })}>
                             <Ionicons name={"share-outline"} size={20} color={"grey"} marginRight={10} />
                         </TouchableOpacity>
+                        }
                         <TouchableOpacity
                             style={styles.flagContainer}
                             onPress={() => reportPostHandler({name: item.user.name, caption: item.caption})}>
@@ -754,7 +758,8 @@ function game(props) {
             sport == 'NFL - Suberbowl Champion' ||
             sport == 'MLB - World Series Winner' ||
             sport == 'NBA - Championship' ||
-            sport == 'NHL - Stanley Cup Winner' 
+            sport == 'NHL - Stanley Cup Winner' ||
+            sport == 'FIFA World Cup Winner' 
             ?
             
             <View style={styles.gameHeaderContainer}>
@@ -772,7 +777,7 @@ function game(props) {
             }
                 <View>
                     {
-                    sport == 'NFL - Suberbowl Champion' || sport == 'MLB - World Series Winner' || sport == 'NBA - Championship' || sport == 'NHL - Stanley Cup Winner' ?
+                    sport == 'NFL - Suberbowl Champion' || sport == 'MLB - World Series Winner' || sport == 'NBA - Championship' || sport == 'NHL - Stanley Cup Winner' || sport == 'FIFA World Cup Winner' ?
                     listAllPlayers == false ?
                     <FlatList 
                         data = {futureGames.sort((a, b) => parseFloat(a.playerOdds) - parseFloat(b.playerOdds)).filter(futureSport => futureSport.sport == sport).slice(0, 5)}

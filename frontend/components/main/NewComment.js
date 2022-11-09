@@ -153,6 +153,7 @@ function NewCommentScreen(props, route) {
 
         if (awayTeam  != undefined) {
           const likedName = props.currentUser.name
+          console.log(props.route.params.uid, likedName)
           firebase.firestore()
             .collection("users")
             .doc(props.route.params.uid)
@@ -166,6 +167,7 @@ function NewCommentScreen(props, route) {
                 })
         } else {
           const likedName = props.currentUser.name
+          console.log(props.route.params.uid, likedName)
           firebase.firestore()
             .collection("users")
             .doc(props.route.params.uid)
@@ -310,35 +312,40 @@ function NewCommentScreen(props, route) {
 
       const storeNotificationForTag = async () => {
 
-        console.log(userTagId)
+        if (userTagId) {
+          console.log(userTagId)
+          if (awayTeam  != undefined) {
+            const likedName = props.currentUser.name
+            firebase.firestore()
+              .collection("users")
+              .doc(userTagId)
+              .collection("notifications")
+              .add({
+                  notificationType: "tag",
+                  creation: firebase.firestore.FieldValue.serverTimestamp(),
+                  otherUserId: firebase.auth().currentUser.uid,
+                  otherUsername: likedName,
+                  notificationText: 'tagged you in a comment on the ' + awayTeam + "/" + homeTeam + " game"
+                  })
+          } else {
+            console.log(userTagId)
+            const likedName = props.currentUser.name
+            firebase.firestore()
+              .collection("users")
+              .doc(userTagId)
+              .collection("notifications")
+              .add({
+                  notificationType: "tag",
+                  creation: firebase.firestore.FieldValue.serverTimestamp(),
+                  otherUserId: firebase.auth().currentUser.uid,
+                  otherUsername: likedName,
+                  notificationText: 'tagged you in a comment',
+                  })
+          }
+       } else {
+
+       }
         
-        if (awayTeam  != undefined) {
-          const likedName = props.currentUser.name
-          firebase.firestore()
-            .collection("users")
-            .doc(userTagId)
-            .collection("notifications")
-            .add({
-                notificationType: "tag",
-                creation: firebase.firestore.FieldValue.serverTimestamp(),
-                otherUserId: firebase.auth().currentUser.uid,
-                otherUsername: likedName,
-                notificationText: 'tagged you in a comment on the ' + awayTeam + "/" + homeTeam + " game"
-                })
-        } else {
-          const likedName = props.currentUser.name
-          firebase.firestore()
-            .collection("users")
-            .doc(userTagId)
-            .collection("notifications")
-            .add({
-                notificationType: "tag",
-                creation: firebase.firestore.FieldValue.serverTimestamp(),
-                otherUserId: firebase.auth().currentUser.uid,
-                otherUsername: likedName,
-                notificationText: 'tagged you in a comment',
-                })
-        }
       }
 
       const uploadImage = async () => {

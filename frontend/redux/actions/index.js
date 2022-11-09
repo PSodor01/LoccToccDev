@@ -280,6 +280,22 @@ export function fetchNBAGames() {
     })
 }
 
+export function fetchNCAABGames() {
+    return ((dispatch) => {
+        firebase.firestore()
+            .collection("ncaab")
+            .orderBy('gameDate', 'desc')
+            .onSnapshot((snapshot) => {
+                let ncaabGames = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    return { id, ...data }
+                })
+                dispatch({ type: NCAAB_GAMES_STATE_CHANGE, ncaabGames });
+            })
+    })
+}
+
 export function fetchNHLGames() {
     return ((dispatch) => {
         firebase.firestore()
@@ -316,7 +332,7 @@ export function fetchMMAGames() {
     })
 }
 
-/*export function fetchEPLGames() {
+export function fetchEPLGames() {
     return ((dispatch) => {
         firebase.firestore()
             .collection("epl")
@@ -332,7 +348,7 @@ export function fetchMMAGames() {
                 }
             })
     })
-}*/
+}
 
 /*export function fetchGolfGames() {
     return ((dispatch) => {

@@ -283,8 +283,8 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
       .then(result => {
         result.data.forEach(game => {
 
-          if (game.bookmakers.findIndex((item) => item.key === 'williamhill_us') > -1) {
-            let i = game.bookmakers.findIndex((item) => item.key === 'williamhill_us')
+          if (game.bookmakers.findIndex((item) => item.key === 'fanduel') > -1) {
+            let i = game.bookmakers.findIndex((item) => item.key === 'fanduel')
             if (game.away_team == game.bookmakers[0].markets[0].outcomes[0].name) {
   
               const writeResult = admin
@@ -485,7 +485,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
   
   })
 
-  exports.getNCAABGameData = functions.pubsub.schedule('every 5 minutes').onRun(async() => {
+  exports.getNCAABGameData = functions.pubsub.schedule('every 2 minutes').onRun(async() => {
     try {
       const response = await axios.get('https://api.the-odds-api.com/v4/sports/basketball_ncaab/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso')
       .then(result => {
@@ -589,14 +589,14 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
   
   })
 
-  exports.getEPLGameData = functions.pubsub.schedule('every 5 minutes').onRun(async() => {
+  exports.getEPLGameData = functions.pubsub.schedule('every 20 minutes').onRun(async() => {
     try {
-      const response = await axios.get('https://api.the-odds-api.com/v4/sports/soccer_epl/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,totals&oddsFormat=american&dateFormat=iso')
+      const response = await axios.get('https://api.the-odds-api.com/v4/sports/soccer_fifa_world_cup/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,totals&oddsFormat=american&dateFormat=iso')
       .then(result => {
         result.data.forEach(game => {
   
-          if (game.bookmakers.findIndex((item) => item.key === 'betmgm') > -1) {
-            let i = game.bookmakers.findIndex((item) => item.key === 'betmgm')
+          if (game.bookmakers.findIndex((item) => item.key === 'barstool') > -1) {
+            let i = game.bookmakers.findIndex((item) => item.key === 'barstool')
             if (game.away_team == game.bookmakers[0].markets[0].outcomes[0].name) {
 
             const writeResult = admin
@@ -651,9 +651,9 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
   
   })
 
-  exports.getEPLScoresData = functions.pubsub.schedule('every 5 minutes').onRun(async() => {
+  exports.getEPLScoresData = functions.pubsub.schedule('every 20 minutes').onRun(async() => {
     try {
-      const response = await axios.get('https://api.the-odds-api.com/v4/sports/soccer_epl/scores/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&dateFormat=iso')
+      const response = await axios.get('https://api.the-odds-api.com/v4/sports/soccer_fifa_world_cup/scores/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&dateFormat=iso')
       .then(result => {
         result.data.forEach(game => {
   
@@ -897,8 +897,8 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
         .then(result => {
           result.data.forEach(game => {
 
-            if (game.bookmakers.findIndex((item) => item.key === 'draftkings') > -1) {
-              let j = game.bookmakers.findIndex((item) => item.key === 'draftkings')
+            if (game.bookmakers.findIndex((item) => item.key === 'circasports') > -1) {
+              let j = game.bookmakers.findIndex((item) => item.key === 'circasports')
               for (let i = 0; i < game.bookmakers[j].markets[0].outcomes.length; i++){
                 const writeResult = admin
                 .firestore()
@@ -916,6 +916,28 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
             } else {
               return
   
+            }
+          })
+        })
+    }catch(err) {console.error(err.message)}
+
+    try {
+      const response = await axios.get('https://api.the-odds-api.com/v4/sports/soccer_fifa_world_cup_winner/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&Format=american&dateFormat=iso')
+        .then(result => {
+          result.data.forEach(game => {
+
+            for (let i = 0; i < game.bookmakers[0].markets[0].outcomes.length; i++){
+                const writeResult = admin
+                .firestore()
+                .collection('futures')
+                .doc(game.bookmakers[0].markets[0].outcomes[i].name)
+                .set({
+                  playerName: game.bookmakers[0].markets[0].outcomes[i].name,
+                  playerOdds: game.bookmakers[0].markets[0].outcomes[i].price > 2 ? Math.round((game.bookmakers[0].markets[0].outcomes[i].price -1)*100) : Math.round(-100/(game.bookmakers[0].markets[0].outcomes[i].price -1)),
+                  gameId: game.id,
+                  sport: 'FIFA World Cup Winner',
+                  
+                }, { merge:true });
             }
           })
         })

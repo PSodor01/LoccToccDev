@@ -8,7 +8,7 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import firebase from 'firebase'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { fetchUser, fetchUserFollowing, fetchUserBlocking, fetchUserNotifications, fetchAllUsers, fetchAllPosts, fetchLikes, fetchFades, fetchMLBGames, fetchMMAGames, fetchFutureGames, fetchFormula1Teams, fetchFormula1Races, fetchFormula1Drivers, fetchFormula1Rankings, fetchNFLGames,  fetchNHLGames, fetchNBAGames, fetchNCAAFGames, fetchContestStatus, clearData } from '../redux/actions/index'
+import { fetchUser, fetchUserFollowing, fetchUserBlocking, fetchUserNotifications, fetchAllUsers, fetchAllPosts, fetchLikes, fetchFades, fetchMLBGames, fetchMMAGames, fetchFutureGames, fetchFormula1Teams, fetchFormula1Races, fetchFormula1Drivers, fetchFormula1Rankings, fetchNFLGames,  fetchNHLGames, fetchNBAGames, fetchNCAAFGames, fetchNCAABGames, fetchEPLGames, fetchContestStatus, clearData } from '../redux/actions/index'
 
 import FeedScreen from './main/Feed'
 import ProfileScreen from './main/Profile'
@@ -71,7 +71,9 @@ export class Main extends Component {
         this.props.fetchNFLGames();
         this.props.fetchNHLGames();
         this.props.fetchNBAGames();
+        this.props.fetchEPLGames();
         this.props.fetchNCAAFGames();
+        this.props.fetchNCAABGames();
         this.props.fetchMMAGames();
         this.props.fetchContestStatus();
     }
@@ -153,6 +155,7 @@ const mapStateToProps = (store) => ({
     ncaabGames: store.ncaabGamesState.ncaabGames,
     nflGames: store.nflGamesState.nflGames,
     nbaGames: store.nbaGamesState.nbaGames,
+    eplGames: store.eplGamesState.eplGames,
     nhlGames: store.nhlGamesState.nhlGames,
     ncaafGames: store.ncaafGamesState.ncaafGames,
     mmaGames: store.mmaGamesState.mmaGames,
@@ -164,6 +167,6 @@ const mapStateToProps = (store) => ({
     formula1Rankings: store.formula1RankingsState.formula1Rankings,
 
 })
-const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUser, fetchUserFollowing, fetchUserNotifications, fetchAllUsers, fetchAllPosts, fetchUserBlocking, fetchLikes, fetchFades, fetchMLBGames, fetchMMAGames, fetchFutureGames, fetchFormula1Teams, fetchFormula1Races, fetchFormula1Drivers, fetchFormula1Rankings, fetchNFLGames, fetchNBAGames, fetchNHLGames, fetchNCAAFGames, fetchContestStatus, clearData }, dispatch);
+const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUser, fetchUserFollowing, fetchUserNotifications, fetchAllUsers, fetchAllPosts, fetchUserBlocking, fetchLikes, fetchFades, fetchMLBGames, fetchMMAGames, fetchFutureGames, fetchFormula1Teams, fetchFormula1Races, fetchFormula1Drivers, fetchFormula1Rankings, fetchNFLGames, fetchNBAGames, fetchNHLGames, fetchNCAABGames, fetchEPLGames, fetchNCAAFGames, fetchContestStatus, clearData }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchProps)(Main);
