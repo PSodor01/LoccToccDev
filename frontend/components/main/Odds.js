@@ -495,6 +495,11 @@ function Odds(props) {
             icon: trendingIcon
         },
         {
+            sport: 'Fantasy',
+            id: '1.5',
+            icon: fantasyIcon
+        },
+        {
             sport: 'NFL',
             id: '2',
             icon: nflIcon
@@ -545,15 +550,24 @@ function Odds(props) {
       const fantasyList = [
         {
             id: '1',
-            fantasyTopic: 'Start or Sit'
+            gameId: 'startsit2022',
+            fantasyTopic: 'Start or Sit',
+            sport: 'Fantasy',
+            icon: fantasyIcon,
         },
         {
             id: '2',
-            fantasyTopic: 'Daily Fantasy Sports'
+            gameId: 'dfs2022',
+            fantasyTopic: 'Daily Fantasy Sports',
+            sport: 'Fantasy',
+            icon: fantasyIcon,
         },
         {
             id: '3',
-            fantasyTopic: 'Waiver Wire'
+            gameId: 'waiver2022',
+            fantasyTopic: 'Waiver Wire',
+            sport: 'Fantasy',
+            icon: fantasyIcon,
         },
       ];
 
@@ -909,10 +923,15 @@ function Odds(props) {
 
     const renderFantasyItem = ({ item }) => {
         return (
-            <View>
-                <TouchableOpacity>
-                    <Text style={styles.listPlayerText}>{item.fantasyTopic}</Text>
+            <View style={styles.listGameContainer}>
+                <TouchableOpacity
+                    onPress={() => props.navigation.navigate('game', {gameId: item.gameId, sport: item.sport, fantasyTopic: item.fantasyTopic })}>
+                    <View style={styles.listOddsContainer}>
+                        <Text style={styles.listPlayerText}>{item.fantasyTopic}</Text>
+                        <Text style={styles.listPlayerText}>{item.icon}</Text>
+                    </View>
                 </TouchableOpacity>
+
             </View>
         )
     }
@@ -1403,8 +1422,6 @@ const styles = StyleSheet.create({
     listOddsContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-    },
-    listPlayerText: {
     },
     awayGameInfoContainer: { 
         flexDirection: 'row',

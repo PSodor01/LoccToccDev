@@ -283,8 +283,8 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
       .then(result => {
         result.data.forEach(game => {
 
-          if (game.bookmakers.findIndex((item) => item.key === 'fanduel') > -1) {
-            let i = game.bookmakers.findIndex((item) => item.key === 'fanduel')
+          if (game.bookmakers.findIndex((item) => item.key === 'betfair') > -1) {
+            let i = game.bookmakers.findIndex((item) => item.key === 'betfair')
             if (game.away_team == game.bookmakers[0].markets[0].outcomes[0].name) {
   
               const writeResult = admin
@@ -897,8 +897,8 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
         .then(result => {
           result.data.forEach(game => {
 
-            if (game.bookmakers.findIndex((item) => item.key === 'circasports') > -1) {
-              let j = game.bookmakers.findIndex((item) => item.key === 'circasports')
+            if (game.bookmakers.findIndex((item) => item.key === 'fanduel') > -1) {
+              let j = game.bookmakers.findIndex((item) => item.key === 'fanduel')
               for (let i = 0; i < game.bookmakers[j].markets[0].outcomes.length; i++){
                 const writeResult = admin
                 .firestore()

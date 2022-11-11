@@ -160,7 +160,7 @@ export function fetchAllUsers() {
     })
 }
 
-export function fetchAllPosts(uid) {
+/*export function fetchAllPosts(uid) {
     var ourDate = new Date();
     var pastDate = ourDate.getDate() - 3;
     ourDate.setDate(pastDate);
@@ -183,7 +183,7 @@ export function fetchAllPosts(uid) {
             })
 
     })
-}
+} */
 
 export function fetchUsersData(uid, getPosts) {
     return ((dispatch, getState) => {

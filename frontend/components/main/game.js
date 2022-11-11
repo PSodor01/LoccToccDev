@@ -42,11 +42,13 @@ function game(props) {
     const [adMobLive, setAdMobLive] = useState();
 
 
-    const {gameId, gameDate, homeTeam, awayTeam, homeMoneyline, awayMoneyline, homeSpread, awaySpread, homeSpreadOdds, awaySpreadOdds, over, overOdds, under, underOdds, drawMoneyline, sport} = props.route.params;
+    const {gameId, gameDate, homeTeam, awayTeam, homeMoneyline, awayMoneyline, homeSpread, awaySpread, homeSpreadOdds, awaySpreadOdds, over, overOdds, under, underOdds, drawMoneyline, sport, fantasyTopic} = props.route.params;
 
     useEffect(() => {
             fetchData()
             Analytics.logEvent('screen_view', { screen_name: 'Game', user_name: props.currentUser.name })
+
+            
         
     }, [props.blocking, props.liked, props.faded, props.route.params.postId, props.users])
 
@@ -759,13 +761,12 @@ function game(props) {
             sport == 'MLB - World Series Winner' ||
             sport == 'NBA - Championship' ||
             sport == 'NHL - Stanley Cup Winner' ||
-            sport == 'FIFA World Cup Winner' 
+            sport == 'FIFA World Cup Winner'
+           
             ?
             
             <View style={styles.gameHeaderContainer}>
                 <Text style={styles.gameHeaderText}>{sport}</Text>
-                
-                
                 <TouchableOpacity 
                     onPress={() => {listAllPlayersFunction()}}>
                     <Text style={styles.seeAllText}>See All</Text>
@@ -843,6 +844,14 @@ function game(props) {
                                 <Text style={styles.detailsText}>{props.formula1Races.totalLaps}</Text>
                             </View>
                         </View>
+                    </View>
+                    
+
+                    :
+
+                    sport == 'Fantasy' ?
+                    <View style={styles.gameHeaderContainer}>
+                        <Text style={styles.gameHeaderText}>{sport} - {fantasyTopic}</Text>
                     </View>
                     
 
@@ -1148,7 +1157,7 @@ function game(props) {
             <TouchableOpacity
                 activeOpacity={0.8}
                 style={styles.button}
-                onPress={() => props.navigation.navigate('NewPost', { gameId: gameId, homeTeam: homeTeam, awayTeam: awayTeam, gameDate: gameDate })}
+                onPress={() => props.navigation.navigate('NewPost', { gameId: gameId, homeTeam: homeTeam, awayTeam: awayTeam, gameDate: gameDate, sport: sport})}
             >
                 <MaterialCommunityIcons name={"plus"} size={30} color="white" />
             </TouchableOpacity>

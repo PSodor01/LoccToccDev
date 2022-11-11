@@ -37,7 +37,7 @@ function AddPostScreen(props) {
   const [allUsers, setAllUsers] = useState([]);
   const [search, setSearch] = useState('');
 
-  const { gameId, homeTeam, awayTeam, gameDate } = props.route.params;
+  const { gameId, homeTeam, awayTeam, gameDate, sport} = props.route.params;
 
   const getUser = async() => {
     const currentUser = await firebase.firestore()
@@ -221,6 +221,10 @@ function AddPostScreen(props) {
 
     const increasePostsCount = () => {
 
+      if (sport == 'Fantasy') {
+        null
+      } else {
+
       firebase.firestore()
           .collection("votes")
           .doc(gameId)
@@ -256,43 +260,46 @@ function AddPostScreen(props) {
                         homeCount: 0,
                         drawCount:0,
                         gamePostsCount: 1,
-
-                      })
+                       
+                    }, { merge:true });
                   
               }
           })
+        }
   }
 
   const storeNotificationForTag = async () => {
 
-    console.log(userTagId)
-    
-    if (awayTeam  != undefined) {
-      const likedName = props.currentUser.name
-      firebase.firestore()
-        .collection("users")
-        .doc(userTagId)
-        .collection("notifications")
-        .add({
-            notificationType: "tag",
-            creation: firebase.firestore.FieldValue.serverTimestamp(),
-            otherUserId: firebase.auth().currentUser.uid,
-            otherUsername: likedName,
-            notificationText: 'tagged you in a post on the ' + awayTeam + "/" + homeTeam + " game"
-            })
+    if (userTagId == null) {
+      null
     } else {
-      const likedName = props.currentUser.name
-      firebase.firestore()
-        .collection("users")
-        .doc(userTagId)
-        .collection("notifications")
-        .add({
-            notificationType: "tag",
-            creation: firebase.firestore.FieldValue.serverTimestamp(),
-            otherUserId: firebase.auth().currentUser.uid,
-            otherUsername: likedName,
-            notificationText: 'tagged you in a post',
-            })
+      if (awayTeam  != undefined) {
+        const likedName = props.currentUser.name
+        firebase.firestore()
+          .collection("users")
+          .doc(userTagId)
+          .collection("notifications")
+          .add({
+              notificationType: "tag",
+              creation: firebase.firestore.FieldValue.serverTimestamp(),
+              otherUserId: firebase.auth().currentUser.uid,
+              otherUsername: likedName,
+              notificationText: 'tagged you in a post on the ' + awayTeam + "/" + homeTeam + " game"
+              })
+      } else {
+        const likedName = props.currentUser.name
+        firebase.firestore()
+          .collection("users")
+          .doc(userTagId)
+          .collection("notifications")
+          .add({
+              notificationType: "tag",
+              creation: firebase.firestore.FieldValue.serverTimestamp(),
+              otherUserId: firebase.auth().currentUser.uid,
+              otherUsername: likedName,
+              notificationText: 'tagged you in a post',
+              })
+      }
     }
   }
 
