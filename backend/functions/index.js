@@ -283,9 +283,14 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
       .then(result => {
         result.data.forEach(game => {
 
-          if (game.bookmakers.findIndex((item) => item.key === 'betfair') > -1) {
-            let i = game.bookmakers.findIndex((item) => item.key === 'betfair')
+          if (game.bookmakers.findIndex((item) => item.key === 'fanduel') > -1) {
+            let i = game.bookmakers.findIndex((item) => item.key === 'fanduel')
+            if (game.away_team == "Georgia Tech Yellow Jackets" || game.away_team == "Grambling State Tigers") 
+            {console.log("skip")}
+            
+            else {
             if (game.away_team == game.bookmakers[0].markets[0].outcomes[0].name) {
+            
   
               const writeResult = admin
               .firestore()
@@ -335,7 +340,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
             }, { merge:true });
   
             }
-          } else {
+          }} else {
             return
   
           }
@@ -491,8 +496,8 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
       .then(result => {
         result.data.forEach(game => {
 
-          if (game.bookmakers.findIndex((item) => item.key === 'draftkings') > -1) {
-            let i = game.bookmakers.findIndex((item) => item.key === 'draftkings')
+          if (game.bookmakers.findIndex((item) => item.key === 'fanduel') > -1) {
+            let i = game.bookmakers.findIndex((item) => item.key === 'fanduel')
             if (game.away_team == game.bookmakers[0].markets[0].outcomes[0].name) {
 
               const writeResult = admin

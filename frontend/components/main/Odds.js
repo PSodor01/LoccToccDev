@@ -103,7 +103,7 @@ function Odds(props) {
             setSport('NFL')
         }
 
-    }, [ props.nflGames, props.ncaafGames, props.eplGames, props.ncaabGames, props.nbaGames, props.nhlGames, props.mmaGames, props.futureGames, props.formula1Teams, props.formula1Races, props.formula1Drivers, props.formula1Rankings ])
+    }, [ props.nflGames, props.ncaafGames, props.eplGames, props.ncaabGames, props.nbaGames, props.nhlGames, props.mmaGames, props.futureGames, ])
 
    useEffect(() => {
 
@@ -290,11 +290,11 @@ function Odds(props) {
 
 
         setFutureGames(props.futureGames)
-        setFormula1Teams(props.formula1Teams)
+        /*setFormula1Teams(props.formula1Teams)
         setFormula1Races(props.formula1Races)
         setFormula1Drivers(props.formula1Drivers)
         setFormula1Rankings(props.formula1Rankings)
-        if (props.formula1Rankings.length > 2 ) {setFormula1RaceLive(true)}
+        if (props.formula1Rankings.length > 2 ) {setFormula1RaceLive(true)} */
 
         trendingFunction(ncaabGames, nflGames, ncaafGames, nbaGames, nhlGames, mmaGames)
         setLoading(false)
@@ -520,28 +520,23 @@ function Odds(props) {
             icon: ncaabIcon
         },
         {
-            sport: 'NHL',
-            id: '6',
-            icon: nhlIcon
-        },
-        {
             sport: 'FIFA',
-            id: '7',
+            id: '6',
             icon: eplIcon
         },
         {
-            sport: 'Formula 1',
-            id: '8',
-            icon: formula1Icon
+            sport: 'NHL',
+            id: '7',
+            icon: nhlIcon
         },
         {
             sport: 'UFC',
-            id: '9',
+            id: '8',
             icon: mmaIcon
         },
         {
             sport: 'Futures',
-            id: '10',
+            id: '9',
             icon: futureIcon
         },
      
@@ -612,7 +607,7 @@ function Odds(props) {
 
     const openAdLink = () => {
 
-        Analytics.logEvent('adClick', {user_name: props.currentUser.name, adPartner: 'Sporttrade'});
+        Analytics.logEvent('adClick', {user_name: props.currentUser.name, adPartner: 'BetUS'});
             
     }
 
@@ -1358,10 +1353,10 @@ function Odds(props) {
             
             }
             <TouchableOpacity style={styles.adView}
-                onPress={() => { Linking.openURL('https://sporttrade.onelink.me/evxw/LoccTocc'); openAdLink()}} >
+                onPress={() => { Linking.openURL('https://record.revmasters.com/_Dzm3I58J4i-hvo5nC3tZQ2Nd7ZgqdRLk/1/'); openAdLink()}} >
                 <Image 
-                    style={{ width: "95%", height: 50 }}
-                    source={require('../../assets/sporttradeBanner.png')}
+                    style={{ width: "95%", height: 40, resizeMode: "contain" }}
+                    source={require('../../assets/BetUSAd.png')}
                 />
             </TouchableOpacity>
          
@@ -1577,6 +1572,7 @@ const styles = StyleSheet.create({
     adView: {
         alignItems: 'center',
         justifyContent: 'center',
+
     },
     gameDateContainer: {
         flexDirection: 'row',
@@ -1731,14 +1727,14 @@ const mapStateToProps = (store) => ({
     mmaGames: store.mmaGamesState.mmaGames,
     eplGames: store.eplGamesState.eplGames,
     futureGames: store.futureGamesState.futureGames,
-    formula1Teams: store.formula1TeamsState.formula1Teams,
-    formula1Races: store.formula1RacesState.formula1Races,
-    formula1Drivers: store.formula1DriversState.formula1Drivers,
-    formula1Rankings: store.formula1RankingsState.formula1Rankings,
     allUsers: store.userState.allUsers,
     currentUser: store.userState.currentUser,
     contestStatus: store.userState.contestStatus,
 
+    /*formula1Teams: store.formula1TeamsState.formula1Teams,
+    formula1Races: store.formula1RacesState.formula1Races,
+    formula1Drivers: store.formula1DriversState.formula1Drivers,
+    formula1Rankings: store.formula1RankingsState.formula1Rankings, */
 
 })
 

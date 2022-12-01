@@ -555,7 +555,7 @@ function game(props) {
 
     const openAdLink = () => {
 
-        Analytics.logEvent('adClick', {user_name: props.currentUser.name, adPartner: 'Sporttrade'});
+        Analytics.logEvent('adClick', {user_name: props.currentUser.name, adPartner: 'BetUS'});
             
     }
 
@@ -1147,10 +1147,10 @@ function game(props) {
 
             
             <TouchableOpacity style={styles.adView}
-                onPress={() => { Linking.openURL('https://sporttrade.onelink.me/evxw/LoccTocc'); openAdLink()}} >
+                onPress={() => { Linking.openURL('https://record.revmasters.com/_Dzm3I58J4i-hvo5nC3tZQ2Nd7ZgqdRLk/1/'); openAdLink()}} >
                 <Image 
-                    style={{ width: "95%", height: 50 }}
-                    source={require('../../assets/sporttradeBanner.png')}
+                    style={{ width: "95%", height: 40, resizeMode: "contain" }}
+                    source={require('../../assets/BetUSAd.png')}
                 />
             </TouchableOpacity>
 

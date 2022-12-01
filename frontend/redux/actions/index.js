@@ -384,7 +384,7 @@ export function fetchFutureGames() {
     })
 }
 
-export function fetchFormula1Teams() {
+/*export function fetchFormula1Teams() {
     return ((dispatch) => {
         firebase.firestore()
             .collection("formula1")
@@ -459,7 +459,7 @@ export function fetchFormula1Rankings() {
                 
             })
     })
-}
+} */
 
 export function fetchContestStatus() {
     return ((dispatch) => {
