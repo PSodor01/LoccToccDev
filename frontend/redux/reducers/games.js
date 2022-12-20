@@ -22,12 +22,12 @@ const initialState = {
     mmaGames: [],
     nhlGames: [],
     nbaGames: [],
-    eplGames: [],
     futureGames: [],
+    /*eplGames: [],
     formula1Teams: [],
     formula1Drivers: [],
     formula1Races: [],
-    formula1Rankings: [],
+    formula1Rankings: [],*/
 }
 
 export const nflGames = (state = initialState, action) => {
@@ -114,12 +114,12 @@ export const nhlGames = (state = initialState, action) => {
     }
 }
 
-export const eplGames = (state = initialState, action) => {
+export const futureGames = (state = initialState, action) => {
     switch (action.type) {
-        case EPL_GAMES_STATE_CHANGE:
+        case FUTURE_GAMES_STATE_CHANGE:
             return {
                 ...state,
-                eplGames: action.eplGames
+                futureGames: action.futureGames
             }
         case CLEAR_DATA:
             return initialState
@@ -128,12 +128,12 @@ export const eplGames = (state = initialState, action) => {
     }
 }
 
-export const futureGames = (state = initialState, action) => {
+/*export const eplGames = (state = initialState, action) => {
     switch (action.type) {
-        case FUTURE_GAMES_STATE_CHANGE:
+        case EPL_GAMES_STATE_CHANGE:
             return {
                 ...state,
-                futureGames: action.futureGames
+                eplGames: action.eplGames
             }
         case CLEAR_DATA:
             return initialState
@@ -197,6 +197,7 @@ export const formula1Rankings = (state = initialState, action) => {
             return state;
     }
 }
+*/
 
 export const mmaGames = (state = initialState, action) => {
     switch (action.type) {

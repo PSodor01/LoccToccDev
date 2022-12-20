@@ -690,10 +690,10 @@ function Feed(props) {
 
             
             <TouchableOpacity style={styles.adView}
-                onPress={() => { Linking.openURL('https://record.revmasters.com/_Dzm3I58J4i-hvo5nC3tZQ2Nd7ZgqdRLk/1/'); openAdLink()}} >
+                onPress={() => { Linking.openURL('https://bit.ly/3uAOAIh'); openAdLink()}} >
                 <Image 
                     style={{ width: "95%", height: 40, resizeMode: "contain" }}
-                    source={require('../../assets/BetUSAd.png')}
+                    source={require('../../assets/fantasyJocksBanner.jpg')}
                 />
             </TouchableOpacity>
         </View>

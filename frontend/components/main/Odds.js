@@ -103,7 +103,7 @@ function Odds(props) {
             setSport('NFL')
         }
 
-    }, [ props.nflGames, props.ncaafGames, props.eplGames, props.ncaabGames, props.nbaGames, props.nhlGames, props.mmaGames, props.futureGames, ])
+    }, [ props.nflGames, props.ncaafGames, props.ncaabGames, props.nbaGames, props.nhlGames, props.mmaGames, props.futureGames, ])
 
    useEffect(() => {
 
@@ -267,27 +267,6 @@ function Odds(props) {
             })
         }
         setmmaGames(props.mmaGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))
-
-        for (let i = 0; i < props.eplGames.length; i++) {
-
-            firebase.firestore()
-            .collection("votes")
-            .doc(props.eplGames[i].gameId)
-            .collection("gameVotes")
-            .doc("info")
-            .get()
-            .then((snapshot) => {
-                if (snapshot.exists) {
-                    let gameMiscData = snapshot.data();
-                    props.eplGames[i].gamePostsCount = gameMiscData.gamePostsCount
-                }
-                else {
-                    props.eplGames[i].gamePostsCount = 0
-                }
-            })
-        }
-        seteplGames(props.eplGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))
-
 
         setFutureGames(props.futureGames)
         /*setFormula1Teams(props.formula1Teams)
@@ -520,23 +499,18 @@ function Odds(props) {
             icon: ncaabIcon
         },
         {
-            sport: 'FIFA',
-            id: '6',
-            icon: eplIcon
-        },
-        {
             sport: 'NHL',
-            id: '7',
+            id: '6',
             icon: nhlIcon
         },
         {
             sport: 'UFC',
-            id: '8',
+            id: '7',
             icon: mmaIcon
         },
         {
             sport: 'Futures',
-            id: '9',
+            id: '8',
             icon: futureIcon
         },
      
@@ -590,12 +564,6 @@ function Odds(props) {
             id: '4',
             icon: nhlIcon,
             gameId: 'fa2852d4b88dd0759b0f8bc2665261b8'
-        },
-        {
-            futureSport: 'FIFA World Cup Winner',
-            id: '5',
-            icon: eplIcon,
-            gameId: '28abbddced5f6df0409dc0c7ec0fd5f6'
         },
         
       ];
@@ -1353,10 +1321,10 @@ function Odds(props) {
             
             }
             <TouchableOpacity style={styles.adView}
-                onPress={() => { Linking.openURL('https://record.revmasters.com/_Dzm3I58J4i-hvo5nC3tZQ2Nd7ZgqdRLk/1/'); openAdLink()}} >
+                onPress={() => { Linking.openURL('https://bit.ly/3uAOAIh'); openAdLink()}} >
                 <Image 
                     style={{ width: "95%", height: 40, resizeMode: "contain" }}
-                    source={require('../../assets/BetUSAd.png')}
+                    source={require('../../assets/fantasyJocksBanner.jpg')}
                 />
             </TouchableOpacity>
          
@@ -1725,7 +1693,6 @@ const mapStateToProps = (store) => ({
     nbaGames: store.nbaGamesState.nbaGames,
     nhlGames: store.nhlGamesState.nhlGames,
     mmaGames: store.mmaGamesState.mmaGames,
-    eplGames: store.eplGamesState.eplGames,
     futureGames: store.futureGamesState.futureGames,
     allUsers: store.userState.allUsers,
     currentUser: store.userState.currentUser,
@@ -1734,7 +1701,8 @@ const mapStateToProps = (store) => ({
     /*formula1Teams: store.formula1TeamsState.formula1Teams,
     formula1Races: store.formula1RacesState.formula1Races,
     formula1Drivers: store.formula1DriversState.formula1Drivers,
-    formula1Rankings: store.formula1RankingsState.formula1Rankings, */
+    formula1Rankings: store.formula1RankingsState.formula1Rankings,
+    eplGames: store.eplGamesState.eplGames, */
 
 })
 

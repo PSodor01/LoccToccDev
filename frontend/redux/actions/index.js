@@ -332,7 +332,7 @@ export function fetchMMAGames() {
     })
 }
 
-export function fetchEPLGames() {
+/*export function fetchEPLGames() {
     return ((dispatch) => {
         firebase.firestore()
             .collection("epl")
@@ -350,7 +350,7 @@ export function fetchEPLGames() {
     })
 }
 
-/*export function fetchGolfGames() {
+export function fetchGolfGames() {
     return ((dispatch) => {
         firebase.firestore()
             .collection("golf")

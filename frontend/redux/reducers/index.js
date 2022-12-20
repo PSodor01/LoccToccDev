@@ -11,14 +11,16 @@ const Reducers = combineReducers({
     nhlGamesState: nhlGames,
     ncaafGamesState: ncaafGames,
     mlbGamesState: mlbGames,
-    eplGamesState: eplGames,
     ncaabGamesState: ncaabGames,
     mmaGamesState: mmaGames,
     futureGamesState: futureGames,
+
+    /*eplGamesState: eplGames,
     formula1TeamsState: formula1Teams,
     formula1RacesState: formula1Races,
     formula1DriversState: formula1Drivers,
     formula1RankingsState: formula1Rankings,
+    */
 })
 
 export default Reducers

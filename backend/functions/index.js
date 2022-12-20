@@ -285,10 +285,6 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
 
           if (game.bookmakers.findIndex((item) => item.key === 'fanduel') > -1) {
             let i = game.bookmakers.findIndex((item) => item.key === 'fanduel')
-            if (game.away_team == "Georgia Tech Yellow Jackets" || game.away_team == "Grambling State Tigers") 
-            {console.log("skip")}
-            
-            else {
             if (game.away_team == game.bookmakers[0].markets[0].outcomes[0].name) {
             
   
@@ -340,7 +336,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
             }, { merge:true });
   
             }
-          }} else {
+          } else {
             return
   
           }
@@ -498,6 +494,11 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
 
           if (game.bookmakers.findIndex((item) => item.key === 'fanduel') > -1) {
             let i = game.bookmakers.findIndex((item) => item.key === 'fanduel')
+            if(game.away_team == "Eastern Kentucky Colonels") {
+              console.log("skip")
+            } else {
+
+            
             if (game.away_team == game.bookmakers[0].markets[0].outcomes[0].name) {
 
               const writeResult = admin
@@ -546,7 +547,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
             }, { merge:true });
   
             }
-          } else {
+          }} else {
             return
 
           }
