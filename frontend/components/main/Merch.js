@@ -5,6 +5,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 
 import { useNavigation } from '@react-navigation/native';
 
+import * as Device from 'expo-device';
+
 import moment from 'moment';
 
 import firebase from 'firebase'
@@ -34,7 +36,7 @@ function Merch(props) {
     const testID = 'ca-app-pub-3940256099942544/2934735716';
     const productionID = 'ca-app-pub-8519029912093094/5453808592';
     // Is a real device and running in production.
-    const adUnitID = Constants.isDevice && !__DEV__ ? productionID : testID;
+    const adUnitID = Device.isDevice && !__DEV__ ? productionID : testID;
 
     
     const EmptyListMessage = () => {

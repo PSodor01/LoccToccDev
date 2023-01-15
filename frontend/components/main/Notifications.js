@@ -8,7 +8,7 @@ import * as Analytics from 'expo-firebase-analytics';
 
 import moment from 'moment';
 
-import Constants from 'expo-constants'
+import * as Device from 'expo-device';
 
 import firebase from 'firebase'
 require('firebase/firestore')
@@ -109,7 +109,7 @@ function Notifications(props) {
     const testID = 'ca-app-pub-3940256099942544/2934735716';
     const productionID = 'ca-app-pub-8519029912093094/1666835736';
     // Is a real device and running in production.
-    const adUnitID = Constants.isDevice && !__DEV__ ? productionID : testID;
+    const adUnitID = Device.isDevice && !__DEV__ ? productionID : testID;
 
     const openAdLink = () => {
 

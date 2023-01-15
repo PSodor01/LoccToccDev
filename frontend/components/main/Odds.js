@@ -8,7 +8,6 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 import * as Notifications from 'expo-notifications'
 import * as Permissions from 'expo-permissions'
-import Constants from 'expo-constants'
 import * as Device from 'expo-device';
 import * as Updates from 'expo-updates';
 
@@ -103,7 +102,7 @@ function Odds(props) {
             setSport('NFL')
         }
 
-    }, [ props.nflGames, props.ncaafGames, props.ncaabGames, props.nbaGames, props.nhlGames, props.mmaGames, props.futureGames, ])
+    }, [ props.nflGames, props.ncaabGames, props.nbaGames, props.nhlGames, props.mmaGames, props.futureGames, ])
 
    useEffect(() => {
 
@@ -143,8 +142,8 @@ function Odds(props) {
 
     const fetchData = () => {
 
-        function trendingFunction(nflGames, ncaabGames, ncaafGames, nbaGames, nhlGames) {
-            let trendingGames = nflGames.concat(ncaafGames, ncaabGames, nbaGames, nhlGames)
+        function trendingFunction(nflGames, ncaabGames, nbaGames, nhlGames) {
+            let trendingGames = nflGames.concat(ncaabGames, nbaGames, nhlGames)
             setTrendingGames(trendingGames)
         }
 
@@ -228,26 +227,6 @@ function Odds(props) {
         }
         setnhlGames(props.nhlGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))
 
-        for (let i = 0; i < props.ncaafGames.length; i++) {
-
-            firebase.firestore()
-            .collection("votes")
-            .doc(props.ncaafGames[i].gameId)
-            .collection("gameVotes")
-            .doc("info")
-            .get()
-            .then((snapshot) => {
-                if (snapshot.exists) {
-                    let gameMiscData = snapshot.data();
-                    props.ncaafGames[i].gamePostsCount = gameMiscData.gamePostsCount
-                }
-                else {
-                    props.ncaafGames[i].gamePostsCount = 0
-                }
-            })
-        }
-        setncaafGames(props.ncaafGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))
-
         for (let i = 0; i < props.mmaGames.length; i++) {
 
             firebase.firestore()
@@ -275,7 +254,7 @@ function Odds(props) {
         setFormula1Rankings(props.formula1Rankings)
         if (props.formula1Rankings.length > 2 ) {setFormula1RaceLive(true)} */
 
-        trendingFunction(ncaabGames, nflGames, ncaafGames, nbaGames, nhlGames, mmaGames)
+        trendingFunction(ncaabGames, nflGames, nbaGames, nhlGames, mmaGames)
         setLoading(false)
 
     }
@@ -304,7 +283,7 @@ function Odds(props) {
 
     const registerForPushNotificationsAsync = async () => {
         let token;
-        if (Constants.isDevice) {
+        if (Device.isDevice) {
           const { status: existingStatus } = await Notifications.getPermissionsAsync();
           let finalStatus = existingStatus;
           if (existingStatus !== 'granted') {
@@ -484,33 +463,28 @@ function Odds(props) {
             icon: nflIcon
         },
         {
-            sport: 'NCAAF',
-            id: '3',
-            icon: ncaafIcon
-        },
-        {
             sport: 'NBA',
-            id: '4',
+            id: '3',
             icon: nbaIcon
         },
         {
             sport: 'NCAAB',
-            id: '5',
+            id: '4',
             icon: ncaabIcon
         },
         {
             sport: 'NHL',
-            id: '6',
+            id: '5',
             icon: nhlIcon
         },
         {
             sport: 'UFC',
-            id: '7',
+            id: '6',
             icon: mmaIcon
         },
         {
             sport: 'Futures',
-            id: '8',
+            id: '7',
             icon: futureIcon
         },
      
@@ -1686,7 +1660,6 @@ const styles = StyleSheet.create({
 })
 
 const mapStateToProps = (store) => ({
-    ncaafGames: store.ncaafGamesState.ncaafGames,
     mlbGames: store.mlbGamesState.mlbGames,
     ncaabGames: store.ncaabGamesState.ncaabGames,
     nflGames: store.nflGamesState.nflGames,

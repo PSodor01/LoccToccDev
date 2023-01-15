@@ -5,7 +5,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 
 import * as Notifications from 'expo-notifications'
 import * as Permissions from 'expo-permissions'
-import Constants from 'expo-constants'
+import * as Device from 'expo-device';
 
 import * as Analytics from 'expo-firebase-analytics';
 
@@ -93,7 +93,7 @@ const SettingsScreen = (props) => {
             setNotificationValue(true);
 
             let token;
-            if (Constants.isDevice) {
+            if (Device.isDevice) {
             const { status: existingStatus } = await Notifications.getPermissionsAsync();
             let finalStatus = existingStatus;
             if (existingStatus !== 'granted') {

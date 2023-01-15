@@ -6,7 +6,7 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import Animated from 'react-native-reanimated';
 import BottomSheet from 'reanimated-bottom-sheet';
 
-import Constants from 'expo-constants'
+import * as Device from 'expo-device';
 
 import Leaderboard from 'react-native-leaderboard';
 
@@ -132,12 +132,12 @@ function Contest(props) {
     const testBannerID = 'ca-app-pub-3940256099942544/2934735716';
     const productionBannerID = 'ca-app-pub-8519029912093094/1640242937';
     // Is a real device and running in production.
-    const adBannerUnitID = Constants.isDevice && !__DEV__ ? productionBannerID : testBannerID;
+    const adBannerUnitID = Device.isDevice && !__DEV__ ? productionBannerID : testBannerID;
 
     const testInterstitialID = 'ca-app-pub-3940256099942544/1033173712';
     const productionInterstitialID = 'ca-app-pub-8519029912093094/2876269149';
     // Is a real device and running in production.
-    const adInterstitialUnitID = Constants.isDevice && !__DEV__ ? productionInterstitialID : testInterstitialID;
+    const adInterstitialUnitID = Device.isDevice && !__DEV__ ? productionInterstitialID : testInterstitialID;
 
     const interstitial = async () => {
         await AdMobInterstitial.setAdUnitID(adInterstitialUnitID); // Test ID, Replace with your-admob-unit-id
