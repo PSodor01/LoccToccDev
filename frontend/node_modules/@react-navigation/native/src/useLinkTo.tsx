@@ -14,11 +14,11 @@ export type To<
   | string
   | (undefined extends ParamList[RouteName]
       ? {
-          screen: RouteName;
+          screen: Extract<RouteName, string>;
           params?: ParamList[RouteName];
         }
       : {
-          screen: RouteName;
+          screen: Extract<RouteName, string>;
           params: ParamList[RouteName];
         });
 
@@ -38,7 +38,7 @@ export default function useLinkTo<
 
       if (typeof to !== 'string') {
         // @ts-expect-error: This is fine
-        root.navigate(to.screen, to.params);
+        navigation.navigate(to.screen, to.params);
         return;
       }
 
