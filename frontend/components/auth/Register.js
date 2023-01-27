@@ -5,10 +5,6 @@ import { FontAwesome5 } from "@expo/vector-icons";
 
 import { CheckBox } from 'react-native-elements';
 
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import { Picker } from '@react-native-community/picker';
-
-import PassMeter from "react-native-passmeter";
 
 import firebase from 'firebase'
 import "firebase/firestore";
@@ -23,40 +19,6 @@ const DismissKeyboard = ({ children }) => (
 const MAX_LEN = 15,
   MIN_LEN = 6,
   PASS_LABELS = ["Too Short", "Weak Sauce", "Better", "There we go!", "YES!!"];
-
-/*
-<View style={styles.datePicker}>
-    <Button 
-        title="Choose Birthday" 
-        onPress={this.onPressButton} 
-    />
-    <Text>{this.state.DateDisplay}</Text>
-    <DateTimePickerModal 
-        isVisible={this.state.visibility}
-        onConfirm={this.handleConfirm}
-        onCancel={this.onPressCancel}
-        mode="date"
-    />
-
-</View>
-<View style={{ paddingTop: 10, marginTop: 30 }}>
-    <Picker
-    style={{ justifyContent: 'center', height: 100}}
-    itemStyle={{ fontSize: 14, }}
-    selectedValue={this.state.gender}
-    onValueChange={(itemValue, itemIndex) => this.setState({gender: itemValue})}
-    >
-        <Picker.Item
-            label='Female'
-            value='female'
-        />
-        <Picker.Item
-            label='Male'
-            value='male'
-        />
-    </Picker>
-</View>
-    */
 
 export class Register extends Component {
 
@@ -181,17 +143,6 @@ export class Register extends Component {
                             secureTextEntry={true}
                             onChangeText={(password) => this.setState({ password })}
                         />
-                        {this.state.password ? 
-                        <PassMeter
-                            showLabels
-                            password={this.state.password}
-                            maxLength={MAX_LEN}
-                            minLength={MIN_LEN}
-                            labels={PASS_LABELS}
-                            useNativeDriver={true}
-                        />
-                        : null
-                        }
                         <TextInput  
                             style={styles.textInput}
                             placeholder="Sign Up Code?"
