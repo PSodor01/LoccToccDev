@@ -6,11 +6,9 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import Animated from 'react-native-reanimated';
 import BottomSheet from 'reanimated-bottom-sheet';
 
-import * as Device from 'expo-device';
-
 import Leaderboard from 'react-native-leaderboard';
 
-import * as Analytics from 'expo-firebase-analytics';
+import analytics from "@react-native-firebase/analytics";
 
 import firebase from 'firebase'
 require("firebase/firestore")
@@ -37,7 +35,7 @@ function Contest(props) {
         const myScore = props.allUsers.filter(user => user.name == props.currentUser.name);
         setMyScore(myScore)
 
-        Analytics.logEvent('screen_view', { screen_name: 'Contest', user_name: props.currentUser.name })
+        analytics().logevent('screen_view', { screen_name: 'Contest', user_name: props.currentUser.name })
 
     }, [props.allUsers, props.currentUser, props.contestStatus])
 
@@ -55,12 +53,12 @@ function Contest(props) {
     )}
 
     const countInfoClicks = () => {
-        Analytics.logEvent('contestInfoClicks', {user_name: props.currentUser.name});
+        analytics().logevent('contestInfoClicks', {user_name: props.currentUser.name});
     }
 
     const countLocctoccWebsiteClicks = () => {
 
-        Analytics.logEvent('websiteClicks', {user_name: props.currentUser.name});
+        analytics().logevent('websiteClicks', {user_name: props.currentUser.name});
 
 
      
@@ -68,21 +66,21 @@ function Contest(props) {
 
     const countLocctoccInstagramClicks = () => {
 
-        Analytics.logEvent('locctoccInstagramClicks', {user_name: props.currentUser.name});
+        analytics().logevent('locctoccInstagramClicks', {user_name: props.currentUser.name});
 
         
     }
 
     const countLocctoccTwitterClicks = () => {
 
-        Analytics.logEvent('locctoccTwitterClicks', {user_name: props.currentUser.name});
+        analytics().logevent('locctoccTwitterClicks', {user_name: props.currentUser.name});
 
         
     }
 
     const countLocctoccTiktokClicks = () => {
 
-        Analytics.logEvent('locctoccTiktokClicks', {user_name: props.currentUser.name});
+        analytics().logevent('locctoccTiktokClicks', {user_name: props.currentUser.name});
 
      
     }
@@ -127,27 +125,6 @@ function Contest(props) {
 
     bs = React.createRef();
     fall = new Animated.Value(1);
-
-
-    const testBannerID = 'ca-app-pub-3940256099942544/2934735716';
-    const productionBannerID = 'ca-app-pub-8519029912093094/1640242937';
-    // Is a real device and running in production.
-    const adBannerUnitID = Device.isDevice && !__DEV__ ? productionBannerID : testBannerID;
-
-    const testInterstitialID = 'ca-app-pub-3940256099942544/1033173712';
-    const productionInterstitialID = 'ca-app-pub-8519029912093094/2876269149';
-    // Is a real device and running in production.
-    const adInterstitialUnitID = Device.isDevice && !__DEV__ ? productionInterstitialID : testInterstitialID;
-
-    const interstitial = async () => {
-        await AdMobInterstitial.setAdUnitID(adInterstitialUnitID); // Test ID, Replace with your-admob-unit-id
-        try {
-            await AdMobInterstitial.requestAdAsync();
-            await AdMobInterstitial.showAdAsync();
-        } catch(error) {
-            console.log(error)
-        }
-    } 
 
     /*<View style={styles.headerContainer}>
         <View style={styles.titleContainer}>
@@ -207,13 +184,6 @@ function Contest(props) {
         </View>
     </View> */
 
-   /* <View style={styles.adView}>
-                <AdMobBanner
-                    bannerSize="banner"
-                    adUnitID={adUnitID} 
-                    servePersonalizedAds // true or false
-                />
-            </View> */
     
     return (
         <View style={styles.textInputContainer}>

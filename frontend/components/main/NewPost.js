@@ -13,7 +13,7 @@ import Animated from 'react-native-reanimated';
 import BottomSheet from 'reanimated-bottom-sheet';
 
 import * as Device from 'expo-device';
-import * as Analytics from 'expo-firebase-analytics';
+import analytics from "@react-native-firebase/analytics";
 
 import firebase from 'firebase'
 require("firebase/firestore")
@@ -53,7 +53,7 @@ function AddPostScreen(props) {
 
     useEffect(() => {
       getUser();
-      Analytics.logEvent('screen_view', { screen_name: 'NewPost', user_name: props.currentUser.name })
+      analytics().logevent('screen_view', { screen_name: 'NewPost', user_name: props.currentUser.name })
     },[]);
 
     useEffect(() => {
@@ -76,7 +76,7 @@ function AddPostScreen(props) {
 
   const pickImage = async () => {
 
-    Analytics.logEvent('addPictureToPost', {user_name: props.currentUser.name});
+    analytics().logevent('addPictureToPost', {user_name: props.currentUser.name});
 
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -93,7 +93,7 @@ function AddPostScreen(props) {
 
   const pickGif = (url) => {
 
-    Analytics.logEvent('addGifToPost', {user_name: props.currentUser.name});
+    analytics().logevent('addGifToPost', {user_name: props.currentUser.name});
 
     let result =  (url);
     console.log(result);
@@ -105,13 +105,13 @@ function AddPostScreen(props) {
   };
 
   const removeImage = () => {
-    Analytics.logEvent('removeImageFromPost', {user_name: props.currentUser.name});
+    analytics().logevent('removeImageFromPost', {user_name: props.currentUser.name});
 
       setImage(null);
   }
 
   const removeTaggedUser = () => {
-    Analytics.logEvent('removeTaggedUserFromPost', {user_name: props.currentUser.name});
+    analytics().logevent('removeTaggedUserFromPost', {user_name: props.currentUser.name});
 
     setUserTagList(null);
     setUserTagId(null);
@@ -129,7 +129,7 @@ function AddPostScreen(props) {
   }
 
   const tagUsersFunction = (name, token, id) => {
-    Analytics.logEvent('addUsersToTagList', {user_name: props.currentUser.name});
+    analytics().logevent('addUsersToTagList', {user_name: props.currentUser.name});
     
         const userTagList = name
         setUserTagList(userTagList)
@@ -175,7 +175,7 @@ function AddPostScreen(props) {
 
   const savePostData = (downloadURL) => {
 
-    Analytics.logEvent('newPost', {user_name: props.currentUser.name});
+    analytics().logevent('newPost', {user_name: props.currentUser.name});
 
     firebase.firestore()
         .collection('posts')

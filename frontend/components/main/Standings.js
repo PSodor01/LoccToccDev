@@ -3,7 +3,7 @@ import { View, Text, FlatList, TouchableOpacity, StyleSheet, ScrollView, Image }
 
 import { useNavigation } from '@react-navigation/native';
 
-import * as Analytics from 'expo-firebase-analytics';
+import analytics from "@react-native-firebase/analytics";
 
 import firebase from 'firebase'
 require("firebase/firestore")
@@ -23,7 +23,7 @@ function Standings(props) {
     const { standingsType } = props.route.params;
 
     useEffect(() => {
-        Analytics.logEvent('screen_view', { screen_name: 'F1 Standings', user_name: props.currentUser.name });
+        analytics().logEvent('screen_view', { screen_name: 'F1 Standings', user_name: props.currentUser.name });
 
         setFormula1Teams(props.formula1Teams)
         setFormula1Drivers(props.formula1Drivers.slice(0, 20))

@@ -8,7 +8,7 @@ import * as ImagePicker from 'expo-image-picker';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
-import * as Analytics from 'expo-firebase-analytics';
+import analytics from "@react-native-firebase/analytics";
 
 import firebase from 'firebase'
 require("firebase/firestore")
@@ -40,7 +40,7 @@ function EditProfileScreen(props) {
 
     const handleUpdate = async() => {
 
-      Analytics.logEvent('submitEditProfile', { user_name: props.currentUser.name});
+      analytics().logevent('submitEditProfile', { user_name: props.currentUser.name});
 
         let imgUrl = await uploadImage();
 
@@ -130,7 +130,7 @@ function EditProfileScreen(props) {
     useEffect(() => {
         getUser();
 
-        Analytics.logEvent('screen_view', { screen_name: 'EditProfile',  user_name: props.currentUser.name })
+        analytics().logevent('screen_view', { screen_name: 'EditProfile',  user_name: props.currentUser.name })
     },[]);
 
     useEffect(() => {
@@ -145,7 +145,7 @@ function EditProfileScreen(props) {
     
       const pickImage = async () => {
 
-        Analytics.logEvent('changeProfilePicture', { user_name: props.currentUser.name});
+        analytics().logevent('changeProfilePicture', { user_name: props.currentUser.name});
 
         let result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Images,

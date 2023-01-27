@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 
 import Onboarding from 'react-native-onboarding-swiper';
 
-import * as Analytics from 'expo-firebase-analytics';
+import analytics from "@react-native-firebase/analytics";
 
 import firebase from 'firebase'
 require("firebase/firestore")
@@ -17,7 +17,7 @@ function OnboardingScreen(props) {
 
 useEffect(() => {
 
-    Analytics.logEvent('screen_view', { screen_name: 'Onboarding', user_name: props.currentUser.name })
+    analytics().logevent('screen_view', { screen_name: 'Onboarding', user_name: props.currentUser.name })
 
 }, [])
 

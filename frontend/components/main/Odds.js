@@ -12,7 +12,7 @@ import * as Updates from 'expo-updates';
 
 import moment from 'moment'
 
-import * as Analytics from 'expo-firebase-analytics';
+import analytics from "@react-native-firebase/analytics";
 import * as StoreReview from 'expo-store-review';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -51,12 +51,11 @@ function Odds(props) {
     const [notification, setNotification] = useState('');
     const [notificationCriteria, setNotificationCriteria] = useState(false);
     const [isFirstLaunch, setIsFirstLaunch] = useState(null)
-    const [adMobLive, setAdMobLive] = useState();
     
     useEffect(() => {
 
-        Analytics.setUserId(firebase.auth().currentUser.uid);
-        Analytics.logEvent('screen_view', { screen_name: 'Odds', user_name: props.currentUser.name });
+        analytics().setUserId(firebase.auth().currentUser.uid);
+        analytics().logevent('screen_view', { screen_name: 'Odds', user_name: props.currentUser.name });
 
         resetBadgeCount()
         
@@ -64,11 +63,6 @@ function Odds(props) {
 
     useEffect(() => {
 
-        if (props.contestStatus.adMobLive == true) {
-            setAdMobLive(true)
-        } else {
-            setAdMobLive(false)
-        }
 
     }, [props.contestStatus])
 
@@ -77,7 +71,7 @@ function Odds(props) {
             if(value == null ) {
                 AsyncStorage.setItem('alreadyLaunched', 'true');    
                 setIsFirstLaunch(true)
-                Analytics.logEvent('firstLaunch', {user_name: props.currentUser.name});
+                analytics().logevent('firstLaunch', {user_name: props.currentUser.name});
 
             } else {
                 setIsFirstLaunch(false);
@@ -358,7 +352,7 @@ function Odds(props) {
         const users = await firebase.firestore().collection("users").get();
         users.docs.map((user) => sendNotification(user.data().token))
 
-        Analytics.logEvent('sendNotificationToAllUsers', {user_name: props.currentUser.name})
+        analytics().logevent('sendNotificationToAllUsers', {user_name: props.currentUser.name})
 
 
 
@@ -402,7 +396,7 @@ function Odds(props) {
             setBrowse(false)
         } else {
             setBrowse(true)
-            Analytics.logEvent('searchGames', {user_name: props.currentUser.name});
+            analytics().logevent('searchGames', {user_name: props.currentUser.name});
         }
     }
 
@@ -415,19 +409,19 @@ function Odds(props) {
     }
     
     const setSportFunction = (sport) => {
-        if (sport == 'Trending') {setSportGames(trendingGames); Analytics.logEvent('selectTrendingGames', { user_name: props.currentUser.name }); setSport('Trending');}
-        if (sport == 'NFL') {setSportGames(props.nflGames); Analytics.logEvent('selectNFLGames', {user_name: props.currentUser.name}); setSport('NFL');}
-        if (sport == 'NBA') {setSportGames(props.nbaGames); Analytics.logEvent('selectNBAGames', {user_name: props.currentUser.name}); setSport('NBA');}
-        if (sport == 'NHL') {setSportGames(props.nhlGames); Analytics.logEvent('selectNHLGames', {user_name: props.currentUser.name}); setSport('NHL');}
-        if (sport == 'NCAAF') {setSportGames(props.ncaafGames); Analytics.logEvent('selectNCAAFGames', {user_name: props.currentUser.name}); setSport('NCAAF');}
-        if (sport == 'FIFA') {setSportGames(props.eplGames); Analytics.logEvent('selectFIFAGames', {user_name: props.currentUser.name}); setSport('FIFA');}
-        if (sport == 'MLB') {setSportGames(props.mlbGames); Analytics.logEvent('selectMLBGames', {user_name: props.currentUser.name}); setSport('MLB');}
-        if (sport == 'NCAAB') {setSportGames(props.ncaabGames); Analytics.logEvent('selectNCAABGames', {user_name: props.currentUser.name}); setSport('NCAAB');}
-        if (sport == 'UFC') {setSportGames(props.mmaGames); Analytics.logEvent('selectUFCGames', {user_name: props.currentUser.name}); setSport('UFC');}
-        if (sport == 'PGA') {setSportGames(props.golfGames); Analytics.logEvent('selectGolfGames', {user_name: props.currentUser.name}); setSport('PGA');}
-        if (sport == 'Futures') {setSportGames(props.futureGames); Analytics.logEvent('selectFuturesGames', {user_name: props.currentUser.name}); setSport('Futures');}
-        if (sport == 'Formula 1') {setSportGames(props.formula1Races); Analytics.logEvent('selectFormula1Games', {user_name: props.currentUser.name}); setSport('Formula 1');}
-        if (sport == 'Fantasy') {setSportGames(fantasyGames); Analytics.logEvent('selectFantasyGames', {user_name: props.currentUser.name}); setSport('Fantasy');}
+        if (sport == 'Trending') {setSportGames(trendingGames); analytics().logevent('selectTrendingGames', { user_name: props.currentUser.name }); setSport('Trending');}
+        if (sport == 'NFL') {setSportGames(props.nflGames); analytics().logevent('selectNFLGames', {user_name: props.currentUser.name}); setSport('NFL');}
+        if (sport == 'NBA') {setSportGames(props.nbaGames); analytics().logevent('selectNBAGames', {user_name: props.currentUser.name}); setSport('NBA');}
+        if (sport == 'NHL') {setSportGames(props.nhlGames); analytics().logevent('selectNHLGames', {user_name: props.currentUser.name}); setSport('NHL');}
+        if (sport == 'NCAAF') {setSportGames(props.ncaafGames); analytics().logevent('selectNCAAFGames', {user_name: props.currentUser.name}); setSport('NCAAF');}
+        if (sport == 'FIFA') {setSportGames(props.eplGames); analytics().logevent('selectFIFAGames', {user_name: props.currentUser.name}); setSport('FIFA');}
+        if (sport == 'MLB') {setSportGames(props.mlbGames); analytics().logevent('selectMLBGames', {user_name: props.currentUser.name}); setSport('MLB');}
+        if (sport == 'NCAAB') {setSportGames(props.ncaabGames); analytics().logevent('selectNCAABGames', {user_name: props.currentUser.name}); setSport('NCAAB');}
+        if (sport == 'UFC') {setSportGames(props.mmaGames); analytics().logevent('selectUFCGames', {user_name: props.currentUser.name}); setSport('UFC');}
+        if (sport == 'PGA') {setSportGames(props.golfGames); analytics().logevent('selectGolfGames', {user_name: props.currentUser.name}); setSport('PGA');}
+        if (sport == 'Futures') {setSportGames(props.futureGames); analytics().logevent('selectFuturesGames', {user_name: props.currentUser.name}); setSport('Futures');}
+        if (sport == 'Formula 1') {setSportGames(props.formula1Races); analytics().logevent('selectFormula1Games', {user_name: props.currentUser.name}); setSport('Formula 1');}
+        if (sport == 'Fantasy') {setSportGames(fantasyGames); analytics().logevent('selectFantasyGames', {user_name: props.currentUser.name}); setSport('Fantasy');}
     }
 
     const nbaIcon = (<Icon name="basketball-outline" color="#ee6730" size={16}/>);
@@ -451,11 +445,7 @@ function Odds(props) {
             id: '1',
             icon: trendingIcon
         },
-        {
-            sport: 'Fantasy',
-            id: '1.5',
-            icon: fantasyIcon
-        },
+      
         {
             sport: 'NFL',
             id: '2',
@@ -485,6 +475,11 @@ function Odds(props) {
             sport: 'Futures',
             id: '7',
             icon: futureIcon
+        },
+        {
+            sport: 'Fantasy',
+            id: '8',
+            icon: fantasyIcon
         },
      
       ];
@@ -541,14 +536,9 @@ function Odds(props) {
         
       ];
 
-    const testID = 'ca-app-pub-3940256099942544/2934735716';
-    const productionID = 'ca-app-pub-8519029912093094/5201658236';
-    // Is a real device and running in production.
-    const adUnitID = Device.isDevice && !__DEV__ ? productionID : testID;
-
     const openAdLink = () => {
 
-        Analytics.logEvent('adClick', {user_name: props.currentUser.name, adPartner: 'BetUS'});
+        analytics().logevent('adClick', {user_name: props.currentUser.name, adPartner: 'BetUS'});
             
     }
 

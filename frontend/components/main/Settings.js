@@ -6,7 +6,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import * as Notifications from 'expo-notifications'
 import * as Device from 'expo-device';
 
-import * as Analytics from 'expo-firebase-analytics';
+import analytics from "@react-native-firebase/analytics";
 
 import firebase from 'firebase'
 require("firebase/firestore")
@@ -36,7 +36,7 @@ const SettingsScreen = (props) => {
             }
         })*/
 
-        Analytics.logEvent('screen_view', { screen_name: 'Settings', user_name: props.currentUser.name });
+        analytics().logEvent('screen_view', { screen_name: 'Settings', user_name: props.currentUser.name });
         
     }, [])
 
@@ -50,7 +50,7 @@ const SettingsScreen = (props) => {
     const deleteAccount = () => {
         firebase.auth().currentUser?.delete();
 
-        Analytics.logEvent('deleteAccount', {user_name: props.currentUser.name});
+        analytics().logEvent('deleteAccount', {user_name: props.currentUser.name});
             
     }
 

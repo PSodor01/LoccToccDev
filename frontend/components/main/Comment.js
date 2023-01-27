@@ -11,9 +11,7 @@ import moment from 'moment';
 
 import * as Device from 'expo-device';
 
-import ShareButton from '../buttons/ShareButton'
-
-import * as Analytics from 'expo-firebase-analytics';
+import analytics from "@react-native-firebase/analytics";
 
 import firebase from 'firebase'
 require('firebase/firestore')
@@ -41,7 +39,7 @@ function Comment(props, route) {
 
     useEffect(() => {
         
-        Analytics.logEvent('screen_view', { screen_name: 'Comment',  user_name: props.currentUser.name })
+        analytics().logevent('screen_view', { screen_name: 'Comment',  user_name: props.currentUser.name })
     
     }, [])
 
@@ -95,13 +93,13 @@ function Comment(props, route) {
 
     const openAdLink = () => {
 
-        Analytics.logEvent('adClick', {user_name: props.currentUser.name, adPartner: 'BetUS'});
+        analytics().logevent('adClick', {user_name: props.currentUser.name, adPartner: 'BetUS'});
             
     }
 
     const handleReportPostEmail = () => {
 
-        Analytics.logEvent('reportComment', {});
+        analytics().logevent('reportComment', {});
 
         const to = ['ReportPost@locctocc.com'] // string or array of email addresses
         email(to, {
@@ -132,10 +130,10 @@ function Comment(props, route) {
     const expandComments = () => {
         if (hidePost == true) {
             setHidePost(false)
-            Analytics.logEvent('uncollapsePostonComments', {user_name: props.currentUser.name})
+            analytics().logevent('uncollapsePostonComments', {user_name: props.currentUser.name})
         } else {
             setHidePost(true)
-            Analytics.logEvent('collapsePostonComments', {user_name: props.currentUser.name})
+            analytics().logevent('collapsePostonComments', {user_name: props.currentUser.name})
         }
     }
 

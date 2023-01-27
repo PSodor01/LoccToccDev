@@ -25,9 +25,6 @@
         "NSPhotoLibraryUsageDescription": "Enable Photo Library Access so that you can upload photos as posts or as your profile picture",
         "GADApplicationIdentifier": "ca-app-pub-8519029912093094~3459984543",
         "UIRequiresFullScreen": true
-      },
-      "config": {
-        "googleMobileAdsAppId": "ca-app-pub-8519029912093094~3459984543"
       }
     },
     "android": {
@@ -58,10 +55,16 @@
       "eas": {
         "projectId": "cfaff4e2-7ba8-4d48-868c-73fdebb6521e"
       }
-    }
-  },
-  "react-native-google-mobile-ads": {
-    "android_app_id": "ca-app-pub-8519029912093094~3459984543",
-    "ios_app_id": "ca-app-pub-8519029912093094~3459984543"
+    },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ]
+    ]
   }
 }

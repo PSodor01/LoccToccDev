@@ -492,8 +492,8 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
       .then(result => {
         result.data.forEach(game => {
 
-          if (game.bookmakers.findIndex((item) => item.key === 'fanduel') > -1) {
-            let i = game.bookmakers.findIndex((item) => item.key === 'fanduel')
+          if (game.bookmakers.findIndex((item) => item.key === 'draftkings') > -1) {
+            let i = game.bookmakers.findIndex((item) => item.key === 'draftkings')
             if(game.away_team == "Eastern Kentucky Colonels") {
               console.log("skip")
             } else {

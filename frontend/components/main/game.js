@@ -12,11 +12,9 @@ import * as Device from 'expo-device';
 
 import { useNavigation } from '@react-navigation/native';
 
-import ShareButton from '../buttons/ShareButton'
-
 import email from 'react-native-email'
 
-import * as Analytics from 'expo-firebase-analytics';
+import analytics from "@react-native-firebase/analytics";
 
 import firebase from 'firebase'
 require("firebase/firestore")
@@ -39,14 +37,13 @@ function game(props) {
     const [golfGames, setGolfGames] = useState([]);
     const [futureGames, setFutureGames] = useState([]);
     const [formula1Races, setFormula1Races] = useState([]);
-    const [adMobLive, setAdMobLive] = useState();
 
 
     const {gameId, gameDate, homeTeam, awayTeam, homeMoneyline, awayMoneyline, homeSpread, awaySpread, homeSpreadOdds, awaySpreadOdds, over, overOdds, under, underOdds, drawMoneyline, sport, fantasyTopic} = props.route.params;
 
     useEffect(() => {
             fetchData()
-            Analytics.logEvent('screen_view', { screen_name: 'Game', user_name: props.currentUser.name })
+            analytics().logevent('screen_view', { screen_name: 'Game', user_name: props.currentUser.name })
 
             
         
@@ -56,18 +53,6 @@ function game(props) {
         setGolfGames(props.golfGames)
         setFutureGames(props.futureGames)
     }, [])
-
-    useEffect(() => {
-
-        if (props.contestStatus.adMobLive == true) {
-            setAdMobLive(true)
-        } else {
-            setAdMobLive(false)
-        }
-
-    }, [props.contestStatus])
-        
-    
 
     const fetchData = () => {
         function matchUserToGamePost(gamePosts) {
@@ -141,7 +126,7 @@ function game(props) {
             .doc(postId)
             .set({})
 
-        Analytics.logEvent('hammerPost', {user_name: props.currentUser.name});
+        analytics().logevent('hammerPost', {user_name: props.currentUser.name});
             
     }
 
@@ -163,7 +148,7 @@ function game(props) {
             .doc(postId)
             .set({})
 
-        Analytics.logEvent('fadePost', {user_name: props.currentUser.name});
+        analytics().logevent('fadePost', {user_name: props.currentUser.name});
     }
 
     const deleteFade = (postId) => {
@@ -364,7 +349,7 @@ function game(props) {
 
     const gameVote = () => {
 
-        Analytics.logEvent('gameVote', {user_name: props.currentUser.name});
+        analytics().logevent('gameVote', {user_name: props.currentUser.name});
 
         firebase.firestore()
             .collection("votes")
@@ -554,13 +539,13 @@ function game(props) {
 
     const openAdLink = () => {
 
-        Analytics.logEvent('adClick', {user_name: props.currentUser.name, adPartner: 'BetUS'});
+        analytics().logevent('adClick', {user_name: props.currentUser.name, adPartner: 'BetUS'});
             
     }
 
     const handleReportPostEmail = (name, caption) => {
 
-        Analytics.logEvent('reportPost', {user_name: props.currentUser.name});
+        analytics().logevent('reportPost', {user_name: props.currentUser.name});
 
         const to = ['ReportPost@locctocc.com'] // string or array of email addresses
         email(to, {
@@ -604,7 +589,7 @@ function game(props) {
             setSortCriteria(false)
         } else {
             setSortCriteria(true)
-            Analytics.logEvent('sortPosts', {user_name: props.currentUser.name});
+            analytics().logevent('sortPosts', {user_name: props.currentUser.name});
         }
     }
 
@@ -613,7 +598,7 @@ function game(props) {
             setListAllPlayers(false)
         } else {
             setListAllPlayers(true)
-            Analytics.logEvent('seeAllPlayers', {user_name: props.currentUser.name});
+            analytics().logevent('seeAllPlayers', {user_name: props.currentUser.name});
         }
     }
 
@@ -737,21 +722,6 @@ function game(props) {
       
     const navigation = useNavigation();
 
-    /* <View style={styles.adView}>
-            <AdMobBanner
-                bannerSize="banner"
-                adUnitID={adUnitID} 
-                servePersonalizedAds // true or false
-            />
-        </View> 
-        <TouchableOpacity style={styles.adView}
-            onPress={() => { Linking.openURL('https://bit.ly/3uAOAIh'); openAdLink()}} >
-            <Image 
-                style={{ width: "95%", height: 40}}
-                source={require('../../assets/fantasyJocksBanner.jpg')}
-            />
-        </TouchableOpacity>*/
-    
     return (
         <View style={styles.container}>
             <View style={styles.gameContainer}>

@@ -7,6 +7,8 @@ import { FontAwesome5 } from "@expo/vector-icons";
 
 import * as firebase from 'firebase'
 
+import 'expo-dev-client';
+
 
 
 import { Provider } from 'react-redux'

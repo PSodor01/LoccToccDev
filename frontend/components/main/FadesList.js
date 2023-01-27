@@ -3,7 +3,7 @@ import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image } from 'react
 
 import { useNavigation } from '@react-navigation/native';
 
-import * as Analytics from 'expo-firebase-analytics';
+import analytics from "@react-native-firebase/analytics";
 
 import firebase from 'firebase'
 require("firebase/firestore")
@@ -20,7 +20,7 @@ function FadesList(props) {
     const { userId, postId } = props.route.params;
 
     useEffect(() => {
-        Analytics.logEvent('screen_view', { screen_name: 'FadesList' })
+        analytics().logevent('screen_view', { screen_name: 'FadesList' })
     }, [])
     
     useEffect(() => {

@@ -8,7 +8,7 @@ import { FontAwesome5 } from "@expo/vector-icons";
 
 import moment from 'moment'
 
-import * as Analytics from 'expo-firebase-analytics';
+import analytics from "@react-native-firebase/analytics";
 
 import { captureRef } from 'react-native-view-shot';
 
@@ -27,7 +27,7 @@ function SocialShare(props) {
 
     useEffect(() => {
 
-        Analytics.logEvent('screen_view', { screen_name: 'SocialShare', user_name: props.currentUser.name })
+        analytics().logEvent('screen_view', { screen_name: 'SocialShare', user_name: props.currentUser.name })
 
     }, [props.allUsers])
 
@@ -40,7 +40,7 @@ function SocialShare(props) {
 
     const onShare = async () => {
 
-        Analytics.logEvent('socialShare', { user_name: props.currentUser.name })
+        analytics().logEvent('socialShare', { user_name: props.currentUser.name })
         
         try {
             const uri = await captureRef(viewRef, {

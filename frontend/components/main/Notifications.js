@@ -4,11 +4,9 @@ import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Linking,
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
-import * as Analytics from 'expo-firebase-analytics';
+import analytics from "@react-native-firebase/analytics";
 
 import moment from 'moment';
-
-import * as Device from 'expo-device';
 
 import firebase from 'firebase'
 require('firebase/firestore')
@@ -20,7 +18,7 @@ function Notifications(props) {
 
     useEffect(() => {
         
-        Analytics.logEvent('screen_view', { screen_name: 'Notifications', user_name: props.currentUser.name })
+        analytics().logevent('screen_view', { screen_name: 'Notifications', user_name: props.currentUser.name })
 
         const hammerIcon = (<Ionicons name={"hammer"} size={28} color={"#AAA9AD"}/>);
         const fadeIcon = (<Ionicons name={"skull"} size={28} color={"black"}/>);
@@ -106,25 +104,13 @@ function Notifications(props) {
         );
       };
 
-    const testID = 'ca-app-pub-3940256099942544/2934735716';
-    const productionID = 'ca-app-pub-8519029912093094/1666835736';
-    // Is a real device and running in production.
-    const adUnitID = Device.isDevice && !__DEV__ ? productionID : testID;
+  
 
     const openAdLink = () => {
 
-        Analytics.logEvent('adClick', {user_name: props.currentUser.name, adPartner: 'BetUS'});
+        analytics().logevent('adClick', {user_name: props.currentUser.name, adPartner: 'BetUS'});
             
     }
-
-    /* <View style={styles.adView}>
-                <AdMobBanner
-                    bannerSize="banner"
-                    adUnitID={adUnitID} 
-                    servePersonalizedAds // true or false
-                />
-            </View> */
-   
     
     return (
         <View style={styles.textInputContainer}>

@@ -10,7 +10,7 @@ import { captureRef } from 'react-native-view-shot';
 
 import moment from 'moment';
 
-import * as Analytics from 'expo-firebase-analytics';
+import analytics from "@react-native-firebase/analytics";
 
 import firebase from 'firebase'
 require('firebase/firestore')
@@ -19,35 +19,21 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { fetchUsersData } from '../../redux/actions/index'
 
-import * as Device from 'expo-device';
-
 
 function Feed(props) {
     const [loading, setLoading] = useState(true);
     const [allPosts, setAllPosts] = useState([]);
     const [followCriteria, setFollowCriteria] = useState(false)
     const [currentUserFollowingCount, setCurrentUserFollowingCount] = useState('')
-    const [adMobLive, setAdMobLive] = useState();
     
 
      useEffect(() => {
         fetchData()
         setCurrentUserFollowingCount(props.currentUser.followingCount)
 
-        Analytics.logEvent('screen_view', { screen_name: 'Feed', user_name: props.currentUser.name })
+        analytics().logevent('screen_view', { screen_name: 'Feed', user_name: props.currentUser.name })
 
     }, [props.blocking, props.faded, props.liked, props.following, props.currentUser])
-
-    useEffect(() => {
-
-        if (props.contestStatus.adMobLive == true) {
-            setAdMobLive(true)
-        } else {
-            setAdMobLive(false)
-        }
-
-    }, [props.contestStatus])
-        
 
     const fetchData = () => {
 
@@ -126,7 +112,7 @@ function Feed(props) {
             .doc(postId)
             .set({})
 
-        Analytics.logEvent('hammerPost', {user_name: props.currentUser.name});
+        analytics().logevent('hammerPost', {user_name: props.currentUser.name});
     }
 
     const deleteLike = (postId, userId) => {
@@ -147,7 +133,7 @@ function Feed(props) {
             .doc(postId)
             .set({})
 
-        Analytics.logEvent('fadePost', {user_name: props.currentUser.name});
+        analytics().logevent('fadePost', {user_name: props.currentUser.name});
     }
 
     const deleteFade = (postId) => {
@@ -335,20 +321,15 @@ function Feed(props) {
             })
     };
 
-    const testID = 'ca-app-pub-3940256099942544/2934735716';
-    const productionID = 'ca-app-pub-8519029912093094/6476007612';
-    // Is a real device and running in production.
-    const adUnitID = Device.isDevice && !__DEV__ ? productionID : testID;
-
     const openAdLink = () => {
 
-        Analytics.logEvent('adClick', {user_name: props.currentUser.name, adPartner: 'BetUS'});
+        analytics().logevent('adClick', {user_name: props.currentUser.name, adPartner: 'BetUS'});
             
     }
 
     const handleReportPostEmail = () => {
 
-        Analytics.logEvent('reportPost', {user_name: props.currentUser.name});
+        analytics().logevent('reportPost', {user_name: props.currentUser.name});
 
         const to = ['ReportPost@locctocc.com'] // string or array of email addresses
         email(to, {
@@ -392,7 +373,7 @@ function Feed(props) {
             setFollowCriteria(false)
         } else {
             setFollowCriteria(true)
-            Analytics.logEvent('filterPostsFriends', {user_name: props.currentUser.name});
+            analytics().logevent('filterPostsFriends', {user_name: props.currentUser.name});
         }
     }
 

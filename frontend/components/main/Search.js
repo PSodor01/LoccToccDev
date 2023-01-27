@@ -3,11 +3,9 @@ import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Image } 
 
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 
-import * as Analytics from 'expo-firebase-analytics';
+import analytics from "@react-native-firebase/analytics";
 
 import moment from 'moment';
-
-import * as Device from 'expo-device';
 
 require("firebase/firestore")
 require("firebase/firebase-storage")
@@ -22,7 +20,7 @@ function Search(props) {
     useEffect(() => {
         
         setAllUsers(props.allUsers)
-        Analytics.logEvent('screen_view', { screen_name: 'Search', user_name: props.currentUser.name })
+        analytics().logEvent('screen_view', { screen_name: 'Search', user_name: props.currentUser.name })
 
     }, [props.allUsers])
 
@@ -72,25 +70,13 @@ function Search(props) {
             setBrowse(false)
         } else {
             setBrowse(true)
-            Analytics.logEvent('seeAllUsersSearch', {user_name: props.currentUser.name});
+            analytics().logEvent('seeAllUsersSearch', {user_name: props.currentUser.name});
         }
     }
 
     
 
-    const testID = 'ca-app-pub-3940256099942544/2934735716';
-    const productionID = 'ca-app-pub-8519029912093094/1666835736';
-    // Is a real device and running in production.
-    const adUnitID = Device.isDevice && !__DEV__ ? productionID : testID;
-
-    /* <View style={styles.adView}>
-                <AdMobBanner
-                    bannerSize="banner"
-                    adUnitID={adUnitID} 
-                    servePersonalizedAds // true or false
-                />
-            </View> */
-   
+     
     
     return (
         <View style={styles.textInputContainer}>

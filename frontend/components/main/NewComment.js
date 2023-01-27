@@ -12,7 +12,7 @@ import * as ImagePicker from 'expo-image-picker';
 import Animated from 'react-native-reanimated';
 import BottomSheet from 'reanimated-bottom-sheet';
 
-import * as Analytics from 'expo-firebase-analytics';
+import analytics from "@react-native-firebase/analytics";
 
 import firebase from 'firebase'
 require('firebase/firestore')
@@ -53,7 +53,7 @@ function NewCommentScreen(props, route) {
     }
     
     useEffect(() => {
-      Analytics.logEvent('screen_view', { screen_name: 'NewComment', user_name: props.currentUser.name })
+      analytics().logevent('screen_view', { screen_name: 'NewComment', user_name: props.currentUser.name })
   }, [])
     
     useEffect(() => {
@@ -110,7 +110,7 @@ function NewCommentScreen(props, route) {
 
     const onCommentSend = (downloadURL) => {
 
-      Analytics.logEvent('newComment', {user_name: props.currentUser.name});
+      analytics().logevent('newComment', {user_name: props.currentUser.name});
 
         firebase.firestore()
             .collection('posts')
@@ -231,7 +231,7 @@ function NewCommentScreen(props, route) {
 
       const pickImage = async () => {
 
-        Analytics.logEvent('addPictureToComment', {user_name: props.currentUser.name});
+        analytics().logevent('addPictureToComment', {user_name: props.currentUser.name});
 
         let result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -248,7 +248,7 @@ function NewCommentScreen(props, route) {
 
       const pickGif = (url) => {
 
-        Analytics.logEvent('addGifToComment', {user_name: props.currentUser.name});
+        analytics().logevent('addGifToComment', {user_name: props.currentUser.name});
 
 
         let result =  (url);
@@ -262,13 +262,13 @@ function NewCommentScreen(props, route) {
     
       const removeImage = () => {
 
-        Analytics.logEvent('removeImageFromComment', {user_name: props.currentUser.name});
+        analytics().logevent('removeImageFromComment', {user_name: props.currentUser.name});
 
         setImage(null);
       }
 
       const removeTaggedUser = () => {
-        Analytics.logEvent('removeTaggedUserFromPost', {user_name: props.currentUser.name});
+        analytics().logevent('removeTaggedUserFromPost', {user_name: props.currentUser.name});
     
         setUserTagList(null);
         setUserTagId(null);
@@ -285,7 +285,7 @@ function NewCommentScreen(props, route) {
       }
 
       const tagUsersFunction = (name, token, id) => {
-        Analytics.logEvent('addUsersToTagList', {user_name: props.currentUser.name});
+        analytics().logevent('addUsersToTagList', {user_name: props.currentUser.name});
         
             const userTagList = name
             setUserTagList(userTagList)

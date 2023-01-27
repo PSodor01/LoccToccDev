@@ -3,7 +3,7 @@ import { View, Text, FlatList, TouchableOpacity, StyleSheet, ScrollView, Image }
 
 import { useNavigation } from '@react-navigation/native';
 
-import * as Analytics from 'expo-firebase-analytics';
+import analytics from "@react-native-firebase/analytics";
 
 import moment from 'moment'
 
@@ -53,7 +53,7 @@ function TeamDetails(props) {
     } = props.route.params;
 
     useEffect(() => {
-        Analytics.logEvent('screen_view', { screen_name: 'F1 Details', user_name: props.currentUser.name });
+        analytics().logEvent('screen_view', { screen_name: 'F1 Details', user_name: props.currentUser.name });
 
         setDetailCategory(detailType)
     }, [])

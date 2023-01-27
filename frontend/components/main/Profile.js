@@ -10,7 +10,7 @@ import email from 'react-native-email'
 
 import moment from 'moment';
 
-import * as Analytics from 'expo-firebase-analytics';
+import analytics from "@react-native-firebase/analytics";
 
 import firebase from 'firebase'
 require('firebase/firestore')
@@ -27,7 +27,7 @@ function Profile(props) {
 
         fetchData()
 
-        Analytics.logEvent('screen_view', { screen_name: 'Profile', user_name: props.currentUser.name })
+        analytics().logevent('screen_view', { screen_name: 'Profile', user_name: props.currentUser.name })
 
     }, [props.route.params.uid, props.following, props.blocking, props.faded, props.liked])
 
@@ -139,7 +139,7 @@ function Profile(props) {
                 follower: firebase.auth().currentUser.uid,
             })
 
-        Analytics.logEvent('followUser', {user_name: props.currentUser.name});
+        analytics().logEvent('followUser', {user_name: props.currentUser.name});
 
         const followName = props.currentUser.name
         firebase.firestore()
@@ -163,7 +163,7 @@ function Profile(props) {
             .doc(props.route.params.uid)
             .delete()
 
-        Analytics.logEvent('unfollowUser', {user_name: props.currentUser.name});
+        analytics().logevent('unfollowUser', {user_name: props.currentUser.name});
     }
 
     const increaseFollowerCount = () => {
@@ -215,7 +215,7 @@ function Profile(props) {
                 );
               })
 
-        Analytics.logEvent('blockUser', {user_name: props.currentUser.name});
+        analytics().logevent('blockUser', {user_name: props.currentUser.name});
     }
 
     const unBlockUser = () => {
@@ -226,7 +226,7 @@ function Profile(props) {
             .doc(props.route.params.uid)
             .delete()
 
-        Analytics.logEvent('unblockUser', {user_name: props.currentUser.name});
+        analytics().logevent('unblockUser', {user_name: props.currentUser.name});
     }
 
     const blockAndUnfollowHandler = () => {
@@ -372,7 +372,7 @@ function Profile(props) {
             .doc(postId)
             .set({})
 
-        Analytics.logEvent('hammerPost', {user_name: props.currentUser.name});
+        analytics().logevent('hammerPost', {user_name: props.currentUser.name});
     }
 
     const deleteLike = (postId) => {
@@ -393,7 +393,7 @@ function Profile(props) {
             .doc(postId)
             .set({})
 
-        Analytics.logEvent('fadePost', {user_name: props.currentUser.name});
+        analytics().logevent('fadePost', {user_name: props.currentUser.name});
     }
 
     const deleteFade = (postId) => {
@@ -516,7 +516,7 @@ function Profile(props) {
 
     const handleReportPostEmail = () => {
 
-        Analytics.logEvent('reportPost', {user_name: props.currentUser.name});
+        analytics().logevent('reportPost', {user_name: props.currentUser.name});
 
 
         const to = ['ReportPost@locctocc.com'] // string or array of email addresses
@@ -565,7 +565,7 @@ function Profile(props) {
                 postsCount: firebase.firestore.FieldValue.increment(-1)
             })
 
-        Analytics.logEvent('deletePost', {user_name: props.currentUser.name});
+        analytics().logevent('deletePost', {user_name: props.currentUser.name});
     })
     }
 
