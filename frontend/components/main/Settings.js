@@ -4,7 +4,6 @@ import { StyleSheet, Switch, TouchableOpacity, View, Text, Alert } from 'react-n
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
 import * as Notifications from 'expo-notifications'
-import * as Permissions from 'expo-permissions'
 import * as Device from 'expo-device';
 
 import * as Analytics from 'expo-firebase-analytics';

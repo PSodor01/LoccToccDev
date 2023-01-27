@@ -86,7 +86,7 @@ function AddPostScreen(props) {
     });
     console.log(result);
 
-    if (!result.cancelled) {
+    if (!result.canceled) {
       setImage(result.uri);
     }
   };

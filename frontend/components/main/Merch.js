@@ -16,7 +16,6 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { fetchUsersData } from '../../redux/actions/index'
 
-import Constants from 'expo-constants'
 
 function Merch(props) {
     const [loading, setLoading] = useState(true);

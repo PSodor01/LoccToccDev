@@ -177,8 +177,8 @@ exports.getNFLGameData = functions.pubsub.schedule('every 2 minutes').onRun(asyn
       .then(result => {
         result.data.forEach(game => {
 
-          if (game.bookmakers.findIndex((item) => item.key === 'draftkings') > -1) {
-            let i = game.bookmakers.findIndex((item) => item.key === 'draftkings')
+          if (game.bookmakers.findIndex((item) => item.key === 'fanduel') > -1) {
+            let i = game.bookmakers.findIndex((item) => item.key === 'fanduel')
             if (game.away_team == game.bookmakers[0].markets[0].outcomes[0].name) {
   
               const writeResult = admin
@@ -390,7 +390,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
       .then(result => {
         result.data.forEach(game => {
 
-          let i = game.bookmakers.findIndex((item) => item.key === 'draftkings')
+          let i = game.bookmakers.findIndex((item) => item.key === 'betonlineag')
 
           if (game.away_team == game.bookmakers[i].markets[0].outcomes[0].name) {
 
@@ -701,8 +701,8 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
       .then(result => {
         result.data.forEach(game => {
 
-          if (game.bookmakers.findIndex((item) => item.key === 'draftkings') > -1) {
-            let i = game.bookmakers.findIndex((item) => item.key === 'draftkings')
+          if (game.bookmakers.findIndex((item) => item.key === 'barstool') > -1) {
+            let i = game.bookmakers.findIndex((item) => item.key === 'barstool')
             if (game.away_team == game.bookmakers[0].markets[0].outcomes[0].name) {
 
               const writeResult = admin

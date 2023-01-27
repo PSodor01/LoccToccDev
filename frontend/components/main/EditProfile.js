@@ -3,7 +3,6 @@ import { Text, View, StyleSheet, ActivityIndicator, TouchableOpacity, TextInput,
 
 import Animated from 'react-native-reanimated';
 import BottomSheet from 'reanimated-bottom-sheet';
-import { Camera } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -22,7 +21,6 @@ function EditProfileScreen(props) {
     const [hasCameraPermission, setHasCameraPermission] = useState(null);
     const [camera, setCamera] = useState(null);
     const [image, setImage] = useState(null);
-    const [type, setType] = useState(Camera.Constants.Type.back);
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [transferred, setTransferred] = useState(0);
@@ -137,8 +135,6 @@ function EditProfileScreen(props) {
 
     useEffect(() => {
         (async () => {
-          const cameraStatus = await Camera.requestPermissionsAsync();
-          setHasCameraPermission(cameraStatus.status === 'granted');
     
           const galleryStatus = await ImagePicker.requestMediaLibraryPermissionsAsync();
           setHasGalleryPermission(galleryStatus.status === 'granted');
@@ -146,14 +142,6 @@ function EditProfileScreen(props) {
     
         })();
       }, []);
-    
-      const takePicture = async () => {
-        if (camera) {
-          const data = await camera.takePictureAsync(null);
-          setImage(result.uri);
-          this.bs.current.snapTo(1);
-        }
-      }
     
       const pickImage = async () => {
 
@@ -172,15 +160,6 @@ function EditProfileScreen(props) {
           this.bs.current.snapTo(1);
         }
       };
-    
-    
-    
-      /*if (hasCameraPermission === null || hasGalleryPermission === false) {
-        return <View />;
-      }
-      if (hasCameraPermission === false || hasGalleryPermission === false) {
-        return <Text>No access to camera</Text>;
-      } */
     
     renderInner = () => (
         <View style={styles.panel}>

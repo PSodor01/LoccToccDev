@@ -1,42 +1,29 @@
 {
-    "submit": {
-      "release": {
-        "android": {
-          "serviceAccountKeyPath": "../path/to/api-xxx-yy-zzz.json",
-          "track": "internal"
-        },
-        "ios": {
-          "appleId": "paul.sodora@locctocc.com",
-          "ascAppId": "1585460244",
-          "appleTeamId": "Paul Sodora"
-        }
+  "submit": {
+    "release": {
+      "android": {
+        "serviceAccountKeyPath": "../path/to/api-xxx-yy-zzz.json",
+        "track": "internal"
+      },
+      "ios": {
+        "appleId": "paul.sodora@locctocc.com",
+        "ascAppId": "1585460244",
+        "appleTeamId": "Paul Sodora"
       }
-    },
-    "build": {
-      "development": {
-        "distribution": "internal",
-        "android": {
-          "gradleCommand": ":app:assembleDebug"
-        },
-        "ios": {
-          "buildConfiguration": "Debug"
-        }
-      },
-      "preview": {
-        "distribution": "internal",
-        "android": {
-          "buildType": "apk"
-        },
-        "ios": {
-          "simulator": true,
-          "cache": {
-          "key": "181121"
-          }
-        }
-      },
-      "production": {}
-    },
-    "cli": {
-      "version": ">= 0.47.0"
     }
+  },
+  "build": {
+    "development": {
+      "developmentClient": "true",
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal"
+    },
+    "production": {
+    }
+  },
+  "cli": {
+    "version": ">= 0.47.0"
   }
+}

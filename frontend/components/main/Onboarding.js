@@ -23,22 +23,6 @@ useEffect(() => {
 
 const navigation = useNavigation();
 
-/*import AsyncStorage from '@react-native-community/async-storage'
-
-const [isFirstLaunch, setIsFirstLaunch] = useState(null)
-
-useEffect(() => {
-    AsyncStorage.getItem('alreadyLaunched').then(value => {
-        if(value == null ) {
-            AsyncStorage.setItem('alreadyLaunched', 'true');
-            setIsFirstLaunch(true)
-        } else {
-            setIsFirstLaunch(false);
-        }
-    });
-}, []);
-
-*/
 
 /*const Dots = ({selected}) => {
     let backgroundColor;

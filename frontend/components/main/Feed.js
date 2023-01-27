@@ -10,8 +10,6 @@ import { captureRef } from 'react-native-view-shot';
 
 import moment from 'moment';
 
-import ShareButton from '../buttons/ShareButton'
-
 import * as Analytics from 'expo-firebase-analytics';
 
 import firebase from 'firebase'

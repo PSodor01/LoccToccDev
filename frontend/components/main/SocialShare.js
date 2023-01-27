@@ -10,12 +10,7 @@ import moment from 'moment'
 
 import * as Analytics from 'expo-firebase-analytics';
 
-import * as Sharing from 'expo-sharing';
-import * as ImageManipulator from "expo-image-manipulator";
 import { captureRef } from 'react-native-view-shot';
-import * as FileSystem from 'expo-file-system';
-import * as ImagePicker from 'expo-image-picker';
-
 
 import firebase from 'firebase'
 require("firebase/firestore")
@@ -37,83 +32,9 @@ function SocialShare(props) {
     }, [props.allUsers])
 
     useEffect(() => {
-        if(Platform.OS == 'ios'){
-            Linking.canOpenURL('instagram://')
-            .then(setShowInstagramStory(true))
-            .catch((err) => console.log(err))
-        } else {
-            Sharing.isAvailableAsync('com.instagram.android')
-            .then(setShowInstagramStory(true))
-            .catch((err) => console.error(err))
-        }
+ 
 
     }, [])
-
-       
-
-    let openShareDialogAsync = async () => {    
-        if (Platform.OS === 'web') {
-            alert(`Uh oh, sharing isn't available on your platform`);
-            return;
-        }
-
-        const uri = await captureRef(viewRef, {
-            format: 'png',
-            quality: 0.7
-        });
-        
-        setSelectedImage(uri);
-        const imageTmp = await ImageManipulator.manipulateAsync(selectedImage.localUri);
-        await Sharing.shareAsync(imageTmp.uri);
-        };
-
-       
-        
-    const url = 'https://source.unsplash.com/daily';
-   
-
-    const instaShareFunction = async () => {
-        const { uri } = await FileSystem.downloadAsync(
-            url,
-            `${FileSystem.documentDirectory}meme.jpg`
-          ).catch(e => console.log('instagram share failed', JSON.stringify(e), url));
-       
-
-        const encodedURL = encodeURIComponent(uri)
-        //const instagramURL = `instagram://library?AssetPath=${encodedURL}`;
-        const instagramUrl = `instagram-stories://share?sharedSticker.backgroundImage=${encodedURL}`;
-        
-        Linking.openURL(instagramUrl)
-
-
-        //const uri = "https://picsum.photos/200/300";
-        //let encodedURL = encodeURIComponent(uri);  
-        //let instagramURL = `instagram://library?AssetPath=${encodedURL}`;
-        //return Linking.openURL(instagramURL);
-
-       
-        
-    }; 
-
-    const tweetNow = () => {
-        let twitterParameters = [];
-        const uri = "https://picsum.photos/200/300"
-        if (uri)
-            twitterParameters.push('url=' + encodeURI(uri));
-            let tweetContent = ''
-        if (tweetContent)
-            twitterParameters.push('text=' + encodeURI(tweetContent));
-        const url =
-          'https://twitter.com/intent/tweet?'
-          + twitterParameters.join('&');
-        Linking.openURL(url)
-          .then((data) => {
-            alert('Twitter Opened');
-          })
-          .catch(() => {
-            alert('Something went wrong');
-          });
-      };
     
     const viewRef = useRef();
 

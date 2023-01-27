@@ -7,7 +7,6 @@ import Foundation from 'react-native-vector-icons/Foundation'
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import * as Notifications from 'expo-notifications'
-import * as Permissions from 'expo-permissions'
 import * as Device from 'expo-device';
 import * as Updates from 'expo-updates';
 
