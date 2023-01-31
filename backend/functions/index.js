@@ -390,7 +390,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
       .then(result => {
         result.data.forEach(game => {
 
-          let i = game.bookmakers.findIndex((item) => item.key === 'betonlineag')
+          let i = game.bookmakers.findIndex((item) => item.key === 'draftkings')
 
           if (game.away_team == game.bookmakers[i].markets[0].outcomes[0].name) {
 

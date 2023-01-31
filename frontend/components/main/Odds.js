@@ -538,7 +538,7 @@ function Odds(props) {
 
     const openAdLink = () => {
 
-        analytics().logevent('adClick', {user_name: props.currentUser.name, adPartner: 'BetUS'});
+        analytics().logevent('adClick', {user_name: props.currentUser.name, adPartner: 'Kutt'});
             
     }
 
@@ -1284,10 +1284,10 @@ function Odds(props) {
             
             }
             <TouchableOpacity style={styles.adView}
-                onPress={() => { Linking.openURL('https://bit.ly/3uAOAIh'); openAdLink()}} >
+                onPress={() => { Linking.openURL('https://apps.apple.com/us/app/kutt/id1578386177'); openAdLink()}} >
                 <Image 
                     style={{ width: "95%", height: 40, resizeMode: "contain" }}
-                    source={require('../../assets/fantasyJocksBanner.jpg')}
+                    source={require('../../assets/kuttBanner.png')}
                 />
             </TouchableOpacity>
          
