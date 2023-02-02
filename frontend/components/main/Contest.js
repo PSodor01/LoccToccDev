@@ -35,7 +35,7 @@ function Contest(props) {
         const myScore = props.allUsers.filter(user => user.name == props.currentUser.name);
         setMyScore(myScore)
 
-        analytics().logevent('screen_view', { screen_name: 'Contest', user_name: props.currentUser.name })
+        analytics().logScreenView({ screen_name: 'Contest', screen_class: 'Contest',  user_name: props.currentUser.name})
 
     }, [props.allUsers, props.currentUser, props.contestStatus])
 
@@ -53,12 +53,12 @@ function Contest(props) {
     )}
 
     const countInfoClicks = () => {
-        analytics().logevent('contestInfoClicks', {user_name: props.currentUser.name});
+        analytics().logEvent('contestInfoClicks', {user_name: props.currentUser.name});
     }
 
     const countLocctoccWebsiteClicks = () => {
 
-        analytics().logevent('websiteClicks', {user_name: props.currentUser.name});
+        analytics().logEvent('websiteClicks', {user_name: props.currentUser.name});
 
 
      
@@ -66,21 +66,21 @@ function Contest(props) {
 
     const countLocctoccInstagramClicks = () => {
 
-        analytics().logevent('locctoccInstagramClicks', {user_name: props.currentUser.name});
+        analytics().logEvent('locctoccInstagramClicks', {user_name: props.currentUser.name});
 
         
     }
 
     const countLocctoccTwitterClicks = () => {
 
-        analytics().logevent('locctoccTwitterClicks', {user_name: props.currentUser.name});
+        analytics().logEvent('locctoccTwitterClicks', {user_name: props.currentUser.name});
 
         
     }
 
     const countLocctoccTiktokClicks = () => {
 
-        analytics().logevent('locctoccTiktokClicks', {user_name: props.currentUser.name});
+        analytics().logEvent('locctoccTiktokClicks', {user_name: props.currentUser.name});
 
      
     }

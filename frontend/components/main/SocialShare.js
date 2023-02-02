@@ -27,7 +27,7 @@ function SocialShare(props) {
 
     useEffect(() => {
 
-        analytics().logEvent('screen_view', { screen_name: 'SocialShare', user_name: props.currentUser.name })
+        analytics().logScreenView({ screen_name: 'SocialShare', screen_class: 'SocialShare',  user_name: props.currentUser.name})
 
     }, [props.allUsers])
 

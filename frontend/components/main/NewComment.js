@@ -53,7 +53,7 @@ function NewCommentScreen(props, route) {
     }
     
     useEffect(() => {
-      analytics().logevent('screen_view', { screen_name: 'NewComment', user_name: props.currentUser.name })
+      analytics().logScreenView({ screen_name: 'NewComment', screen_class: 'NewComment',  user_name: props.currentUser.name})
   }, [])
     
     useEffect(() => {
@@ -110,7 +110,7 @@ function NewCommentScreen(props, route) {
 
     const onCommentSend = (downloadURL) => {
 
-      analytics().logevent('newComment', {user_name: props.currentUser.name});
+      analytics().logEvent('newComment', {user_name: props.currentUser.name});
 
         firebase.firestore()
             .collection('posts')
@@ -231,7 +231,7 @@ function NewCommentScreen(props, route) {
 
       const pickImage = async () => {
 
-        analytics().logevent('addPictureToComment', {user_name: props.currentUser.name});
+        analytics().logEvent('addPictureToComment', {user_name: props.currentUser.name});
 
         let result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -248,7 +248,7 @@ function NewCommentScreen(props, route) {
 
       const pickGif = (url) => {
 
-        analytics().logevent('addGifToComment', {user_name: props.currentUser.name});
+        analytics().logEvent('addGifToComment', {user_name: props.currentUser.name});
 
 
         let result =  (url);
@@ -262,13 +262,13 @@ function NewCommentScreen(props, route) {
     
       const removeImage = () => {
 
-        analytics().logevent('removeImageFromComment', {user_name: props.currentUser.name});
+        analytics().logEvent('removeImageFromComment', {user_name: props.currentUser.name});
 
         setImage(null);
       }
 
       const removeTaggedUser = () => {
-        analytics().logevent('removeTaggedUserFromPost', {user_name: props.currentUser.name});
+        analytics().logEvent('removeTaggedUserFromPost', {user_name: props.currentUser.name});
     
         setUserTagList(null);
         setUserTagId(null);
@@ -285,7 +285,7 @@ function NewCommentScreen(props, route) {
       }
 
       const tagUsersFunction = (name, token, id) => {
-        analytics().logevent('addUsersToTagList', {user_name: props.currentUser.name});
+        analytics().logEvent('addUsersToTagList', {user_name: props.currentUser.name});
         
             const userTagList = name
             setUserTagList(userTagList)

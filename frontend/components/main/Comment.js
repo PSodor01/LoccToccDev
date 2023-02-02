@@ -39,7 +39,7 @@ function Comment(props, route) {
 
     useEffect(() => {
         
-        analytics().logevent('screen_view', { screen_name: 'Comment',  user_name: props.currentUser.name })
+        analytics().logScreenView({ screen_name: 'Comment', screen_class: 'Comment',  user_name: props.currentUser.name})
     
     }, [])
 
@@ -93,13 +93,13 @@ function Comment(props, route) {
 
     const openAdLink = () => {
 
-        analytics().logevent('adClick', {user_name: props.currentUser.name, adPartner: 'Kutt'});
+        analytics().logEvent('adClick', {user_name: props.currentUser.name, adPartner: 'Kutt'});
             
     }
 
     const handleReportPostEmail = () => {
 
-        analytics().logevent('reportComment', {});
+        analytics().logEvent('reportComment', {});
 
         const to = ['ReportPost@locctocc.com'] // string or array of email addresses
         email(to, {
@@ -130,10 +130,10 @@ function Comment(props, route) {
     const expandComments = () => {
         if (hidePost == true) {
             setHidePost(false)
-            analytics().logevent('uncollapsePostonComments', {user_name: props.currentUser.name})
+            analytics().logEvent('uncollapsePostonComments', {user_name: props.currentUser.name})
         } else {
             setHidePost(true)
-            analytics().logevent('collapsePostonComments', {user_name: props.currentUser.name})
+            analytics().logEvent('collapsePostonComments', {user_name: props.currentUser.name})
         }
     }
 
@@ -248,13 +248,16 @@ function Comment(props, route) {
                     
                 )}
             />
-            <TouchableOpacity style={styles.adView}
-                onPress={() => { Linking.openURL('https://apps.apple.com/us/app/kutt/id1578386177'); openAdLink()}} >
-                <Image 
-                    style={{ width: "95%", height: 40, resizeMode: "contain" }}
-                    source={require('../../assets/kuttBanner.png')}
-                />
-            </TouchableOpacity>
+            <View  style={styles.adView}>
+                <TouchableOpacity
+                    style={{ width: "95%", height: 40, alignItems: 'center', backgroundColor: 'black' }}
+                    onPress={() => { Linking.openURL('https://apps.apple.com/us/app/kutt/id1578386177'); openAdLink()}} >
+                    <Image 
+                        source={require('../../assets/kuttBanner.png')}
+                        style={{  height: 40, resizeMode: 'contain'  }}
+                    />
+                </TouchableOpacity>
+            </View>
           
         </View>
     )

@@ -5,6 +5,6 @@
   "minify": false,
   "urlRandomness": "44-ysb",
   "https": false,
-  "scheme": "exp+locctocc",
-  "devClient": false
+  "devClient": true,
+  "scheme": "com.psodor01.locctocc"
 }

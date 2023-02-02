@@ -41,7 +41,6 @@ import { DrawerContent } from './components/Drawer'
 
 import LandingScreen from './components/auth/Landing'
 import RegisterScreen from './components/auth/Register'
-import OnboardingScreen from './components/main/Onboarding'
 import LoginScreen from './components/auth/Login'
 import ResetPasswordScreen from './components/auth/ResetPassword'
 import MainScreen from './components/Main'
@@ -116,15 +115,6 @@ const MainStackScreen = ({navigation, props}) => (
             <FontAwesome5 name="bars" size={24} color="#fff" />
           </TouchableOpacity>
         ),
-        headerRight: () => (
-          <TouchableOpacity 
-            style={{ alignItems: "flex-end", marginRight:16 }}
-            onPress={() => navigation.navigate('Onboarding')}
-            >
-            <FontAwesome5 name="info-circle" size={24} color="#fff" />
-          </TouchableOpacity>
-        ),
-        
       }}
         />
 
@@ -488,24 +478,7 @@ const MainStackScreen = ({navigation, props}) => (
             
           }}
         />
-        <MainStack.Screen name="Onboarding" component={OnboardingScreen}
-        options={{
-            headerTitle: () => (
-              <View style={{ flexDirection: 'row', alignItems: 'space-between', justifyContent: 'center'}}>
-                  <Text style={styles.headerName}>locctocc </Text>
-                  <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
-              </View>
-            ),
-            headerTitleAlign: "center",
-            headerLeft: () => (
-              <TouchableOpacity 
-              style={{ alignItems: "flex-end", marginLeft:16 }}
-              onPress={() => navigation.goBack()}
-              >
-              <FontAwesome5 name="chevron-left" size={24} color="#fff" />
-            </TouchableOpacity>
-            )
-          }} />
+     
 
         
   </MainStack.Navigator>
@@ -571,18 +544,6 @@ export class App extends Component {
       );
     }
 
-    /*if (!loggedIn) {
-      return (
-          <NavigationContainer>
-            <Stack.Navigator initialRouteName="Onboarding">
-              <Stack.Screen name="Onboarding" component={OnboardingScreen}
-                options={{ headerShown: false }}
-              />
-            </Stack.Navigator>
-          </NavigationContainer>
-        
-      );
-    }*/
 
     return (
         <Provider store={store}>

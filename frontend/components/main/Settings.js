@@ -36,7 +36,7 @@ const SettingsScreen = (props) => {
             }
         })*/
 
-        analytics().logEvent('screen_view', { screen_name: 'Settings', user_name: props.currentUser.name });
+        analytics().logScreenView({ screen_name: 'Settings', screen_class: 'Settings',  user_name: props.currentUser.name})
         
     }, [])
 

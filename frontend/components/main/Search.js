@@ -20,7 +20,7 @@ function Search(props) {
     useEffect(() => {
         
         setAllUsers(props.allUsers)
-        analytics().logEvent('screen_view', { screen_name: 'Search', user_name: props.currentUser.name })
+        analytics().logScreenView({ screen_name: 'Search', screen_class: 'Search',  user_name: props.currentUser.name})
 
     }, [props.allUsers])
 

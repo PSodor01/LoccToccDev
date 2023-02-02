@@ -19,7 +19,7 @@ function FollowerScreen(props) {
     const { userId } = props.route.params;
 
     useEffect(() => {
-        analytics().logevent('screen_view', { screen_name: 'FollowerList' })
+        analytics().logScreenView({ screen_name: 'FollowerScreen', screen_class: 'FollowerScreen'})
     }, [])
     
     useEffect(() => {

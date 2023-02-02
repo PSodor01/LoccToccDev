@@ -2,7 +2,7 @@
   "expo": {
     "name": "locctocc",
     "slug": "locctocc",
-    "version": "1.1.29",
+    "version": "1.1.30",
     "orientation": "portrait",
     "icon": "./assets/locctocclogo.png",
     "splash": {
@@ -36,6 +36,15 @@
       "package": "com.psodor01.locctocc",
       "versionCode": 6
     },
+    "plugins": [
+      "@react-native-firebase/app",
+      ["expo-build-properties",
+      {
+        "ios": {
+          "useFrameworks": "static"
+        }
+      }]
+    ],
     "web": {
       "favicon": "./assets/favicon.png",
       "config": {
@@ -55,16 +64,6 @@
       "eas": {
         "projectId": "cfaff4e2-7ba8-4d48-868c-73fdebb6521e"
       }
-    },
-    "plugins": [
-      [
-        "expo-build-properties",
-        {
-          "ios": {
-            "useFrameworks": "static"
-          }
-        }
-      ]
-    ]
+    }
   }
 }

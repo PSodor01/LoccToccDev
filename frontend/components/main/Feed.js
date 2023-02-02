@@ -31,7 +31,7 @@ function Feed(props) {
         fetchData()
         setCurrentUserFollowingCount(props.currentUser.followingCount)
 
-        analytics().logevent('screen_view', { screen_name: 'Feed', user_name: props.currentUser.name })
+        analytics().logScreenView({ screen_name: 'Feed', screen_class: 'Feed',  user_name: props.currentUser.name})
 
     }, [props.blocking, props.faded, props.liked, props.following, props.currentUser])
 
@@ -112,7 +112,7 @@ function Feed(props) {
             .doc(postId)
             .set({})
 
-        analytics().logevent('hammerPost', {user_name: props.currentUser.name});
+        analytics().logEvent('hammerPost', {user_name: props.currentUser.name});
     }
 
     const deleteLike = (postId, userId) => {
@@ -133,7 +133,7 @@ function Feed(props) {
             .doc(postId)
             .set({})
 
-        analytics().logevent('fadePost', {user_name: props.currentUser.name});
+        analytics().logEvent('fadePost', {user_name: props.currentUser.name});
     }
 
     const deleteFade = (postId) => {
@@ -323,13 +323,13 @@ function Feed(props) {
 
     const openAdLink = () => {
 
-        analytics().logevent('adClick', {user_name: props.currentUser.name, adPartner: 'Kutt'});
+        analytics().logEvent('adClick', {user_name: props.currentUser.name, adPartner: 'Kutt'});
             
     }
 
     const handleReportPostEmail = () => {
 
-        analytics().logevent('reportPost', {user_name: props.currentUser.name});
+        analytics().logEvent('reportPost', {user_name: props.currentUser.name});
 
         const to = ['ReportPost@locctocc.com'] // string or array of email addresses
         email(to, {
@@ -373,7 +373,7 @@ function Feed(props) {
             setFollowCriteria(false)
         } else {
             setFollowCriteria(true)
-            analytics().logevent('filterPostsFriends', {user_name: props.currentUser.name});
+            analytics().logEvent('filterPostsFriends', {user_name: props.currentUser.name});
         }
     }
 
@@ -668,13 +668,16 @@ function Feed(props) {
             /> }
 
             
-            <TouchableOpacity style={styles.adView}
-                onPress={() => { Linking.openURL('https://apps.apple.com/us/app/kutt/id1578386177'); openAdLink()}} >
-                <Image 
-                    style={{ width: "95%", height: 40, resizeMode: "contain" }}
-                    source={require('../../assets/kuttBanner.png')}
-                />
-            </TouchableOpacity>
+            <View  style={styles.adView}>
+                <TouchableOpacity
+                    style={{ width: "95%", height: 40, alignItems: 'center', backgroundColor: 'black' }}
+                    onPress={() => { Linking.openURL('https://apps.apple.com/us/app/kutt/id1578386177'); openAdLink()}} >
+                    <Image 
+                        source={require('../../assets/kuttBanner.png')}
+                        style={{  height: 40, resizeMode: 'contain'  }}
+                    />
+                </TouchableOpacity>
+            </View>
         </View>
             
 

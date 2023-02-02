@@ -53,7 +53,7 @@ function AddPostScreen(props) {
 
     useEffect(() => {
       getUser();
-      analytics().logevent('screen_view', { screen_name: 'NewPost', user_name: props.currentUser.name })
+      analytics().logScreenView({ screen_name: 'NewPost', screen_class: 'NewPost',  user_name: props.currentUser.name})
     },[]);
 
     useEffect(() => {
@@ -76,7 +76,7 @@ function AddPostScreen(props) {
 
   const pickImage = async () => {
 
-    analytics().logevent('addPictureToPost', {user_name: props.currentUser.name});
+    analytics().logEvent('addPictureToPost', {user_name: props.currentUser.name});
 
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -93,7 +93,7 @@ function AddPostScreen(props) {
 
   const pickGif = (url) => {
 
-    analytics().logevent('addGifToPost', {user_name: props.currentUser.name});
+    analytics().logEvent('addGifToPost', {user_name: props.currentUser.name});
 
     let result =  (url);
     console.log(result);
@@ -105,13 +105,13 @@ function AddPostScreen(props) {
   };
 
   const removeImage = () => {
-    analytics().logevent('removeImageFromPost', {user_name: props.currentUser.name});
+    analytics().logEvent('removeImageFromPost', {user_name: props.currentUser.name});
 
       setImage(null);
   }
 
   const removeTaggedUser = () => {
-    analytics().logevent('removeTaggedUserFromPost', {user_name: props.currentUser.name});
+    analytics().logEvent('removeTaggedUserFromPost', {user_name: props.currentUser.name});
 
     setUserTagList(null);
     setUserTagId(null);
@@ -129,7 +129,7 @@ function AddPostScreen(props) {
   }
 
   const tagUsersFunction = (name, token, id) => {
-    analytics().logevent('addUsersToTagList', {user_name: props.currentUser.name});
+    analytics().logEvent('addUsersToTagList', {user_name: props.currentUser.name});
     
         const userTagList = name
         setUserTagList(userTagList)
@@ -175,7 +175,7 @@ function AddPostScreen(props) {
 
   const savePostData = (downloadURL) => {
 
-    analytics().logevent('newPost', {user_name: props.currentUser.name});
+    analytics().logEvent('newPost', {user_name: props.currentUser.name});
 
     firebase.firestore()
         .collection('posts')

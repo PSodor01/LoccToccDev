@@ -20,7 +20,7 @@ function FadesList(props) {
     const { userId, postId } = props.route.params;
 
     useEffect(() => {
-        analytics().logevent('screen_view', { screen_name: 'FadesList' })
+        analytics().logScreenView({ screen_name: 'FadesList', screen_class: 'FadesList'})
     }, [])
     
     useEffect(() => {

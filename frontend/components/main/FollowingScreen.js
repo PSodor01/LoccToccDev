@@ -22,7 +22,7 @@ function FollowingScreen(props) {
     const { userId } = props.route.params;
 
     useEffect(() => {
-        analytics().logevent('screen_view', { screen_name: 'FollowingList' })
+        analytics().logScreenView({ screen_name: 'FollowingScreen', screen_class: 'FollowingScreen'})
     }, [])
 
     

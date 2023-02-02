@@ -22,7 +22,7 @@ function LikesList(props) {
     const { userId, postId } = props.route.params;
 
     useEffect(() => {
-        analytics().logevent('screen_view', { screen_name: 'LikesList' })
+        analytics().logScreenView({ screen_name: 'LikesList', screen_class: 'LikesList'})
     }, [])
 
     

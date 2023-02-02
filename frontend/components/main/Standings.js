@@ -23,7 +23,7 @@ function Standings(props) {
     const { standingsType } = props.route.params;
 
     useEffect(() => {
-        analytics().logEvent('screen_view', { screen_name: 'F1 Standings', user_name: props.currentUser.name });
+        analytics().logScreenView({ screen_name: 'F1 Standings', screen_class: 'F1 Standings',  user_name: props.currentUser.name})
 
         setFormula1Teams(props.formula1Teams)
         setFormula1Drivers(props.formula1Drivers.slice(0, 20))

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "736365930098",
+    "firebase_url": "https://locctoccdev-default-rtdb.firebaseio.com",
+    "project_id": "locctoccdev",
+    "storage_bucket": "locctoccdev.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:736365930098:android:d8ca37f64eba31835684eb",
+        "android_client_info": {
+          "package_name": "com.psodor01.locctocc"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "736365930098-1bll1v8aiqoatdl6p0si8nk9qjr6hkdl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCt02jGmdE9zkDlEyxX4im02i1tQ6GAWDI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "736365930098-1bll1v8aiqoatdl6p0si8nk9qjr6hkdl.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "736365930098-cp1gh9e8n23tbsc2vebm9l4rrssg5btk.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.psodor01.locctocc"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

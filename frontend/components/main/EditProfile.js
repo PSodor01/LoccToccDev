@@ -40,7 +40,7 @@ function EditProfileScreen(props) {
 
     const handleUpdate = async() => {
 
-      analytics().logevent('submitEditProfile', { user_name: props.currentUser.name});
+      analytics().logEvent('submitEditProfile', { user_name: props.currentUser.name});
 
         let imgUrl = await uploadImage();
 
@@ -130,7 +130,7 @@ function EditProfileScreen(props) {
     useEffect(() => {
         getUser();
 
-        analytics().logevent('screen_view', { screen_name: 'EditProfile',  user_name: props.currentUser.name })
+        analytics().logScreenView({ screen_name: 'EditProfile', screen_class: 'EditProfile',  user_name: props.currentUser.name})
     },[]);
 
     useEffect(() => {
@@ -145,7 +145,7 @@ function EditProfileScreen(props) {
     
       const pickImage = async () => {
 
-        analytics().logevent('changeProfilePicture', { user_name: props.currentUser.name});
+        analytics().logEvent('changeProfilePicture', { user_name: props.currentUser.name});
 
         let result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Images,

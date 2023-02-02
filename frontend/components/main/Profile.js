@@ -27,7 +27,7 @@ function Profile(props) {
 
         fetchData()
 
-        analytics().logevent('screen_view', { screen_name: 'Profile', user_name: props.currentUser.name })
+        analytics().logScreenView({ screen_name: 'Profile', screen_class: 'Profile',  user_name: props.currentUser.name})
 
     }, [props.route.params.uid, props.following, props.blocking, props.faded, props.liked])
 
@@ -163,7 +163,7 @@ function Profile(props) {
             .doc(props.route.params.uid)
             .delete()
 
-        analytics().logevent('unfollowUser', {user_name: props.currentUser.name});
+        analytics().logEvent('unfollowUser', {user_name: props.currentUser.name});
     }
 
     const increaseFollowerCount = () => {
@@ -215,7 +215,7 @@ function Profile(props) {
                 );
               })
 
-        analytics().logevent('blockUser', {user_name: props.currentUser.name});
+        analytics().logEvent('blockUser', {user_name: props.currentUser.name});
     }
 
     const unBlockUser = () => {
@@ -226,7 +226,7 @@ function Profile(props) {
             .doc(props.route.params.uid)
             .delete()
 
-        analytics().logevent('unblockUser', {user_name: props.currentUser.name});
+        analytics().logEvent('unblockUser', {user_name: props.currentUser.name});
     }
 
     const blockAndUnfollowHandler = () => {
@@ -372,7 +372,7 @@ function Profile(props) {
             .doc(postId)
             .set({})
 
-        analytics().logevent('hammerPost', {user_name: props.currentUser.name});
+        analytics().logEvent('hammerPost', {user_name: props.currentUser.name});
     }
 
     const deleteLike = (postId) => {
@@ -393,7 +393,7 @@ function Profile(props) {
             .doc(postId)
             .set({})
 
-        analytics().logevent('fadePost', {user_name: props.currentUser.name});
+        analytics().logEvent('fadePost', {user_name: props.currentUser.name});
     }
 
     const deleteFade = (postId) => {
@@ -516,7 +516,7 @@ function Profile(props) {
 
     const handleReportPostEmail = () => {
 
-        analytics().logevent('reportPost', {user_name: props.currentUser.name});
+        analytics().logEvent('reportPost', {user_name: props.currentUser.name});
 
 
         const to = ['ReportPost@locctocc.com'] // string or array of email addresses
@@ -565,7 +565,7 @@ function Profile(props) {
                 postsCount: firebase.firestore.FieldValue.increment(-1)
             })
 
-        analytics().logevent('deletePost', {user_name: props.currentUser.name});
+        analytics().logEvent('deletePost', {user_name: props.currentUser.name});
     })
     }
 

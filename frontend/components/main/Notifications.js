@@ -18,7 +18,7 @@ function Notifications(props) {
 
     useEffect(() => {
         
-        analytics().logevent('screen_view', { screen_name: 'Notifications', user_name: props.currentUser.name })
+        analytics().logScreenView({ screen_name: 'Notifications', screen_class: 'Notifications',  user_name: props.currentUser.name})
 
         const hammerIcon = (<Ionicons name={"hammer"} size={28} color={"#AAA9AD"}/>);
         const fadeIcon = (<Ionicons name={"skull"} size={28} color={"black"}/>);
@@ -108,7 +108,7 @@ function Notifications(props) {
 
     const openAdLink = () => {
 
-        analytics().logevent('adClick', {user_name: props.currentUser.name, adPartner: 'Kutt'});
+        analytics().logEvent('adClick', {user_name: props.currentUser.name, adPartner: 'Kutt'});
             
     }
     
@@ -121,13 +121,16 @@ function Notifications(props) {
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={ItemView}
             />  
-            <TouchableOpacity style={styles.adView}
-                onPress={() => { Linking.openURL('https://apps.apple.com/us/app/kutt/id1578386177'); openAdLink()}} >
-                <Image 
-                    style={{ width: "95%", height: 40, resizeMode: "contain" }}
-                    source={require('../../assets/kuttBanner.png')}
-                />
-            </TouchableOpacity>
+           <View  style={styles.adView}>
+                <TouchableOpacity
+                    style={{ width: "95%", height: 40, alignItems: 'center', backgroundColor: 'black' }}
+                    onPress={() => { Linking.openURL('https://apps.apple.com/us/app/kutt/id1578386177'); openAdLink()}} >
+                    <Image 
+                        source={require('../../assets/kuttBanner.png')}
+                        style={{  height: 40, resizeMode: 'contain'  }}
+                    />
+                </TouchableOpacity>
+            </View>
         </View>
         
             

@@ -53,7 +53,7 @@ function TeamDetails(props) {
     } = props.route.params;
 
     useEffect(() => {
-        analytics().logEvent('screen_view', { screen_name: 'F1 Details', user_name: props.currentUser.name });
+        analytics().logScreenView({ screen_name: 'TeamDetails', screen_class: 'TeamDetails',  user_name: props.currentUser.name})
 
         setDetailCategory(detailType)
     }, [])
