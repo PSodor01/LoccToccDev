@@ -5,10 +5,6 @@ import { useNavigation } from '@react-navigation/native';
 
 import analytics from "@react-native-firebase/analytics";
 
-import firebase from 'firebase'
-require("firebase/firestore")
-require("firebase/firebase-storage")
-
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { fetchUsersData } from '../../redux/actions/index'

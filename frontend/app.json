@@ -2,7 +2,7 @@
   "expo": {
     "name": "locctocc",
     "slug": "locctocc",
-    "version": "1.1.30",
+    "version": "1.1.31",
     "orientation": "portrait",
     "icon": "./assets/locctocclogo.png",
     "splash": {
@@ -46,7 +46,6 @@
       }]
     ],
     "web": {
-      "favicon": "./assets/favicon.png",
       "config": {
         "firebase": {
           "apiKey": "AIzaSyAmXTsXkPI-J6mineXVOY9wa0y-B7R_GDw",

@@ -492,9 +492,9 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
       .then(result => {
         result.data.forEach(game => {
 
-          if (game.bookmakers.findIndex((item) => item.key === 'draftkings') > -1) {
-            let i = game.bookmakers.findIndex((item) => item.key === 'draftkings')
-            if(game.away_team == "Eastern Kentucky Colonels") {
+          if (game.bookmakers.findIndex((item) => item.key === 'mybookieag') > -1) {
+            let i = game.bookmakers.findIndex((item) => item.key === 'mybookieag')
+            if(game.away_team == "Ohio Bobcats") {
               console.log("skip")
             } else {
 
@@ -597,7 +597,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
 
   exports.getEPLGameData = functions.pubsub.schedule('every 20 minutes').onRun(async() => {
     try {
-      const response = await axios.get('https://api.the-odds-api.com/v4/sports/soccer_fifa_world_cup/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,totals&oddsFormat=american&dateFormat=iso')
+      const response = await axios.get('https://api.the-odds-api.com/v4/sports/soccer_epl/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,totals&oddsFormat=american&dateFormat=iso')
       .then(result => {
         result.data.forEach(game => {
   
@@ -659,7 +659,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
 
   exports.getEPLScoresData = functions.pubsub.schedule('every 20 minutes').onRun(async() => {
     try {
-      const response = await axios.get('https://api.the-odds-api.com/v4/sports/soccer_fifa_world_cup/scores/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&dateFormat=iso')
+      const response = await axios.get('https://api.the-odds-api.com/v4/sports/soccer_epl/scores/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&dateFormat=iso')
       .then(result => {
         result.data.forEach(game => {
   
@@ -928,7 +928,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
     }catch(err) {console.error(err.message)}
 
     try {
-      const response = await axios.get('https://api.the-odds-api.com/v4/sports/soccer_fifa_world_cup_winner/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&Format=american&dateFormat=iso')
+      const response = await axios.get('https://api.the-odds-api.com/v4/sports/soccer_epl/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&Format=american&dateFormat=iso')
         .then(result => {
           result.data.forEach(game => {
 
@@ -1014,7 +1014,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
     };
 
     try {
-      const response = await axios.get("https://v1.formula-1.api-sports.io//rankings/teams?season=2022", options)
+      const response = await axios.get("https://v1.formula-1.api-sports.io//rankings/teams?season=2023", options)
       .then(result => {
 
           for (let i = 0; i < result.data.response.length; i++){
@@ -1097,7 +1097,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
                   .doc("currentRace")
                   .set({
                     raceType: result.data.response[i].type,
-                    gameId: result.data.response[i].id + 'abc',
+                    gameId: result.data.response[i].id + 'abc2023',
                     sport: 'formula1',
                     gameDate: result.data.response[i].date,
                     raceName: result.data.response[i].competition.name,
@@ -1148,7 +1148,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
 
   })
 
-  exports.getFormula1DriverData = functions.pubsub.schedule('every 2 minutes').onRun(async() => {
+  exports.getFormula1IndividualDriverData = functions.pubsub.schedule('every 2 minutes').onRun(async() => {
     const options = {
       method: 'GET',
       redirect: 'follow',
@@ -1159,7 +1159,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
     };
 
     try {
-      const response = await axios.get("https://v1.formula-1.api-sports.io/drivers?id=82", options)
+      const response = await axios.get("https://v1.formula-1.api-sports.io/drivers?id=83", options)
       .then(result => {
 
           for (let i = 0; i < result.data.response.length; i++){
@@ -1201,7 +1201,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
     };
 
     try {
-      const response = await axios.get("https://v1.formula-1.api-sports.io//rankings/drivers?season=2022", options)
+      const response = await axios.get("https://v1.formula-1.api-sports.io//rankings/drivers?season=2023", options)
       .then(result => {
 
           for (let i = 0; i < result.data.response.length; i++){

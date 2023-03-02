@@ -1,13 +1,13 @@
+import  firebase  from "firebase/compat/app";
+import "firebase/compat/auth";
+import 'firebase/compat/firestore';
+
 import React, { Component } from 'react'
 import { View, TouchableOpacity, Text, Linking, TextInput, StyleSheet, TouchableWithoutFeedback, Keyboard } from 'react-native'
 
 import { FontAwesome5 } from "@expo/vector-icons";
 
 import { CheckBox } from 'react-native-elements';
-
-
-import firebase from 'firebase'
-import "firebase/firestore";
 
 const DismissKeyboard = ({ children }) => (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -16,26 +16,22 @@ const DismissKeyboard = ({ children }) => (
 
 )
 
-const MAX_LEN = 15,
-  MIN_LEN = 6,
-  PASS_LABELS = ["Too Short", "Weak Sauce", "Better", "There we go!", "YES!!"];
-
 export class Register extends Component {
 
     constructor(props) {
         super(props);
 
-        this.state = {
-            email: '',
-            password: '',
-            name: '',
-            createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
-            aboutMe: '',
-            location: '',
-            signUpCode: '',
-            userImg: null,
-            checked: false,
-            lastLogin: '',
+            this.state = {
+                email: '',
+                password: '',
+                name: '',
+                createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
+                aboutMe: '',
+                location: '',
+                signUpCode: '',
+                userImg: null,
+                checked: false,
+                lastLogin: firebase.firestore.Timestamp.fromDate(new Date()),
 
         }
 
@@ -46,58 +42,52 @@ export class Register extends Component {
         visibility:false,
         DateDisplay:"",
         checked: false,
-
-
-    }
-
-    handleConfirm=(date) => {
-        this.setState({ DateDisplay:date.toUTCString() }, 
-        this.setState({ visibility: false }),
-        console.log("Date picked:", date.toUTCString())
-
-        )
-    }
-
-    onPressCancel= () => {
-        this.setState({ visibility: false })
-    }
-
-    onPressButton = () => {
-        this.setState({ visibility: true })
-    }
-
-    onChangeCheck() {
-        this.setState({ checked: !this.state.checked })
     }
 
     incompleteAlert = () => {
         alert('Oops! Please fill out all fields')
     }
 
+  
+
+
     async onSignUp() {
-        const { email, password, name, aboutMe, location, signUpCode, userImg, createdAt, lastLogin } = this.state;
-        firebase.auth().createUserWithEmailAndPassword(email, password)
-            .then((result) => {
-                firebase.firestore().collection("users")
-                    .doc(firebase.auth().currentUser.uid)
-                    .set({
-                        name,
-                        email,
-                        aboutMe,
-                        location,
-                        signUpCode,
-                        userImg,
-                        createdAt,
-                        followerCount: 0,
-                        followingCount: 0,
-                        postsCount: 0,
-                        lastLogin: firebase.firestore.Timestamp.fromDate(new Date()),
-                    })
+        const { email, password, name, aboutMe, location, signUpCode, userImg } = this.state;
+
+        if (name.length == 0 || email.length == 0 || password.length == 0) {
+            alert('Oops! Please fill out all fields')
+            return;
+        }
+        if (password.length < 6) {
+            alert("Passwords must be at least 6 characters")
+            return;
+        }
+
+        createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            const user = userCredential.user;
+            console.log(user.uid)
+
+            addDoc(collection(db, "users"), {
+                name,
+                email,
+                aboutMe,
+                location,
+                signUpCode,
+                userImg,
+                createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
+                followerCount: 0,
+                followingCount: 0,
+                postsCount: 0,
+                lastLogin: firebase.firestore.Timestamp.fromDate(new Date()),
+            });
+
             })
-            .catch(error => {   
-                alert(error.message)
-                console.log(error.message)
-             })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                console.log(errorCode, errorMessage)
+            })
     }
 
     render() {
@@ -285,10 +275,6 @@ const styles = StyleSheet.create({
         fontSize: 10,
         alignSelf: 'center',
         width: "70%",
-    },
-    datePicker: {
-        alignItems: 'center',
-        marginBottom: 20,
     },
     hyperlinkStyle: {
         color: 'blue',

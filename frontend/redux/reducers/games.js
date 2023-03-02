@@ -23,11 +23,11 @@ const initialState = {
     nhlGames: [],
     nbaGames: [],
     futureGames: [],
-    /*eplGames: [],
+    eplGames: [],
     formula1Teams: [],
     formula1Drivers: [],
     formula1Races: [],
-    formula1Rankings: [],*/
+    formula1Rankings: [],
 }
 
 export const nflGames = (state = initialState, action) => {
@@ -128,7 +128,7 @@ export const futureGames = (state = initialState, action) => {
     }
 }
 
-/*export const eplGames = (state = initialState, action) => {
+export const eplGames = (state = initialState, action) => {
     switch (action.type) {
         case EPL_GAMES_STATE_CHANGE:
             return {
@@ -197,7 +197,7 @@ export const formula1Rankings = (state = initialState, action) => {
             return state;
     }
 }
-*/
+
 
 export const mmaGames = (state = initialState, action) => {
     switch (action.type) {

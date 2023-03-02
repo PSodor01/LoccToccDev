@@ -12,10 +12,6 @@ import analytics from "@react-native-firebase/analytics";
 
 import { captureRef } from 'react-native-view-shot';
 
-import firebase from 'firebase'
-require("firebase/firestore")
-require("firebase/firebase-storage")
-
 import { connect } from 'react-redux'
 
 function SocialShare(props) {

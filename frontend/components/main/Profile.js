@@ -10,10 +10,12 @@ import email from 'react-native-email'
 
 import moment from 'moment';
 
+import  firebase  from "firebase/compat/app";
+import "firebase/compat/auth";
+import 'firebase/compat/firestore';
+
 import analytics from "@react-native-firebase/analytics";
 
-import firebase from 'firebase'
-require('firebase/firestore')
 import { connect } from 'react-redux'
 
 function Profile(props) {
@@ -90,7 +92,7 @@ function Profile(props) {
                         console.log('does not exist')
                     }
                 })
-            firebase.firestore()
+                firebase.firestore()
                 .collection("posts")
                 .doc(props.route.params.uid)
                 .collection("userPosts")
@@ -129,7 +131,7 @@ function Profile(props) {
     }
 
     const onFollow = () => {
-        const userFollowing = firebase.firestore()
+        const userFollowing =  firebase.firestore()
             .collection("following")
             .doc(firebase.auth().currentUser.uid)
             .collection("userFollowing")
@@ -203,7 +205,7 @@ function Profile(props) {
     }
 
     const blockUser = () => {
-        const userBlocking = firebase.firestore()
+        const userBlocking =  firebase.firestore()
             .collection("blocking")
             .doc(firebase.auth().currentUser.uid)
             .collection("userBlocking")
@@ -292,8 +294,7 @@ function Profile(props) {
     }
 
     const sendNotificationForFollow = async () => {
-        const users = await firebase
-            .firestore()
+        const users = await  firebase.firestore()
             .collection("users")
             .doc(props.route.params.uid)
             .get()
@@ -316,8 +317,7 @@ function Profile(props) {
     };
 
     const sendNotificationForLike = async () => {
-        const users = await firebase
-            .firestore()
+        const users = await  firebase.firestore()
             .collection("users")
             .doc(props.route.params.uid)
             .get()
@@ -341,8 +341,7 @@ function Profile(props) {
     };
 
     const sendNotificationForFade = async () => {
-        const users = await firebase
-            .firestore()
+        const users = await  firebase.firestore()
             .collection("users")
             .doc(props.route.params.uid)
             .get()
@@ -417,7 +416,7 @@ function Profile(props) {
             .doc(firebase.auth().currentUser.uid)
             .set({})
 
-        firebase.firestore()
+            firebase.firestore()
             .collection("posts")
             .doc(props.route.params.uid)
             .collection("userPosts")
@@ -450,7 +449,7 @@ function Profile(props) {
                 likesCount: firebase.firestore.FieldValue.increment(-1)
             })
 
-        firebase.firestore()
+            firebase.firestore()
             .collection("posts")
             .doc(props.route.params.uid)
             .collection("userPosts")
@@ -484,7 +483,7 @@ function Profile(props) {
                 fadesCount: firebase.firestore.FieldValue.increment(1)
             })
 
-        firebase.firestore()
+            firebase.firestore()
             .collection("posts")
             .doc(props.route.params.uid)
             .collection("userPosts")
@@ -504,7 +503,7 @@ function Profile(props) {
                 fadesCount: firebase.firestore.FieldValue.increment(-1)
             })
 
-        firebase.firestore()
+            firebase.firestore()
             .collection("posts")
             .doc(props.route.params.uid)
             .collection("userPosts")
@@ -558,7 +557,7 @@ function Profile(props) {
                   'Your post has been deleted!',
                 );
 
-        firebase.firestore()
+            firebase.firestore()
             .collection("users")
             .doc(firebase.auth().currentUser.uid)
             .update({

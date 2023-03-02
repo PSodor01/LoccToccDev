@@ -13,8 +13,8 @@ import * as Device from 'expo-device';
 
 import analytics from "@react-native-firebase/analytics";
 
-import firebase from 'firebase'
-require('firebase/firestore')
+import  firebase  from "firebase/compat/app";
+import 'firebase/compat/firestore';
 
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'

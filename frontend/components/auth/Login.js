@@ -1,12 +1,13 @@
 import React, { Component } from 'react'
-import { View, ScrollView, StyleSheet, Alert, Text, TextInput, TouchableOpacity, Image, TouchableWithoutFeedback, Keyboard } from 'react-native'
+import { View, StyleSheet, Alert, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from 'react-native'
 
 import { FontAwesome5 } from "@expo/vector-icons";
 import Fontisto from 'react-native-vector-icons/Fontisto';
 
 import email from 'react-native-email'
 
-import firebase from 'firebase'
+import  firebase  from "firebase/compat/app";
+import "firebase/compat/auth";
 
 const DismissKeyboard = ({ children }) => (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -16,7 +17,6 @@ const DismissKeyboard = ({ children }) => (
 )
 
 export class Login extends Component {
-    
     
     constructor(props) {
         super(props);

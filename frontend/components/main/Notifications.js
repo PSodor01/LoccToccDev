@@ -8,8 +8,6 @@ import analytics from "@react-native-firebase/analytics";
 
 import moment from 'moment';
 
-import firebase from 'firebase'
-require('firebase/firestore')
 import { connect } from 'react-redux'
 
 function Notifications(props) {

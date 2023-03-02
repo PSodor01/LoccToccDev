@@ -3,14 +3,12 @@ import { StyleSheet, Switch, TouchableOpacity, View, Text, Alert } from 'react-n
 
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
-import * as Notifications from 'expo-notifications'
 import * as Device from 'expo-device';
 
 import analytics from "@react-native-firebase/analytics";
 
-import firebase from 'firebase'
-require("firebase/firestore")
-require("firebase/firebase-storage")
+import  firebase  from "firebase/compat/app";
+import "firebase/compat/auth";
 
 import { connect } from 'react-redux'
 
@@ -21,7 +19,7 @@ const SettingsScreen = (props) => {
 
     useEffect(() => {
 
-        /*firebase.firestore()
+        /*db
         .collection("users")
         .doc('3THx5eaT6BRJreb2JensMsjRv3O2')
         .get()
@@ -72,63 +70,6 @@ const SettingsScreen = (props) => {
         )
     }
 
-    const notificationFunction = async () => {
-        if (notificationValue == true) {
-
-            setNotificationValue(false)
-
-            firebase.firestore()
-            .collection("users")
-            .doc('3THx5eaT6BRJreb2JensMsjRv3O2')
-            .update({
-                token: null
-            })
-
-            
-            
-            
-        } else {
-
-            setNotificationValue(true);
-
-            let token;
-            if (Device.isDevice) {
-            const { status: existingStatus } = await Notifications.getPermissionsAsync();
-            let finalStatus = existingStatus;
-            if (existingStatus !== 'granted') {
-                const { status } = await Notifications.requestPermissionsAsync();
-                finalStatus = status;
-            }
-            if (finalStatus !== 'granted') {
-                //alert('Failed to get push token for push notification!');
-                return;
-            }
-            token = (await Notifications.getExpoPushTokenAsync()).data;
-            } else {
-            alert('Must use physical device for Push Notifications');
-            }
-
-            if (token) {
-                const res = await firebase.firestore()
-                    .collection("users")
-                    .doc(firebase.auth().currentUser.uid)
-                    .set({token}, { merge:true });
-            }
-            
-        
-            if (Platform.OS === 'android') {
-            Notifications.setNotificationChannelAsync('default', {
-                name: 'default',
-                importance: Notifications.AndroidImportance.MAX,
-                vibrationPattern: [0, 250, 250, 250],
-                lightColor: '#FF231F7C',
-            });
-            }
-        
-            return token;
-            
-        }
-    }
 
     return (
         <View style={styles.container}>

@@ -15,9 +15,9 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import * as Device from 'expo-device';
 import analytics from "@react-native-firebase/analytics";
 
-import firebase from 'firebase'
-require("firebase/firestore")
-require("firebase/firebase-storage")
+import  firebase  from "firebase/compat/app";
+import "firebase/compat/auth";
+import 'firebase/compat/firestore';
 import { connect } from 'react-redux'
 
 function AddPostScreen(props) {

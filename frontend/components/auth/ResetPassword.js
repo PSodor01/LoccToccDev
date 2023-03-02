@@ -3,8 +3,8 @@ import { StyleSheet, ActivityIndicator, View, Text, Alert, Button, TextInput, To
 
 import { FontAwesome5 } from "@expo/vector-icons";
 
-import firebase from 'firebase'
-require('firebase/firestore')
+import  firebase  from "firebase/compat/app";
+import "firebase/compat/auth";
 
 export default function ResetPasswordScreen({ navigation }) {
 
@@ -122,3 +122,4 @@ const styles = StyleSheet.create({
         alignSelf: "center",
     },
 })
+

@@ -24,9 +24,9 @@ import { USER_STATE_CHANGE,
     CONTEST_STATUS_STATE_CHANGE,
     CLEAR_DATA
     } from '../constants/index'
-import firebase from 'firebase'
-import { SnapshotViewIOSComponent } from 'react-native'
-require('firebase/firestore')
+    
+import firebase from 'firebase/compat/app'
+import 'firebase/compat/firestore';
 
 
 export function clearData() {
@@ -164,7 +164,6 @@ export function fetchAllUsers() {
     var ourDate = new Date();
     var pastDate = ourDate.getDate() - 3;
     ourDate.setDate(pastDate);
-
     return ((dispatch) => {
         firebase.firestore()
             .collectionGroup("userPosts")
@@ -181,7 +180,6 @@ export function fetchAllUsers() {
                 for(let i = 0; i < allPosts.length; i++){
                 }
             })
-
     })
 } */
 
@@ -226,7 +224,7 @@ export function fetchMLBGames() {
     })
 }
 
-export function fetchNFLGames() {
+/*export function fetchNFLGames() {
     return ((dispatch) => {
         firebase.firestore()
             .collection("nfl")
@@ -260,7 +258,7 @@ export function fetchNCAAFGames() {
                 }
             })
     })
-}
+}*/
 
 export function fetchNBAGames() {
     return ((dispatch) => {
@@ -332,7 +330,7 @@ export function fetchMMAGames() {
     })
 }
 
-/*export function fetchEPLGames() {
+export function fetchEPLGames() {
     return ((dispatch) => {
         firebase.firestore()
             .collection("epl")
@@ -350,6 +348,7 @@ export function fetchMMAGames() {
     })
 }
 
+/*
 export function fetchGolfGames() {
     return ((dispatch) => {
         firebase.firestore()
@@ -384,7 +383,7 @@ export function fetchFutureGames() {
     })
 }
 
-/*export function fetchFormula1Teams() {
+export function fetchFormula1Teams() {
     return ((dispatch) => {
         firebase.firestore()
             .collection("formula1")
@@ -402,7 +401,6 @@ export function fetchFutureGames() {
             })
     })
 }
-
 export function fetchFormula1Races() {
     return ((dispatch) => {
         firebase.firestore()
@@ -414,7 +412,6 @@ export function fetchFormula1Races() {
             .then((snapshot) => {
                 if (snapshot.exists) {
                     let formula1Races = snapshot.data();
-
                     dispatch({  type: FORMULA1_RACES_STATE_CHANGE, formula1Races})
                 }
                 else {
@@ -422,7 +419,6 @@ export function fetchFormula1Races() {
             })
     })
 }
-
 export function fetchFormula1Drivers() {
     return ((dispatch) => {
         firebase.firestore()
@@ -441,7 +437,6 @@ export function fetchFormula1Drivers() {
             })
     })
 }
-
 export function fetchFormula1Rankings() {
     return ((dispatch) => {
         firebase.firestore()
@@ -459,7 +454,7 @@ export function fetchFormula1Rankings() {
                 
             })
     })
-} */
+} 
 
 export function fetchContestStatus() {
     return ((dispatch) => {
@@ -479,6 +474,12 @@ export function fetchContestStatus() {
                 
     })
 }
+
+
+
+
+
+
 
 
 

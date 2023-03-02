@@ -7,10 +7,6 @@ import analytics from "@react-native-firebase/analytics";
 
 import moment from 'moment'
 
-import firebase from 'firebase'
-require("firebase/firestore")
-require("firebase/firebase-storage")
-
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { fetchUsersData } from '../../redux/actions/index'
@@ -381,7 +377,7 @@ const styles = StyleSheet.create({
         
     },
     headerContainer: {
-        alignItems: 'left'
+        alignItems: 'flex-start'
     },
     borderView: {
         borderBottomColor: '#CACFD2',

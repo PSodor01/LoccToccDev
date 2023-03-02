@@ -16,9 +16,9 @@ import email from 'react-native-email'
 
 import analytics from "@react-native-firebase/analytics";
 
-import firebase from 'firebase'
-require("firebase/firestore")
-require("firebase/firebase-storage")
+import  firebase  from "firebase/compat/app";
+import "firebase/compat/auth";
+import 'firebase/compat/firestore';
 
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -52,6 +52,7 @@ function game(props) {
     useEffect(() => {
         setGolfGames(props.golfGames)
         setFutureGames(props.futureGames)
+        setFormula1Races(props.formula1Races)
     }, [])
 
     const fetchData = () => {
@@ -1438,6 +1439,7 @@ const mapStateToProps = (store) => ({
     feed: store.usersState.feed,
     usersFollowingLoaded: store.usersState.usersFollowingLoaded,
     futureGames: store.futureGamesState.futureGames,
+    formula1Races: store.formula1RacesState.formula1Races,
     contestStatus: store.userState.contestStatus,
 })
 const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUsersData }, dispatch);
