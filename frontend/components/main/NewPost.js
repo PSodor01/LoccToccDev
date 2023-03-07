@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Platform, Alert, FlatList, StyleSheet, Dimensions, ActivityIndicator, TextInput, TouchableOpacity, Image, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView} from 'react-native';
+import { View, Text, Platform, Alert, FlatList, StyleSheet, Dimensions, ActivityIndicator, TextInput, TouchableOpacity, Image } from 'react-native';
 
 import { Feather } from "@expo/vector-icons";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
@@ -15,9 +15,8 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import * as Device from 'expo-device';
 import analytics from "@react-native-firebase/analytics";
 
-import  firebase  from "firebase/compat/app";
-import "firebase/compat/auth";
-import 'firebase/compat/firestore';
+import firebase from 'firebase'
+require("firebase/firestore")
 import { connect } from 'react-redux'
 
 function AddPostScreen(props) {

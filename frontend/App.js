@@ -1,8 +1,7 @@
 
 import 'react-native-gesture-handler';
 
-import  firebase  from "firebase/compat/app";
-import "firebase/compat/auth";
+import * as firebase from 'firebase'
 
 import React, { Component } from 'react';
 
@@ -12,11 +11,13 @@ import { FontAwesome5 } from "@expo/vector-icons";
 
 import 'expo-dev-client';
 
+
 import { Provider } from 'react-redux'
 import { createStore, applyMiddleware } from 'redux'
 import rootReducer from './redux/reducers'
 import thunk from 'redux-thunk'
 const store = createStore(rootReducer, applyMiddleware(thunk))
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyAmXTsXkPI-J6mineXVOY9wa0y-B7R_GDw",
@@ -29,10 +30,10 @@ const firebaseConfig = {
   measurementId: "G-4YXWQRXEF1"
 };
 
-
 if (firebase.apps.length === 0) {
   firebase.initializeApp(firebaseConfig)
 }
+
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -86,18 +87,19 @@ const MainStackScreen = ({navigation, props}) => (
         },
         headerTintColor: '#fff',
         headerTitleStyle: {
-          fontWeight: 'bold'
+          fontWeight: 'bold',
         }
       }}
       >
     <MainStack.Screen name="Main" component={MainScreen} 
       options={{
         headerTitle: () => (
-          <View style={{ flexDirection: 'row'}}>
+          <View style={{ flexDirection: 'row', justifyContent: 'center'}}>
               <Text style={styles.headerName}>locctocc </Text>
               <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
           </View>
         ),
+        headerTitleAlign: "center",
         headerLeft: () => (
           <TouchableOpacity 
             style={{ alignItems: "flex-end", marginLeft:16 }}
@@ -121,15 +123,10 @@ const MainStackScreen = ({navigation, props}) => (
       <MainStack.Screen 
         name="Feed" 
         component={Feed}
-        listeners={({ navigation, route }) => ({
-            tabPress: e => {
-                if (route.state && route.state.routeNames.length > 0) {
-                    navigation.navigate('Feed')
-                }
-            }
-        })} 
+       
           />
       <MainStack.Screen name="Search" component={Search}/>
+      <MainStack.Screen name="Notifications" component={Notifications}/>
       <MainStack.Screen name="Profile" component={Profile}
         options={{
           headerTitle: () => (
@@ -138,6 +135,7 @@ const MainStackScreen = ({navigation, props}) => (
                 <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
             </View>
           ),
+          headerTitleAlign: "center",
           headerLeft: () => (
             <TouchableOpacity 
             style={{ alignItems: "flex-end", marginLeft:16 }}
@@ -156,6 +154,25 @@ const MainStackScreen = ({navigation, props}) => (
                 <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
             </View>
           ),
+          headerTitleAlign: "center",
+          headerLeft: () => (
+            <TouchableOpacity 
+            style={{ alignItems: "flex-end", marginLeft:16 }}
+            onPress={() => navigation.goBack()}
+            >
+            <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+          </TouchableOpacity>
+          ),
+          
+        }}
+      />
+      <MainStack.Screen name="SocialShare" component={SocialShare} 
+        options={{
+          headerTitle: () => (
+            <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+            </View>
+          ),
+          headerTitleAlign: "center",
           headerLeft: () => (
             <TouchableOpacity 
             style={{ alignItems: "flex-end", marginLeft:16 }}
@@ -175,6 +192,7 @@ const MainStackScreen = ({navigation, props}) => (
                 <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
             </View>
           ),
+          headerTitleAlign: "center",
           headerLeft: () => (
             <TouchableOpacity 
             style={{ alignItems: "flex-end", marginLeft:16 }}
@@ -194,6 +212,7 @@ const MainStackScreen = ({navigation, props}) => (
                 <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
             </View>
           ),
+          headerTitleAlign: "center",
           headerLeft: () => (
             <TouchableOpacity 
             style={{ alignItems: "flex-end", marginLeft:16 }}
@@ -208,6 +227,7 @@ const MainStackScreen = ({navigation, props}) => (
       <MainStack.Screen name="EditProfile" component={EditProfileScreen} 
         options={{
           headerTitle: "Edit Profile",
+          headerTitleAlign: "center",
           headerLeft: () => (
               <TouchableOpacity 
               style={{ alignItems: "flex-end", marginLeft:16 }}
@@ -220,6 +240,7 @@ const MainStackScreen = ({navigation, props}) => (
       <MainStack.Screen name="HouseGuidelines" component={HouseGuidelinesScreen}
         options={{
             headerTitle: "Community Guidelines",
+            headerTitleAlign: "center",
             headerLeft: () => (
               <TouchableOpacity 
               style={{ alignItems: "flex-end", marginLeft:16 }}
@@ -232,6 +253,7 @@ const MainStackScreen = ({navigation, props}) => (
       <MainStack.Screen name="ContactUs" component={ContactUsScreen}
         options={{
             headerTitle: "Contact Us",
+            headerTitleAlign: "center",
             headerLeft: () => (
               <TouchableOpacity 
               style={{ alignItems: "flex-end", marginLeft:16 }}
@@ -244,6 +266,7 @@ const MainStackScreen = ({navigation, props}) => (
         <MainStack.Screen name="Settings" component={SettingsScreen}
         options={{
             headerTitle: "Settings",
+            headerTitleAlign: "center",
             headerLeft: () => (
               <TouchableOpacity 
               style={{ alignItems: "flex-end", marginLeft:16 }}
@@ -256,6 +279,7 @@ const MainStackScreen = ({navigation, props}) => (
       <MainStack.Screen name="Partners" component={PartnersScreen}
         options={{
             headerTitle: "Our Partners",
+            headerTitleAlign: "center",
             headerLeft: () => (
               <TouchableOpacity 
               style={{ alignItems: "flex-end", marginLeft:16 }}
@@ -268,6 +292,7 @@ const MainStackScreen = ({navigation, props}) => (
       <MainStack.Screen name="AboutUs" component={AboutUsScreen}
         options={{
           headerTitle: "About Us",
+          headerTitleAlign: "center",
           headerLeft: () => (
               <TouchableOpacity 
               style={{ alignItems: "flex-end", marginLeft:16 }}
@@ -281,6 +306,7 @@ const MainStackScreen = ({navigation, props}) => (
       <MainStack.Screen name="LegalDocs" component={LegalDocsScreen}
         options={{
           headerTitle: "Privacy",
+          headerTitleAlign: "center",
           headerLeft: () => (
               <TouchableOpacity 
               style={{  alignItems: "flex-end", marginLeft:16 }}
@@ -294,12 +320,13 @@ const MainStackScreen = ({navigation, props}) => (
       <MainStack.Screen name="Odds" component={Odds}
         options={{
           headerTitle: () => (
-            <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+            <View style={{ flexDirection: 'row', alignItems: 'space-between', justifyContent: 'center'}}>
                 <Text style={styles.headerName}>locctocc </Text>
                 <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
             </View>
             
           ),
+          headerTitleAlign: "center",
           headerLeft: () => (
             <TouchableOpacity 
             style={{ alignItems: "flex-end", marginLeft:16 }}
@@ -319,6 +346,7 @@ const MainStackScreen = ({navigation, props}) => (
                 <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
             </View>
           ),
+          headerTitleAlign: "center",
           headerLeft: () => (
             <TouchableOpacity 
             style={{ alignItems: "flex-end", marginLeft:16 }}
@@ -333,11 +361,12 @@ const MainStackScreen = ({navigation, props}) => (
       <MainStack.Screen name="TeamDetails" component={TeamDetails}
         options={{
           headerTitle: () => (
-            <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+            <View style={{ flexDirection: 'row', alignItems: 'space-between', justifyContent: 'center'}}>
                 <Text style={styles.headerName}>locctocc </Text>
                 <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
             </View>
           ),
+          headerTitleAlign: "center",
           headerLeft: () => (
             <TouchableOpacity 
             style={{ alignItems: "flex-end", marginLeft:16 }}
@@ -352,11 +381,12 @@ const MainStackScreen = ({navigation, props}) => (
       <MainStack.Screen name="Standings" component={Standings}
       options={{
         headerTitle: () => (
-          <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+          <View style={{ flexDirection: 'row', alignItems: 'space-between', justifyContent: 'center'}}>
               <Text style={styles.headerName}>locctocc </Text>
               <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
           </View>
         ),
+        headerTitleAlign: "center",
         headerLeft: () => (
           <TouchableOpacity 
           style={{ alignItems: "flex-end", marginLeft:16 }}
@@ -371,11 +401,12 @@ const MainStackScreen = ({navigation, props}) => (
       <MainStack.Screen name="Following" component={FollowingScreen}
         options={{
           headerTitle: () => (
-            <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+            <View style={{ flexDirection: 'row', alignItems: 'space-between', justifyContent: 'center'}}>
                 <Text style={styles.headerName}>locctocc </Text>
                 <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
             </View>
           ),
+          headerTitleAlign: "center",
           headerLeft: () => (
             <TouchableOpacity 
             style={{ alignItems: "flex-end", marginLeft:16 }}
@@ -390,11 +421,12 @@ const MainStackScreen = ({navigation, props}) => (
         <MainStack.Screen name="Follower" component={FollowerScreen}
           options={{
             headerTitle: () => (
-              <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+              <View style={{ flexDirection: 'row', alignItems: 'space-between', justifyContent: 'center'}}>
                   <Text style={styles.headerName}>locctocc </Text>
                   <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
               </View>
             ),
+            headerTitleAlign: "center",
             headerLeft: () => (
               <TouchableOpacity 
               style={{ alignItems: "flex-end", marginLeft:16 }}
@@ -409,11 +441,12 @@ const MainStackScreen = ({navigation, props}) => (
         <MainStack.Screen name="LikesList" component={LikesList}
           options={{
             headerTitle: () => (
-              <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+              <View style={{ flexDirection: 'row', alignItems: 'space-between', justifyContent: 'center'}}>
                   <Text style={styles.headerName}>locctocc </Text>
                   <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
               </View>
             ),
+            headerTitleAlign: "center",
             headerLeft: () => (
               <TouchableOpacity 
               style={{ alignItems: "flex-end", marginLeft:16 }}
@@ -428,11 +461,12 @@ const MainStackScreen = ({navigation, props}) => (
         <MainStack.Screen name="FadesList" component={FadesList}
           options={{
             headerTitle: () => (
-              <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+              <View style={{ flexDirection: 'row', alignItems: 'space-between', justifyContent: 'center'}}>
                   <Text style={styles.headerName}>locctocc </Text>
                   <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
               </View>
             ),
+            headerTitleAlign: "center",
             headerLeft: () => (
               <TouchableOpacity 
               style={{ alignItems: "flex-end", marginLeft:16 }}
@@ -444,9 +478,6 @@ const MainStackScreen = ({navigation, props}) => (
             
           }}
         />
-       
-
-        
   </MainStack.Navigator>
 )
 
@@ -476,14 +507,12 @@ export class App extends Component {
     })
   }
 
-   render() {
+  render() {
     const { loggedIn, loaded } = this.state;
     if (!loaded) {
       return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <View style={{ flexDirection: 'row' }}>
-            <Text style={styles.loadingLogo}>locctocc </Text>
-            <FontAwesome5 name="comment-dollar" color="#009387" size={26} />
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center'  }}>
+          <View>
           </View>
           <ActivityIndicator/>
         </View>
@@ -528,7 +557,7 @@ export class App extends Component {
         <Provider store={store}>
           <NavigationContainer>
             <Drawer.Navigator drawerContent={props => <DrawerContent {...props} />}>
-              <Drawer.Screen name="Main" component={MainStackScreen} options={{ headerShown: false }}/>
+              <Drawer.Screen name="Main" component={MainStackScreen} options={{headerShown: false}} />
             </Drawer.Navigator>
           </NavigationContainer>
         </Provider>
@@ -536,6 +565,7 @@ export class App extends Component {
   }
 }
 
+export default App
 
 
 const styles = StyleSheet.create({
@@ -566,7 +596,5 @@ const styles = StyleSheet.create({
   
   
 })
-
-export default App
 
 

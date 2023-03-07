@@ -5,8 +5,8 @@ import { useNavigation } from '@react-navigation/native';
 
 import analytics from "@react-native-firebase/analytics";
 
-import  firebase  from "firebase/compat/app";
-import 'firebase/compat/firestore';
+import firebase from 'firebase'
+require("firebase/firestore")
 
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'

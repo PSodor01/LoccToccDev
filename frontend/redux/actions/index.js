@@ -25,8 +25,9 @@ import { USER_STATE_CHANGE,
     CLEAR_DATA
     } from '../constants/index'
     
-import firebase from 'firebase/compat/app'
-import 'firebase/compat/firestore';
+    import firebase from 'firebase'
+    import { SnapshotViewIOSComponent } from 'react-native'
+    require('firebase/firestore')
 
 
 export function clearData() {

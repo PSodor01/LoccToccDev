@@ -10,9 +10,8 @@ import email from 'react-native-email'
 
 import moment from 'moment';
 
-import  firebase  from "firebase/compat/app";
-import "firebase/compat/auth";
-import 'firebase/compat/firestore';
+import firebase from 'firebase'
+require("firebase/firestore")
 
 import analytics from "@react-native-firebase/analytics";
 
@@ -35,28 +34,6 @@ function Profile(props) {
 
     const fetchData = () => {
         const { currentUser, posts } = props;
-
-        function matchLikesToPosts(posts) {
-            for (let i = 0; i < posts.length; i++) {
-
-                if (props.faded.indexOf(posts[i].id) > -1) {
-                    posts[i].faded = true
-                } else {
-                    posts[i].faded = false
-                }
-
-                if (props.liked.indexOf(posts[i].id) > -1) {
-                    posts[i].liked = true
-                } else {
-                    posts[i].liked = false
-                }
-                
-            }
-            setUserPosts(posts)
-            setLoading(false)
-            
-
-        }   
     
         if (props.route.params.uid === firebase.auth().currentUser.uid) {
             setUser(currentUser);
@@ -65,7 +42,6 @@ function Profile(props) {
                 .doc(firebase.auth().currentUser.uid)
                 .collection("userPosts")
                 .orderBy("creation", "desc")
-                .limit(50)
                 .get()
                 .then((snapshot) => {
                     let posts = snapshot.docs.map(doc => {
@@ -73,9 +49,14 @@ function Profile(props) {
                         const id = doc.id;
                         return { id, ...data }
                     })
-                    matchLikesToPosts(posts)
+                    posts.sort(function (x, y) {
+                        return y.creation - x.creation;
+                    })
+                    setUserPosts(posts)
+                    setLoading(false);
                     
                 })
+            setUserPosts(posts)
             setLoading(false);
         }
         else {
@@ -92,12 +73,11 @@ function Profile(props) {
                         console.log('does not exist')
                     }
                 })
-                firebase.firestore()
+            firebase.firestore()
                 .collection("posts")
                 .doc(props.route.params.uid)
                 .collection("userPosts")
                 .orderBy("creation", "desc")
-                .limit(50)
                 .get()
                 .then((snapshot) => {
                     let posts = snapshot.docs.map(doc => {
@@ -108,7 +88,8 @@ function Profile(props) {
                     posts.sort(function (x, y) {
                         return y.creation - x.creation;
                     })
-                    matchLikesToPosts(posts)
+                    setUserPosts(posts)
+                    setLoading(false);
                     
                 })
         }
@@ -124,10 +105,6 @@ function Profile(props) {
         } else {
             setBlocking(false);
         }
-
-        
-        
-
     }
 
     const onFollow = () => {

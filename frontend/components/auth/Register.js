@@ -1,6 +1,5 @@
-import  firebase  from "firebase/compat/app";
-import "firebase/compat/auth";
-import 'firebase/compat/firestore';
+import firebase from 'firebase'
+import "firebase/firestore";
 
 import React, { Component } from 'react'
 import { View, TouchableOpacity, Text, Linking, TextInput, StyleSheet, TouchableWithoutFeedback, Keyboard } from 'react-native'
@@ -52,42 +51,28 @@ export class Register extends Component {
 
 
     async onSignUp() {
-        const { email, password, name, aboutMe, location, signUpCode, userImg } = this.state;
-
-        if (name.length == 0 || email.length == 0 || password.length == 0) {
-            alert('Oops! Please fill out all fields')
-            return;
-        }
-        if (password.length < 6) {
-            alert("Passwords must be at least 6 characters")
-            return;
-        }
-
-        createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            const user = userCredential.user;
-            console.log(user.uid)
-
-            addDoc(collection(db, "users"), {
-                name,
-                email,
-                aboutMe,
-                location,
-                signUpCode,
-                userImg,
-                createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
-                followerCount: 0,
-                followingCount: 0,
-                postsCount: 0,
-                lastLogin: firebase.firestore.Timestamp.fromDate(new Date()),
-            });
-
+        const { email, password, name, aboutMe, location, signUpCode, userImg, createdAt } = this.state;
+        firebase.auth().createUserWithEmailAndPassword(email, password)
+            .then((result) => {
+                firebase.firestore().collection("users")
+                    .doc(firebase.auth().currentUser.uid)
+                    .set({
+                        name,
+                        email,
+                        aboutMe,
+                        location,
+                        signUpCode,
+                        userImg,
+                        createdAt,
+                        followerCount: 0,
+                        followingCount: 0,
+                        postsCount: 0,
+                    })
             })
-            .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                console.log(errorCode, errorMessage)
-            })
+            .catch(error => {   
+                alert(error.message)
+                console.log(error.message)
+             })
     }
 
     render() {

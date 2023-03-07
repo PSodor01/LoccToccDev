@@ -384,6 +384,9 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
   
   })
 
+  //for player props
+  //https://api.the-odds-api.com/v4/sports/basketball_nba/events/abe2c187d35b88402a28c99a113601e9/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=player_points&oddsFormat=american&dateFormat=iso
+
   exports.getNBAGameData = functions.pubsub.schedule('every 2 minutes').onRun(async() => {
     try {
       const response = await axios.get('https://api.the-odds-api.com/v4/sports/basketball_nba/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso')
@@ -1159,7 +1162,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
     };
 
     try {
-      const response = await axios.get("https://v1.formula-1.api-sports.io/drivers?id=83", options)
+      const response = await axios.get("https://v1.formula-1.api-sports.io/drivers?id=97", options)
       .then(result => {
 
           for (let i = 0; i < result.data.response.length; i++){

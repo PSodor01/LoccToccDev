@@ -3,8 +3,8 @@ import { StyleSheet, ActivityIndicator, View, Text, Alert, Button, TextInput, To
 
 import { FontAwesome5 } from "@expo/vector-icons";
 
-import  firebase  from "firebase/compat/app";
-import "firebase/compat/auth";
+import firebase from 'firebase'
+import "firebase/firestore";
 
 export default function ResetPasswordScreen({ navigation }) {
 

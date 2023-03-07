@@ -16,9 +16,8 @@ import email from 'react-native-email'
 
 import analytics from "@react-native-firebase/analytics";
 
-import  firebase  from "firebase/compat/app";
-import "firebase/compat/auth";
-import 'firebase/compat/firestore';
+import firebase from 'firebase'
+require("firebase/firestore")
 
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'

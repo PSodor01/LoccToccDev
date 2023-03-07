@@ -6,8 +6,8 @@ import Fontisto from 'react-native-vector-icons/Fontisto';
 
 import email from 'react-native-email'
 
-import  firebase  from "firebase/compat/app";
-import "firebase/compat/auth";
+import firebase from 'firebase'
+import "firebase/firestore";
 
 const DismissKeyboard = ({ children }) => (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>

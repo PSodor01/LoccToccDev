@@ -11,9 +11,8 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 
-import  firebase  from "firebase/compat/app";
-import "firebase/compat/auth";
-import 'firebase/compat/firestore';
+import firebase from 'firebase'
+require("firebase/firestore")
 
 
 export function DrawerContent(props) {

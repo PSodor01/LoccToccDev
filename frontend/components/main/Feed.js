@@ -10,9 +10,8 @@ import { captureRef } from 'react-native-view-shot';
 
 import moment from 'moment';
 
-import  firebase  from "firebase/compat/app";
-import "firebase/compat/auth";
-import 'firebase/compat/firestore';
+import firebase from 'firebase'
+require("firebase/firestore")
 
 import analytics from "@react-native-firebase/analytics";
 

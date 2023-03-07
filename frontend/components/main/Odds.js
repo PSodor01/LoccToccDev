@@ -13,9 +13,9 @@ import * as StoreReview from 'expo-store-review';
 
 import moment from 'moment'
 
-import  firebase  from "firebase/compat/app";
-import "firebase/compat/auth";
-import 'firebase/compat/firestore';
+import firebase from 'firebase'
+require("firebase/firestore")
+require("firebase/firebase-storage")
 
 import analytics from "@react-native-firebase/analytics";
 
@@ -56,11 +56,10 @@ function Odds(props) {
 
         await Notifications.setBadgeCountAsync(0);
         
-        
     }
 
-    useEffect(() => {
 
+    useEffect(() => {
 
         (() => registerForPushNotificationsAsync())()
         checkForUpdate()
@@ -278,7 +277,7 @@ function Odds(props) {
         }
 
         if (token) {
-            const res = await db
+            const res = await firebase.firestore()
                 .collection("users")
                 .doc(firebase.auth().currentUser.uid)
                 .set({token}, { merge:true });

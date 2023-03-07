@@ -10,9 +10,8 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import analytics from "@react-native-firebase/analytics";
 
-import  firebase  from "firebase/compat/app";
-import "firebase/compat/auth";
-import 'firebase/compat/firestore';
+import firebase from 'firebase'
+require("firebase/firestore")
 
 import { connect } from 'react-redux'
 

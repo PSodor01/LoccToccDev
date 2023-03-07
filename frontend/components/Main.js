@@ -6,8 +6,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 
-import  firebase  from "firebase/compat/app";
-import "firebase/compat/auth";
+import firebase from 'firebase'
+import "firebase/firestore";
 
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
