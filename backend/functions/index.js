@@ -384,9 +384,6 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
   
   })
 
-  //for player props
-  //https://api.the-odds-api.com/v4/sports/basketball_nba/events/abe2c187d35b88402a28c99a113601e9/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=player_points&oddsFormat=american&dateFormat=iso
-
   exports.getNBAGameData = functions.pubsub.schedule('every 2 minutes').onRun(async() => {
     try {
       const response = await axios.get('https://api.the-odds-api.com/v4/sports/basketball_nba/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso')
@@ -419,6 +416,34 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
               underOdds: game.bookmakers[i].markets[2].outcomes[1].price,
           }, { merge:true });
 
+          try {
+            const response2 = axios.get("https://api.the-odds-api.com/v4/sports/basketball_nba/events/" + game.id + "/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=player_points&oddsFormat=american&dateFormat=iso")
+            .then(result => {
+      
+              for (let i = 0; i < result.data.bookmakers[0].markets[0].outcomes.length; i++){
+                const writeResult = admin
+                  .firestore()
+                  .collection("nba")
+                  .doc("props")
+                  .collection('players')
+                  .doc(result.data.bookmakers[0].markets[0].outcomes[i].description)
+                  .set({
+                    gameId: result.data.id,
+                    playerPropName: result.data.bookmakers[0].markets[0].outcomes[i].description,
+                    playerPropTotal: result.data.bookmakers[0].markets[0].outcomes[i].point,
+                    playerPropOverOdds: result.data.bookmakers[0].markets[0].outcomes[i].price,
+                    playerPropUnderOdds: result.data.bookmakers[0].markets[0].outcomes[i].price,
+      
+                }, { merge:true });           
+            }
+                 
+          })
+        }catch(err) {console.error(err.message)}
+
+          
+
+          
+
           } else {
             const writeResult = admin
             .firestore()
@@ -442,7 +467,37 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
               underOdds: game.bookmakers[i].markets[2].outcomes[1].price,
           }, { merge:true });
 
+          try {
+            const response2 = axios.get("https://api.the-odds-api.com/v4/sports/basketball_nba/events/" + game.id + "/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=player_points&oddsFormat=american&dateFormat=iso")
+            .then(result => {
+
+              console.log(result.data.bookmakers[0].markets[0].outcomes[i].price[0])
+              console.log(result.data.bookmakers[0].markets[0].outcomes[i].price[1])
+              console.log(result.data.bookmakers[0].markets[0].outcomes[i].price[2])
+
+              for (let i = 0; i < result.data.bookmakers[0].markets[0].outcomes.length; i++){
+                const writeResult = admin
+                  .firestore()
+                  .collection("nba")
+                  .doc("props")
+                  .collection('players')
+                  .doc(result.data.bookmakers[0].markets[0].outcomes[i].description)
+                  .set({
+                    gameId: result.data.id,
+                    playerPropName: result.data.bookmakers[0].markets[0].outcomes[i].description,
+                    playerPropTotal: result.data.bookmakers[0].markets[0].outcomes[i].point,
+                    playerPropOverOdds: result.data.bookmakers[0].markets[0].outcomes[i].price,
+                    playerPropUnderOdds: result.data.bookmakers[0].markets[0].outcomes[i].price,
+
+                }, { merge:true });           
+            }
+                
+    })
+  }catch(err) {console.error(err.message)}
+
           }
+
+          
 
           
         })
@@ -450,6 +505,37 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
   }catch(err) {console.error(err.message)}
 
   })
+
+  exports.getNBAPlayerPropData = functions.pubsub.schedule('every 2 minutes').onRun(async() => {
+    try {
+      const response2 = await axios.get("https://api.the-odds-api.com/v4/sports/basketball_nba/events/67cf37ec1fb9969fc994254ea6a6237e/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=player_points&oddsFormat=american&dateFormat=iso")
+      .then(result => {
+
+        for (let i = 0; i < result.data.bookmakers[0].markets[0].outcomes.length; i++){
+          const writeResult = admin
+            .firestore()
+            .collection("nba")
+            .doc("props")
+            .collection('players')
+            .doc(result.data.bookmakers[0].markets[0].outcomes[i].description)
+            .set({
+              gameId: result.data.id,
+              playerPropName: result.data.bookmakers[0].markets[0].outcomes[i].description,
+              playerPropTotal: result.data.bookmakers[0].markets[0].outcomes[i].point,
+              playerPropOdds: result.data.bookmakers[0].markets[0].outcomes[i].price,
+
+          }, { merge:true });           
+      }
+           
+    })
+  }catch(err) {console.error(err.message)}
+             
+
+   
+
+  })
+
+  
 
   exports.getNBAScoresData = functions.pubsub.schedule('every 2 minutes').onRun(async() => {
     try {

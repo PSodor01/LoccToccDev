@@ -112,6 +112,13 @@ function Feed(props) {
             .doc(postId)
             .set({})
 
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                loccMadness2023Score: firebase.firestore.FieldValue.increment(10)
+            })
+
         analytics().logEvent('hammerPost', {user_name: props.currentUser.name});
     }
 
@@ -123,6 +130,13 @@ function Feed(props) {
             .doc(postId)
             .delete({})
         
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                loccMadness2023Score: firebase.firestore.FieldValue.increment(-10)
+            })
+        
     }
 
     const storeFade = (postId) => {
@@ -132,6 +146,13 @@ function Feed(props) {
             .collection("userFades")
             .doc(postId)
             .set({})
+
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                loccMadness2023Score: firebase.firestore.FieldValue.increment(-10)
+            })
 
         analytics().logEvent('fadePost', {user_name: props.currentUser.name});
     }
@@ -144,6 +165,12 @@ function Feed(props) {
             .doc(postId)
             .delete({})
 
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                loccMadness2023Score: firebase.firestore.FieldValue.increment(10)
+            })
     }
 
     const onLikePress = (userId, postId) => {
@@ -157,7 +184,7 @@ function Feed(props) {
             .doc(firebase.auth().currentUser.uid)
             .set({})
 
-            firebase.firestore()
+        firebase.firestore()
             .collection("posts")
             .doc(userId)
             .collection("userPosts")
@@ -166,18 +193,12 @@ function Feed(props) {
                 likesCount: firebase.firestore.FieldValue.increment(1)
             })
 
-        const likedName = props.currentUser.name
         firebase.firestore()
             .collection("users")
             .doc(userId)
-            .collection("notifications")
-            .add({
-                notificationType: "hammer",
-                creation: firebase.firestore.FieldValue.serverTimestamp(),
-                otherUserId: firebase.auth().currentUser.uid,
-                otherUsername: likedName,
-                notificationText: 'hammered your post',
-              })
+            .update({
+                loccMadness2023Score: firebase.firestore.FieldValue.increment(20)
+        })
     }
 
     const onDislikePress = (userId, postId) => {
@@ -190,7 +211,7 @@ function Feed(props) {
                 likesCount: firebase.firestore.FieldValue.increment(-1)
             })
 
-            firebase.firestore()
+        firebase.firestore()
             .collection("posts")
             .doc(userId)
             .collection("userPosts")
@@ -198,6 +219,14 @@ function Feed(props) {
             .collection("likes")
             .doc(firebase.auth().currentUser.uid)
             .delete()
+
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .update({
+                loccMadness2023Score: firebase.firestore.FieldValue.increment(-20)
+        })
+        
     }
 
     const onFadePress = (userId, postId) => {
@@ -210,7 +239,7 @@ function Feed(props) {
                 fadesCount: firebase.firestore.FieldValue.increment(1)
             })
 
-            firebase.firestore()
+        firebase.firestore()
             .collection("posts")
             .doc(userId)
             .collection("userPosts")
@@ -219,18 +248,12 @@ function Feed(props) {
             .doc(firebase.auth().currentUser.uid)
             .set({})
 
-        const likedName = props.currentUser.name
         firebase.firestore()
             .collection("users")
             .doc(userId)
-            .collection("notifications")
-            .add({
-                notificationType: "fade",
-                creation: firebase.firestore.FieldValue.serverTimestamp(),
-                otherUserId: firebase.auth().currentUser.uid,
-                otherUsername: likedName,
-                notificationText: 'faded your post',
-                })
+            .update({
+                loccMadness2023Score: firebase.firestore.FieldValue.increment(-50)
+        })
     }
 
     const onUnfadePress = (userId, postId) => {
@@ -243,7 +266,7 @@ function Feed(props) {
                 fadesCount: firebase.firestore.FieldValue.increment(-1)
             })
 
-            firebase.firestore()
+        firebase.firestore()
             .collection("posts")
             .doc(userId)
             .collection("userPosts")
@@ -251,6 +274,14 @@ function Feed(props) {
             .collection("fades")
             .doc(firebase.auth().currentUser.uid)
             .delete()
+
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .update({
+                loccMadness2023Score: firebase.firestore.FieldValue.increment(50)
+        })
+
     }
 
     const sendNotification = async (notification, token) => {

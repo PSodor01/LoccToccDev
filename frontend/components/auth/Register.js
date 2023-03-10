@@ -51,7 +51,7 @@ export class Register extends Component {
 
 
     async onSignUp() {
-        const { email, password, name, aboutMe, location, signUpCode, userImg, createdAt } = this.state;
+        const { email, password, name, aboutMe, location, signUpCode, userImg, createdAt, lastLogin } = this.state;
         firebase.auth().createUserWithEmailAndPassword(email, password)
             .then((result) => {
                 firebase.firestore().collection("users")
@@ -64,6 +64,7 @@ export class Register extends Component {
                         signUpCode,
                         userImg,
                         createdAt,
+                        lastLogin,
                         followerCount: 0,
                         followingCount: 0,
                         postsCount: 0,

@@ -1,5 +1,5 @@
-import React, { Component, useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Alert, ActivityIndicator, Linking, FlatList, TouchableOpacity, Image, Platform} from 'react-native';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { Text, View, StyleSheet, Alert, Linking, FlatList, TouchableOpacity, Image } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -11,6 +11,7 @@ import moment from 'moment'
 import * as Device from 'expo-device';
 
 import { useNavigation } from '@react-navigation/native';
+import BottomSheet, { BottomSheetModal, BottomSheetModalProvider, BottomSheetFlatList } from "@gorhom/bottom-sheet";
 
 import email from 'react-native-email'
 
@@ -36,12 +37,15 @@ function game(props) {
     const [golfGames, setGolfGames] = useState([]);
     const [futureGames, setFutureGames] = useState([]);
     const [formula1Races, setFormula1Races] = useState([]);
+    const [playerProps, setPlayerProps] = useState([]);
+    const [isOpen, setIsOpen] = useState(false);
 
 
     const {gameId, gameDate, homeTeam, awayTeam, homeMoneyline, awayMoneyline, homeSpread, awaySpread, homeSpreadOdds, awaySpreadOdds, over, overOdds, under, underOdds, drawMoneyline, sport, fantasyTopic} = props.route.params;
 
     useEffect(() => {
             fetchData()
+            fetchPropData()
             analytics().logScreenView({ screen_name: 'game', screen_class: 'game', user_name: props.currentUser.name})
 
             
@@ -126,6 +130,13 @@ function game(props) {
             .doc(postId)
             .set({})
 
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                loccMadness2023Score: firebase.firestore.FieldValue.increment(10)
+            })
+
         analytics().logEvent('hammerPost', {user_name: props.currentUser.name});
             
     }
@@ -138,6 +149,12 @@ function game(props) {
             .doc(postId)
             .delete({})
 
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                loccMadness2023Score: firebase.firestore.FieldValue.increment(-10)
+            })
     }
 
     const storeFade = (postId) => {
@@ -147,6 +164,13 @@ function game(props) {
             .collection("userFades")
             .doc(postId)
             .set({})
+
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                loccMadness2023Score: firebase.firestore.FieldValue.increment(-10)
+            })
 
         analytics().logEvent('fadePost', {user_name: props.currentUser.name});
     }
@@ -159,6 +183,12 @@ function game(props) {
             .doc(postId)
             .delete({})
 
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                loccMadness2023Score: firebase.firestore.FieldValue.increment(10)
+            })
     }
 
     const onLikePress = (userId, postId) => {
@@ -181,19 +211,12 @@ function game(props) {
                 likesCount: firebase.firestore.FieldValue.increment(1)
             })
 
-        const likedName = props.currentUser.name
         firebase.firestore()
             .collection("users")
             .doc(userId)
-            .collection("notifications")
-            .add({
-                notificationType: "hammer",
-                creation: firebase.firestore.FieldValue.serverTimestamp(),
-                otherUserId: firebase.auth().currentUser.uid,
-                otherUsername: likedName,
-                notificationText: 'hammered your post on the ' + awayTeam + "/" + homeTeam + " game",
-              })
-
+            .update({
+                loccMadness2023Score: firebase.firestore.FieldValue.increment(20)
+        })
     }
 
     const onDislikePress = (userId, postId) => {
@@ -214,6 +237,14 @@ function game(props) {
             .collection("likes")
             .doc(firebase.auth().currentUser.uid)
             .delete()
+        
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .update({
+                loccMadness2023Score: firebase.firestore.FieldValue.increment(-20)
+        })
+        
     }
 
     const onFadePress = (userId, postId) => {
@@ -235,19 +266,12 @@ function game(props) {
             .doc(firebase.auth().currentUser.uid)
             .set({})
 
-        const likedName = props.currentUser.name
         firebase.firestore()
             .collection("users")
             .doc(userId)
-            .collection("notifications")
-            .add({
-                notificationType: "fade",
-                creation: firebase.firestore.FieldValue.serverTimestamp(),
-                otherUserId: firebase.auth().currentUser.uid,
-                otherUsername: likedName,
-                notificationText: 'faded your post on the ' + awayTeam + "/" + homeTeam + " game",
-              })
-
+            .update({
+                loccMadness2023Score: firebase.firestore.FieldValue.increment(-50)
+        })
     }
 
     const onUnfadePress = (userId, postId) => {
@@ -268,7 +292,14 @@ function game(props) {
             .collection("fades")
             .doc(firebase.auth().currentUser.uid)
             .delete()
-        
+
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .update({
+                loccMadness2023Score: firebase.firestore.FieldValue.increment(50)
+        })
+
     }
 
     const sendNotification = async (notification, token) => {
@@ -602,7 +633,63 @@ function game(props) {
         }
     }
 
-    
+    const fetchPropData = () => {
+        firebase.firestore()
+            .collection("nba")
+            .doc("props")
+            .collection("players")
+            .where('gameId', '==', gameId)
+            .onSnapshot((snapshot) => {
+                let playerProps = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    return { id, ...data }
+                })
+                setPlayerProps(playerProps);
+
+                
+            })
+    };
+
+    const bottomSheetModalRef = useRef(null)
+
+    const snapPoints = ["60%", "95%"]
+
+    function handlePresentModal() {
+        bottomSheetModalRef.current?.present();
+        setIsOpen(true);
+    }
+
+   const renderPlayerPropItem = useCallback(({ item }) => (
+        <View style={styles.propsContainer}>
+            <View style={styles.propsNameContainer}>
+                <Text style={{ fontWeight: 'bold' }}>{item.playerPropName}</Text>
+            </View>
+            <View style={styles.propsOddsMainContainer}>
+                <View style={styles.propsOddsContainer}>
+                    <Text style={styles.spreadText}>O {item.playerPropTotal}</Text>
+                    {item.playerPropOverOdds > 0 ?
+                        <Text style={styles.oddsTopRowText}>+{item.playerPropOverOdds}</Text>
+                        :
+                        <Text style={styles.oddsTopRowText}>{item.playerPropOverOdds}</Text>
+                    }
+                </View>
+                <View style={styles.propsOddsContainer}>
+                    <Text style={styles.spreadText}>U {item.playerPropTotal}</Text>
+                    {item.playerPropUnderOdds > 0 ?
+                        <Text style={styles.oddsTopRowText}>+{item.playerPropUnderOdds}</Text>
+                        :
+                        <Text style={styles.oddsTopRowText}>{item.playerPropUnderOdds}</Text>
+                    }
+                </View>
+            </View>
+        </View>
+        
+    ),
+    []
+   );
+        
+   
     
     const renderItem = ({item}) => {
         return (
@@ -723,7 +810,26 @@ function game(props) {
     const navigation = useNavigation();
 
     return (
-        <View style={styles.container}>
+        <BottomSheetModalProvider>
+            <BottomSheetModal
+                    ref={bottomSheetModalRef}
+                    index={0}
+                    snapPoints={snapPoints}
+                    backgroundStyle={{ borderRadius: 50, }}
+                    onDismiss={() => setIsOpen(false)}
+                >
+                    <View style={styles.bottomSheetContainer}>
+                        <Text style={styles.bottomSheetTitle}>Player Props</Text>
+                            <BottomSheetFlatList
+                            data = {playerProps}
+                            renderItem={renderPlayerPropItem}
+                            />
+                    </View>
+            </BottomSheetModal>
+        <View style={[
+            styles.container,
+            { backgroundColor: isOpen ? "#e1e2e6" : "white" },
+        ]}>
             <View style={styles.gameContainer}>
             {sport == 'US Masters Tournament Lines - Winner' || 
             sport == 'NFL - Suberbowl Champion' ||
@@ -751,13 +857,11 @@ function game(props) {
                     listAllPlayers == false ?
                     <FlatList 
                         data = {futureGames.sort((a, b) => parseFloat(a.playerOdds) - parseFloat(b.playerOdds)).filter(futureSport => futureSport.sport == sport).slice(0, 5)}
-                        style={styles.feed}
                         renderItem={renderListItem}
                     />
                     :
                     <FlatList 
                         data = {futureGames.sort((a, b) => parseFloat(a.playerOdds) - parseFloat(b.playerOdds)).filter(futureSport => futureSport.sport == sport)}
-                        style={styles.feed}
                         renderItem={renderListItem}
                     />
 
@@ -830,7 +934,6 @@ function game(props) {
                     listAllPlayers == false ?
                     <FlatList 
                         data = {golfGames.sort((a, b) => parseFloat(a.playerOdds) - parseFloat(b.playerOdds)).slice(0, 5)}
-                        style={styles.feed}
                         renderItem={renderListItem}
                     />
 
@@ -839,7 +942,6 @@ function game(props) {
                     
                     <FlatList 
                         data = {golfGames.sort((a, b) => parseFloat(a.playerOdds) - parseFloat(b.playerOdds))}
-                        style={styles.feed}
                         renderItem={renderListItem}
                     />
                     :
@@ -968,8 +1070,15 @@ function game(props) {
                         </View>
                     </View>
                     :
-                    <View>
+                        <View>
+                            <TouchableOpacity
+                                onPress={handlePresentModal}>
+                                <Text>bottom sheet</Text>
+                            </TouchableOpacity>
+                            
                         <View style={styles.awayGameInfoContainer}>
+                               
+                                
                             <View style={styles.teamItem}>
                                 <TouchableOpacity
                                     onPress={() => {gameVote(); increaseAwayCount()}}>
@@ -1079,6 +1188,7 @@ function game(props) {
                             </View>
                         </View>
                     </View>
+                    
                     }
                 </View>                    
             </View> 
@@ -1135,7 +1245,7 @@ function game(props) {
             </TouchableOpacity>
             
         </View>
-            
+        </BottomSheetModalProvider>
         )
 }
 
@@ -1153,7 +1263,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         borderBottomWidth: 1,
         borderBottomColor: "rgba(0,0,0,0.1)",
-        backgroundColor: "#ffffff",
 
     },
     awayGameInfoContainer: { 
@@ -1184,7 +1293,6 @@ const styles = StyleSheet.create({
         width: "55%",
         borderRightColor: "#e1e2e6",
         borderRightWidth: 1,
-        backgroundColor: "#ffffff",
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -1192,7 +1300,6 @@ const styles = StyleSheet.create({
     },
     teamNameItem: {
         width: "90%",
-        backgroundColor: "#ffffff",
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -1424,6 +1531,35 @@ const styles = StyleSheet.create({
         paddingBottom: '1%',
         paddingLeft: 4
     },
+    bottomSheetContainer: {
+        flex: 1,
+        alignItems: 'center',
+    },
+    bottomSheetTitle: {
+        fontWeight: "900",
+        letterSpacing: .5,
+        fontSize: 16
+    },
+    propsContainer: {
+        flexDirection: 'row',
+        padding: 10,
+        justifyContent: 'space-between',
+        marginHorizontal: "10%",
+        borderBottomColor: "#CACFD2",
+        borderBottomWidth: 1,
+    },
+    propsOddsMainContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: "35%"
+    },
+    propsOddsContainer: {
+        alignItems: 'center',
+    },
+    propsNameContainer: {
+        width: "65%"
+    }
     
     
 })

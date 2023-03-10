@@ -137,6 +137,13 @@ function NewCommentScreen(props, route) {
                 navigation.goBack()
             }))
 
+            firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+              loccMadness2023Score: firebase.firestore.FieldValue.increment(30)
+        })
+
 
       }
 
@@ -148,6 +155,13 @@ function NewCommentScreen(props, route) {
         .doc(props.route.params.postId)
         .update({
             comments: firebase.firestore.FieldValue.increment(1)
+        })
+
+        firebase.firestore()
+            .collection("users")
+            .doc(props.route.params.uid)
+            .update({
+              loccMadness2023Score: firebase.firestore.FieldValue.increment(20)
         })
 
         if (awayTeam  != undefined) {

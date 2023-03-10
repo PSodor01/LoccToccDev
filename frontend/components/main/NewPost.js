@@ -204,6 +204,7 @@ function AddPostScreen(props) {
             .doc(firebase.auth().currentUser.uid)
             .update({
                 postsCount: firebase.firestore.FieldValue.increment(1),
+                loccMadness2023Score: firebase.firestore.FieldValue.increment(30)
             })
 
 
@@ -215,6 +216,7 @@ function AddPostScreen(props) {
         
         
     })
+    
 
     }
 

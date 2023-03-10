@@ -85,6 +85,26 @@ function Odds(props) {
     }, [])
 
     useEffect(() => {
+
+        firebase.firestore()
+          .collection('users')
+          .doc(firebase.auth().currentUser.uid)
+          .get()
+          .then((snapshot) => {
+              if (snapshot.exists) {
+                  if (snapshot.data().loccMadness2023Score > -100000) {
+                  } else{
+                      firebase.firestore()
+                      .collection("users")
+                      .doc(firebase.auth().currentUser.uid)
+                      .set({loccMadness2023Score: 150}, { merge:true });
+                  }
+              }
+          })
+  
+      }, [])
+
+    useEffect(() => {
         AsyncStorage.getItem('alreadyLaunched').then(value => {
             if(value == null ) {
                 AsyncStorage.setItem('alreadyLaunched', 'true');    
