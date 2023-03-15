@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { StyleSheet, View, Text, Linking, Image, FlatList, TouchableOpacity, Alert, Share } from 'react-native'
+import { StyleSheet, View, Text, Linking, Image, FlatList, TouchableOpacity, Alert, Share, Modal } from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons';
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Foundation from 'react-native-vector-icons/Foundation'
@@ -16,93 +16,89 @@ require("firebase/firestore")
 import analytics from "@react-native-firebase/analytics";
 
 import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
-import { fetchUsersData } from '../../redux/actions/index'
 
 
 function Feed(props) {
     const [loading, setLoading] = useState(true);
-    const [allPosts, setAllPosts] = useState([]);
-    const [followCriteria, setFollowCriteria] = useState(false)
+    const [followCriteria, setFollowCriteria] = useState(true)
     const [currentUserFollowingCount, setCurrentUserFollowingCount] = useState('')
-    
+    const [combinedData, setCombinedData] = useState([]);
+    const [limit, setLimit] = useState(10);
+    const [showScrollButton, setShowScrollButton] = useState(false);
+    const [fullscreen, setFullscreen] = useState(false);
 
      useEffect(() => {
+        
         fetchData()
         setCurrentUserFollowingCount(props.currentUser.followingCount)
 
         analytics().logScreenView({ screen_name: 'Feed', screen_class: 'Feed',  user_name: props.currentUser.name})
 
-    }, [props.blocking, props.faded, props.liked, props.following, props.currentUser])
+    }, [props.blocking, props.faded, props.liked, props.following, props.currentUser.followingCount])
 
-    const fetchData = () => {
-
-        function matchUserToAllPosts(allPosts) {
-            for (let i = 0; i < allPosts.length; i++) {
-                if (allPosts[i].hasOwnProperty('user')) {
-                    continue;
-                }
-
-                const user = props.users.find(x => x.uid === allPosts[i].creator)
-                if (user == undefined) {
-                    props.fetchUsersData(allPosts[i].creator, false)
-                } else {
-                    allPosts[i].user = user
-                }
-
-                if (props.blocking.indexOf(allPosts[i].creator) > -1) {
-                    allPosts[i].blocked = true
-                } else {
-                    allPosts[i].blocked = false
-                }
+    const fetchCombinedData = async (limit) => {
+        const [users, gamePosts] = await Promise.all([
+            firebase.firestore().collection("users").get(),
+            firebase.firestore().collectionGroup("userPosts").orderBy('creation', 'desc').limit(limit).get()
+        ]);
     
-                if (props.faded.indexOf(allPosts[i].id) > -1) {
-                    allPosts[i].faded = true
-                } else {
-                    allPosts[i].faded = false
-                }
+        const usersData = users.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        const gamePostsData = gamePosts.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     
-                if (props.following.indexOf(allPosts[i].creator) > -1) {
-                    allPosts[i].following = true
-                } else {
-                    allPosts[i].following = false
-                }
+        const combinedData = gamePostsData.map((gamePost) => {
+            const user = usersData.find((user) => user.id === gamePost.creator);
+            return { ...gamePost, user };
+        });
     
-                if (props.liked.indexOf(allPosts[i].id) > -1) {
-                    allPosts[i].liked = true
-                } else {
-                    allPosts[i].liked = false
-                }
+        for (let i = 0; i < combinedData.length; i++) {
+            if (props.blocking.indexOf(combinedData[i].creator) > -1) {
+                combinedData[i].blocked = true
+            } else {
+                combinedData[i].blocked = false
             }
-            setAllPosts(allPosts)
-            setLoading(false)
-
-
+    
+            if (props.liked.indexOf(combinedData[i].id) > -1) {
+                combinedData[i].liked = true
+            } else {
+                combinedData[i].liked = false
+            }
+    
+            if (props.faded.indexOf(combinedData[i].id) > -1) {
+                combinedData[i].faded = true
+            } else {
+                combinedData[i].faded = false
+            }
+    
+            if (props.following.indexOf(combinedData[i].creator) > -1) {
+                combinedData[i].following = true
+            } else {
+                combinedData[i].following = false
+            }
         }
+    
+        return combinedData;
+    };
 
-        var ourDate = new Date();
-        var pastDate = ourDate.getDate() - 3;
-        ourDate.setDate(pastDate);
+    const fetchData = async () => {
+        const data = await fetchCombinedData(limit);
+        setCombinedData(data);
+        setLoading(false);
+    };
 
-        firebase.firestore()
-        .collectionGroup("userPosts")
-        .where("creation", ">=", ourDate)
-        .orderBy('creation', 'desc')
-        .get()
-        .then((snapshot) => {
+    const handleEndReached = async () => {
+        setLimit(limit + 10); // increase the limit to fetch more posts
+        const data = await fetchCombinedData(limit);
+        setCombinedData([...combinedData, ...data]); // append the new posts to the current data
+        analytics().logEvent('loadMore', {user_name: props.currentUser.name});
+    };
 
-            let allPosts = snapshot.docs.map(doc => {
-                const data = doc.data();
-                const id = doc.id;
-                return { id, ...data }
-            })
-                
-            matchUserToAllPosts(allPosts)
+    const flatListRef = useRef(null);
 
-
-            })
-
-    }
+    const handleImagePress = () => {
+        setFullscreen(!fullscreen);
+        analytics().logEvent('fullSizeImage', {user_name: props.currentUser.name});
+      };
+    
     
     const storeLike = (postId, userId) => {
         firebase.firestore()
@@ -434,7 +430,7 @@ function Feed(props) {
                     : 
                     <View style={styles.feedItem}>
                         <TouchableOpacity
-                            onPress={() => props.navigation.navigate("Profile", {uid: item.user.uid})}>
+                            onPress={() => props.navigation.navigate("Profile", {uid: item.user.id})}>
                             <Image 
                                 style={styles.profilePhotoPostContainer}
                                 source={{uri: item.user ? item.user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
@@ -450,7 +446,18 @@ function Feed(props) {
                                 {item.caption != null ? <Text style={styles.captionText}>{item.caption}</Text> : null}
                                 {item.downloadURL != "blank" ?
                                     <View style={styles.postPictureContainer}>
-                                        <Image resizeMode={"cover"} source={{uri: item.downloadURL}} style={styles.postImage}/> 
+                                        <TouchableOpacity onPress={handleImagePress}>
+                                            <Image
+                                            resizeMode="cover"
+                                            source={{ uri: item.downloadURL }}
+                                            style={styles.postImage}
+                                            />
+                                        </TouchableOpacity>
+                                        <Modal visible={fullscreen} transparent={true}>
+                                            <TouchableOpacity style={styles.fullscreenContainer} onPress={handleImagePress}>
+                                                <Image resizeMode="contain" source={{ uri: item.downloadURL }} style={styles.fullscreenImage} />
+                                            </TouchableOpacity>
+                                        </Modal>
                                     </View>
                                  : null}
                                 {item.userTagList != null ? <Text style={{ color: '#0033cc', fontWeight: 'bold' }}>@{item.userTagList}</Text> : null}
@@ -459,7 +466,7 @@ function Feed(props) {
                 { item.liked == true ?
                     <View style={styles.likeContainer}>
                         <TouchableOpacity
-                            onPress={() => {onDislikePress(item.user.uid, item.id); deleteLike(item.id)}} >
+                            onPress={() => {onDislikePress(item.user.id, item.id); deleteLike(item.id)}} >
                             <Ionicons name={"hammer"} size={20} color={"black"} />
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -472,7 +479,7 @@ function Feed(props) {
                     
                     <View style={styles.likeContainer}>
                         <TouchableOpacity
-                            onPress={() => {onLikePress(item.user.uid, item.id); storeLike(item.id); sendNotificationForLike(item.user.uid, item.user.name)}}> 
+                            onPress={() => {onLikePress(item.user.id, item.id); storeLike(item.id); sendNotificationForLike(item.user.id, item.user.name)}}> 
                             <Ionicons name={"hammer-outline"}  size={20} color={"grey"}/>
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -484,7 +491,7 @@ function Feed(props) {
                     { item.faded == true ?
                     <View style={styles.likeContainer}>
                         <TouchableOpacity
-                            onPress={() => {onUnfadePress(item.user.uid, item.id); deleteFade(item.id)}} >
+                            onPress={() => {onUnfadePress(item.user.id, item.id); deleteFade(item.id)}} >
                             <Foundation name={"skull"} size={20} color={"black"} />
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -497,7 +504,7 @@ function Feed(props) {
                     
                     <View style={styles.likeContainer}>
                         <TouchableOpacity
-                            onPress={() => {onFadePress(item.user.uid, item.id); storeFade(item.id); sendNotificationForFade(item.user.uid, item.user.name)}}> 
+                            onPress={() => {onFadePress(item.user.id, item.id); storeFade(item.id); sendNotificationForFade(item.user.id, item.user.name)}}> 
                             <Foundation name={"skull"}  size={20} color={"#B3B6B7"}/>
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -508,7 +515,7 @@ function Feed(props) {
                     }
                     <TouchableOpacity
                         style={styles.commentsContainer}
-                        onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.user.uid, posterId: item.user.uid, posterName: item.user.name, postCreation: item.creation, postCaption: item.caption, posterImg: item.user.userImg, postImg: item.downloadURL })}>
+                        onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.user.id, posterId: item.user.id, posterName: item.user.name, postCreation: item.creation, postCaption: item.caption, posterImg: item.user.userImg, postImg: item.downloadURL })}>
                         <Ionicons name={"chatbubble-outline"} size={20} color={"grey"} marginRight={10} />
                         <Text style={styles.likeNumber}>{item.comments}</Text>
                     </TouchableOpacity>
@@ -537,7 +544,7 @@ function Feed(props) {
                     <View
                          style={styles.feedItem}>
                         <TouchableOpacity
-                            onPress={() => props.navigation.navigate("Profile", {uid: item.user.uid})}>
+                            onPress={() => props.navigation.navigate("Profile", {uid: item.user.id})}>
                             <Image 
                                 style={styles.profilePhotoPostContainer}
                                 source={{uri: item.user ? item.user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
@@ -552,7 +559,18 @@ function Feed(props) {
                                 {item.caption != null ? <Text style={styles.captionText}>{item.caption}</Text> : null}
                                 {item.downloadURL != "blank" ?
                                     <View style={styles.postPictureContainer}>
-                                        <Image resizeMode={"cover"} source={{uri: item.downloadURL}} style={styles.postImage}/> 
+                                        <TouchableOpacity onPress={handleImagePress}>
+                                            <Image
+                                            resizeMode="cover"
+                                            source={{ uri: item.downloadURL }}
+                                            style={styles.postImage}
+                                            />
+                                        </TouchableOpacity>
+                                        <Modal visible={fullscreen} transparent={true}>
+                                            <TouchableOpacity style={styles.fullscreenContainer} onPress={handleImagePress}>
+                                                <Image resizeMode="contain" source={{ uri: item.downloadURL }} style={styles.fullscreenImage} />
+                                            </TouchableOpacity>
+                                        </Modal>
                                     </View>
                                  : null}
                                 {item.userTagList != null ? <Text style={{ color: '#0033cc', fontWeight: 'bold' }}>@{item.userTagList}</Text> : null}
@@ -561,7 +579,7 @@ function Feed(props) {
                 { item.liked == true ?
                     <View style={styles.likeContainer}>
                         <TouchableOpacity
-                            onPress={() => {onDislikePress(item.user.uid, item.id); deleteLike(item.id)}} >
+                            onPress={() => {onDislikePress(item.user.id, item.id); deleteLike(item.id)}} >
                             <Ionicons name={"hammer"} size={20} color={"black"} />
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -574,7 +592,7 @@ function Feed(props) {
                     
                     <View style={styles.likeContainer}>
                         <TouchableOpacity
-                            onPress={() => {onLikePress(item.user.uid, item.id); storeLike(item.id)}}> 
+                            onPress={() => {onLikePress(item.user.id, item.id); storeLike(item.id)}}> 
                             <Ionicons name={"hammer-outline"}  size={20} color={"grey"}/>
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -586,7 +604,7 @@ function Feed(props) {
                     { item.faded == true ?
                     <View style={styles.likeContainer}>
                         <TouchableOpacity
-                            onPress={() => {onUnfadePress(item.user.uid, item.id); deleteFade(item.id)}} >
+                            onPress={() => {onUnfadePress(item.user.id, item.id); deleteFade(item.id)}} >
                             <Foundation name={"skull"} size={20} color={"black"} />
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -600,7 +618,7 @@ function Feed(props) {
                     
                     <View style={styles.likeContainer}>
                         <TouchableOpacity
-                            onPress={() => {onFadePress(item.user.uid, item.id); storeFade(item.id)}}> 
+                            onPress={() => {onFadePress(item.user.id, item.id); storeFade(item.id)}}> 
                             <Foundation name={"skull"}  size={20} color={"#B3B6B7"}/>
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -611,7 +629,7 @@ function Feed(props) {
                     }
                     <TouchableOpacity
                         style={styles.commentsContainer}
-                        onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.user.uid, posterId: item.user.uid, posterName: item.user.name, postCreation: item.creation, postCaption: item.caption, posterImg: item.user.userImg, postImg: item.downloadURL })}>
+                        onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.user.id, posterId: item.user.id, posterName: item.user.name, postCreation: item.creation, postCaption: item.caption, posterImg: item.user.userImg, postImg: item.downloadURL })}>
                         <Ionicons name={"chatbubble-outline"} size={20} color={"grey"} marginRight={10} />
                         <Text style={styles.likeNumber}>{item.comments}</Text>
                     </TouchableOpacity>
@@ -682,24 +700,57 @@ function Feed(props) {
             }
             {followCriteria == false ? 
             <FlatList
+                ref={flatListRef}
                 style={styles.feed}
-                data = {allPosts.sort(function (x, y) {return y.creation - x.creation})}
-                onRefresh={() => fetchData()}
-                refreshing={loading}
+                data = {combinedData}
                 renderItem={renderFollowingItem}
+                keyExtractor={(item, index) => index.toString()}
+                onScroll={(event) => {
+                    const offsetY = event.nativeEvent.contentOffset.y;
+                    if (offsetY > 100) { // adjust the number as needed
+                    setShowScrollButton(true);
+                    } else {
+                    setShowScrollButton(false);
+                    }
+                }}
+                onEndReached={handleEndReached}
+                onEndReachedThreshold={0.1}
+            /> 
 
-            /> :
+            
+            :
             <FlatList
+                ref={flatListRef}
                 style={styles.feed}
-                data = {allPosts.sort(function (x, y) {return y.creation - x.creation})}
-                onRefresh={() => fetchData()}
-                refreshing={loading}
+                data = {combinedData}
                 renderItem={renderItem}
+                keyExtractor={(item, index) => index.toString()}
+                onScroll={(event) => {
+                    const offsetY = event.nativeEvent.contentOffset.y;
+                    if (offsetY > 100) { // adjust the number as needed
+                    setShowScrollButton(true);
+                    } else {
+                    setShowScrollButton(false);
+                    }
+                }}
+                onEndReached={handleEndReached}
+                onEndReachedThreshold={0.1}
 
             /> }
 
             
             <View  style={styles.adView}>
+                {showScrollButton && (
+                    <TouchableOpacity
+                        style={styles.scrollButton}
+                        onPress={() => {
+                        flatListRef.current.scrollToOffset({ animated: true, offset: 0 });
+                        setShowScrollButton(false);
+                        }}
+                    >
+                        <Ionicons name="arrow-up-circle" size={30} color="#009387" />
+                    </TouchableOpacity>
+                )}
                 <TouchableOpacity
                     style={{ width: "95%", height: 40, alignItems: 'center', backgroundColor: 'black' }}
                     onPress={() => { Linking.openURL('https://apps.apple.com/us/app/kutt/id1578386177'); openAdLink()}} >
@@ -759,6 +810,17 @@ const styles = StyleSheet.create({
         width: "100%",
         height: "100%",
     },
+    fullscreenContainer: {
+        flex: 1,
+        backgroundColor: "black",
+        justifyContent: "center",
+        alignItems: "center",
+      },
+      fullscreenImage: {
+        flex: 1,
+        width: "100%",
+        height: "100%",
+      },
     captionText: {
         paddingBottom: 5,
     },
@@ -837,6 +899,25 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+    scrollButton: {
+        position: 'absolute',
+        bottom: 50,
+        right: 20,
+        backgroundColor: '#fff',
+        borderRadius: 50,
+        width: 50,
+        height: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+      },
 })
 
 const mapStateToProps = (store) => ({
@@ -850,6 +931,5 @@ const mapStateToProps = (store) => ({
 
 })
 
-const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUsersData }, dispatch);
 
-export default connect(mapStateToProps, mapDispatchProps)(Feed);
+export default connect(mapStateToProps)(Feed);

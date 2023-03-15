@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Image, Linking } from 'react-native'
+import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Image, Linking, Alert } from 'react-native'
 
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 
 import Animated from 'react-native-reanimated';
 import BottomSheet from 'reanimated-bottom-sheet';
 
-import Constants from 'expo-constants';
+import * as Device from 'expo-device';
 
 import Leaderboard from 'react-native-leaderboard'
 
 
 import analytics from "@react-native-firebase/analytics";
+import { BannerAdSize, InterstitialAd, TestIds, GAMBannerAd } from 'react-native-google-mobile-ads';
+
 
 import firebase from 'firebase'
 require("firebase/firestore")
@@ -23,6 +25,25 @@ function Contest(props) {
     const [allUsers, setAllUsers] = useState([]);
     const [myScore, setMyScore] = useState([]);
     const [contestLive, setContestLive] = useState();
+    const [showInterstitial, setShowInterstitial] = useState(false);
+
+    useEffect(() => {
+        // show interstitial 50% of the time
+        const shouldShowInterstitial = Math.random() < 0.5;
+        console.log(shouldShowInterstitial)
+
+        setShowInterstitial(shouldShowInterstitial);
+      }, []);
+    
+      useEffect(() => {
+        if (showInterstitial) {
+            interstitial.load();
+            setTimeout(() => {
+                interstitial.show()
+            }, 2000)
+        }
+      }, [showInterstitial]);
+
 
     useEffect(() => {
 
@@ -58,13 +79,24 @@ function Contest(props) {
             </View>
     )}
 
+    const handleRowPress = (rowData) => {
+        const { id } = rowData;
+        props.navigation.navigate("Profile", {uid: id})
+      };
+
     const countInfoClicks = () => {
         analytics().logEvent('contestInfoClicks', {user_name: props.currentUser.name});
     }
 
-    const countWebsiteClicks = () => {
+    const countWebsiteClicks = async () => {
+        const url = 'https://www.snackmagic.com/?grsf=613qvn';
+        const supported = await Linking.canOpenURL(url);
+        if (supported) {
+            await Linking.openURL(url);
+        }
 
         analytics().logEvent('websiteClicks', {user_name: props.currentUser.name});
+        
 
     }
 
@@ -126,16 +158,23 @@ function Contest(props) {
     bs = React.createRef();
     fall = new Animated.Value(1);
 
+    const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-8519029912093094/8258310490'
+    const interstitialAdUnitId = __DEV__ ? TestIds.INTERSTITIAL : 'ca-app-pub-8519029912093094/1664981983'
 
-    const testBannerID = 'ca-app-pub-3940256099942544/2934735716';
+    const interstitial = InterstitialAd.createForAdRequest(interstitialAdUnitId, {
+        requestNonPersonalizedAdsOnly: true,
+    })
+
+
+    /*const testBannerID = 'ca-app-pub-3940256099942544/2934735716';
     const productionBannerID = 'ca-app-pub-8519029912093094/1640242937';
     // Is a real device and running in production.
-    const adBannerUnitID = Constants.isDevice && !__DEV__ ? productionBannerID : testBannerID;
+    const adBannerUnitID = Device.isDevice && !__DEV__ ? productionBannerID : testBannerID;
 
     const testInterstitialID = 'ca-app-pub-3940256099942544/1033173712';
     const productionInterstitialID = 'ca-app-pub-8519029912093094/2876269149';
     // Is a real device and running in production.
-    const adInterstitialUnitID = Constants.isDevice && !__DEV__ ? productionInterstitialID : testInterstitialID;
+    const adInterstitialUnitID = Device.isDevice && !__DEV__ ? productionInterstitialID : testInterstitialID;
 
     const interstitial = async () => {
         await AdMobInterstitial.setAdUnitID(adInterstitialUnitID); // Test ID, Replace with your-admob-unit-id
@@ -145,7 +184,7 @@ function Contest(props) {
         } catch(error) {
             console.log(error)
         }
-    } 
+    } */
 
     /*<View style={styles.headerContainer}>
         <View style={styles.titleContainer}>
@@ -293,10 +332,12 @@ function Contest(props) {
                     <View style={styles.headerContainer}>
         <View style={styles.titleContainer}>
             <View>
-                <Image 
-                    style={{ width: 130, height: 100, marginBottom: 5, marginRight: 10, }}
-                    source={require('../../assets/snackMagicAd.png')}
-                />
+                <TouchableOpacity onPress={() => {countWebsiteClicks()}}>
+                    <Image 
+                        style={{ width: 130, height: 100, marginBottom: 5, marginRight: 10, }}
+                        source={require('../../assets/snackMagicAd.png')}
+                    />
+                </TouchableOpacity>
             </View>
             <View>
                 <View style={styles.titleContainer}>
@@ -323,10 +364,7 @@ function Contest(props) {
                     <TouchableOpacity
                         style={styles.linkText}>
                             <Text style={styles.linkText}
-                        onPress={() => {
-                        countWebsiteClicks()
-                        Linking.openURL('https://www.snackmagic.com/?grsf=613qvn');
-                        }}>
+                        onPress={() => {countWebsiteClicks()}}>
                         Snack Magic</Text>
                     </TouchableOpacity>
                 </View>
@@ -394,12 +432,24 @@ function Contest(props) {
                 
                 <Leaderboard 
                     data={allUsers} 
+                    onRowPress={handleRowPress}
                     sortBy='loccMadness2023Score' 
                     labelBy='name'
                     icon='userImg'
-                    />
+                />
+                
+                
                 
             </Animated.View>
+            <View style={styles.adView}>
+                <GAMBannerAd
+                    unitId={adUnitId}
+                    sizes={[BannerAdSize.FULL_BANNER]}
+                    requestOptions={{
+                        requestNonPersonalizedAdsOnly: true,
+                    }}
+                />
+            </View>
         </View>
         
             
@@ -499,6 +549,7 @@ const styles = StyleSheet.create({
         color: 'white',
     },
     adView: {
+        width: "60%",
         alignItems: 'center',
         justifyContent: 'center',
     },

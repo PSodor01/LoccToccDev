@@ -69,7 +69,6 @@ import Odds from './components/main/Odds'
 import game from './components/main/game'
 import TeamDetails from './components/main/TeamDetails'
 import Standings from './components/main/Standings'
-import Contest from './components/main/Contest'
 
 
 const Stack = createStackNavigator();
@@ -128,7 +127,6 @@ const MainStackScreen = ({navigation, props}) => (
           />
       <MainStack.Screen name="Search" component={Search}/>
       <MainStack.Screen name="Notifications" component={Notifications}/>
-      <MainStack.Screen name="Contest" component={Contest}/>
       <MainStack.Screen name="Profile" component={Profile}
         options={{
           headerTitle: () => (

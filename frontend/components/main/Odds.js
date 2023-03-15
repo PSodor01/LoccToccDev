@@ -253,15 +253,13 @@ function Odds(props) {
 
     }
 
-
-    
     const checkForUpdate = async () => {
-
-        const update = await Updates.checkForUpdateAsync();
-        if (update.isAvailable) {
-            updateApp();
+        if (!__DEV__) {
+            const update = await Updates.checkForUpdateAsync();
+            if (update.isAvailable) {
+                updateApp();
+            }
         }
-        
     }
     
     const updateApp = async () => {
@@ -532,11 +530,21 @@ function Odds(props) {
         
       ];
 
+    const testID = 'ca-app-pub-3940256099942544/2934735716';
+    const productionID = 'ca-app-pub-8519029912093094/5201658236';
+    // Is a real device and running in production.
+    const adUnitID = Device.isDevice && !__DEV__ ? productionID : testID;
+
+
+
       const openAdLink = () => {
 
         analytics().logEvent('adClick', {user_name: props.currentUser.name});
             
-    }
+        }
+        
+
+
 
       const renderSportsListItem = ({ item }) => (
         <View>
@@ -1268,6 +1276,7 @@ function Odds(props) {
                     />
                 </TouchableOpacity>
             </View>
+           
             
          
             

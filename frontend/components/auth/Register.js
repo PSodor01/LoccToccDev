@@ -15,6 +15,33 @@ const DismissKeyboard = ({ children }) => (
 
 )
 
+const sendNotification = async (notification) => {
+    console.log(notification)
+    const message = {
+        to: 'ExponentPushToken[eIr7vlNdKZjkSVesQEDiZ5]',
+        sound: 'default',
+        body: notification ? notification : '',
+        badge: 1,
+    };
+    
+    await fetch('https://exp.host/--/api/v2/push/send', {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Accept-encoding': 'gzip, deflate',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(message),
+    });
+}
+
+const sendNotificationForSignUp =  (email, name) => {
+   
+    const notification = 'New user created! Email: ' + email + ' and username: ' +  name
+    sendNotification(notification)
+               
+};
+
 export class Register extends Component {
 
     constructor(props) {
@@ -46,10 +73,7 @@ export class Register extends Component {
     incompleteAlert = () => {
         alert('Oops! Please fill out all fields')
     }
-
   
-
-
     async onSignUp() {
         const { email, password, name, aboutMe, location, signUpCode, userImg, createdAt, lastLogin } = this.state;
         firebase.auth().createUserWithEmailAndPassword(email, password)
@@ -74,6 +98,8 @@ export class Register extends Component {
                 alert(error.message)
                 console.log(error.message)
              })
+
+        sendNotificationForSignUp(email, name)
     }
 
     render() {

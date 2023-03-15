@@ -3,6 +3,7 @@ import { StyleSheet, Switch, TouchableOpacity, View, Text, Alert } from 'react-n
 
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
+import * as Notifications from 'expo-notifications'
 import * as Device from 'expo-device';
 
 import analytics from "@react-native-firebase/analytics";
@@ -14,36 +15,107 @@ import { connect } from 'react-redux'
 
 const SettingsScreen = (props) => {
 
-    const [switchValue, setSwitchValue] = useState(false);
+    const [isEnabled, setIsEnabled] = useState();
     const [notificationValue, setNotificationValue] = useState();
 
     useEffect(() => {
 
-        /*db
+        firebase.firestore()
         .collection("users")
-        .doc('3THx5eaT6BRJreb2JensMsjRv3O2')
+        .doc(firebase.auth().currentUser.uid)
         .get()
         .then((snapshot) => {
             if (snapshot.exists) {
                 let userData = snapshot.data();
                 let token = userData.token
-                setNotificationValue(true)
+                if(token == 'blank') {
+                    setIsEnabled(false)
+                    setNotificationValue(false)
+                } else {
+                    setIsEnabled(true)
+                    setNotificationValue(true)
+                }
             }
             else {
                 setNotificationValue(false)
+                setIsEnabled(false)
             }
-        })*/
+        })
 
         analytics().logScreenView({ screen_name: 'Settings', screen_class: 'Settings',  user_name: props.currentUser.name})
         
     }, [])
 
+    const notificationFunction = async () => {
+        if (notificationValue == true) {
 
+            setNotificationValue(false)
 
-    const toggleSwitch = (value) => {
-        setSwitchValue(value)
+            firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                token: null
+            })
+
+        } else {
+
+            setNotificationValue(true);
+
+            let token;
+        if (Device.isDevice) {
+          const { status: existingStatus } = await Notifications.getPermissionsAsync();
+          let finalStatus = existingStatus;
+          if (existingStatus !== 'granted') {
+            const { status } = await Notifications.requestPermissionsAsync({
+                ios: {
+                    allowAlert: true,
+                    allowBadge: true,
+                    allowSound: true,
+                    allowAnnouncements: true,
+                },
+            });
+            finalStatus = status;
+          }
+          if (finalStatus !== 'granted') {
+            //alert('Failed to get push token for push notification!');
+            return;
+          }
+          token = (await Notifications.getExpoPushTokenAsync()).data;
+        } else {
+          alert('Must use physical device for Push Notifications');
+        }
+
+        if (token) {
+            const res = await firebase.firestore()
+                .collection("users")
+                .doc(firebase.auth().currentUser.uid)
+                .set({token}, { merge:true });
+        }
         
-    };
+      
+        if (Platform.OS === 'android') {
+          Notifications.setNotificationChannelAsync('default', {
+            name: 'default',
+            importance: Notifications.AndroidImportance.MAX,
+            vibrationPattern: [0, 250, 250, 250],
+            lightColor: '#FF231F7C',
+          });
+        }
+      
+        return token;
+            
+        }
+    }
+
+
+
+    const toggleSwitch = () => {
+        setIsEnabled(previousState => !previousState);
+        notificationFunction();
+        analytics().logEvent('userTurnOnNotifications', {user_name: props.currentUser.name});
+    }
+       
 
     const deleteAccount = () => {
         firebase.auth().currentUser?.delete();
@@ -80,7 +152,26 @@ const SettingsScreen = (props) => {
                     <AntDesign name={"deleteuser"} size={16} color={"black"}/>
                     <Text>    Delete Account</Text>
                 </TouchableOpacity>
+                
             </View>
+            <View style={styles.rowContainer}>
+                <View style={styles.buttonContainer}>
+                    <AntDesign name={"bells"} size={16} color={"black"}/>
+                    <Text>    Notifications</Text>
+                </View>
+                <View >
+                    <Switch
+                        trackColor={{ false: "#767577", true: "#81b0ff" }}
+                        thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
+                        ios_backgroundColor="#3e3e3e"
+                        onValueChange={toggleSwitch}
+                        value={isEnabled}
+                    />
+                </View>
+                
+                
+            </View>
+            
         </View>
         
     )
@@ -98,10 +189,17 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         flexDirection: 'row',
-        padding: 10,
     },
     documentRow: {
         flexDirection: 'row',
+        padding: 10,
+        marginRight: "5%",
+        borderBottomColor: "#e1e2e6",
+        borderBottomWidth: 1,
+    },
+    rowContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         padding: 10,
         marginRight: "5%",
         borderBottomColor: "#e1e2e6",

@@ -18,7 +18,6 @@ import ProfileScreen from './main/Profile'
 import Notifications from './main/Notifications'
 import SearchScreen from './main/Search'
 import Odds from './main/Odds'
-import ContestScreen from './main/Contest'
 
 
 const Tab = createBottomTabNavigator();
@@ -101,17 +100,7 @@ export class Main extends Component {
                         ),
                     }}
                     />
-                <Tab.Screen 
-                    name="Contest" 
-                    component={ContestScreen}
-                    options={{
-                        tabBarLabel: 'Leaders',
-                        tabBarColor: '#009387',
-                        tabBarIcon: ({ color, size }) => (
-                            <FontAwesome5 name="trophy" color={"#FFD700"} size={20} />
-                        ),
-                    }}
-                    />
+                
                 <Tab.Screen 
                     name="Notifications" 
                     component={Notifications}

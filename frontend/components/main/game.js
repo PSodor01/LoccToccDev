@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Text, View, StyleSheet, Alert, Linking, FlatList, TouchableOpacity, Image } from 'react-native';
+import { Text, View, StyleSheet, Alert, Linking, FlatList, TouchableOpacity, Image, Modal } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -21,8 +21,6 @@ import firebase from 'firebase'
 require("firebase/firestore")
 
 import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
-import { fetchUsersData } from '../../redux/actions/index'
 
 function game(props) {
 
@@ -39,18 +37,17 @@ function game(props) {
     const [formula1Races, setFormula1Races] = useState([]);
     const [playerProps, setPlayerProps] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
+    const [combinedData, setCombinedData] = useState([]);
+    const [fullscreen, setFullscreen] = useState(false);
 
 
     const {gameId, gameDate, homeTeam, awayTeam, homeMoneyline, awayMoneyline, homeSpread, awaySpread, homeSpreadOdds, awaySpreadOdds, over, overOdds, under, underOdds, drawMoneyline, sport, fantasyTopic} = props.route.params;
 
     useEffect(() => {
-            fetchData()
             fetchPropData()
             analytics().logScreenView({ screen_name: 'game', screen_class: 'game', user_name: props.currentUser.name})
 
-            
-        
-    }, [props.blocking, props.liked, props.faded, props.route.params.postId, props.users])
+    }, [props.route.params.postId, props.users])
 
     useEffect(() => {
         setGolfGames(props.golfGames)
@@ -58,69 +55,53 @@ function game(props) {
         setFormula1Races(props.formula1Races)
     }, [])
 
-    const fetchData = () => {
-        function matchUserToGamePost(gamePosts) {
-            for (let i = 0; i < gamePosts.length; i++) {
-                if (gamePosts[i].hasOwnProperty('user')) {
-                    continue;
-                }
+    useEffect(() => {
+        fetchCombinedData();
+    }, [props.blocking, props.liked, props.faded]);
 
-                const user = props.users.find(x => x.uid === gamePosts[i].creator)
-                if (user == undefined) {
-                    props.fetchUsersData(gamePosts[i].creator, false)
-                } else {
-                    gamePosts[i].user = user
-                }
+    const fetchCombinedData = async () => {
+        const [users, gamePosts] = await Promise.all([
+            firebase.firestore().collection("users").get(),
+            firebase.firestore().collectionGroup("userPosts").where('gameId', '==', gameId).orderBy('creation', 'desc').get()
+        ]);
 
-                if (props.blocking.indexOf(gamePosts[i].creator) > -1) {
-                    gamePosts[i].blocked = true
-                } else {
-                    gamePosts[i].blocked = false
-                }
+        const usersData = users.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        const gamePostsData = gamePosts.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 
-                if (props.liked.indexOf(gamePosts[i].id) > -1) {
-                    gamePosts[i].liked = true
-                } else {
-                    gamePosts[i].liked = false
-                }
+        const combinedData = gamePostsData.map((gamePost) => {
+            const user = usersData.find((user) => user.id === gamePost.creator);
+            return { ...gamePost, user };
+        });
 
-                if (props.faded.indexOf(gamePosts[i].id) > -1) {
-                    gamePosts[i].faded = true
-                } else {
-                    gamePosts[i].faded = false
-                }
-                
+        for (let i = 0; i < combinedData.length; i++) {
+            if (props.blocking.indexOf(combinedData[i].creator) > -1) {
+                combinedData[i].blocked = true
+            } else {
+                combinedData[i].blocked = false
             }
-            setGamePosts(gamePosts)
-            setLoading(false)
+
+            if (props.liked.indexOf(combinedData[i].id) > -1) {
+                combinedData[i].liked = true
+            } else {
+                combinedData[i].liked = false
+            }
+
+            if (props.faded.indexOf(combinedData[i].id) > -1) {
+                combinedData[i].faded = true
+            } else {
+                combinedData[i].faded = false
+            }
+            
         }
-
-        if (props.route.params.postId !== postId) {
-            firebase.firestore()
-            .collectionGroup("userPosts")
-            .where('gameId', '==', gameId)
-            .orderBy('creation', 'desc')
-            .get()
-            .then((snapshot) => {
-
-                let gamePosts = snapshot.docs.map(doc => {
-                    const data = doc.data();
-                    const id = doc.id;
-                    return { id, ...data }
-                })
-                    
-                    matchUserToGamePost(gamePosts)
-
-                })
-
-        } else {
-            matchUserToGamePost(gamePosts)
+    
+            setCombinedData(combinedData);
+            setVoteCount()
             setLoading(false)
-        }
-        
-        setVoteCount()
+    };
 
-    }
+    const handleImagePress = () => {
+        setFullscreen(!fullscreen);
+      };
 
     const storeLike = (postId, userId) => {
         firebase.firestore()
@@ -248,6 +229,7 @@ function game(props) {
     }
 
     const onFadePress = (userId, postId) => {
+        console.log(userId, postId)
         firebase.firestore()
             .collection("posts")
             .doc(userId)
@@ -703,7 +685,7 @@ function game(props) {
                 item.user !== undefined ?
                 <View style={styles.feedItem}>
                     <TouchableOpacity
-                    onPress={() => props.navigation.navigate("Profile", {uid: item.user.uid})}>
+                    onPress={() => props.navigation.navigate("Profile", {uid: item.user.id})}>
                     <Image 
                         style={styles.profilePhotoCommentContainer}
                         source={{uri: item.user ? item.user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
@@ -719,7 +701,18 @@ function game(props) {
                         {item.caption != null ? <Text style={styles.captionText}>{item.caption}</Text> : null}
                         {item.downloadURL != "blank" ?
                             <View style={styles.postPictureContainer}>
-                                <Image resizeMode={"cover"} source={{uri: item.downloadURL}} style={styles.postImage}/> 
+                                <TouchableOpacity onPress={handleImagePress}>
+                                    <Image
+                                    resizeMode="cover"
+                                    source={{ uri: item.downloadURL }}
+                                    style={styles.postImage}
+                                    />
+                                </TouchableOpacity>
+                                <Modal visible={fullscreen} transparent={true}>
+                                    <TouchableOpacity style={styles.fullscreenContainer} onPress={handleImagePress}>
+                                        <Image resizeMode="contain" source={{ uri: item.downloadURL }} style={styles.fullscreenImage} />
+                                    </TouchableOpacity>
+                                </Modal>
                             </View>
                             : null}
                         {item.userTagList != null ? <Text style={{ color: '#0033cc', fontWeight: 'bold' }}>@{item.userTagList}</Text> : null}
@@ -728,7 +721,7 @@ function game(props) {
                         { item.liked == true ?
                         <View style={styles.likeContainer}>
                             <TouchableOpacity
-                                onPress={() => {onDislikePress(item.user.uid, item.id); deleteLike(item.id)}} >
+                                onPress={() => {onDislikePress(item.user.id, item.id); deleteLike(item.id)}} >
                                 <Ionicons name={"hammer"} size={20} color={"black"} />
                             </TouchableOpacity>
                             <TouchableOpacity
@@ -741,7 +734,7 @@ function game(props) {
                         
                         <View style={styles.likeContainer}>
                             <TouchableOpacity
-                                onPress={() => {onLikePress(item.user.uid, item.id); storeLike(item.id); sendNotificationForLike(item.user.uid, item.user.name)}}> 
+                                onPress={() => {onLikePress(item.user.id, item.id); storeLike(item.id); sendNotificationForLike(item.user.id, item.user.name)}}> 
                                 <Ionicons name={"hammer-outline"}  size={20} color={"grey"}/>
                             </TouchableOpacity>
                             <TouchableOpacity
@@ -753,7 +746,7 @@ function game(props) {
                         { item.faded == true ?
                         <View style={styles.likeContainer}>
                             <TouchableOpacity
-                                onPress={() => {onUnfadePress(item.user.uid, item.id); deleteFade(item.id)}} >
+                                onPress={() => {onUnfadePress(item.user.id, item.id); deleteFade(item.id)}} >
                                 <Foundation name={"skull"} size={20} color={"black"} />
                             </TouchableOpacity>
                             <TouchableOpacity
@@ -766,7 +759,7 @@ function game(props) {
                         
                         <View style={styles.likeContainer}>
                             <TouchableOpacity
-                                onPress={() => {onFadePress(item.user.uid, item.id); storeFade(item.id), sendNotificationForFade(item.user.uid, item.user.name)}}> 
+                                onPress={() => {onFadePress(item.user.id, item.id); storeFade(item.id), sendNotificationForFade(item.user.id, item.user.name)}}> 
                                 <Foundation name={"skull"}  size={20} color={"#B3B6B7"}/>
                             </TouchableOpacity>
                             <TouchableOpacity
@@ -777,7 +770,7 @@ function game(props) {
                         }
                         <TouchableOpacity
                             style={styles.commentsContainer}
-                            onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.user.uid, posterId: item.user.uid, posterName: item.user.name, postCreation: item.creation, postCaption: item.caption, posterImg: item.user.userImg, postImg: item.downloadURL, awayTeam: awayTeam, homeTeam: homeTeam })}>
+                            onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.user.id, posterId: item.user.id, posterName: item.user.name, postCreation: item.creation, postCaption: item.caption, posterImg: item.user.userImg, postImg: item.downloadURL, awayTeam: awayTeam, homeTeam: homeTeam })}>
                             <Ionicons name={"chatbubble-outline"} size={20} color={"grey"} marginRight={10} />
                             <Text style={styles.likeNumber}>{item.comments}</Text>
                         </TouchableOpacity>
@@ -1071,11 +1064,6 @@ function game(props) {
                     </View>
                     :
                         <View>
-                            <TouchableOpacity
-                                onPress={handlePresentModal}>
-                                <Text>bottom sheet</Text>
-                            </TouchableOpacity>
-                            
                         <View style={styles.awayGameInfoContainer}>
                                
                                 
@@ -1206,9 +1194,9 @@ function game(props) {
             </View>
             {sortCriteria == true ? 
             <FlatList
-                data = {gamePosts.sort(function (x, y) {return y.creation - x.creation})}
+                data = {combinedData.sort(function (x, y) {return y.creation - x.creation})}
                 ListEmptyComponent={EmptyListMessage}
-                onRefresh={() => fetchData()}
+                onRefresh={() => fetchCombinedData()}
                 refreshing={loading}
                 renderItem={renderItem}
             />
@@ -1216,9 +1204,9 @@ function game(props) {
 
                 
             <FlatList
-                data = {gamePosts.sort((a, b) => parseFloat(b.likesCount) - parseFloat(a.likesCount))}
+                data = {combinedData.sort((a, b) => parseFloat(b.likesCount) - parseFloat(a.likesCount))}
                 ListEmptyComponent={EmptyListMessage}
-                onRefresh={() => fetchData()}
+                onRefresh={() => fetchCombinedData()}
                 refreshing={loading}
                 renderItem={renderItem}
             />
@@ -1361,6 +1349,17 @@ const styles = StyleSheet.create({
         width: "100%",
         height: "100%",
     },
+    fullscreenContainer: {
+        flex: 1,
+        backgroundColor: "black",
+        justifyContent: "center",
+        alignItems: "center",
+      },
+      fullscreenImage: {
+        flex: 1,
+        width: "100%",
+        height: "100%",
+      },
     captionText: {
         paddingBottom: 5,
     },
@@ -1577,6 +1576,5 @@ const mapStateToProps = (store) => ({
     formula1Races: store.formula1RacesState.formula1Races,
     contestStatus: store.userState.contestStatus,
 })
-const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUsersData }, dispatch);
 
-export default connect(mapStateToProps,  mapDispatchProps)(game);
+export default connect(mapStateToProps)(game);

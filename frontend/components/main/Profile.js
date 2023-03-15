@@ -34,6 +34,28 @@ function Profile(props) {
 
     const fetchData = () => {
         const { currentUser, posts } = props;
+
+        function matchLikesToPosts(posts) {
+            for (let i = 0; i < posts.length; i++) {
+
+                if (props.faded.indexOf(posts[i].id) > -1) {
+                    posts[i].faded = true
+                } else {
+                    posts[i].faded = false
+                }
+
+                if (props.liked.indexOf(posts[i].id) > -1) {
+                    posts[i].liked = true
+                } else {
+                    posts[i].liked = false
+                }
+                
+            }
+            setUserPosts(posts)
+            setLoading(false)
+            
+
+        }   
     
         if (props.route.params.uid === firebase.auth().currentUser.uid) {
             setUser(currentUser);
@@ -49,6 +71,7 @@ function Profile(props) {
                         const id = doc.id;
                         return { id, ...data }
                     })
+                    matchLikesToPosts(posts)
                     posts.sort(function (x, y) {
                         return y.creation - x.creation;
                     })
@@ -88,6 +111,7 @@ function Profile(props) {
                     posts.sort(function (x, y) {
                         return y.creation - x.creation;
                     })
+                    matchLikesToPosts(posts)
                     setUserPosts(posts)
                     setLoading(false);
                     
@@ -433,7 +457,7 @@ function Profile(props) {
         const likedName = props.currentUser.name
         firebase.firestore()
             .collection("users")
-            .doc(userId)
+            .doc(props.route.params.uid)
             .collection("notifications")
             .add({
                 notificationType: "hammer",
@@ -466,7 +490,7 @@ function Profile(props) {
         const likedName = props.currentUser.name
         firebase.firestore()
             .collection("users")
-            .doc(userId)
+            .doc(props.route.params.uid)
             .collection("notifications")
             .add({
                 notificationType: "fade",
