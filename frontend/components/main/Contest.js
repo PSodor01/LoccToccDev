@@ -5,14 +5,10 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 
 import Animated from 'react-native-reanimated';
 import BottomSheet from 'reanimated-bottom-sheet';
-
-import * as Device from 'expo-device';
-
-import Leaderboard from 'react-native-leaderboard'
-
+import { Avatar } from 'react-native-elements';
 
 import analytics from "@react-native-firebase/analytics";
-import { BannerAdSize, InterstitialAd, TestIds, GAMBannerAd } from 'react-native-google-mobile-ads';
+import { BannerAdSize, InterstitialAd, TestIds, BannerAd } from 'react-native-google-mobile-ads';
 
 
 import firebase from 'firebase'
@@ -26,24 +22,6 @@ function Contest(props) {
     const [myScore, setMyScore] = useState([]);
     const [contestLive, setContestLive] = useState();
     const [showInterstitial, setShowInterstitial] = useState(false);
-
-    useEffect(() => {
-        // show interstitial 50% of the time
-        const shouldShowInterstitial = Math.random() < 0.5;
-        console.log(shouldShowInterstitial)
-
-        setShowInterstitial(shouldShowInterstitial);
-      }, []);
-    
-      useEffect(() => {
-        if (showInterstitial) {
-            interstitial.load();
-            setTimeout(() => {
-                interstitial.show()
-            }, 2000)
-        }
-      }, [showInterstitial]);
-
 
     useEffect(() => {
 
@@ -63,10 +41,6 @@ function Contest(props) {
 
     }, [props.allUsers, props.currentUser, props.contestStatus])
 
-    /*useEffect(() => {
-        interstitial()
-    }, []) */
-
     const renderMyScore = ({item}) => {
         return (
             <View>
@@ -78,11 +52,7 @@ function Contest(props) {
             }
             </View>
     )}
-
-    const handleRowPress = (rowData) => {
-        const { id } = rowData;
-        props.navigation.navigate("Profile", {uid: id})
-      };
+    
 
     const countInfoClicks = () => {
         analytics().logEvent('contestInfoClicks', {user_name: props.currentUser.name});
@@ -159,11 +129,97 @@ function Contest(props) {
     fall = new Animated.Value(1);
 
     const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-8519029912093094/8258310490'
-    const interstitialAdUnitId = __DEV__ ? TestIds.INTERSTITIAL : 'ca-app-pub-8519029912093094/1664981983'
+    
 
-    const interstitial = InterstitialAd.createForAdRequest(interstitialAdUnitId, {
-        requestNonPersonalizedAdsOnly: true,
-    })
+    const renderItem = ({ item, index }) => {
+        const rowStyle = index % 2 === 0 ? leaderboardStyles.row : leaderboardStyles.rowAlt;
+        const indexStyle = index < 9 ? leaderboardStyles.indexSingleDigit : leaderboardStyles.indexDoubleDigit;
+
+    
+        return (
+          <TouchableOpacity style={rowStyle} onPress={() => props.navigation.navigate("Profile", {uid: item.id})}>
+             <View style={[leaderboardStyles.indexContainer, indexStyle]}>
+                <Text style={leaderboardStyles.index}>{index + 1}</Text>
+            </View>
+            <Avatar
+                source={{ uri: item.userImg }}
+                icon={{ name: 'person', type: 'ionicons', color: 'white' }}
+                overlayContainerStyle={{ backgroundColor: '#95B9C7' }}
+                style={{ marginRight: 10, width: 50, height: 50 }}
+                rounded
+                size="medium"
+                containerStyle={leaderboardStyles.avatarContainer}
+            />
+            <Text style={leaderboardStyles.userName}>{item.name}</Text>
+            <Text style={leaderboardStyles.userScore}>{item.loccMadness2023Score}</Text>
+          </TouchableOpacity>
+        );
+      };
+
+      const leaderboardStyles = {
+        container: {
+          flex: 1,
+        },
+        row: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingVertical: 10,
+          paddingHorizontal: 15,
+          backgroundColor: 'white',
+        },
+        rowAlt: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingVertical: 10,
+          paddingHorizontal: 15,
+          backgroundColor: '#EFEFEF',
+        },
+        index: {
+            fontWeight: 'bold',
+            fontSize: 18,
+            marginRight: 4,
+            width: 28,
+            textAlign: 'center',
+        },
+        userImg: {
+            width: 48,
+            height: 48,
+            borderRadius: 24,
+            marginRight: 12,
+        },
+        userName: {
+            flex: 1,
+            fontWeight: 'bold',
+            marginRight: 12,
+        },
+        userScore: {
+            fontWeight: 'bold',
+            fontSize: 16,
+        },
+        avatarContainer: {
+            marginRight: 10,
+            alignSelf: 'flex-start',
+          },
+        
+        indexContainer: {
+        minWidth: 22,
+        marginRight: 10,
+        alignItems: 'center',
+        },
+    
+        indexDoubleDigit: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: '#FFF',
+        },
+    
+        indexSingleDigit: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#FFF',
+        },
+      };
+
 
 
     /*const testBannerID = 'ca-app-pub-3940256099942544/2934735716';
@@ -430,25 +486,25 @@ function Contest(props) {
                 
                 }
                 
-                <Leaderboard 
-                    data={allUsers} 
-                    onRowPress={handleRowPress}
-                    sortBy='loccMadness2023Score' 
-                    labelBy='name'
-                    icon='userImg'
-                />
+                <FlatList
+                data = {allUsers}
+                renderItem={renderItem}
+                keyExtractor={(item, index) => index.toString()}
+                
+            /> 
                 
                 
                 
             </Animated.View>
             <View style={styles.adView}>
-                <GAMBannerAd
+                <BannerAd
                     unitId={adUnitId}
                     sizes={[BannerAdSize.FULL_BANNER]}
                     requestOptions={{
                         requestNonPersonalizedAdsOnly: true,
                     }}
                 />
+                
             </View>
         </View>
         

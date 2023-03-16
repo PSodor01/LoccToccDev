@@ -8,7 +8,6 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 import * as Notifications from 'expo-notifications'
 import * as Device from 'expo-device';
-import * as Updates from 'expo-updates';
 import * as StoreReview from 'expo-store-review';
 
 import moment from 'moment'
@@ -62,7 +61,6 @@ function Odds(props) {
     useEffect(() => {
 
         (() => registerForPushNotificationsAsync())()
-        checkForUpdate()
         resetBadgeCount()
 
         analytics().setUserId(firebase.auth().currentUser.uid);
@@ -251,22 +249,6 @@ function Odds(props) {
         trendingFunction(ncaabGames, nbaGames, nhlGames, mmaGames)
         setLoading(false)
 
-    }
-
-    const checkForUpdate = async () => {
-        if (!__DEV__) {
-            const update = await Updates.checkForUpdateAsync();
-            if (update.isAvailable) {
-                updateApp();
-            }
-        }
-    }
-    
-    const updateApp = async () => {
-
-        await Updates.fetchUpdateAsync()
-        Updates.reloadAsync() 
-        
     }
 
     const registerForPushNotificationsAsync = async () => {

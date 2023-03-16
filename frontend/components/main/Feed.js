@@ -23,7 +23,7 @@ function Feed(props) {
     const [followCriteria, setFollowCriteria] = useState(true)
     const [currentUserFollowingCount, setCurrentUserFollowingCount] = useState('')
     const [combinedData, setCombinedData] = useState([]);
-    const [limit, setLimit] = useState(10);
+    const [limit, setLimit] = useState(20);
     const [showScrollButton, setShowScrollButton] = useState(false);
     const [fullscreen, setFullscreen] = useState(false);
 
@@ -433,7 +433,7 @@ function Feed(props) {
                             onPress={() => props.navigation.navigate("Profile", {uid: item.user.id})}>
                             <Image 
                                 style={styles.profilePhotoPostContainer}
-                                source={{uri: item.user ? item.user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                                source={{uri: item.user != null ? item.user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
                             />
                         </TouchableOpacity>
                         <View style={styles.postRightContainer}>

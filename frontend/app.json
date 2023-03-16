@@ -2,7 +2,7 @@
   "expo": {
     "name": "locctocc",
     "slug": "locctocc",
-    "version": "1.2.04",
+    "version": "1.2.05",
     "orientation": "portrait",
     "icon": "./assets/locctocclogo.png",
     "splash": {
@@ -25,8 +25,10 @@
         "NSCameraUsageDescription": "Enable Camera Access so that you can upload photos as posts or as your profile picture",
         "NSPhotoLibraryUsageDescription": "Enable Photo Library Access so that you can upload photos as posts or as your profile picture",
         "UIRequiresFullScreen": true
+      },
+      "runtimeVersion": {
+        "policy": "appVersion"
       }
-     
     },
     "android": {
       "googleServicesFile": "./google-services.json",
@@ -68,5 +70,9 @@
         "projectId": "cfaff4e2-7ba8-4d48-868c-73fdebb6521e"
       }
     }
+  },
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-8519029912093094~3459984543",
+    "ios_app_id": "ca-app-pub-8519029912093094~3459984543"
   }
 }

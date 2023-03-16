@@ -3,6 +3,8 @@ import 'react-native-gesture-handler';
 
 import * as firebase from 'firebase'
 
+import * as Updates from 'expo-updates';
+
 import React, { Component } from 'react';
 
 import { View, ActivityIndicator, StyleSheet, Text, TouchableOpacity, Alert, Image } from 'react-native'
@@ -69,6 +71,7 @@ import Odds from './components/main/Odds'
 import game from './components/main/game'
 import TeamDetails from './components/main/TeamDetails'
 import Standings from './components/main/Standings'
+import Contest from './components/main/Contest'
 
 
 const Stack = createStackNavigator();
@@ -108,14 +111,7 @@ const MainStackScreen = ({navigation, props}) => (
             <FontAwesome5 name="bars" size={24} color="#fff" />
           </TouchableOpacity>
         ),
-        headerRight: () => (
-          <TouchableOpacity 
-            style={{ alignItems: "flex-end", marginRight:16 }}
-            onPress={() => navigation.navigate('Onboarding')}
-            >
-            <FontAwesome5 name="info-circle" size={24} color="#fff" />
-          </TouchableOpacity>
-        ),
+        
         
       }}
         />
@@ -127,6 +123,7 @@ const MainStackScreen = ({navigation, props}) => (
           />
       <MainStack.Screen name="Search" component={Search}/>
       <MainStack.Screen name="Notifications" component={Notifications}/>
+      <MainStack.Screen name="Contest" component={Contest}/>
       <MainStack.Screen name="Profile" component={Profile}
         options={{
           headerTitle: () => (
@@ -490,6 +487,24 @@ export class App extends Component {
 
   }
 
+  async componentDidMount() {
+    if (!__DEV__) {
+    try {
+      const update = await Updates.checkForUpdateAsync();
+      if (update.isAvailable) {
+        await Updates.fetchUpdateAsync();
+        // Prompt the user to reload the app to apply the update
+        await Updates.reloadAsync();
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }
+  this.setState({
+    loaded: true,
+  })
+  }
+
   componentDidMount() {
 
     firebase.auth().onAuthStateChanged((user) => {
@@ -506,6 +521,13 @@ export class App extends Component {
       }
     })
   }
+
+
+
+ 
+
+  
+    
 
   render() {
     const { loggedIn, loaded } = this.state;
