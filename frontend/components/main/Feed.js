@@ -14,6 +14,7 @@ import firebase from 'firebase'
 require("firebase/firestore")
 
 import analytics from "@react-native-firebase/analytics";
+import { BannerAdSize, TestIds, BannerAd } from 'react-native-google-mobile-ads';
 
 import { connect } from 'react-redux'
 
@@ -23,9 +24,11 @@ function Feed(props) {
     const [followCriteria, setFollowCriteria] = useState(true)
     const [currentUserFollowingCount, setCurrentUserFollowingCount] = useState('')
     const [combinedData, setCombinedData] = useState([]);
-    const [limit, setLimit] = useState(20);
+    const [limit, setLimit] = useState(10);
     const [showScrollButton, setShowScrollButton] = useState(false);
     const [fullscreen, setFullscreen] = useState(false);
+
+    const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-8519029912093094/8258310490'
 
      useEffect(() => {
         
@@ -112,7 +115,7 @@ function Feed(props) {
             .collection("users")
             .doc(firebase.auth().currentUser.uid)
             .update({
-                loccMadness2023Score: firebase.firestore.FieldValue.increment(10)
+                loccMadness2023Score: firebase.firestore.FieldValue.increment(20)
             })
 
         analytics().logEvent('hammerPost', {user_name: props.currentUser.name});
@@ -130,7 +133,7 @@ function Feed(props) {
             .collection("users")
             .doc(firebase.auth().currentUser.uid)
             .update({
-                loccMadness2023Score: firebase.firestore.FieldValue.increment(-10)
+                loccMadness2023Score: firebase.firestore.FieldValue.increment(-20)
             })
         
     }
@@ -147,7 +150,7 @@ function Feed(props) {
             .collection("users")
             .doc(firebase.auth().currentUser.uid)
             .update({
-                loccMadness2023Score: firebase.firestore.FieldValue.increment(-10)
+                loccMadness2023Score: firebase.firestore.FieldValue.increment(-50)
             })
 
         analytics().logEvent('fadePost', {user_name: props.currentUser.name});
@@ -165,7 +168,7 @@ function Feed(props) {
             .collection("users")
             .doc(firebase.auth().currentUser.uid)
             .update({
-                loccMadness2023Score: firebase.firestore.FieldValue.increment(10)
+                loccMadness2023Score: firebase.firestore.FieldValue.increment(50)
             })
     }
 
@@ -715,6 +718,8 @@ function Feed(props) {
                 }}
                 onEndReached={handleEndReached}
                 onEndReachedThreshold={0.1}
+                onRefresh={() => fetchData()}
+                refreshing={loading}
             /> 
 
             
@@ -735,6 +740,8 @@ function Feed(props) {
                 }}
                 onEndReached={handleEndReached}
                 onEndReachedThreshold={0.1}
+                onRefresh={() => fetchData()}
+                refreshing={loading}
 
             /> }
 
@@ -751,14 +758,14 @@ function Feed(props) {
                         <Ionicons name="arrow-up-circle" size={30} color="#009387" />
                     </TouchableOpacity>
                 )}
-                <TouchableOpacity
-                    style={{ width: "95%", height: 40, alignItems: 'center', backgroundColor: 'black' }}
-                    onPress={() => { Linking.openURL('https://apps.apple.com/us/app/kutt/id1578386177'); openAdLink()}} >
-                    <Image 
-                        source={require('../../assets/kuttBanner.png')}
-                        style={{  height: 40, resizeMode: 'contain'  }}
-                    />
-                </TouchableOpacity>
+                <BannerAd
+                    unitId={adUnitId}
+                    sizes={[BannerAdSize.FULL_BANNER]}
+                    requestOptions={{
+                        requestNonPersonalizedAdsOnly: true,
+                    }}
+                />
+                
             </View>
         </View>
             

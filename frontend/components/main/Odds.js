@@ -17,6 +17,7 @@ require("firebase/firestore")
 require("firebase/firebase-storage")
 
 import analytics from "@react-native-firebase/analytics";
+import { BannerAdSize, TestIds, BannerAd } from 'react-native-google-mobile-ads';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -50,6 +51,8 @@ function Odds(props) {
     const [notification, setNotification] = useState('');
     const [notificationCriteria, setNotificationCriteria] = useState(false);
     const [isFirstLaunch, setIsFirstLaunch] = useState(null)
+
+    const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-8519029912093094/8258310490'
 
     const resetBadgeCount = async () => {
 
@@ -1248,15 +1251,15 @@ function Odds(props) {
 
             
             }
-            <View  style={styles.adView}>
-                <TouchableOpacity
-                    style={{ width: "95%", height: 40, alignItems: 'center', backgroundColor: 'black' }}
-                    onPress={() => { Linking.openURL('https://apps.apple.com/us/app/kutt/id1578386177'); openAdLink()}} >
-                    <Image 
-                        source={require('../../assets/kuttBanner.png')}
-                        style={{  height: 40, resizeMode: 'contain'  }}
-                    />
-                </TouchableOpacity>
+            <View style={styles.adView}>
+                <BannerAd
+                    unitId={adUnitId}
+                    sizes={[BannerAdSize.FULL_BANNER]}
+                    requestOptions={{
+                        requestNonPersonalizedAdsOnly: true,
+                    }}
+                />
+                
             </View>
            
             

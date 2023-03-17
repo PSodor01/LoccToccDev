@@ -8,7 +8,7 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import { Avatar } from 'react-native-elements';
 
 import analytics from "@react-native-firebase/analytics";
-import { BannerAdSize, InterstitialAd, TestIds, BannerAd } from 'react-native-google-mobile-ads';
+import { BannerAdSize, TestIds, BannerAd } from 'react-native-google-mobile-ads';
 
 
 import firebase from 'firebase'

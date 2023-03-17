@@ -16,6 +16,7 @@ import BottomSheet, { BottomSheetModal, BottomSheetModalProvider, BottomSheetFla
 import email from 'react-native-email'
 
 import analytics from "@react-native-firebase/analytics";
+import { BannerAdSize, TestIds, BannerAd } from 'react-native-google-mobile-ads';
 
 import firebase from 'firebase'
 require("firebase/firestore")
@@ -43,6 +44,8 @@ function game(props) {
 
     const {gameId, gameDate, homeTeam, awayTeam, homeMoneyline, awayMoneyline, homeSpread, awaySpread, homeSpreadOdds, awaySpreadOdds, over, overOdds, under, underOdds, drawMoneyline, sport, fantasyTopic} = props.route.params;
 
+    const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-8519029912093094/8258310490'
+    
     useEffect(() => {
             fetchPropData()
             analytics().logScreenView({ screen_name: 'game', screen_class: 'game', user_name: props.currentUser.name})
@@ -115,7 +118,7 @@ function game(props) {
             .collection("users")
             .doc(firebase.auth().currentUser.uid)
             .update({
-                loccMadness2023Score: firebase.firestore.FieldValue.increment(10)
+                loccMadness2023Score: firebase.firestore.FieldValue.increment(20)
             })
 
         analytics().logEvent('hammerPost', {user_name: props.currentUser.name});
@@ -134,7 +137,7 @@ function game(props) {
             .collection("users")
             .doc(firebase.auth().currentUser.uid)
             .update({
-                loccMadness2023Score: firebase.firestore.FieldValue.increment(-10)
+                loccMadness2023Score: firebase.firestore.FieldValue.increment(-20)
             })
     }
 
@@ -150,7 +153,7 @@ function game(props) {
             .collection("users")
             .doc(firebase.auth().currentUser.uid)
             .update({
-                loccMadness2023Score: firebase.firestore.FieldValue.increment(-10)
+                loccMadness2023Score: firebase.firestore.FieldValue.increment(-50)
             })
 
         analytics().logEvent('fadePost', {user_name: props.currentUser.name});
@@ -168,7 +171,7 @@ function game(props) {
             .collection("users")
             .doc(firebase.auth().currentUser.uid)
             .update({
-                loccMadness2023Score: firebase.firestore.FieldValue.increment(10)
+                loccMadness2023Score: firebase.firestore.FieldValue.increment(50)
             })
     }
 
@@ -1213,15 +1216,15 @@ function game(props) {
             }
 
             
-            <View  style={styles.adView}>
-                <TouchableOpacity
-                    style={{ width: "95%", height: 40, alignItems: 'center', backgroundColor: 'black' }}
-                    onPress={() => { Linking.openURL('https://apps.apple.com/us/app/kutt/id1578386177'); openAdLink()}} >
-                    <Image 
-                        source={require('../../assets/kuttBanner.png')}
-                        style={{  height: 40, resizeMode: 'contain'  }}
-                    />
-                </TouchableOpacity>
+            <View style={styles.adView}>
+                <BannerAd
+                    unitId={adUnitId}
+                    sizes={[BannerAdSize.FULL_BANNER]}
+                    requestOptions={{
+                        requestNonPersonalizedAdsOnly: true,
+                    }}
+                />
+                
             </View>
 
             <TouchableOpacity

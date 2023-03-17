@@ -5,6 +5,7 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
 import analytics from "@react-native-firebase/analytics";
+import { BannerAdSize, TestIds, BannerAd } from 'react-native-google-mobile-ads';
 
 import moment from 'moment';
 
@@ -12,6 +13,8 @@ import { connect } from 'react-redux'
 
 function Notifications(props) {
     const [notifications, setNotifications] = useState([]);
+
+    const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-8519029912093094/8258310490'
     
 
     useEffect(() => {
@@ -119,15 +122,15 @@ function Notifications(props) {
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={ItemView}
             />  
-           <View  style={styles.adView}>
-                <TouchableOpacity
-                    style={{ width: "95%", height: 40, alignItems: 'center', backgroundColor: 'black' }}
-                    onPress={() => { Linking.openURL('https://apps.apple.com/us/app/kutt/id1578386177'); openAdLink()}} >
-                    <Image 
-                        source={require('../../assets/kuttBanner.png')}
-                        style={{  height: 40, resizeMode: 'contain'  }}
-                    />
-                </TouchableOpacity>
+           <View style={styles.adView}>
+                <BannerAd
+                    unitId={adUnitId}
+                    sizes={[BannerAdSize.FULL_BANNER]}
+                    requestOptions={{
+                        requestNonPersonalizedAdsOnly: true,
+                    }}
+                />
+                
             </View>
         </View>
         
