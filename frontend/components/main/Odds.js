@@ -54,17 +54,9 @@ function Odds(props) {
 
     const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-8519029912093094/8258310490'
 
-    const resetBadgeCount = async () => {
-
-        await Notifications.setBadgeCountAsync(0);
-        
-    }
-
-
     useEffect(() => {
 
         (() => registerForPushNotificationsAsync())()
-        resetBadgeCount()
 
         analytics().setUserId(firebase.auth().currentUser.uid);
         analytics().logScreenView({ screen_name: 'Odds', screen_class: 'Odds',  user_name: props.currentUser.name})
@@ -105,26 +97,21 @@ function Odds(props) {
   
       }, [])
 
-    useEffect(() => {
-        AsyncStorage.getItem('alreadyLaunched').then(value => {
-            if(value == null ) {
-                AsyncStorage.setItem('alreadyLaunched', 'true');    
-                setIsFirstLaunch(true)
-                analytics().logEvent('firstLaunch', {user_name: props.currentUser.name});
-
-            } else {
-                setIsFirstLaunch(false);
-                if (StoreReview.hasAction()) {
-                        StoreReview.requestReview();
-                  }
-            }
+      useEffect(() => {
+        AsyncStorage.getItem('launchCount').then(count => {
+          const launchCount = count ? parseInt(count) + 1 : 1;
+          AsyncStorage.setItem('launchCount', launchCount.toString());
+      
+          if (launchCount === 2 && StoreReview.hasAction()) {
+            StoreReview.requestReview();
+          }
         });
-
-    }, []);
+      }, []);
 
     useEffect(() => {
         fetchData()
-        if ( sport == 'NCAAB' || sport == 'NHL' || sport == 'NCAAF' || sport == 'EPL' || sport == 'UFC' || sport == 'PGA' || sport == 'Futures' || sport == 'Formula 1' ||sport == 'Trending') {
+
+        if ( sport == 'NCAAB' || sport == 'NHL' || sport == 'MLB' || sport == 'NCAAF' || sport == 'EPL' || sport == 'UFC' || sport == 'PGA' || sport == 'Futures' || sport == 'Formula 1' ||sport == 'Trending') {
 
         } 
         else {
@@ -132,12 +119,12 @@ function Odds(props) {
             setSport('NBA')
         }
 
-    }, [ props.ncaabGames, props.nbaGames, props.nhlGames, props.mmaGames, props.futureGames, props.eplGames, props.formula1Teams, props.formula1Races, props.formula1Drivers, props.formula1Rankings])
+    }, [ props.ncaabGames, props.nbaGames, props.mlbGames, props.nhlGames, props.mmaGames, props.futureGames, props.eplGames, props.formula1Teams, props.formula1Races, props.formula1Drivers, props.formula1Rankings])
 
     const fetchData = () => {
 
-        function trendingFunction(nbaGames, ncaabGames, nhlGames) {
-            let trendingGames = nbaGames.concat(ncaabGames, nhlGames)
+        function trendingFunction(nbaGames, ncaabGames, nhlGames, mlbGames) {
+            let trendingGames = nbaGames.concat(ncaabGames, nhlGames, mlbGames)
             setTrendingGames(trendingGames)
         }
 
@@ -201,6 +188,26 @@ function Odds(props) {
         }
         setnhlGames(props.nhlGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))
 
+        for (let i = 0; i < props.mlbGames.length; i++) {
+
+            firebase.firestore()
+            .collection("votes")
+            .doc(props.mlbGames[i].gameId)
+            .collection("gameVotes")
+            .doc("info")
+            .get()
+            .then((snapshot) => {
+                if (snapshot.exists) {
+                    let gameMiscData = snapshot.data();
+                    props.mlbGames[i].gamePostsCount = gameMiscData.gamePostsCount
+                }
+                else {
+                    props.mlbGames[i].gamePostsCount = 0
+                }
+            })
+        }
+        setnhlGames(props.mlbGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))
+
         for (let i = 0; i < props.mmaGames.length; i++) {
 
             firebase.firestore()
@@ -249,7 +256,7 @@ function Odds(props) {
         
         if (props.formula1Rankings.length > 2 ) {setFormula1RaceLive(true)}
 
-        trendingFunction(ncaabGames, nbaGames, nhlGames, mmaGames)
+        trendingFunction(ncaabGames, nbaGames, nhlGames, mlbGames, mmaGames)
         setLoading(false)
 
     }
@@ -299,14 +306,16 @@ function Odds(props) {
         return token;
     }
 
-    const sendNotification = async (token) => {
+    const sendNotification = async (notification, token) => {
+
+        const currentBadgeNumber = await Notifications.getBadgeCountAsync();
+        const nextBadgeNumber = currentBadgeNumber + 1;
 
         const message = {
             to: token,
             sound: 'default',
-            title: 'locctocc',
             body: notification ? notification : '',
-            badge: 1,
+            badge: nextBadgeNumber,
         };
         
         await fetch('https://exp.host/--/api/v2/push/send', {
@@ -319,7 +328,9 @@ function Odds(props) {
             body: JSON.stringify(message),
         });
 
-        
+        // Update the badge number in the local notification center
+        await Notifications.setBadgeCountAsync(nextBadgeNumber);
+
     }
 
     const sendNotificationToAllUsers = async () => {
@@ -431,33 +442,38 @@ function Odds(props) {
             icon: ncaabIcon
         },
         {
-            sport: 'NHL',
+            sport: 'MLB',
             id: '4',
+            icon: mlbIcon
+        },
+        {
+            sport: 'NHL',
+            id: '5',
             icon: nhlIcon
         },
         {
             sport: 'EPL',
-            id: '5',
+            id: '6',
             icon: eplIcon
         },
         {
             sport: 'Formula 1',
-            id: '6',
+            id: '7',
             icon: formula1Icon
         },
         {
             sport: 'UFC',
-            id: '7',
+            id: '8',
             icon: mmaIcon
         },
         {
             sport: 'Futures',
-            id: '8',
+            id: '9',
             icon: futureIcon
         },
         {
             sport: 'Fantasy',
-            id: '9',
+            id: '10',
             icon: fantasyIcon
         },
      
@@ -515,12 +531,6 @@ function Odds(props) {
         
       ];
 
-    const testID = 'ca-app-pub-3940256099942544/2934735716';
-    const productionID = 'ca-app-pub-8519029912093094/5201658236';
-    // Is a real device and running in production.
-    const adUnitID = Device.isDevice && !__DEV__ ? productionID : testID;
-
-
 
       const openAdLink = () => {
 
@@ -528,8 +538,6 @@ function Odds(props) {
             
         }
         
-
-
 
       const renderSportsListItem = ({ item }) => (
         <View>

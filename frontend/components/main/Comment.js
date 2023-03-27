@@ -19,26 +19,16 @@ require("firebase/firestore")
 
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { fetchUsersData } from '../../redux/actions/index'
 
 function Comment(props, route) {
     const [comments, setComments] = useState([])
-    const [postId, setPostId] = useState("")
-    const [text, setText] = useState("")
-    const [userData, setUserData] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [combinedData, setCombinedData] = useState([]);
+    const [loading, setLoading] = useState(false);
     const [hidePost, setHidePost] = useState(false);
-    const [allUsers, setAllUsers] = useState([]);
 
-    const { posterId, posterName, posterImg, postCreation, postCaption, postImg, awayTeam, homeTeam } = props.route.params;
+    const { postId, posterId, posterName, posterImg, postCreation, postCaption, postImg, awayTeam, homeTeam } = props.route.params;
 
     const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-8519029912093094/8258310490'
-
-    useEffect(() => {
-        fetchData()
-        setAllUsers(props.allUsers)
-        
-    }, [props.route.params.postId, props.users, props.allUsers])
 
     useEffect(() => {
         
@@ -46,53 +36,35 @@ function Comment(props, route) {
     
     }, [])
 
-    const fetchData = () => {
-        function matchUserToComment(comments) {
-            for (let i = 0; i < comments.length; i++) {
-                if (comments[i].hasOwnProperty('user')) {
-                    continue;
-                }
+    useEffect(() => {
+        const unsubscribe = props.navigation.addListener('focus', () => {
+          fetchCombinedData();
+        });
+    
+        return unsubscribe;
+      }, [props.navigation]);
 
-                const user = props.users.find(x => x.uid === comments[i].creator)
-                if (user == undefined) {
-                    props.fetchUsersData(comments[i].creator, false)
-                } else {
-                    comments[i].user = user
-                }
-            }
-            setComments(comments)
-        }
 
-        if (props.route.params.postId !== postId) {
-            firebase.firestore()
-                .collection('posts')
-                .doc(props.route.params.uid)
-                .collection('userPosts')
-                .doc(props.route.params.postId)
-                .collection('comments')
-                .orderBy("creation", "asc")
-                .get()
-                .then((snapshot) => {
-                    let comments = snapshot.docs.map(doc => {
-                        const data = doc.data();
-                        const id = doc.id;
-                        return { id, ...data }
-                    })
-                    matchUserToComment(comments)
-                    setLoading(false);
-                })
-            setPostId(props.route.params.postId)
-            setLoading(false);
-        } else {
-            matchUserToComment(comments)
-            setLoading(false);
-        }
-    }
+    const fetchCombinedData = async () => {
+        setLoading(true);
+        const [users, comments] = await Promise.all([
+            firebase.firestore().collection("users").get(),
+            firebase.firestore().collection("posts").doc(props.route.params.uid).collection('userPosts').doc(props.route.params.postId).collection('comments').orderBy("creation", "asc").get(),
+        ]);
+        
+        const usersData = users.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        const commentsData = comments.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    
+        const combinedData = commentsData.map((comment) => {
+            const user = usersData.find((user) => user.id === comment.creator);
+            return { ...comment, user };
+        });
+    
+        setCombinedData(combinedData);
+        setLoading(false);
 
-    const testID = 'ca-app-pub-3940256099942544/2934735716';
-    const productionID = 'ca-app-pub-8519029912093094/9708977287';
-    // Is a real device and running in production.
-    const adUnitID = Device.isDevice && !__DEV__ ? productionID : testID;
+    };
+
 
     const openAdLink = () => {
 
@@ -208,7 +180,7 @@ function Comment(props, route) {
             </View>
             
             <FlatList
-                data={comments}
+                data={combinedData}
                 ListEmptyComponent={EmptyListMessage}
                 onRefresh={() => fetchData()}
                 refreshing={loading}
@@ -268,11 +240,9 @@ function Comment(props, route) {
 
 
 const mapStateToProps = (store) => ({
-    users: store.usersState.users,
-    allUsers: store.userState.allUsers,
     currentUser: store.userState.currentUser,
 })
-const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUsersData }, dispatch);
+const mapDispatchProps = (dispatch) => bindActionCreators({ }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchProps)(Comment);
 

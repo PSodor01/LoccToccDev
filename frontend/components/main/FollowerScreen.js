@@ -18,6 +18,7 @@ function FollowerScreen(props) {
     const { userId } = props.route.params;
 
     useEffect(() => {
+        console.log(userId)
         analytics().logScreenView({ screen_name: 'FollowerScreen', screen_class: 'FollowerScreen'})
     }, [])
     
@@ -82,7 +83,8 @@ function FollowerScreen(props) {
                 style={styles.feed}
                 renderItem={({ item }) => (
                     <View style={styles.feedItem}>
-                        <TouchableOpacity style={styles.postLeftContainer}>
+                        <TouchableOpacity style={styles.postLeftContainer}
+                        onPress={() => props.navigation.navigate("Profile", {uid: item.follower})}>
                             <Image 
                                 style={styles.profilePhotoPostContainer}
                                 source={{uri: item.user ? item.user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}

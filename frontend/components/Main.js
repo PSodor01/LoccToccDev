@@ -15,7 +15,7 @@ import { fetchUser, fetchUserFollowing, fetchUserBlocking, fetchUserNotification
 
 import FeedScreen from './main/Feed'
 import ProfileScreen from './main/Profile'
-import Notifications from './main/Notifications'
+import NotificationsScreen from './main/Notifications'
 import SearchScreen from './main/Search'
 import Odds from './main/Odds'
 import ContestScreen from './main/Contest'
@@ -114,7 +114,7 @@ export class Main extends Component {
                     />
                 <Tab.Screen 
                     name="Notifications" 
-                    component={Notifications}
+                    component={NotificationsScreen}
                     options={{
                         tabBarLabel: 'Notifications',
                         tabBarColor: '#009387',

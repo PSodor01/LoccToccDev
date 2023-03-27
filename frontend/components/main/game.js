@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Text, View, StyleSheet, Alert, Linking, FlatList, TouchableOpacity, Image, Modal } from 'react-native';
+import { Text, View, StyleSheet, Alert, Linking, FlatList, TouchableOpacity, Image, Modal, ActivityIndicator } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -8,7 +8,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import moment from 'moment'
 
-import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications'
 
 import { useNavigation } from '@react-navigation/native';
 import BottomSheet, { BottomSheetModal, BottomSheetModalProvider, BottomSheetFlatList } from "@gorhom/bottom-sheet";
@@ -25,7 +25,6 @@ import { connect } from 'react-redux'
 
 function game(props) {
 
-    const [gamePosts, setGamePosts] = useState([]);
     const [postId, setPostId] = useState("");
     const [loading, setLoading] = useState(true);
     const [sortCriteria, setSortCriteria] = useState(true);
@@ -37,6 +36,10 @@ function game(props) {
     const [futureGames, setFutureGames] = useState([]);
     const [formula1Races, setFormula1Races] = useState([]);
     const [playerProps, setPlayerProps] = useState([]);
+    const [propDescription, setPropDescription] = useState(null);
+    const [propOver, setPropOver] = useState(null);
+    const [propUnder, setPropUnder] = useState(null);
+    const [propShortName, setPropShortName] = useState(null);
     const [isOpen, setIsOpen] = useState(false);
     const [combinedData, setCombinedData] = useState([]);
     const [fullscreen, setFullscreen] = useState(false);
@@ -44,13 +47,24 @@ function game(props) {
 
     const {gameId, gameDate, homeTeam, awayTeam, homeMoneyline, awayMoneyline, homeSpread, awaySpread, homeSpreadOdds, awaySpreadOdds, over, overOdds, under, underOdds, drawMoneyline, sport, fantasyTopic} = props.route.params;
 
-    const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-8519029912093094/8258310490'
+    const bannerAdUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-8519029912093094/8258310490'
+    const nativeAdUnitId = __DEV__ ? TestIds.NATIVE_AD : 'ca-app-pub-8519029912093094/2848035284';
+
+
     
     useEffect(() => {
-            fetchPropData()
             analytics().logScreenView({ screen_name: 'game', screen_class: 'game', user_name: props.currentUser.name})
 
     }, [props.route.params.postId, props.users])
+
+    useEffect(() => {
+        const unsubscribe = props.navigation.addListener('focus', () => {
+          fetchCombinedData();
+          
+        });
+    
+        return unsubscribe;
+      }, [props.navigation, props.blocking, props.liked, props.faded]);
 
     useEffect(() => {
         setGolfGames(props.golfGames)
@@ -58,9 +72,7 @@ function game(props) {
         setFormula1Races(props.formula1Races)
     }, [])
 
-    useEffect(() => {
-        fetchCombinedData();
-    }, [props.blocking, props.liked, props.faded]);
+    
 
     const fetchCombinedData = async () => {
         const [users, gamePosts] = await Promise.all([
@@ -232,7 +244,6 @@ function game(props) {
     }
 
     const onFadePress = (userId, postId) => {
-        console.log(userId, postId)
         firebase.firestore()
             .collection("posts")
             .doc(userId)
@@ -288,11 +299,15 @@ function game(props) {
     }
 
     const sendNotification = async (notification, token) => {
+
+        const currentBadgeNumber = await Notifications.getBadgeCountAsync();
+        const nextBadgeNumber = currentBadgeNumber + 1;
+
         const message = {
             to: token,
             sound: 'default',
             body: notification ? notification : '',
-            badge: 1,
+            badge: nextBadgeNumber,
         };
         
         await fetch('https://exp.host/--/api/v2/push/send', {
@@ -304,6 +319,10 @@ function game(props) {
             },
             body: JSON.stringify(message),
         });
+
+        // Update the badge number in the local notification center
+        await Notifications.setBadgeCountAsync(nextBadgeNumber);
+
     }
 
     const sendNotificationForLike = async (uid, name) => {
@@ -548,10 +567,7 @@ function game(props) {
         )
     }
 
-    const testID = 'ca-app-pub-3940256099942544/2934735716';
-    const productionID = 'ca-app-pub-8519029912093094/8554579884';
-    // Is a real device and running in production.
-    const adUnitID = Device.isDevice && !__DEV__ ? productionID : testID;
+   
 
     const openAdLink = () => {
 
@@ -618,23 +634,267 @@ function game(props) {
         }
     }
 
-    const fetchPropData = () => {
-        firebase.firestore()
-            .collection("nba")
-            .doc("props")
-            .collection("players")
-            .where('gameId', '==', gameId)
-            .onSnapshot((snapshot) => {
-                let playerProps = snapshot.docs.map(doc => {
-                    const data = doc.data();
-                    const id = doc.id;
-                    return { id, ...data }
-                })
-                setPlayerProps(playerProps);
+    const fetchNBAPropData = async (propName, propOverOdds, propUnderOdds) => {
 
-                
-            })
-    };
+        const playerData = await firebase.firestore()
+          .collection("nba")
+          .doc("props")
+          .collection("players")
+          .where('gameId', '==', gameId)
+          .get();
+      
+        const filteredPlayerTotal = playerData.docs
+          .map((doc) => ({ id: doc.id, ...doc.data() }))
+          .filter((player) => player.hasOwnProperty(propName))
+          .map((player) => ({ id: player.id, [propName]: player[propName] }));
+      
+        const filteredPlayerOverOdds = playerData.docs
+          .map((doc) => ({ id: doc.id, ...doc.data() }))
+          .filter((player) => player.hasOwnProperty(propOverOdds))
+          .map((player) => ({ id: player.id, [propOverOdds]: player[propOverOdds] }));
+      
+        const filteredPlayerUnderOdds = playerData.docs
+          .map((doc) => ({ id: doc.id, ...doc.data() }))
+          .filter((player) => player.hasOwnProperty(propUnderOdds))
+          .map((player) => ({ id: player.id, [propUnderOdds]: player[propUnderOdds] }));
+      
+        const filteredPlayer = filteredPlayerTotal.concat(filteredPlayerOverOdds, filteredPlayerUnderOdds)
+          .reduce((acc, curr) => {
+            const existingPlayer = acc.find(p => p.id === curr.id);
+            if (existingPlayer) {
+              Object.assign(existingPlayer, curr);
+            } else {
+              acc.push(curr);
+            }
+            return acc;
+          }, []);
+
+          setPlayerProps(filteredPlayer)
+      
+      };
+
+      const fetchNHLPropData = async (propName, propOverOdds, propUnderOdds) => {
+
+        const playerData = await firebase.firestore()
+          .collection("nhl")
+          .doc("props")
+          .collection("players")
+          .where('gameId', '==', gameId)
+          .get();
+      
+        const filteredPlayerTotal = playerData.docs
+          .map((doc) => ({ id: doc.id, ...doc.data() }))
+          .filter((player) => player.hasOwnProperty(propName))
+          .map((player) => ({ id: player.id, [propName]: player[propName] }));
+      
+        const filteredPlayerOverOdds = playerData.docs
+          .map((doc) => ({ id: doc.id, ...doc.data() }))
+          .filter((player) => player.hasOwnProperty(propOverOdds))
+          .map((player) => ({ id: player.id, [propOverOdds]: player[propOverOdds] }));
+      
+        const filteredPlayerUnderOdds = playerData.docs
+          .map((doc) => ({ id: doc.id, ...doc.data() }))
+          .filter((player) => player.hasOwnProperty(propUnderOdds))
+          .map((player) => ({ id: player.id, [propUnderOdds]: player[propUnderOdds] }));
+      
+        const filteredPlayer = filteredPlayerTotal.concat(filteredPlayerOverOdds, filteredPlayerUnderOdds)
+          .reduce((acc, curr) => {
+            const existingPlayer = acc.find(p => p.id === curr.id);
+            if (existingPlayer) {
+              Object.assign(existingPlayer, curr);
+            } else {
+              acc.push(curr);
+            }
+            return acc;
+          }, []);
+
+          setPlayerProps(filteredPlayer)
+      
+      };
+
+      const setPropDataTypes = async (propName, propShortName, propOverOdds, propUnderOdds) => {
+        setPropDescription(propName)
+        setPropOver(propOverOdds)
+        setPropUnder(propUnderOdds)
+        setPropShortName(propShortName)
+    
+      };
+      
+
+
+      const renderPlayerPropItem = useCallback(({ item }) => (
+        <View style={styles.propsContainer}>
+          <View style={styles.propsNameContainer}>
+            <Text style={{ fontWeight: 'bold' }}>{item.id}</Text>
+          </View>
+          <View style={styles.propsOddsMainContainer}>
+            <View style={styles.propsOddsContainer}>
+              {propDescription && (
+                <>
+                  <Text style={styles.spreadText}>O {item[propDescription]}</Text>
+                  {item[propOver] > 0 ? (
+                    <Text style={styles.oddsTopRowText}>+{item[propOver]}</Text>
+                  ) : (
+                    <Text style={styles.oddsTopRowText}>{item[propOver]}</Text>
+                  )}
+                </>
+              )}
+            </View>
+            <View style={styles.propsOddsContainer}>
+              {propDescription && (
+                <>
+                  <Text style={styles.spreadText}>U {item[propDescription]}</Text>
+                  {item[propUnder] > 0 ? (
+                    <Text style={styles.oddsTopRowText}>+{item[propUnder]}</Text>
+                  ) : (
+                    <Text style={styles.oddsTopRowText}>{item[propUnder]}</Text>
+                  )}
+                </>
+              )}
+            </View>
+          </View>
+        </View>
+      ), [propDescription, propOver, propUnder]);
+
+    const renderNBAPlayerPropListItem = ({ item }) => (
+        <View style={styles.playerPropListItemContainer}>
+            <TouchableOpacity onPress={() => {
+                handlePresentModal();
+                fetchNBAPropData(item.propTitle, item.propOverOdds, item.propUnderOdds);
+                setPropDataTypes(item.propTitle, item.propName, item.propOverOdds, item.propUnderOdds);
+                }}>
+                <Text style={styles.playerPropListItemText}>{item.propName}</Text>
+            </TouchableOpacity>
+        </View>
+        
+        
+    );
+
+    const renderNHLPlayerPropListItem = ({ item }) => (
+        <View style={styles.playerPropListItemContainer}>
+            <TouchableOpacity onPress={() => {
+                handlePresentModal();
+                fetchNHLPropData(item.propTitle, item.propOverOdds, item.propUnderOdds);
+                setPropDataTypes(item.propTitle, item.propName, item.propOverOdds, item.propUnderOdds);
+                }}>
+                <Text style={styles.playerPropListItemText}>{item.propName}</Text>
+            </TouchableOpacity>
+        </View>
+        
+        
+    );
+
+  const nbaPlayerPropList = [
+      {
+          id: '1',
+          propName: 'Points',
+          propTitle: 'player_pointsTotal',
+          propOverOdds: 'player_pointsOverOdds',
+          propUnderOdds: 'player_pointsUnderOdds',
+      },
+      {
+          id: '2',
+          propName: 'Rebounds',
+          propTitle: 'player_reboundsTotal',
+          propOverOdds: 'player_reboundsOverOdds',
+          propUnderOdds: 'player_reboundsUnderOdds'
+      },
+      {
+          id: '3',
+          propName: 'Assists',
+          propTitle: 'player_assistsTotal',
+          propOverOdds: 'player_assistsOverOdds',
+          propUnderOdds: 'player_assistsUnderOdds'
+      },
+      {
+          id: '4',
+          propName: 'Threes',
+          propTitle: 'player_threesTotal',
+          propOverOdds: 'player_threesOverOdds',
+          propUnderOdds: 'player_threesUnderOdds'
+      },
+      {
+          id: '5',
+          propName: 'P/R/A',
+          propTitle: 'player_points_rebounds_assistsTotal',
+          propOverOdds: 'player_points_rebounds_assistsOverOdds',
+          propUnderOdds: 'player_points_rebounds_assistsUnderOdds'
+      },
+      {
+          id: '6',
+          propName: 'P/R',
+          propTitle: 'player_points_reboundsTotal',
+          propOverOdds: 'player_points_reboundsOverOdds',
+          propUnderOdds: 'player_points_reboundsUnderOdds'
+      },
+      {
+          id: '7',
+          propName: 'P/A',
+          propTitle: 'player_points_assistsTotal',
+          propOverOdds: 'player_points_assistsOverOdds',
+          propUnderOdds: 'player_points_assistsUnderOdds'
+      },
+      {
+          id: '8',
+          propName: 'Steals',
+          propTitle: 'player_stealsTotal',
+          propOverOdds: 'player_stealsOverOdds',
+          propUnderOdds: 'player_stealsUnderOdds'
+      },
+      {
+          id: '9',
+          propName: 'Blocks',
+          propTitle: 'player_blocksTotal',
+          propOverOdds: 'player_blocksOverOdds',
+          propUnderOdds: 'player_blocksUnderOdds'
+      },
+      {
+          id: '10',
+          propName: 'Turnovers',
+          propTitle: 'player_turnoversTotal',
+          propOverOdds: 'player_turnoversOverOdds',
+          propUnderOdds: 'player_turnoversUnderOdds'
+      },
+    ];
+
+    const nhlPlayerPropList = [
+        {
+            id: '1',
+            propName: 'Points',
+            propTitle: 'player_pointsTotal',
+            propOverOdds: 'player_pointsOverOdds',
+            propUnderOdds: 'player_pointsUnderOdds',
+        },
+        {
+            id: '2',
+            propName: 'Shots on Goal',
+            propTitle: 'player_shots_on_goalTotal',
+            propOverOdds: 'player_shots_on_goalOverOdds',
+            propUnderOdds: 'player_shots_on_goalUnderOdds'
+        },
+        {
+            id: '3',
+            propName: 'Assists',
+            propTitle: 'player_assistsTotal',
+            propOverOdds: 'player_assistsOverOdds',
+            propUnderOdds: 'player_assistsUnderOdds'
+        },
+        {
+            id: '4',
+            propName: 'Blocked Shots',
+            propTitle: 'player_blocked_shotsTotal',
+            propOverOdds: 'player_blocked_shotsOverOdds',
+            propUnderOdds: 'player_blocked_shotsUnderOdds'
+        },
+        {
+            id: '5',
+            propName: 'Power Play Points',
+            propTitle: 'player_power_play_pointsTotal',
+            propOverOdds: 'player_power_play_pointsOverOdds',
+            propUnderOdds: 'player_power_play_pointsUnderOdds'
+        },
+        
+      ];
 
     const bottomSheetModalRef = useRef(null)
 
@@ -645,38 +905,11 @@ function game(props) {
         setIsOpen(true);
     }
 
-   const renderPlayerPropItem = useCallback(({ item }) => (
-        <View style={styles.propsContainer}>
-            <View style={styles.propsNameContainer}>
-                <Text style={{ fontWeight: 'bold' }}>{item.playerPropName}</Text>
-            </View>
-            <View style={styles.propsOddsMainContainer}>
-                <View style={styles.propsOddsContainer}>
-                    <Text style={styles.spreadText}>O {item.playerPropTotal}</Text>
-                    {item.playerPropOverOdds > 0 ?
-                        <Text style={styles.oddsTopRowText}>+{item.playerPropOverOdds}</Text>
-                        :
-                        <Text style={styles.oddsTopRowText}>{item.playerPropOverOdds}</Text>
-                    }
-                </View>
-                <View style={styles.propsOddsContainer}>
-                    <Text style={styles.spreadText}>U {item.playerPropTotal}</Text>
-                    {item.playerPropUnderOdds > 0 ?
-                        <Text style={styles.oddsTopRowText}>+{item.playerPropUnderOdds}</Text>
-                        :
-                        <Text style={styles.oddsTopRowText}>{item.playerPropUnderOdds}</Text>
-                    }
-                </View>
-            </View>
-        </View>
-        
-    ),
-    []
-   );
+   
         
    
     
-    const renderItem = ({item}) => {
+    const renderItem =  ({ item, index }) => {
         return (
             <View>
                 { item.blocked == true || item.id == postId ?
@@ -816,17 +1049,43 @@ function game(props) {
                 >
                     <View style={styles.bottomSheetContainer}>
                         <Text style={styles.bottomSheetTitle}>Player Props</Text>
+                        <Text style={styles.spreadText}>{propShortName}</Text>
+                        {propDescription ? (
                             <BottomSheetFlatList
                             data = {playerProps}
                             renderItem={renderPlayerPropItem}
+                            keyExtractor={item => item.id}
+                            ListEmptyComponent={<Text style={styles.emptyListMessage}>No player props for this game currently</Text>}
+
                             />
+                                ) : (
+                            <ActivityIndicator />
+                                )}
                     </View>
             </BottomSheetModal>
-        <View style={[
-            styles.container,
-            { backgroundColor: isOpen ? "#e1e2e6" : "white" },
-        ]}>
+            
+        <View style={[styles.container,{ backgroundColor: isOpen ? "#e1e2e6" : "white" }]}>
             <View style={styles.gameContainer}>
+            {sport == 'basketball_nba' || sport == 'basketball_ncaab' ? 
+                <FlatList
+                    data={nbaPlayerPropList}
+                    renderItem={renderNBAPlayerPropListItem}
+                    horizontal={true}
+                    keyExtractor={(item) => item.id}
+                    contentContainerStyle={{paddingHorizontal: 5,marginBottom:6, borderBottomColor: "#e1e2e6", borderBottomWidth: 1}}
+                />
+            : null}
+
+            {sport == 'icehockey_nhl'  ? 
+                <FlatList
+                    data={nhlPlayerPropList}
+                    renderItem={renderNHLPlayerPropListItem}
+                    horizontal={true}
+                    keyExtractor={(item) => item.id}
+                    contentContainerStyle={{paddingHorizontal: 5,marginBottom:6, borderBottomColor: "#e1e2e6", borderBottomWidth: 1}}
+                />
+            : null}
+
             {sport == 'US Masters Tournament Lines - Winner' || 
             sport == 'NFL - Suberbowl Champion' ||
             sport == 'MLB - World Series Winner' ||
@@ -1218,7 +1477,7 @@ function game(props) {
             
             <View style={styles.adView}>
                 <BannerAd
-                    unitId={adUnitId}
+                    unitId={bannerAdUnitId}
                     sizes={[BannerAdSize.FULL_BANNER]}
                     requestOptions={{
                         requestNonPersonalizedAdsOnly: true,
@@ -1243,7 +1502,7 @@ function game(props) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingTop: 6,
+        paddingTop: 2,
         backgroundColor: "#ffffff",
     },
     gameContainer: {
@@ -1438,6 +1697,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+    adContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: 10,
+      },
     sortContainer: {
         flexDirection: 'row',
         justifyContent: 'flex-end',
@@ -1561,7 +1825,24 @@ const styles = StyleSheet.create({
     },
     propsNameContainer: {
         width: "65%"
-    }
+    },
+    playerPropListItemContainer: {
+        borderRadius: 8,
+        paddingHorizontal: 4,
+        paddingBottom: 5,
+        marginHorizontal: 8,
+    },
+    playerPropListItemText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#333',
+    },
+    emptyListMessage: {
+        textAlign: 'center',
+        paddingTop: 20,
+        fontSize: 16,
+        color: 'grey'
+      },
     
     
 })

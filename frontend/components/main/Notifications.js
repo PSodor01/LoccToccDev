@@ -7,17 +7,27 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import analytics from "@react-native-firebase/analytics";
 import { BannerAdSize, TestIds, BannerAd } from 'react-native-google-mobile-ads';
 
+import * as Notifications from 'expo-notifications'
+
 import moment from 'moment';
 
 import { connect } from 'react-redux'
 
-function Notifications(props) {
+function NotificationsScreen(props) {
     const [notifications, setNotifications] = useState([]);
 
     const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-8519029912093094/8258310490'
+
+    const resetBadgeCount = async () => {
+
+        await Notifications.setBadgeCountAsync(0);
+        
+    }
     
 
     useEffect(() => {
+
+        resetBadgeCount()
         
         analytics().logScreenView({ screen_name: 'Notifications', screen_class: 'Notifications',  user_name: props.currentUser.name})
 
@@ -191,6 +201,6 @@ const mapStateToProps = (store) => ({
     currentUser: store.userState.currentUser,
 })
 
-export default connect(mapStateToProps)(Notifications);
+export default connect(mapStateToProps)(NotificationsScreen);
 
 

@@ -51,11 +51,11 @@ function EditProfileScreen(props) {
         .collection('users')
         .doc(firebase.auth().currentUser.uid)
         .update({
-        name: userData.name,
-        email: userData.email,
-        aboutMe: userData.aboutMe,
-        location: userData.location,
-        userImg: imgUrl,
+          name: userData.name,
+          email: userData.email,
+          aboutMe: userData.aboutMe,
+          location: userData.location,
+          userImg: imgUrl,
         })
         .then(() => {
         console.log('User Updated!');
@@ -130,7 +130,7 @@ function EditProfileScreen(props) {
         getUser();
 
         analytics().logScreenView({ screen_name: 'EditProfile', screen_class: 'EditProfile',  user_name: props.currentUser.name})
-    },[]);
+    },[userData]);
 
     useEffect(() => {
         (async () => {

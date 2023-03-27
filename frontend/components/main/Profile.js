@@ -10,6 +10,8 @@ import email from 'react-native-email'
 
 import moment from 'moment';
 
+import * as Notifications from 'expo-notifications';
+
 import firebase from 'firebase'
 require("firebase/firestore")
 
@@ -26,6 +28,7 @@ function Profile(props) {
     
     useEffect(() => {
 
+        console.log(props.route.params.uid)
         fetchData()
 
         analytics().logScreenView({ screen_name: 'Profile', screen_class: 'Profile',  user_name: props.currentUser.name})
@@ -304,11 +307,15 @@ function Profile(props) {
     }
 
     const sendNotification = async (notification, token) => {
+
+        const currentBadgeNumber = await Notifications.getBadgeCountAsync();
+        const nextBadgeNumber = currentBadgeNumber + 1;
+
         const message = {
             to: token,
             sound: 'default',
             body: notification ? notification : '',
-            badge: 1,
+            badge: nextBadgeNumber,
         };
         
         await fetch('https://exp.host/--/api/v2/push/send', {
@@ -320,8 +327,12 @@ function Profile(props) {
             },
             body: JSON.stringify(message),
         });
-    }
 
+        // Update the badge number in the local notification center
+        await Notifications.setBadgeCountAsync(nextBadgeNumber);
+
+    }
+    
     const sendNotificationForFollow = async () => {
         const users = await  firebase.firestore()
             .collection("users")

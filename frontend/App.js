@@ -54,7 +54,7 @@ import NewPostScreen from './components/main/NewPost'
 import NewCommentScreen from './components/main/NewComment'
 import EditProfileScreen from './components/main/EditProfile'
 import Feed from './components/main/Feed'
-import Notifications from './components/main/Notifications'
+import NotificationsScreen from './components/main/Notifications'
 import Search from './components/main/Search'
 import Profile from './components/main/Profile'
 import AboutUsScreen from './components/main/AboutUs'
@@ -122,7 +122,7 @@ const MainStackScreen = ({navigation, props}) => (
        
           />
       <MainStack.Screen name="Search" component={Search}/>
-      <MainStack.Screen name="Notifications" component={Notifications}/>
+      <MainStack.Screen name="Notifications" component={NotificationsScreen}/>
       <MainStack.Screen name="Contest" component={Contest}/>
       <MainStack.Screen name="Profile" component={Profile}
         options={{

@@ -12,6 +12,8 @@ import * as ImagePicker from 'expo-image-picker';
 import Animated from 'react-native-reanimated';
 import BottomSheet from 'reanimated-bottom-sheet';
 
+import * as Notifications from 'expo-notifications';
+
 import analytics from "@react-native-firebase/analytics";
 
 import firebase from 'firebase'
@@ -65,48 +67,6 @@ function NewCommentScreen(props, route) {
       
     }, [props.allUsers])
 
-    useEffect(() => {
-
-        function matchUserToComment(comments) {
-            for (let i = 0; i < comments.length; i++) {
-                if (comments[i].hasOwnProperty('user')) {
-                    continue;
-                }
-
-                const user = props.users.find(x => x.uid === comments[i].creator)
-                if (user == undefined) {
-                    props.fetchUsersData(comments[i].creator, false)
-                } else {
-                    comments[i].user = user
-                }
-            }
-            setComments(comments)
-        }
-
-
-        if (props.route.params.postId !== postId) {
-            firebase.firestore()
-                .collection('posts')
-                .doc(props.route.params.uid)
-                .collection('userPosts')
-                .doc(props.route.params.postId)
-                .collection('comments')
-                .orderBy("creation", "desc")
-                .get()
-                .then((snapshot) => {
-                    let comments = snapshot.docs.map(doc => {
-                        const data = doc.data();
-                        const id = doc.id;
-                        return { id, ...data }
-                    })
-                    matchUserToComment(comments)
-                })
-            setPostId(props.route.params.postId)
-        } else {
-            matchUserToComment(comments)
-        }
-    }, [props.route.params.postId, props.users])
-
     const onCommentSend = (downloadURL) => {
 
       analytics().logEvent('newComment', {user_name: props.currentUser.name});
@@ -133,19 +93,16 @@ function NewCommentScreen(props, route) {
                 );
                 setComments(null);
                 setLoading(false)
-              }).then((function () {
-                navigation.goBack()
-            }))
-
-            firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-              loccMadness2023Score: firebase.firestore.FieldValue.increment(30)
-        })
-
-
-      }
+                props.navigation.goBack();
+              }).then(() => {
+                firebase.firestore()
+                  .collection("users")
+                  .doc(firebase.auth().currentUser.uid)
+                  .update({
+                    loccMadness2023Score: firebase.firestore.FieldValue.increment(30)
+                  });
+              });
+          };
 
     const onCommentCount = () => {
         firebase.firestore()
@@ -196,11 +153,15 @@ function NewCommentScreen(props, route) {
       }
 
       const sendNotification = async (notification, token) => {
+
+        const currentBadgeNumber = await Notifications.getBadgeCountAsync();
+        const nextBadgeNumber = currentBadgeNumber + 1;
+
         const message = {
-          to: token,
-          sound: 'default',
-          body: notification ? notification : '',
-          badge: 1,
+            to: token,
+            sound: 'default',
+            body: notification ? notification : '',
+            badge: nextBadgeNumber,
         };
         
         await fetch('https://exp.host/--/api/v2/push/send', {
@@ -212,7 +173,11 @@ function NewCommentScreen(props, route) {
             },
             body: JSON.stringify(message),
         });
-      }
+
+        // Update the badge number in the local notification center
+        await Notifications.setBadgeCountAsync(nextBadgeNumber);
+
+    }
 
     const sendNotificationForComment = async () => {
         const users = await firebase

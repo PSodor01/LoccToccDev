@@ -12,6 +12,8 @@ import * as ImagePicker from 'expo-image-picker';
 import Animated from 'react-native-reanimated';
 import BottomSheet from 'reanimated-bottom-sheet';
 
+import * as Notifications from 'expo-notifications';
+
 import * as Device from 'expo-device';
 import analytics from "@react-native-firebase/analytics";
 
@@ -154,11 +156,15 @@ function AddPostScreen(props) {
   }
 
   const sendNotification = async (notification, token) => {
+
+    const currentBadgeNumber = await Notifications.getBadgeCountAsync();
+    const nextBadgeNumber = currentBadgeNumber + 1;
+
     const message = {
         to: token,
         sound: 'default',
         body: notification ? notification : '',
-        badge: 1,
+        badge: nextBadgeNumber,
     };
     
     await fetch('https://exp.host/--/api/v2/push/send', {
@@ -170,7 +176,11 @@ function AddPostScreen(props) {
         },
         body: JSON.stringify(message),
     });
-  }
+
+    // Update the badge number in the local notification center
+    await Notifications.setBadgeCountAsync(nextBadgeNumber);
+
+}
 
   const savePostData = (downloadURL) => {
 
@@ -198,6 +208,7 @@ function AddPostScreen(props) {
           );
           setPost(null);
           setLoading(false)
+          props.navigation.goBack();
 
           firebase.firestore()
             .collection("users")
@@ -209,9 +220,7 @@ function AddPostScreen(props) {
 
 
 
-        }).then((function () {
-          navigation.goBack()
-      })).catch((error) => {
+        }).catch((error) => {
         console.log(error)
         
         

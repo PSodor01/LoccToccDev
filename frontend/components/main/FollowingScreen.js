@@ -85,7 +85,8 @@ function FollowingScreen(props) {
                 style={styles.feed}
                 renderItem={({ item }) => (
                     <View style={styles.feedItem}>
-                        <TouchableOpacity style={styles.postLeftContainer}>
+                        <TouchableOpacity style={styles.postLeftContainer}
+                        onPress={() => props.navigation.navigate("Profile", {uid: item.id})}>
                             <Image 
                                 style={styles.profilePhotoPostContainer}
                                 source={{uri: item.user ? item.user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}

@@ -35,10 +35,31 @@ const sendNotification = async (notification) => {
     });
 }
 
+const sendNotificationJoe = async (notification) => {
+    console.log(notification)
+    const message = {
+        to: 'ExponentPushToken[Dg_nkoPO9aQrFOKjNr5jlc]',
+        sound: 'default',
+        body: notification ? notification : '',
+        badge: 1,
+    };
+    
+    await fetch('https://exp.host/--/api/v2/push/send', {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Accept-encoding': 'gzip, deflate',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(message),
+    });
+}
+
 const sendNotificationForSignUp =  (email, name) => {
    
     const notification = 'New user created! Email: ' + email + ' and username: ' +  name
     sendNotification(notification)
+    sendNotificationJoe(notification)
                
 };
 

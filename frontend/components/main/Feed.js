@@ -10,6 +10,8 @@ import { captureRef } from 'react-native-view-shot';
 
 import moment from 'moment';
 
+import * as Notifications from 'expo-notifications';
+
 import firebase from 'firebase'
 require("firebase/firestore")
 
@@ -24,7 +26,7 @@ function Feed(props) {
     const [followCriteria, setFollowCriteria] = useState(true)
     const [currentUserFollowingCount, setCurrentUserFollowingCount] = useState('')
     const [combinedData, setCombinedData] = useState([]);
-    const [limit, setLimit] = useState(10);
+    const [limit, setLimit] = useState(20);
     const [showScrollButton, setShowScrollButton] = useState(false);
     const [fullscreen, setFullscreen] = useState(false);
 
@@ -39,7 +41,7 @@ function Feed(props) {
 
     }, [props.blocking, props.faded, props.liked, props.following, props.currentUser.followingCount])
 
-    const fetchCombinedData = async (limit) => {
+    const fetchCombinedData = async () => {
         const [users, gamePosts] = await Promise.all([
             firebase.firestore().collection("users").get(),
             firebase.firestore().collectionGroup("userPosts").orderBy('creation', 'desc').limit(limit).get()
@@ -89,9 +91,8 @@ function Feed(props) {
     };
 
     const handleEndReached = async () => {
-        setLimit(limit + 10); // increase the limit to fetch more posts
-        const data = await fetchCombinedData(limit);
-        setCombinedData([...combinedData, ...data]); // append the new posts to the current data
+        setLimit(limit + 20); // increase the limit to fetch more posts
+        await fetchData(); // fetch the next batch of posts
         analytics().logEvent('loadMore', {user_name: props.currentUser.name});
     };
 
@@ -284,11 +285,15 @@ function Feed(props) {
     }
 
     const sendNotification = async (notification, token) => {
+
+        const currentBadgeNumber = await Notifications.getBadgeCountAsync();
+        const nextBadgeNumber = currentBadgeNumber + 1;
+
         const message = {
             to: token,
             sound: 'default',
             body: notification ? notification : '',
-            badge: 1,
+            badge: nextBadgeNumber,
         };
         
         await fetch('https://exp.host/--/api/v2/push/send', {
@@ -300,6 +305,10 @@ function Feed(props) {
             },
             body: JSON.stringify(message),
         });
+
+        // Update the badge number in the local notification center
+        await Notifications.setBadgeCountAsync(nextBadgeNumber);
+
     }
 
     const sendNotificationForLike = async (uid, name) => {
@@ -702,26 +711,25 @@ function Feed(props) {
             null
             }
             {followCriteria == false ? 
-            <FlatList
-                ref={flatListRef}
-                style={styles.feed}
-                data = {combinedData}
-                renderItem={renderFollowingItem}
-                keyExtractor={(item, index) => index.toString()}
-                onScroll={(event) => {
-                    const offsetY = event.nativeEvent.contentOffset.y;
-                    if (offsetY > 100) { // adjust the number as needed
-                    setShowScrollButton(true);
-                    } else {
-                    setShowScrollButton(false);
-                    }
-                }}
-                onEndReached={handleEndReached}
-                onEndReachedThreshold={0.1}
-                onRefresh={() => fetchData()}
-                refreshing={loading}
-            /> 
-
+                <FlatList
+                    ref={flatListRef}
+                    style={styles.feed}
+                    data={combinedData}
+                    renderItem={renderFollowingItem}
+                    keyExtractor={(item, index) => index.toString()}
+                    onScroll={(event) => {
+                        const offsetY = event.nativeEvent.contentOffset.y;
+                        if (offsetY > 100) { // adjust the number as needed
+                            setShowScrollButton(true);
+                        } else {
+                            setShowScrollButton(false);
+                        }
+                    }}
+                    onEndReached={handleEndReached}
+                    onEndReachedThreshold={0.1}
+                    onRefresh={() => fetchData()}
+                    refreshing={loading}
+                />
             
             :
             <FlatList
