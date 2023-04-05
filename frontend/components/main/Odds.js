@@ -77,7 +77,7 @@ function Odds(props) {
         
     }, [])
 
-    useEffect(() => {
+    /*useEffect(() => {
 
         firebase.firestore()
           .collection('users')
@@ -95,7 +95,7 @@ function Odds(props) {
               }
           })
   
-      }, [])
+      }, []) */
 
       useEffect(() => {
         AsyncStorage.getItem('launchCount').then(count => {
@@ -119,34 +119,14 @@ function Odds(props) {
             setSport('NBA')
         }
 
-    }, [ props.ncaabGames, props.nbaGames, props.mlbGames, props.nhlGames, props.mmaGames, props.futureGames, props.eplGames, props.formula1Teams, props.formula1Races, props.formula1Drivers, props.formula1Rankings])
+    }, [ props.nbaGames, props.mlbGames, props.nhlGames, props.mmaGames, props.futureGames, props.eplGames, props.golfGames, props.formula1Teams, props.formula1Races, props.formula1Drivers, props.formula1Rankings])
 
     const fetchData = () => {
 
-        function trendingFunction(nbaGames, ncaabGames, nhlGames, mlbGames) {
-            let trendingGames = nbaGames.concat(ncaabGames, nhlGames, mlbGames)
+        function trendingFunction(nbaGames, nhlGames, mlbGames) {
+            let trendingGames = nbaGames.concat(nhlGames, mlbGames)
             setTrendingGames(trendingGames)
         }
-
-        for (let i = 0; i < props.ncaabGames.length; i++) {
-
-            firebase.firestore()
-            .collection("votes")
-            .doc(props.ncaabGames[i].gameId)
-            .collection("gameVotes")
-            .doc("info")
-            .get()
-            .then((snapshot) => {
-                if (snapshot.exists) {
-                    let gameMiscData = snapshot.data();
-                    props.ncaabGames[i].gamePostsCount = gameMiscData.gamePostsCount
-                }
-                else {
-                    props.ncaabGames[i].gamePostsCount = 0
-                }
-            })
-        }
-        setncaabGames(props.ncaabGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))
 
         for (let i = 0; i < props.nbaGames.length; i++) {
 
@@ -253,10 +233,11 @@ function Odds(props) {
         setFormula1Races(props.formula1Races)
         setFormula1Drivers(props.formula1Drivers)
         setFormula1Rankings(props.formula1Rankings)
+        setGolfGames(props.golfGames)
         
         if (props.formula1Rankings.length > 2 ) {setFormula1RaceLive(true)}
 
-        trendingFunction(ncaabGames, nbaGames, nhlGames, mlbGames, mmaGames)
+        trendingFunction(nbaGames, nhlGames, mlbGames, mmaGames)
         setLoading(false)
 
     }
@@ -394,6 +375,8 @@ function Odds(props) {
     }
 
     const setSportFunction = (sport) => {
+
+        console.log(sport)
         if (sport == 'Trending') {setSportGames(trendingGames); analytics().logEvent('selectTrendingGames', { user_name: props.currentUser.name }); setSport('Trending');}
         if (sport == 'NFL') {setSportGames(props.nflGames); analytics().logEvent('selectNFLGames', {user_name: props.currentUser.name}); setSport('NFL');}
         if (sport == 'NBA') {setSportGames(props.nbaGames); analytics().logEvent('selectNBAGames', {user_name: props.currentUser.name}); setSport('NBA');}
@@ -437,9 +420,9 @@ function Odds(props) {
             icon: nbaIcon
         },
         {
-            sport: 'NCAAB',
+            sport: 'PGA',
             id: '3',
-            icon: ncaabIcon
+            icon: golfIcon
         },
         {
             sport: 'MLB',
@@ -798,26 +781,26 @@ function Odds(props) {
 
     const renderListItem = ({ item }) => {
         return (
-            <View>
-                <View style={styles.listGameContainer}>
-                    <TouchableOpacity
-                        onPress={() => props.navigation.navigate('game', {gameId: item.gameId, sport: item.sport })}>
-                        <View style={styles.listOddsContainer}>
-                            <View style={styles.listPlayerContainer}>
-                                <Text style={styles.listPlayerText}>{item.playerName}</Text>
-                            </View>
-                            <View>
-                                {item.playerOdds > 0 ?
-                                <Text>+{item.playerOdds}</Text> : <Text>{item.playerOdds}</Text>
-                                } 
-                            </View>
-                            
-                        </View>
-                    </TouchableOpacity>
-                </View>
+          <TouchableOpacity
+            style={styles.listGameContainer}
+            onPress={() =>
+              props.navigation.navigate("game", { gameId: item.gameId, sport: item.sport })
+            }
+          >
+            <View style={styles.listOddsContainer}>
+              <View style={styles.listOddsLeft}>
+                <Text style={styles.listPlayerName}>{item.playerName}</Text>
+              </View>
+              <View style={styles.listOddsRight}>
+                <Text style={styles.listOddsText}>
+                  {item.playerOdds > 0 ? "+" : ""}
+                  {item.playerOdds}
+                </Text>
+              </View>
             </View>
-        )
-    }
+          </TouchableOpacity>
+        );
+      };
 
     const renderFutureItem = ({ item }) => {
         return (
@@ -826,8 +809,11 @@ function Odds(props) {
                     <TouchableOpacity
                         onPress={() => props.navigation.navigate('game', {gameId: item.gameId, sport: item.futureSport })}>
                         <View style={styles.listOddsContainer}>
-                            <View style={styles.listPlayerContainer}>
+                            <View style={styles.listOddsLeft}>
                                 <Text style={styles.listPlayerText}>{item.futureSport}  {item.icon}</Text>
+                            </View>
+                            <View>
+                                
                             </View>
                         </View>
                     </TouchableOpacity>
@@ -968,7 +954,7 @@ function Odds(props) {
     
             />
             :
-            /*
+            
             sportGames == props.golfGames  ?
             <FlatList 
                 data = {sportGames.sort((a, b) => parseFloat(a.playerOdds) - parseFloat(b.playerOdds))}
@@ -976,7 +962,7 @@ function Odds(props) {
                 renderItem={renderListItem}
     
             /> 
-            :*/
+            :
 
             sportGames == props.futureGames  ?
             <FlatList 
@@ -1319,17 +1305,36 @@ const styles = StyleSheet.create({
         backgroundColor: "#ffffff",
     },
     listGameContainer: {
-        padding: 12,
-        marginRight: 2,
-        marginLeft: 2,
-        borderTopWidth: .8,
-        borderTopColor: "#ccc",
         backgroundColor: "#ffffff",
-    },
-    listOddsContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
+        marginVertical: 4,
+        marginHorizontal: 8,
+        borderRadius: 10,
+        elevation: 2,
+      },
+      listOddsContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        paddingHorizontal: 12,
+        paddingVertical: 16,
+        borderTopWidth: 0.5,
+        borderTopColor: "#ccc",
+      },
+      listOddsLeft: {
+        flex: 1,
+      },
+      listPlayerName: {
+        fontWeight: "bold",
+        fontSize: 14,
+      },
+      listOddsRight: {
+        flex: 1,
+        alignItems: "flex-end",
+      },
+      listOddsText: {
+        fontWeight: "bold",
+        fontSize: 14,
+        color: "#009387",
+      },
     awayGameInfoContainer: { 
         flexDirection: 'row',
     },
@@ -1631,7 +1636,6 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = (store) => ({
     mlbGames: store.mlbGamesState.mlbGames,
-    ncaabGames: store.ncaabGamesState.ncaabGames,
     nbaGames: store.nbaGamesState.nbaGames,
     nhlGames: store.nhlGamesState.nhlGames,
     mmaGames: store.mmaGamesState.mmaGames,
@@ -1644,7 +1648,8 @@ const mapStateToProps = (store) => ({
     formula1Races: store.formula1RacesState.formula1Races,
     formula1Drivers: store.formula1DriversState.formula1Drivers,
     formula1Rankings: store.formula1RankingsState.formula1Rankings,
-    eplGames: store.eplGamesState.eplGames
+    eplGames: store.eplGamesState.eplGames,
+    golfGames: store.golfGamesState.golfGames,
 
 })
 

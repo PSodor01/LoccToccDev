@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux'
 import { user } from './user'
 import { users } from './users'
-import { nflGames, ncaafGames, mlbGames, ncaabGames, nbaGames, nhlGames, mmaGames, eplGames, futureGames, formula1Teams, formula1Races, formula1Drivers, formula1Rankings} from './games'
+import { nflGames, ncaafGames, mlbGames, golfGames, ncaabGames, nbaGames, nhlGames, mmaGames, eplGames, futureGames, formula1Teams, formula1Races, formula1Drivers, formula1Rankings} from './games'
 
 const Reducers = combineReducers({
     userState: user,
@@ -14,6 +14,7 @@ const Reducers = combineReducers({
     ncaabGamesState: ncaabGames,
     mmaGamesState: mmaGames,
     futureGamesState: futureGames,
+    golfGamesState: golfGames,
 
     eplGamesState: eplGames,
     formula1TeamsState: formula1Teams,

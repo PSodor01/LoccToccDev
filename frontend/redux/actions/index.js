@@ -279,7 +279,7 @@ export function fetchNBAGames() {
     })
 }
 
-export function fetchNCAABGames() {
+/*export function fetchNCAABGames() {
     return ((dispatch) => {
         firebase.firestore()
             .collection("ncaab")
@@ -293,7 +293,7 @@ export function fetchNCAABGames() {
                 dispatch({ type: NCAAB_GAMES_STATE_CHANGE, ncaabGames });
             })
     })
-}
+} */
 
 export function fetchNHLGames() {
     return ((dispatch) => {
@@ -349,7 +349,7 @@ export function fetchEPLGames() {
     })
 }
 
-/*
+
 export function fetchGolfGames() {
     return ((dispatch) => {
         firebase.firestore()
@@ -365,7 +365,7 @@ export function fetchGolfGames() {
                 }
             })
     })
-} */
+} 
 
 export function fetchFutureGames() {
     return ((dispatch) => {

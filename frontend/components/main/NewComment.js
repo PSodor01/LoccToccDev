@@ -94,14 +94,7 @@ function NewCommentScreen(props, route) {
                 setComments(null);
                 setLoading(false)
                 props.navigation.goBack();
-              }).then(() => {
-                firebase.firestore()
-                  .collection("users")
-                  .doc(firebase.auth().currentUser.uid)
-                  .update({
-                    loccMadness2023Score: firebase.firestore.FieldValue.increment(30)
-                  });
-              });
+              })
           };
 
     const onCommentCount = () => {
@@ -112,13 +105,6 @@ function NewCommentScreen(props, route) {
         .doc(props.route.params.postId)
         .update({
             comments: firebase.firestore.FieldValue.increment(1)
-        })
-
-        firebase.firestore()
-            .collection("users")
-            .doc(props.route.params.uid)
-            .update({
-              loccMadness2023Score: firebase.firestore.FieldValue.increment(20)
         })
 
         if (awayTeam  != undefined) {

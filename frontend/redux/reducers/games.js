@@ -11,6 +11,7 @@ import { NFL_GAMES_STATE_CHANGE,
     NHL_GAMES_STATE_CHANGE, 
     NBA_GAMES_STATE_CHANGE, 
     EPL_GAMES_STATE_CHANGE,
+    GOLF_GAMES_STATE_CHANGE,
     CLEAR_DATA 
 } from "../constants"
 
@@ -28,6 +29,7 @@ const initialState = {
     formula1Drivers: [],
     formula1Races: [],
     formula1Rankings: [],
+    golfGames: [],
 }
 
 export const nflGames = (state = initialState, action) => {
@@ -120,6 +122,20 @@ export const futureGames = (state = initialState, action) => {
             return {
                 ...state,
                 futureGames: action.futureGames
+            }
+        case CLEAR_DATA:
+            return initialState
+        default:
+            return state;
+    }
+}
+
+export const golfGames = (state = initialState, action) => {
+    switch (action.type) {
+        case GOLF_GAMES_STATE_CHANGE:
+            return {
+                ...state,
+                golfGames: action.golfGames
             }
         case CLEAR_DATA:
             return initialState

@@ -127,10 +127,16 @@ function EditProfileScreen(props) {
       };
 
     useEffect(() => {
+      
         getUser();
+        
+    },[userData]);
+
+    useEffect(() => {
 
         analytics().logScreenView({ screen_name: 'EditProfile', screen_class: 'EditProfile',  user_name: props.currentUser.name})
-    },[userData]);
+
+    },[]);
 
     useEffect(() => {
         (async () => {
@@ -138,8 +144,9 @@ function EditProfileScreen(props) {
           const galleryStatus = await ImagePicker.requestMediaLibraryPermissionsAsync();
           setHasGalleryPermission(galleryStatus.status === 'granted');
     
-    
         })();
+
+        
       }, []);
     
       const pickImage = async () => {

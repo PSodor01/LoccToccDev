@@ -67,9 +67,9 @@ exports.testLike = functions.firestore.document('/likes/{userId}/userLikes/{post
   })
 
 
-  exports.getMLBGameData = functions.pubsub.schedule('every 20 minutes').onRun(async () => {
+  exports.getMLBGameData = functions.pubsub.schedule('every 10 minutes').onRun(async () => {
     try {
-      const response = await axios.get('https://api.the-odds-api.com/v4/sports/baseball_mlb_preseason/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso');
+      const response = await axios.get('https://api.the-odds-api.com/v4/sports/baseball_mlb/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso');
       const games = response.data;
       const collectionRef = admin.firestore().collection('mlb');
   
@@ -145,7 +145,7 @@ exports.testLike = functions.firestore.document('/likes/{userId}/userLikes/{post
     }
   });
 
-exports.getMLBScoresData = functions.pubsub.schedule('every 2 minutes').onRun(async() => {
+exports.getMLBScoresData = functions.pubsub.schedule('every 10 minutes').onRun(async() => {
   try {
     const response = await axios.get('https://api.the-odds-api.com/v4/sports/baseball_mlb/scores/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&dateFormat=iso')
     .then(result => {
@@ -587,7 +587,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
               market.outcomes.forEach(outcome => {
 
                 if (outcome.name === 'Over') {
-                const writeResult = admin.firestore().collection("ncaab").doc("props").collection('players').doc(outcome.description).set({
+                const writeResult = admin.firestore().collection("nba").doc("props").collection('players').doc(outcome.description).set({
                   gameId: result.data.id,
                   playerPropName: outcome.description,
                   [`${propType}Total`]: outcome.point,
@@ -595,7 +595,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
                 }, { merge:true });
               } 
               else if (outcome.name === 'Under') {
-                const writeResult = admin.firestore().collection("ncaab").doc("props").collection('players').doc(outcome.description).set({
+                const writeResult = admin.firestore().collection("nba").doc("props").collection('players').doc(outcome.description).set({
                   [`${propType}UnderOdds`]: outcome.price,
                 }, { merge:true });
 
@@ -874,7 +874,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
 
   exports.getGolfGameData = functions.pubsub.schedule('every 5 minutes').onRun(async() => {
     try {
-      const response = await axios.get('https://api.the-odds-api.com/v4/sports/golf_pga_championship_winner/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&Format=american&dateFormat=iso')
+      const response = await axios.get('https://api.the-odds-api.com/v4/sports/golf_masters_tournament_winner/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&Format=american&dateFormat=iso')
         .then(result => {
           result.data.forEach(game => {
 

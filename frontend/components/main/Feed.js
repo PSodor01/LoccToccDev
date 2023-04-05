@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { StyleSheet, View, Text, Linking, Image, FlatList, TouchableOpacity, Alert, Share, Modal } from 'react-native'
+import { StyleSheet, View, Text, Linking, Image, FlatList, TouchableOpacity, ActivityIndicator, Alert, Share, Modal } from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons';
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Foundation from 'react-native-vector-icons/Foundation'
@@ -26,7 +26,8 @@ function Feed(props) {
     const [followCriteria, setFollowCriteria] = useState(true)
     const [currentUserFollowingCount, setCurrentUserFollowingCount] = useState('')
     const [combinedData, setCombinedData] = useState([]);
-    const [limit, setLimit] = useState(20);
+    const [limit, setLimit] = useState(40);
+    const [loadingMore, setLoadingMore] = useState(false);
     const [showScrollButton, setShowScrollButton] = useState(false);
     const [fullscreen, setFullscreen] = useState(false);
 
@@ -91,8 +92,10 @@ function Feed(props) {
     };
 
     const handleEndReached = async () => {
-        setLimit(limit + 20); // increase the limit to fetch more posts
+        setLoadingMore(true); // show loading icon
+        setLimit(limit + 40); // increase the limit to fetch more posts
         await fetchData(); // fetch the next batch of posts
+        setLoadingMore(false); // hide loading icon
         analytics().logEvent('loadMore', {user_name: props.currentUser.name});
     };
 
@@ -112,13 +115,6 @@ function Feed(props) {
             .doc(postId)
             .set({})
 
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                loccMadness2023Score: firebase.firestore.FieldValue.increment(20)
-            })
-
         analytics().logEvent('hammerPost', {user_name: props.currentUser.name});
     }
 
@@ -130,13 +126,6 @@ function Feed(props) {
             .doc(postId)
             .delete({})
         
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                loccMadness2023Score: firebase.firestore.FieldValue.increment(-20)
-            })
-        
     }
 
     const storeFade = (postId) => {
@@ -146,13 +135,6 @@ function Feed(props) {
             .collection("userFades")
             .doc(postId)
             .set({})
-
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                loccMadness2023Score: firebase.firestore.FieldValue.increment(-50)
-            })
 
         analytics().logEvent('fadePost', {user_name: props.currentUser.name});
     }
@@ -165,12 +147,6 @@ function Feed(props) {
             .doc(postId)
             .delete({})
 
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                loccMadness2023Score: firebase.firestore.FieldValue.increment(50)
-            })
     }
 
     const onLikePress = (userId, postId) => {
@@ -193,12 +169,6 @@ function Feed(props) {
                 likesCount: firebase.firestore.FieldValue.increment(1)
             })
 
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                loccMadness2023Score: firebase.firestore.FieldValue.increment(20)
-        })
     }
 
     const onDislikePress = (userId, postId) => {
@@ -220,13 +190,6 @@ function Feed(props) {
             .doc(firebase.auth().currentUser.uid)
             .delete()
 
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                loccMadness2023Score: firebase.firestore.FieldValue.increment(-20)
-        })
-        
     }
 
     const onFadePress = (userId, postId) => {
@@ -248,12 +211,6 @@ function Feed(props) {
             .doc(firebase.auth().currentUser.uid)
             .set({})
 
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                loccMadness2023Score: firebase.firestore.FieldValue.increment(-50)
-        })
     }
 
     const onUnfadePress = (userId, postId) => {
@@ -274,13 +231,6 @@ function Feed(props) {
             .collection("fades")
             .doc(firebase.auth().currentUser.uid)
             .delete()
-
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                loccMadness2023Score: firebase.firestore.FieldValue.increment(50)
-        })
 
     }
 
@@ -322,7 +272,6 @@ function Feed(props) {
                     let data = snapshot.data();
 
                     const token = data.token
-                    
  
                     if (token != undefined) {
                         const likedName = props.currentUser.name
@@ -729,28 +678,29 @@ function Feed(props) {
                     onEndReachedThreshold={0.1}
                     onRefresh={() => fetchData()}
                     refreshing={loading}
+                    ListFooterComponent={loadingMore ? <ActivityIndicator size="large" /> : null}
                 />
             
             :
             <FlatList
                 ref={flatListRef}
                 style={styles.feed}
-                data = {combinedData}
+                data={combinedData}
                 renderItem={renderItem}
                 keyExtractor={(item, index) => index.toString()}
                 onScroll={(event) => {
                     const offsetY = event.nativeEvent.contentOffset.y;
                     if (offsetY > 100) { // adjust the number as needed
-                    setShowScrollButton(true);
+                        setShowScrollButton(true);
                     } else {
-                    setShowScrollButton(false);
+                        setShowScrollButton(false);
                     }
                 }}
                 onEndReached={handleEndReached}
                 onEndReachedThreshold={0.1}
                 onRefresh={() => fetchData()}
                 refreshing={loading}
-
+                ListFooterComponent={loadingMore ? <ActivityIndicator size="large" /> : null}
             /> }
 
             

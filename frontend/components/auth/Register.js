@@ -8,6 +8,8 @@ import { FontAwesome5 } from "@expo/vector-icons";
 
 import { CheckBox } from 'react-native-elements';
 
+import * as Notifications from 'expo-notifications'
+
 const DismissKeyboard = ({ children }) => (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         {children}
@@ -15,52 +17,34 @@ const DismissKeyboard = ({ children }) => (
 
 )
 
-const sendNotification = async (notification) => {
-    console.log(notification)
+const sendNotification = async (tokens, notification) => {
+
+    const currentBadgeNumber = await Notifications.getBadgeCountAsync();
+    const nextBadgeNumber = currentBadgeNumber + 1;
+    
     const message = {
-        to: 'ExponentPushToken[eIr7vlNdKZjkSVesQEDiZ5]',
         sound: 'default',
         body: notification ? notification : '',
-        badge: 1,
+        badge: nextBadgeNumber,
     };
-    
-    await fetch('https://exp.host/--/api/v2/push/send', {
-        method: 'POST',
-        headers: {
-            Accept: 'application/json',
-            'Accept-encoding': 'gzip, deflate',
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(message),
-    });
-}
+    for (const token of tokens) {
+        message.to = token;
+        await fetch('https://exp.host/--/api/v2/push/send', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Accept-encoding': 'gzip, deflate',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(message),
+        });
+    }
+};
 
-const sendNotificationJoe = async (notification) => {
-    console.log(notification)
-    const message = {
-        to: 'ExponentPushToken[Dg_nkoPO9aQrFOKjNr5jlc]',
-        sound: 'default',
-        body: notification ? notification : '',
-        badge: 1,
-    };
-    
-    await fetch('https://exp.host/--/api/v2/push/send', {
-        method: 'POST',
-        headers: {
-            Accept: 'application/json',
-            'Accept-encoding': 'gzip, deflate',
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(message),
-    });
-}
-
-const sendNotificationForSignUp =  (email, name) => {
-   
-    const notification = 'New user created! Email: ' + email + ' and username: ' +  name
-    sendNotification(notification)
-    sendNotificationJoe(notification)
-               
+const sendNotificationForSignUp = async (email, name) => {
+    const notification = 'New user created! Email: ' + email + ' and username: ' + name;
+    const tokens = ['ExponentPushToken[Dg_nkoPO9aQrFOKjNr5jlc]', 'other_token_here'];
+    await sendNotification(tokens, notification);
 };
 
 export class Register extends Component {
@@ -97,30 +81,28 @@ export class Register extends Component {
   
     async onSignUp() {
         const { email, password, name, aboutMe, location, signUpCode, userImg, createdAt, lastLogin } = this.state;
-        firebase.auth().createUserWithEmailAndPassword(email, password)
-            .then((result) => {
-                firebase.firestore().collection("users")
-                    .doc(firebase.auth().currentUser.uid)
-                    .set({
-                        name,
-                        email,
-                        aboutMe,
-                        location,
-                        signUpCode,
-                        userImg,
-                        createdAt,
-                        lastLogin,
-                        followerCount: 0,
-                        followingCount: 0,
-                        postsCount: 0,
-                    })
-            })
-            .catch(error => {   
-                alert(error.message)
-                console.log(error.message)
-             })
-
-        sendNotificationForSignUp(email, name)
+        try {
+            await firebase.auth().createUserWithEmailAndPassword(email, password);
+            await firebase.firestore().collection("users")
+                .doc(firebase.auth().currentUser.uid)
+                .set({
+                    name,
+                    email,
+                    aboutMe,
+                    location,
+                    signUpCode,
+                    userImg,
+                    createdAt,
+                    lastLogin,
+                    followerCount: 0,
+                    followingCount: 0,
+                    postsCount: 0,
+                });
+            sendNotificationForSignUp(email, name);
+        } catch (error) {
+            alert(error.message);
+            console.log(error.message);
+        }
     }
 
     render() {

@@ -126,13 +126,6 @@ function game(props) {
             .doc(postId)
             .set({})
 
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                loccMadness2023Score: firebase.firestore.FieldValue.increment(20)
-            })
-
         analytics().logEvent('hammerPost', {user_name: props.currentUser.name});
             
     }
@@ -145,12 +138,6 @@ function game(props) {
             .doc(postId)
             .delete({})
 
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                loccMadness2023Score: firebase.firestore.FieldValue.increment(-20)
-            })
     }
 
     const storeFade = (postId) => {
@@ -160,13 +147,6 @@ function game(props) {
             .collection("userFades")
             .doc(postId)
             .set({})
-
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                loccMadness2023Score: firebase.firestore.FieldValue.increment(-50)
-            })
 
         analytics().logEvent('fadePost', {user_name: props.currentUser.name});
     }
@@ -179,12 +159,6 @@ function game(props) {
             .doc(postId)
             .delete({})
 
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                loccMadness2023Score: firebase.firestore.FieldValue.increment(50)
-            })
     }
 
     const onLikePress = (userId, postId) => {
@@ -207,12 +181,6 @@ function game(props) {
                 likesCount: firebase.firestore.FieldValue.increment(1)
             })
 
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                loccMadness2023Score: firebase.firestore.FieldValue.increment(20)
-        })
     }
 
     const onDislikePress = (userId, postId) => {
@@ -233,13 +201,6 @@ function game(props) {
             .collection("likes")
             .doc(firebase.auth().currentUser.uid)
             .delete()
-        
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                loccMadness2023Score: firebase.firestore.FieldValue.increment(-20)
-        })
         
     }
 
@@ -262,12 +223,6 @@ function game(props) {
             .doc(firebase.auth().currentUser.uid)
             .set({})
 
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                loccMadness2023Score: firebase.firestore.FieldValue.increment(-50)
-        })
     }
 
     const onUnfadePress = (userId, postId) => {
@@ -288,13 +243,6 @@ function game(props) {
             .collection("fades")
             .doc(firebase.auth().currentUser.uid)
             .delete()
-
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                loccMadness2023Score: firebase.firestore.FieldValue.increment(50)
-        })
 
     }
 
@@ -636,6 +584,8 @@ function game(props) {
 
     const fetchNBAPropData = async (propName, propOverOdds, propUnderOdds) => {
 
+        analytics().logEvent('selectNBAProps', {user_name: props.currentUser.name});
+
         const playerData = await firebase.firestore()
           .collection("nba")
           .doc("props")
@@ -674,6 +624,8 @@ function game(props) {
       };
 
       const fetchNHLPropData = async (propName, propOverOdds, propUnderOdds) => {
+
+        analytics().logEvent('selectNHLProps', {user_name: props.currentUser.name});
 
         const playerData = await firebase.firestore()
           .collection("nhl")
@@ -1858,7 +1810,7 @@ const mapStateToProps = (store) => ({
     usersFollowingLoaded: store.usersState.usersFollowingLoaded,
     futureGames: store.futureGamesState.futureGames,
     formula1Races: store.formula1RacesState.formula1Races,
-    contestStatus: store.userState.contestStatus,
+    golfGames: store.golfGamesState.golfGames,
 })
 
 export default connect(mapStateToProps)(game);

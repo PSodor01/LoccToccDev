@@ -11,7 +11,7 @@ import "firebase/firestore";
 
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { fetchUser, fetchUserFollowing, fetchUserBlocking, fetchUserNotifications, fetchAllUsers, fetchLikes, fetchFades, fetchMLBGames, fetchMMAGames, fetchFutureGames,  fetchNHLGames, fetchNBAGames, fetchNCAABGames, fetchEPLGames, fetchFormula1Teams, fetchFormula1Races, fetchFormula1Drivers, fetchFormula1Rankings, fetchContestStatus, clearData } from '../redux/actions/index'
+import { fetchUser, fetchUserFollowing, fetchUserBlocking, fetchUserNotifications, fetchAllUsers, fetchLikes, fetchFades, fetchMLBGames, fetchMMAGames, fetchFutureGames,  fetchNHLGames, fetchNBAGames, fetchGolfGames, fetchEPLGames, fetchFormula1Teams, fetchFormula1Races, fetchFormula1Drivers, fetchFormula1Rankings, fetchContestStatus, clearData } from '../redux/actions/index'
 
 import FeedScreen from './main/Feed'
 import ProfileScreen from './main/Profile'
@@ -50,6 +50,7 @@ export class Main extends Component {
         this.props.fetchAllUsers();
         this.props.fetchMLBGames();
         this.props.fetchEPLGames();
+        this.props.fetchGolfGames();
         this.props.fetchFutureGames();
         this.props.fetchFormula1Teams();
         this.props.fetchFormula1Races();
@@ -57,7 +58,6 @@ export class Main extends Component {
         this.props.fetchFormula1Rankings();
         this.props.fetchNHLGames();
         this.props.fetchNBAGames();
-        this.props.fetchNCAABGames();
         this.props.fetchMMAGames();
         this.props.fetchContestStatus();
 
@@ -161,12 +161,12 @@ export class Main extends Component {
 
 const mapStateToProps = (store) => ({
     currentUser: store.userState.currentUser,
-    ncaabGames: store.ncaabGamesState.ncaabGames,
     nbaGames: store.nbaGamesState.nbaGames,
     nhlGames: store.nhlGamesState.nhlGames,
     mmaGames: store.mmaGamesState.mmaGames,
     mlbGames: store.mlbGamesState.mlbGames,
     eplGames: store.eplGamesState.eplGames,
+    golfGames: store.golfGamesState.golfGames,
     futureGames: store.futureGamesState.futureGames,
     formula1Teams: store.formula1TeamsState.formula1Teams,
     formula1Races: store.formula1RacesState.formula1Races,
@@ -175,6 +175,6 @@ const mapStateToProps = (store) => ({
    
 
 })
-const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUser, fetchUserFollowing, fetchUserNotifications, fetchAllUsers, fetchUserBlocking, fetchLikes, fetchFades, fetchMLBGames, fetchMMAGames, fetchFutureGames, fetchNBAGames, fetchNHLGames, fetchNCAABGames, fetchEPLGames, fetchFormula1Teams, fetchFormula1Races, fetchFormula1Drivers, fetchFormula1Rankings,  fetchContestStatus, clearData }, dispatch);
+const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUser, fetchUserFollowing, fetchUserNotifications, fetchAllUsers, fetchUserBlocking, fetchLikes, fetchFades, fetchMLBGames, fetchMMAGames, fetchFutureGames, fetchNBAGames, fetchNHLGames, fetchGolfGames, fetchEPLGames, fetchFormula1Teams, fetchFormula1Races, fetchFormula1Drivers, fetchFormula1Rankings,  fetchContestStatus, clearData }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchProps)(Main);
