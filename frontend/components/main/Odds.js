@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Alert, Linking, Image, TextInput, Dimensions, FlatList, TouchableOpacity, ScrollView } from 'react-native';
+import { Text, View, StyleSheet, Alert, ActivityIndicator, Image, TextInput, Dimensions, FlatList, TouchableOpacity, ScrollView } from 'react-native';
 
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -38,6 +38,7 @@ function Odds(props) {
     const [golfGames, setGolfGames] = useState([]);
     const [fantasyGames, setFantasyGames] = useState([]);
     const [futureGames, setFutureGames] = useState([]);
+    const [teamLogos, setTeamLogos] = useState([]);
     const [formula1Teams, setFormula1Teams] = useState([]);
     const [formula1Races, setFormula1Races] = useState([]);
     const [formula1Drivers, setFormula1Drivers] = useState([]);
@@ -110,6 +111,7 @@ function Odds(props) {
 
     useEffect(() => {
         fetchData()
+        setLoading(true)
 
         if ( sport == 'NCAAB' || sport == 'NHL' || sport == 'MLB' || sport == 'NCAAF' || sport == 'EPL' || sport == 'UFC' || sport == 'PGA' || sport == 'Futures' || sport == 'Formula 1' ||sport == 'Trending') {
 
@@ -117,117 +119,52 @@ function Odds(props) {
         else {
             setSportGames(props.nbaGames)
             setSport('NBA')
+            setLoading(false)
         }
 
     }, [ props.nbaGames, props.mlbGames, props.nhlGames, props.mmaGames, props.futureGames, props.eplGames, props.golfGames, props.formula1Teams, props.formula1Races, props.formula1Drivers, props.formula1Rankings])
 
-    const fetchData = () => {
 
-        function trendingFunction(nbaGames, nhlGames, mlbGames) {
-            let trendingGames = nbaGames.concat(nhlGames, mlbGames)
-            setTrendingGames(trendingGames)
-        }
+    const fetchData = async () => {
+        const games = [props.nbaGames, props.nhlGames, props.mlbGames, props.mmaGames, props.eplGames];
 
-        for (let i = 0; i < props.nbaGames.length; i++) {
+        const teamLogosById = {};
+            for (const logo of props.teamLogos) {
+                teamLogosById[logo.id] = logo.teamLogo;
+            }
 
-            firebase.firestore()
+            for (const game of [...props.nbaGames, ...props.mlbGames, ...props.nhlGames]) {
+                game.homeTeamLogo = teamLogosById[game.homeTeam];
+                game.awayTeamLogo = teamLogosById[game.awayTeam];
+            }
+        
+        const fetchGamePostsCount = async (game) => {
+          return firebase.firestore()
             .collection("votes")
-            .doc(props.nbaGames[i].gameId)
+            .doc(game.gameId)
             .collection("gameVotes")
             .doc("info")
             .get()
             .then((snapshot) => {
-                if (snapshot.exists) {
-                    let gameMiscData = snapshot.data();
-                    props.nbaGames[i].gamePostsCount = gameMiscData.gamePostsCount
-                }
-                else {
-                    props.nbaGames[i].gamePostsCount = 0
-                }
-            })
-        }
-        setnbaGames(props.nbaGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))
-
-        for (let i = 0; i < props.nhlGames.length; i++) {
-
-            firebase.firestore()
-            .collection("votes")
-            .doc(props.nhlGames[i].gameId)
-            .collection("gameVotes")
-            .doc("info")
-            .get()
-            .then((snapshot) => {
-                if (snapshot.exists) {
-                    let gameMiscData = snapshot.data();
-                    props.nhlGames[i].gamePostsCount = gameMiscData.gamePostsCount
-                }
-                else {
-                    props.nhlGames[i].gamePostsCount = 0
-                }
-            })
-        }
-        setnhlGames(props.nhlGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))
-
-        for (let i = 0; i < props.mlbGames.length; i++) {
-
-            firebase.firestore()
-            .collection("votes")
-            .doc(props.mlbGames[i].gameId)
-            .collection("gameVotes")
-            .doc("info")
-            .get()
-            .then((snapshot) => {
-                if (snapshot.exists) {
-                    let gameMiscData = snapshot.data();
-                    props.mlbGames[i].gamePostsCount = gameMiscData.gamePostsCount
-                }
-                else {
-                    props.mlbGames[i].gamePostsCount = 0
-                }
-            })
-        }
-        setnhlGames(props.mlbGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))
-
-        for (let i = 0; i < props.mmaGames.length; i++) {
-
-            firebase.firestore()
-            .collection("votes")
-            .doc(props.mmaGames[i].gameId)
-            .collection("gameVotes")
-            .doc("info")
-            .get()
-            .then((snapshot) => {
-                if (snapshot.exists) {
-                    let gameMiscData = snapshot.data();
-                    props.mmaGames[i].gamePostsCount = gameMiscData.gamePostsCount
-                }
-                else {
-                    props.mmaGames[i].gamePostsCount = 0
-                }
-            })
-        }
-        setmmaGames(props.mmaGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))
-
-        for (let i = 0; i < props.eplGames.length; i++) {
-
-            firebase.firestore()
-            .collection("votes")
-            .doc(props.eplGames[i].gameId)
-            .collection("gameVotes")
-            .doc("info")
-            .get()
-            .then((snapshot) => {
-                if (snapshot.exists) {
-                    let gameMiscData = snapshot.data();
-                    props.eplGames[i].gamePostsCount = gameMiscData.gamePostsCount
-                }
-                else {
-                    props.eplGames[i].gamePostsCount = 0
-                }
-            })
-        }
-        seteplGames(props.eplGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))
-
+              if (snapshot.exists) {
+                const gameMiscData = snapshot.data();
+                game.gamePostsCount = gameMiscData.gamePostsCount
+              } else {
+                game.gamePostsCount = 0
+              }
+            });
+        };
+        
+        const addGamePostsCount = async (games) => {
+          for (const game of games) {
+            await fetchGamePostsCount(game);
+          }
+        };
+        
+        await addGamePostsCount(games.flat());
+      
+        const trendingGames = games.flat().sort((a, b) => a.gameDate.localeCompare(b.gameDate));
+        setTrendingGames(trendingGames);
         setFutureGames(props.futureGames)
         setFormula1Teams(props.formula1Teams)
         setFormula1Races(props.formula1Races)
@@ -237,10 +174,8 @@ function Odds(props) {
         
         if (props.formula1Rankings.length > 2 ) {setFormula1RaceLive(true)}
 
-        trendingFunction(nbaGames, nhlGames, mlbGames, mmaGames)
-        setLoading(false)
-
-    }
+        setLoading(false);
+      }
 
     const registerForPushNotificationsAsync = async () => {
         let token;
@@ -375,8 +310,6 @@ function Odds(props) {
     }
 
     const setSportFunction = (sport) => {
-
-        console.log(sport)
         if (sport == 'Trending') {setSportGames(trendingGames); analytics().logEvent('selectTrendingGames', { user_name: props.currentUser.name }); setSport('Trending');}
         if (sport == 'NFL') {setSportGames(props.nflGames); analytics().logEvent('selectNFLGames', {user_name: props.currentUser.name}); setSport('NFL');}
         if (sport == 'NBA') {setSportGames(props.nbaGames); analytics().logEvent('selectNBAGames', {user_name: props.currentUser.name}); setSport('NBA');}
@@ -593,10 +526,20 @@ function Odds(props) {
                             <View style={styles.awayGameInfoContainer}>
                                 <View style={styles.teamItem}>
                                     <View style={styles.teamNameItem}>
-                                        <Text style={styles.teamText}>{item.awayTeam}</Text>
+                                    {item.sport == 'mma_mixed_martial_arts' ?
+                                    null
+                                    :
+                                    <Image  source={{ uri: item.awayTeamLogo }} style={styles.logoImage} />}
+                                        <View>
+                                            <Text style={styles.teamText}>{item.awayTeam}</Text>
+                                        </View>
                                     </View>
+                                    <View style={styles.teamScoreItem}>
                                     {item.awayScore || item.homeScore ? <Text style={styles.scoreText}>{item.awayScore}</Text> : null}
+                                    </View>
+                                    
                                 </View>
+                                
                                 <View style={styles.moneylineItem}>
                                     {item.awayMoneyline > 0 ? 
                                         <Text style={styles.spreadText}>+{item.awayMoneyline}</Text> 
@@ -628,9 +571,18 @@ function Odds(props) {
                             <View style={styles.homeGameInfoContainer}>
                                 <View style={styles.teamItem}>
                                     <View style={styles.teamNameItem}>
-                                        <Text style={styles.teamText}>{item.homeTeam}</Text>
+                                        {item.sport == 'mma_mixed_martial_arts' ?
+                                        null
+                                        :
+                                        <Image  source={{ uri: item.homeTeamLogo }} style={styles.logoImage} />}
+                                        <View>
+                                            <Text style={styles.teamText}>{item.homeTeam}</Text>
+                                        </View>
                                     </View>
+                                    <View style={styles.teamScoreItem}>
                                     {item.awayScore || item.homeScore ? <Text style={styles.scoreText}>{item.homeScore}</Text> : null}
+                                    </View>
+                                    
                                 </View>
                                 <View style={styles.moneylineItem}>
                                     {item.homeMoneyline > 0 ? 
@@ -1237,9 +1189,12 @@ function Odds(props) {
             :
 
             <FlatList 
-                data = {sportGames}
+                data = {sportGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate))}
                 style={styles.feed}
                 renderItem={renderItem}
+                ListEmptyComponent={() => (
+                    loading && <ActivityIndicator size="large"/>
+                )}
     
             />
 
@@ -1335,88 +1290,90 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: "#009387",
       },
-    awayGameInfoContainer: { 
-        flexDirection: 'row',
-    },
-    eplAwayGameInfoContainer: { 
-        flexDirection: 'row',
-    },
-    homeGameInfoContainer: { 
-        flexDirection: 'row',
-    },
-    eplHomeGameInfoContainer: { 
-        flexDirection: 'row',
-        paddingVertical: 6,
-    },
-    gameHeaderText: {
-        fontWeight: "bold",
-        paddingBottom: 5,
-    },
-    spreadText: {
-        textAlign: 'right',
-    },
-    oddsTopRowText: {
-        textAlign: 'right',
-        color: 'grey',
-        paddingBottom: 5,
-        fontSize: 12,
-    },
-    oddsBottomRowText: {
-        textAlign: 'right',
-        color: 'grey',
-        fontSize: 12,
-    },
-    teamItem: {
-        width: "55%",
-        borderRightColor: "#e1e2e6",
-        borderRightWidth: 1,
-        backgroundColor: "#ffffff",
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingRight: 2,
+        awayGameInfoContainer: { 
+            flexDirection: 'row',
+        },
+        eplAwayGameInfoContainer: { 
+            flexDirection: 'row',
+        },
+        homeGameInfoContainer: { 
+            flexDirection: 'row',
+        },
+        eplHomeGameInfoContainer: { 
+            flexDirection: 'row',
+            paddingVertical: 6,
+        },
+        gameHeaderText: {
+            fontWeight: "bold",
+            paddingBottom: 5,
+        },
+        spreadText: {
+            textAlign: 'right',
+        },
+        oddsTopRowText: {
+            textAlign: 'right',
+            color: 'grey',
+            paddingBottom: 5,
+            fontSize: 12,
+        },
+        oddsBottomRowText: {
+            textAlign: 'right',
+            color: 'grey',
+            fontSize: 12,
+        },
+        teamItem: {
+            width: "55%",
+            borderRightColor: "#e1e2e6",
+            borderRightWidth: 1,
+            backgroundColor: "#ffffff",
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingRight: 2,
+            justifyContent: "space-between"
 
-    },
-    teamNameItem: {
-        width: "90%",
-        backgroundColor: "#ffffff",
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingRight: 2,
-    },
-    scoreText: {
-        color: '#0033cc',
-        fontWeight: 'bold',
-        fontSize: 12,
-    },
-    spreadItem: {
-        width: "15%",
-        borderRightColor: "#e1e2e6",
-        borderRightWidth: 1,
-        alignItems: 'center',
-        paddingTop: 2,
-        justifyContent: 'center',
-    },
-    moneylineItem: {
-        width: "15%",
-        borderRightColor: "#e1e2e6",
-        borderRightWidth: 1,
-        alignItems: 'center',
-        paddingTop: 2,
-        justifyContent: 'center',
-    },
-    totalItem: {
-        width: "15%",
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingTop: 2,
-    },
-    gameHeaderContainer: {
-        flexDirection: 'row',
-        marginLeft: '2%',
-        paddingBottom: 2,
-    },
+        },
+        teamNameItem: {
+            backgroundColor: "#ffffff",
+            flexDirection: 'row',
+            paddingRight: 2,
+            alignItems: 'center',
+        },
+        teamScoreItem: {
+            alignItems: 'center',
+            justifyContent: 'flex-end'
+        },
+        scoreText: {
+            color: '#0033cc',
+            fontWeight: 'bold',
+            fontSize: 12,
+        },
+        spreadItem: {
+            width: "15%",
+            borderRightColor: "#e1e2e6",
+            borderRightWidth: 1,
+            alignItems: 'center',
+            paddingTop: 2,
+            justifyContent: 'center',
+        },
+        moneylineItem: {
+            width: "15%",
+            borderRightColor: "#e1e2e6",
+            borderRightWidth: 1,
+            alignItems: 'center',
+            paddingTop: 2,
+            justifyContent: 'center',
+        },
+        totalItem: {
+            width: "15%",
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            paddingTop: 2,
+        },
+        gameHeaderContainer: {
+            flexDirection: 'row',
+            marginLeft: '2%',
+            paddingBottom: 2,
+        },
     formula1HeaderContainer: {
         justifyContent: 'space-between',
         flexDirection: 'row',
@@ -1631,7 +1588,14 @@ const styles = StyleSheet.create({
     fakeButtonContainer: {
         alignItems: 'flex-end',
         marginRight: "10%",
-    }
+    },
+    logoImage: {
+        resizeMode: "contain",
+        width: 30,
+        height: 30,
+        marginRight: 10,
+    },
+    
 })
 
 const mapStateToProps = (store) => ({
@@ -1640,6 +1604,7 @@ const mapStateToProps = (store) => ({
     nhlGames: store.nhlGamesState.nhlGames,
     mmaGames: store.mmaGamesState.mmaGames,
     futureGames: store.futureGamesState.futureGames,
+    teamLogos: store.teamLogosState.teamLogos,
     allUsers: store.userState.allUsers,
     currentUser: store.userState.currentUser,
     contestStatus: store.userState.contestStatus,

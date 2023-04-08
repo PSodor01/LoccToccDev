@@ -127,7 +127,6 @@ function NotificationsScreen(props) {
         <View style={styles.textInputContainer}>
             <FlatList
                 data = {notifications}
-                style={styles.feed}
                 ListEmptyComponent={EmptyListMessage}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={ItemView}

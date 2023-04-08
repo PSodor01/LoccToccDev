@@ -167,6 +167,35 @@ exports.getMLBScoresData = functions.pubsub.schedule('every 10 minutes').onRun(a
   }
 })
 
+exports.getLogoData = functions.pubsub.schedule('every 2 minutes').timeZone('America/New_York').onRun(async() => {
+  const options = {
+    method: 'GET',
+    redirect: 'follow',
+    headers: {
+      'x-rapidapi-key': '2354874cc8e479f89b4d769daf9de0df',
+      'x-rapidapi-host': 'v1.hockey.api-sports.io'
+    },
+  };
+
+  try {
+    const response = await axios.get("https://v1.hockey.api-sports.io/teams?league=57&season=2022", options)
+    .then(result => {
+
+        for (let i = 0; i < result.data.response.length; i++){
+          const writeResult = admin
+            .firestore()
+            .collection("logos")
+            .doc(result.data.response[i].name)
+            .set({
+              teamLogo: result.data.response[i].logo,
+
+          }, { merge:true });           
+      }
+           
+    })
+  }catch(err) {console.error(err.message)}
+})
+
 exports.getNFLGameData = functions.pubsub.schedule('every 2 minutes').onRun(async() => {
   try {
     const response = await axios.get('https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso');

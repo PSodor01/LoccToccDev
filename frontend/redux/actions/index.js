@@ -15,6 +15,8 @@ import { USER_STATE_CHANGE,
     MMA_GAMES_STATE_CHANGE,
     GOLF_GAMES_STATE_CHANGE,
     FUTURE_GAMES_STATE_CHANGE,
+    TEAM_LOGOS_STATE_CHANGE,
+    BLOG_DETAILS_STATE_CHANGE,
     FORMULA1_TEAMS_STATE_CHANGE,
     FORMULA1_RACES_STATE_CHANGE,
     FORMULA1_DRIVERS_STATE_CHANGE,
@@ -378,8 +380,36 @@ export function fetchFutureGames() {
                     return { id, ...data }
                 })
                 dispatch({ type: FUTURE_GAMES_STATE_CHANGE, futureGames });
-                for(let i = 0; i < futureGames.length; i++){
-                }
+            })
+    })
+}
+
+export function fetchTeamLogos() {
+    return ((dispatch) => {
+        firebase.firestore()
+            .collection("logos")
+            .onSnapshot((snapshot) => {
+                let teamLogos = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    return { id, ...data }
+                })
+                dispatch({ type: TEAM_LOGOS_STATE_CHANGE, teamLogos });
+            })
+    })
+}
+
+export function fetchBlogDetails() {
+    return ((dispatch) => {
+        firebase.firestore()
+            .collection("blogs")
+            .onSnapshot((snapshot) => {
+                let blogDetails = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    return { id, ...data }
+                })
+                dispatch({ type: BLOG_DETAILS_STATE_CHANGE, blogDetails });
             })
     })
 }

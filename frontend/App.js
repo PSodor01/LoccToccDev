@@ -72,6 +72,9 @@ import game from './components/main/game'
 import TeamDetails from './components/main/TeamDetails'
 import Standings from './components/main/Standings'
 import Contest from './components/main/Contest'
+import BlogHomeScreen from './components/main/BlogHome'
+import BlogDetailsScreen from './components/main/BlogDetails'
+import BlogHome from './components/main/BlogHome';
 
 
 const Stack = createStackNavigator();
@@ -111,6 +114,14 @@ const MainStackScreen = ({navigation, props}) => (
             <FontAwesome5 name="bars" size={24} color="#fff" />
           </TouchableOpacity>
         ),
+        headerRight: () => (
+          <TouchableOpacity 
+            style={{ alignItems: "flex-end", marginRight:16 }}
+            onPress={() => navigation.navigate('Notifications')}
+            >
+            <FontAwesome5 name="heart" size={24} color="#fff" />
+          </TouchableOpacity>
+        ),
         
         
       }}
@@ -122,8 +133,48 @@ const MainStackScreen = ({navigation, props}) => (
        
           />
       <MainStack.Screen name="Search" component={Search}/>
-      <MainStack.Screen name="Notifications" component={NotificationsScreen}/>
+      <MainStack.Screen name="Notifications" component={NotificationsScreen}
+         options={{
+          headerTitle: () => (
+            <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+                <Text style={styles.headerName}>locctocc </Text>
+                <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
+            </View>
+          ),
+          headerTitleAlign: "center",
+          headerLeft: () => (
+            <TouchableOpacity 
+            style={{ alignItems: "flex-end", marginLeft:16 }}
+            onPress={() => navigation.goBack()}
+            >
+            <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+          </TouchableOpacity>
+          ),
+          
+        }}
+      />
       <MainStack.Screen name="Contest" component={Contest}/>
+      <MainStack.Screen name="BlogHome" component={BlogHomeScreen}/>
+      <MainStack.Screen name="BlogDetails" component={BlogDetailsScreen}
+        options={{
+          headerTitle: () => (
+            <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+                <Text style={styles.headerName}>locctocc </Text>
+                <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
+            </View>
+          ),
+          headerTitleAlign: "center",
+          headerLeft: () => (
+            <TouchableOpacity 
+            style={{ alignItems: "flex-end", marginLeft:16 }}
+            onPress={() => navigation.goBack()}
+            >
+            <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+          </TouchableOpacity>
+          ),
+          
+        }}
+          />
       <MainStack.Screen name="Profile" component={Profile}
         options={{
           headerTitle: () => (
