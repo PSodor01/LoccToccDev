@@ -52,6 +52,18 @@ function BlogDetailsScreen(props) {
 
     }, [ props.blogDetails ])
 
+    const countExternalBlogClicks = async (blogLink) => {
+
+      const url = blogLink;
+        const supported = await Linking.canOpenURL(url);
+        if (supported) {
+            await Linking.openURL(url);
+        }
+
+      analytics().logEvent('externalBlogClick', {user_name: props.currentUser.name, blog_name: props.blogDetails.blogTitle});
+
+    }
+
     const ItemView = ({ item }) => {
         const subHeadings = [];
         const paragraphs = [];
@@ -79,6 +91,9 @@ function BlogDetailsScreen(props) {
             <View style={styles.feedItem}>
               <View style={styles.textContainer}>
                 <Text style={styles.title}>{item.blogTitle}</Text>
+                {item.blogAuthor == "A Locctocc Original" ? 
+                            <Text style={styles.author}>{item.blogAuthor}</Text> 
+                            : <Text style={styles.author}>Written by: {item.blogAuthor}</Text>}
                 <Text style={styles.date}>
                   {moment(item.blogDate.toDate()).format("MMM Do, YYYY")}
                 </Text>
@@ -96,6 +111,27 @@ function BlogDetailsScreen(props) {
                 );
               })}
               <Text style={styles.paragraphText}>{item.blogOutro}</Text>
+              <Text></Text>
+              {item.blogAuthor == "A Locctocc Original" ? 
+              null
+              :
+              <Text style={styles.paragraphText}>Check out more from:</Text>
+              }
+              {item.blogAuthor == "A Locctocc Original" ? 
+              null
+              :
+              <TouchableOpacity>
+                <Text style={styles.linkText}
+                  onPress={() => {
+                    countExternalBlogClicks(item.blogLink)
+                    Linking.openURL('https://' + item.blogLink);
+                  }}
+                >
+                  {item.blogAuthor}
+                </Text>
+              </TouchableOpacity>
+              }
+             
             </View>
           </View>
         );
@@ -157,6 +193,11 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         marginBottom: 5,
     },
+    author: {
+      fontSize: 14,
+      fontWeight: "bold",
+      marginBottom: 5,
+    },
     subHeadingText: {
         fontSize: 14,
         fontWeight: "bold",
@@ -172,6 +213,10 @@ const styles = StyleSheet.create({
         fontSize: 14,
         marginBottom: 5,
     },
+    linkText: {
+      color: 'blue',
+      fontSize: 14,
+    }, 
     adView: {
         alignItems: "center",
         justifyContent: "center",

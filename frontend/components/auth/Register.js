@@ -43,7 +43,7 @@ const sendNotification = async (tokens, notification) => {
 
 const sendNotificationForSignUp = async (email, name) => {
     const notification = 'New user created! Email: ' + email + ' and username: ' + name;
-    const tokens = ['ExponentPushToken[Dg_nkoPO9aQrFOKjNr5jlc]', 'other_token_here'];
+    const tokens = ['ExponentPushToken[Dg_nkoPO9aQrFOKjNr5jlc]', 'ExponentPushToken[eIr7vlNdKZjkSVesQEDiZ5]'];
     await sendNotification(tokens, notification);
 };
 

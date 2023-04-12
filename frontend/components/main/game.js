@@ -45,7 +45,7 @@ function game(props) {
     const [fullscreen, setFullscreen] = useState(false);
 
 
-    const {gameId, gameDate, homeTeam, awayTeam, homeMoneyline, awayMoneyline, homeSpread, awaySpread, homeSpreadOdds, awaySpreadOdds, over, overOdds, under, underOdds, drawMoneyline, sport, fantasyTopic} = props.route.params;
+    const {gameId, gameDate, homeTeam, awayTeam, homeMoneyline, awayMoneyline, homeSpread, awaySpread, homeSpreadOdds, awaySpreadOdds, over, overOdds, under, underOdds, drawMoneyline, sport, fantasyTopic, awayTeamLogo, homeTeamLogo} = props.route.params;
 
     const bannerAdUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-8519029912093094/8258310490'
     const nativeAdUnitId = __DEV__ ? TestIds.NATIVE_AD : 'ca-app-pub-8519029912093094/2848035284';
@@ -1201,6 +1201,7 @@ function game(props) {
                                     onPress={() => {gameVote(); increaseHomeCount()}}>
                                     <View style={styles.voteContainer}>
                                         <Text style={styles.teamText}>{homeTeam}</Text>
+                                        
 
                                         {homeVote == '0%' ? 
                                             <Text style={styles.noVote}>{homeVote} </Text>
@@ -1285,8 +1286,11 @@ function game(props) {
                                 <TouchableOpacity
                                     onPress={() => {gameVote(); increaseAwayCount()}}>
                                     <View style={styles.voteContainer}>
+                                        {sport == 'mma_mixed_martial_arts' ?
+                                        null
+                                        :
+                                        <Image  source={{ uri: awayTeamLogo }} style={styles.logoImage} />}
                                         <Text style={styles.teamText}>{awayTeam}</Text>
-
                                         {awayVote == '0%' ? 
                                             <Text style={styles.noVote}>{awayVote} </Text>
                                             :
@@ -1339,6 +1343,10 @@ function game(props) {
                                 <TouchableOpacity
                                     onPress={() => {gameVote(); increaseHomeCount()}}>
                                     <View style={styles.voteContainer}>
+                                        {sport == 'mma_mixed_martial_arts' ?
+                                        null
+                                        :
+                                        <Image  source={{ uri: homeTeamLogo }} style={styles.logoImage} />}
                                         <Text style={styles.teamText}>{homeTeam}</Text>
 
                                         {homeVote == '0%' ? 
@@ -1794,7 +1802,13 @@ const styles = StyleSheet.create({
         paddingTop: 20,
         fontSize: 16,
         color: 'grey'
-      },
+    },
+    logoImage: {
+        resizeMode: "contain",
+        width: 30,
+        height: 30,
+        marginRight: 10,
+    },
     
     
 })

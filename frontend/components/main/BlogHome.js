@@ -28,16 +28,27 @@ function BlogHomeScreen(props) {
 
     }, [ props.blogDetails ])
 
+    const storeBlogClick = (blogTitle) => {
+
+        analytics().logEvent('blogClick', {user_name: props.currentUser.name, blogName: blogTitle});
+            
+    }
+
     const ItemView = ({item}) => {
         return (
             <View>
                 <TouchableOpacity
-                onPress={() => props.navigation.navigate('BlogDetails', {blogId: item.id})}
-                >
+                    onPress={() => {
+                        storeBlogClick(item.blogTitle);
+                        props.navigation.navigate('BlogDetails', { blogId: item.id });
+                }}>
                     <View style={styles.feedItem}>
                         <Image source={{ uri: item.blogImage }} style={styles.logoImage} />
                         <View style={styles.textContainer}>
                             <Text style={styles.title}>{item.blogTitle}</Text>
+                            {item.blogAuthor == "A Locctocc Original" ? 
+                            <Text style={styles.author}>{item.blogAuthor}</Text> 
+                            : <Text style={styles.author}>Written by: {item.blogAuthor}</Text>}
                             <Text style={styles.date}>{moment(item.blogDate.toDate()).format("MMM Do, YYYY")}</Text>
                         </View>
                     </View>
@@ -95,6 +106,11 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 18,
+        fontWeight: "bold",
+        marginBottom: 5,
+    },
+    author: {
+        fontSize: 16,
         fontWeight: "bold",
         marginBottom: 5,
     },

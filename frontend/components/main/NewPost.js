@@ -210,6 +210,15 @@ function AddPostScreen(props) {
           setLoading(false)
           props.navigation.goBack();
 
+          firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                postsCount: firebase.firestore.FieldValue.increment(1),
+            })
+
+
+
         }).catch((error) => {
         console.log(error)
         

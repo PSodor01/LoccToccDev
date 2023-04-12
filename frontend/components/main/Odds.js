@@ -353,43 +353,38 @@ function Odds(props) {
             icon: nbaIcon
         },
         {
-            sport: 'PGA',
-            id: '3',
-            icon: golfIcon
-        },
-        {
             sport: 'MLB',
-            id: '4',
+            id: '3',
             icon: mlbIcon
         },
         {
             sport: 'NHL',
-            id: '5',
+            id: '4',
             icon: nhlIcon
         },
         {
             sport: 'EPL',
-            id: '6',
+            id: '5',
             icon: eplIcon
         },
         {
             sport: 'Formula 1',
-            id: '7',
+            id: '6',
             icon: formula1Icon
         },
         {
             sport: 'UFC',
-            id: '8',
+            id: '7',
             icon: mmaIcon
         },
         {
             sport: 'Futures',
-            id: '9',
+            id: '8',
             icon: futureIcon
         },
         {
             sport: 'Fantasy',
-            id: '10',
+            id: '9',
             icon: fantasyIcon
         },
      
@@ -487,7 +482,7 @@ function Odds(props) {
             <View>
                 <View style={styles.gameContainer}>
                     <TouchableOpacity
-                        onPress={() => props.navigation.navigate('game', {gameId: item.gameId, gameDate: item.gameDate, homeTeam: item.homeTeam, awayTeam: item.awayTeam, homeSpread: item.homeSpread, awaySpread: item.awaySpread, homeSpreadOdds: item.homeSpreadOdds, awaySpreadOdds: item.awaySpreadOdds, awayMoneyline: item.awayMoneyline, homeMoneyline: item.homeMoneyline, over: item.over, overOdds: item.overOdds, under: item.under, underOdds: item.underOdds, sport: item.sport, homeScore: item.homeScore, awayScore: item.awayScore })}>
+                        onPress={() => props.navigation.navigate('game', {gameId: item.gameId, gameDate: item.gameDate, homeTeam: item.homeTeam, awayTeam: item.awayTeam, homeSpread: item.homeSpread, awaySpread: item.awaySpread, homeSpreadOdds: item.homeSpreadOdds, awaySpreadOdds: item.awaySpreadOdds, awayMoneyline: item.awayMoneyline, homeMoneyline: item.homeMoneyline, over: item.over, overOdds: item.overOdds, under: item.under, underOdds: item.underOdds, sport: item.sport, homeScore: item.homeScore, awayScore: item.awayScore, awayTeamLogo: item.awayTeamLogo, homeTeamLogo: item.homeTeamLogo })}>
                         <View>
                             {item.gamePostsCount > 6 ?
                                 <View style={styles.gameDateContainer}>
