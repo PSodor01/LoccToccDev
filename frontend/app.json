@@ -34,7 +34,7 @@
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.psodor01.locctocc",
-      "versionCode": 6,
+      "versionCode": 7,
       "runtimeVersion": "1.0.0"
     },
     "plugins": [

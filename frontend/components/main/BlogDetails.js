@@ -52,9 +52,9 @@ function BlogDetailsScreen(props) {
 
     }, [ props.blogDetails ])
 
-    const countExternalBlogClicks = async (blogLink) => {
+    const countExternalBlogClicks = async (blogTitle) => {
 
-      const url = blogLink;
+      const url = blogTitle;
         const supported = await Linking.canOpenURL(url);
         if (supported) {
             await Linking.openURL(url);
@@ -123,7 +123,7 @@ function BlogDetailsScreen(props) {
               <TouchableOpacity>
                 <Text style={styles.linkText}
                   onPress={() => {
-                    countExternalBlogClicks(item.blogLink)
+                    countExternalBlogClicks(item.blogTitle)
                     Linking.openURL('https://' + item.blogLink);
                   }}
                 >
