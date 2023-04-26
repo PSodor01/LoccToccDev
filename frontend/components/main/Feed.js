@@ -6,6 +6,7 @@ import Foundation from 'react-native-vector-icons/Foundation'
 
 import { useNavigation } from '@react-navigation/native';
 import email from 'react-native-email';
+import { Avatar } from 'react-native-elements';
 import { captureRef } from 'react-native-view-shot';
 
 import moment from 'moment';
@@ -30,6 +31,7 @@ function Feed(props) {
     const [loadingMore, setLoadingMore] = useState(false);
     const [showScrollButton, setShowScrollButton] = useState(false);
     const [fullscreen, setFullscreen] = useState(false);
+    const [selectedImage, setSelectedImage] = useState(null);
 
     const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-8519029912093094/8258310490'
 
@@ -101,11 +103,12 @@ function Feed(props) {
 
     const flatListRef = useRef(null);
 
-    const handleImagePress = () => {
-        setFullscreen(!fullscreen);
+    const handleImagePress = (url) => {
+        setSelectedImage(url);
+        setFullscreen(true);
         analytics().logEvent('fullSizeImage', {user_name: props.currentUser.name});
       };
-    
+      
     
     const storeLike = (postId, userId) => {
         firebase.firestore()
@@ -392,9 +395,13 @@ function Feed(props) {
                     <View style={styles.feedItem}>
                         <TouchableOpacity
                             onPress={() => props.navigation.navigate("Profile", {uid: item.user.id})}>
-                            <Image 
-                                style={styles.profilePhotoPostContainer}
-                                source={{uri: item.user != null ? item.user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                            <Avatar
+                                source={{ uri: item.user.userImg }}
+                                icon={{ name: 'person', type: 'ionicons', color: 'white' }}
+                                overlayContainerStyle={{ backgroundColor: '#95B9C7' }}
+                                style={{ width: 50, height: 50 }}
+                                rounded
+                                size="medium"
                             />
                         </TouchableOpacity>
                         <View style={styles.postRightContainer}>
@@ -407,21 +414,35 @@ function Feed(props) {
                                 {item.caption != null ? <Text style={styles.captionText}>{item.caption}</Text> : null}
                                 {item.downloadURL != "blank" ?
                                     <View style={styles.postPictureContainer}>
-                                        <TouchableOpacity onPress={handleImagePress}>
-                                            <Image
+                                        <TouchableOpacity onPress={() => handleImagePress(item.downloadURL)}>
+                                        <Image
                                             resizeMode="cover"
                                             source={{ uri: item.downloadURL }}
                                             style={styles.postImage}
-                                            />
+                                        />
                                         </TouchableOpacity>
                                         <Modal visible={fullscreen} transparent={true}>
-                                            <TouchableOpacity style={styles.fullscreenContainer} onPress={handleImagePress}>
-                                                <Image resizeMode="contain" source={{ uri: item.downloadURL }} style={styles.fullscreenImage} />
-                                            </TouchableOpacity>
+                                        <TouchableOpacity style={styles.fullscreenContainer} onPress={() => setFullscreen(false)}>
+                                            <Image resizeMode="contain" source={{ uri: selectedImage }} style={styles.fullscreenImage} />
+                                        </TouchableOpacity>
                                         </Modal>
                                     </View>
-                                 : null}
-                                {item.userTagList != null ? <Text style={{ color: '#0033cc', fontWeight: 'bold' }}>@{item.userTagList}</Text> : null}
+                                    : null
+                                }
+                                 {item.userTagList ? 
+                                    <View>
+                                        {Array.isArray(item.userTagList) ? 
+                                        item.userTagList.map((user, index) => (
+                                            <Text key={index} style={{ color: '#0033cc', fontWeight: 'bold' }}>@{user}</Text>
+                                        )) 
+                                        :
+                                        item.userTagList.split(',').map((user, index) => (
+                                            <Text key={index} style={{ color: '#0033cc', fontWeight: 'bold' }}>@{user.trim()}</Text>
+                                        ))
+                                        }
+                                    </View>
+                                    : null
+                                    }
                             </View>
                             <View style={styles.postFooterContainer}>
                 { item.liked == true ?
@@ -506,9 +527,13 @@ function Feed(props) {
                          style={styles.feedItem}>
                         <TouchableOpacity
                             onPress={() => props.navigation.navigate("Profile", {uid: item.user.id})}>
-                            <Image 
-                                style={styles.profilePhotoPostContainer}
-                                source={{uri: item.user ? item.user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                            <Avatar
+                                source={{ uri: item.user.userImg }}
+                                icon={{ name: 'person', type: 'ionicons', color: 'white' }}
+                                overlayContainerStyle={{ backgroundColor: '#95B9C7' }}
+                                style={{ width: 50, height: 50 }}
+                                rounded
+                                size="medium"
                             />
                         </TouchableOpacity>
                         <View style={styles.postRightContainer}>
@@ -520,21 +545,35 @@ function Feed(props) {
                                 {item.caption != null ? <Text style={styles.captionText}>{item.caption}</Text> : null}
                                 {item.downloadURL != "blank" ?
                                     <View style={styles.postPictureContainer}>
-                                        <TouchableOpacity onPress={handleImagePress}>
-                                            <Image
+                                        <TouchableOpacity onPress={() => handleImagePress(item.downloadURL)}>
+                                        <Image
                                             resizeMode="cover"
                                             source={{ uri: item.downloadURL }}
                                             style={styles.postImage}
-                                            />
+                                        />
                                         </TouchableOpacity>
                                         <Modal visible={fullscreen} transparent={true}>
-                                            <TouchableOpacity style={styles.fullscreenContainer} onPress={handleImagePress}>
-                                                <Image resizeMode="contain" source={{ uri: item.downloadURL }} style={styles.fullscreenImage} />
-                                            </TouchableOpacity>
+                                        <TouchableOpacity style={styles.fullscreenContainer} onPress={() => setFullscreen(false)}>
+                                            <Image resizeMode="contain" source={{ uri: selectedImage }} style={styles.fullscreenImage} />
+                                        </TouchableOpacity>
                                         </Modal>
                                     </View>
-                                 : null}
-                                {item.userTagList != null ? <Text style={{ color: '#0033cc', fontWeight: 'bold' }}>@{item.userTagList}</Text> : null}
+                                    : null
+                                }
+                                 {item.userTagList ? 
+                                    <View>
+                                        {Array.isArray(item.userTagList) ? 
+                                        item.userTagList.map((user, index) => (
+                                            <Text key={index} style={{ color: '#0033cc', fontWeight: 'bold' }}>@{user}</Text>
+                                        )) 
+                                        :
+                                        item.userTagList.split(',').map((user, index) => (
+                                            <Text key={index} style={{ color: '#0033cc', fontWeight: 'bold' }}>@{user.trim()}</Text>
+                                        ))
+                                        }
+                                    </View>
+                                    : null
+                                    }
                             </View>
                             <View style={styles.postFooterContainer}>
                 { item.liked == true ?
@@ -716,13 +755,7 @@ function Feed(props) {
                         <Ionicons name="arrow-up-circle" size={30} color="#009387" />
                     </TouchableOpacity>
                 )}
-                <BannerAd
-                    unitId={adUnitId}
-                    sizes={[BannerAdSize.FULL_BANNER]}
-                    requestOptions={{
-                        requestNonPersonalizedAdsOnly: true,
-                    }}
-                />
+                
                 
             </View>
         </View>

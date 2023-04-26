@@ -5,6 +5,8 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 
 import { useNavigation } from '@react-navigation/native';
 
+import { Avatar } from 'react-native-elements';
+
 import analytics from "@react-native-firebase/analytics";
 
 import firebase from 'firebase'
@@ -41,6 +43,7 @@ function FollowingScreen(props) {
                 }
             }
             setFollowing(following)
+            console.log(following)
             
 
             
@@ -87,9 +90,13 @@ function FollowingScreen(props) {
                     <View style={styles.feedItem}>
                         <TouchableOpacity style={styles.postLeftContainer}
                         onPress={() => props.navigation.navigate("Profile", {uid: item.id})}>
-                            <Image 
-                                style={styles.profilePhotoPostContainer}
-                                source={{uri: item.user ? item.user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                            <Avatar
+                                source={{ uri: item.user.userImg }}
+                                icon={{ name: 'person', type: 'ionicons', color: 'white' }}
+                                overlayContainerStyle={{ backgroundColor: '#95B9C7' }}
+                                style={{ width: 50, height: 50 }}
+                                rounded
+                                size="medium"
                             />
                             <Text style={styles.searchResultsText}>{item.user ? item.user.name : null}</Text>
                         </TouchableOpacity>
@@ -113,12 +120,6 @@ const styles = StyleSheet.create({
         padding: 5,
         alignSelf: 'center',
         marginLeft: "5%",
-    },
-    profilePhotoPostContainer: {
-        backgroundColor: "#e1e2e6",
-        width: 50,
-        height: 50,
-        borderRadius: 40,
     },
     feedItem:{
         padding:4,

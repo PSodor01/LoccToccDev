@@ -11,6 +11,7 @@ import * as ImagePicker from 'expo-image-picker';
 
 import Animated from 'react-native-reanimated';
 import BottomSheet from 'reanimated-bottom-sheet';
+import { Avatar } from 'react-native-elements';
 
 import * as Notifications from 'expo-notifications';
 
@@ -31,9 +32,9 @@ function NewCommentScreen(props, route) {
     const [userData, setUserData] = useState(null);
     const [gifs, setGifs] = useState([]);
     const [term, updateTerm] = useState('');
-    const [userTagList, setUserTagList] = useState(null);
-    const [userTagId, setUserTagId] = useState(null);
-    const [userTokenList, setUserTokenList] = useState(null);
+    const [userTagList, setUserTagList] = useState([]);
+    const [userTagIdList, setUserTagIdList] = useState([]);
+    const [userTokenList, setUserTokenList] = useState([]);
     const [isUserTagged, setIsUserTagged] = useState(false);
     const [gifMode, setGifMode] = useState(null);
     const [allUsers, setAllUsers] = useState([]);
@@ -231,14 +232,14 @@ function NewCommentScreen(props, route) {
         setImage(null);
       }
 
-      const removeTaggedUser = () => {
+      const removeTaggedUser = (index) => {
         analytics().logEvent('removeTaggedUserFromPost', {user_name: props.currentUser.name});
     
-        setUserTagList(null);
-        setUserTagId(null);
-        setUserTokenList(null);
-        setIsUserTagged([null])
-      }
+    
+        setUserTagList(userTagList.filter((_, i) => i !== index));
+        setUserTagIdList(userTagIdList.filter((_, i) => i !== index));
+        setUserTokenList(userTokenList.filter((_, i) => i !== index));
+      };
 
       const setGifFunction = () => {
         setGifMode(true)
@@ -249,68 +250,55 @@ function NewCommentScreen(props, route) {
       }
 
       const tagUsersFunction = (name, token, id) => {
-        analytics().logEvent('addUsersToTagList', {user_name: props.currentUser.name});
-        
-            const userTagList = name
-            setUserTagList(userTagList)
-            setUserTagId(id)
-            setUserTokenList(token)
-            setIsUserTagged(true)
-    
+        analytics().logEvent('addUsersToTagList', { user_name: props.currentUser.name });
+      
+        if (userTagList.length >= 5) {
+          // Only allow up to 5 tagged users
+          return;
+        }
+      
+        setUserTagList([...userTagList, name]);
+        setUserTagIdList([...userTagIdList, id]);
+        setUserTokenList([...userTokenList, token]);
+        setIsUserTagged(true);
       }
-
+    
       const sendNotificationForTag = async () => {
         if (userTokenList) {
-            const taggerName = props.currentUser.name
-            const name = userTagList
-            const token = userTokenList
-            if (awayTeam  != undefined) {const notification = '(' + name + '): ' + taggerName + ' tagged you in a comment on the ' + awayTeam + "/" + homeTeam + " game"
-              sendNotification(notification, token)
-              console.log(token)}
-              else {const notification = '(' + name + '): ' + taggerName + ' tagged you in a comment'
-              sendNotification(notification, token)}
-            //const users = await firebase.firestore().collection("users").get();
-            //users.docs.map((user) => sendNotification(user.data().token))
+          const taggerName = props.currentUser.name;
+          const notificationText = awayTeam
+            ? `(${userTagList.join(', ')}): ${taggerName} tagged you in a post on the ${awayTeam}/${homeTeam} game`
+            : `(${userTagList.join(', ')}): ${taggerName} tagged you in a post`;
+      
+          userTokenList.forEach(token => {
+            sendNotification(notificationText, token);
+          });
         }
-      }
+      };
 
       const storeNotificationForTag = async () => {
-
-        if (userTagId) {
-          console.log(userTagId)
-          if (awayTeam  != undefined) {
-            const likedName = props.currentUser.name
-            firebase.firestore()
-              .collection("users")
-              .doc(userTagId)
-              .collection("notifications")
-              .add({
-                  notificationType: "tag",
-                  creation: firebase.firestore.FieldValue.serverTimestamp(),
-                  otherUserId: firebase.auth().currentUser.uid,
-                  otherUsername: likedName,
-                  notificationText: 'tagged you in a comment on the ' + awayTeam + "/" + homeTeam + " game"
-                  })
+        userTagIdList.forEach(id => {
+          if (awayTeam) {
+            const likedName = props.currentUser.name;
+            firebase.firestore().collection('users').doc(id).collection('notifications').add({
+              notificationType: 'tag',
+              creation: firebase.firestore.FieldValue.serverTimestamp(),
+              otherUserId: firebase.auth().currentUser.uid,
+              otherUsername: likedName,
+              notificationText: `tagged you in a post on the ${awayTeam}/${homeTeam} game`,
+            });
           } else {
-            console.log(userTagId)
-            const likedName = props.currentUser.name
-            firebase.firestore()
-              .collection("users")
-              .doc(userTagId)
-              .collection("notifications")
-              .add({
-                  notificationType: "tag",
-                  creation: firebase.firestore.FieldValue.serverTimestamp(),
-                  otherUserId: firebase.auth().currentUser.uid,
-                  otherUsername: likedName,
-                  notificationText: 'tagged you in a comment',
-                  })
+            const likedName = props.currentUser.name;
+            firebase.firestore().collection('users').doc(id).collection('notifications').add({
+              notificationType: 'tag',
+              creation: firebase.firestore.FieldValue.serverTimestamp(),
+              otherUserId: firebase.auth().currentUser.uid,
+              otherUsername: likedName,
+              notificationText: 'tagged you in a post',
+            });
           }
-       } else {
-
-       }
-        
-      }
+        });
+      };
 
       const uploadImage = async () => {
         if( image == null ) {
@@ -462,10 +450,14 @@ function NewCommentScreen(props, route) {
                     <View style={styles.feedItem}>
                         <TouchableOpacity style={styles.postLeftContainer}
                             onPress={() => {tagUsersFunction(item.name, item.token, item.id); this.bs.current.snapTo(1)}}>
-                            <Image 
-                                style={styles.profilePhotoPostContainer}
-                                source={{uri: item.name ? item.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
-                            />
+                            <Avatar
+                              source={{ uri: item.userImg }}
+                              icon={{ name: 'person', type: 'ionicons', color: 'white' }}
+                              overlayContainerStyle={{ backgroundColor: '#95B9C7' }}
+                              style={{ marginRight: "2%", width: 50, height: 50 }}
+                              rounded
+                              size="medium"
+                          />
                             <Text style={styles.searchResultsText}>{item.name}</Text>
                         </TouchableOpacity>
                     </View> }
@@ -523,9 +515,13 @@ function NewCommentScreen(props, route) {
                 }}>
                   <Text style={styles.gameText}>Replying to @{posterName}</Text>
                   <View style={styles.typePostContainer}>
-                    <Image 
-                      style={styles.profilePhotoPostContainer}
-                      source={{uri: userData ? userData.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                    <Avatar
+                      source={{ uri: userData ? userData.userImg : null }}
+                      icon={{ name: 'person', type: 'ionicons', color: 'white' }}
+                      overlayContainerStyle={{ backgroundColor: '#95B9C7' }}
+                      style={{ marginRight: "2%", width: 50, height: 50 }}
+                      rounded
+                      size="medium"
                     />  
                     <TextInput
                       placeholder="Type your comment here..."
@@ -538,16 +534,20 @@ function NewCommentScreen(props, route) {
                     />
         
                   </View>
-                  {isUserTagged == true ?
-                  <View style={styles.tagListContainer}>
-                    <Text style={{ fontWeight: 'bold' }}>Tagged friends: </Text>
-                    <Text style={{ color: '#0033cc', fontWeight: 'bold' }}>@{userTagList}</Text>
-                    <TouchableOpacity onPress={() => {removeTaggedUser()}}>
-                        <Feather name="x-circle" size={16} color ="red" />
-                    </TouchableOpacity>
-                  </View>
-                  :
-                    null}
+                  {isUserTagged && (
+                    <View>
+                      <Text style={{ fontWeight: 'bold' }}>Tagged friends: </Text>
+                      {userTagList.map((name, index) => (
+                        <View style={styles.tagListContainer}>
+                          <Text key={userTagIdList[index]} style={{ color: '#0033cc', fontWeight: 'bold' }}>@{name} </Text>
+                          <TouchableOpacity onPress={() => removeTaggedUser(index)}>
+                            <Feather name="x-circle" size={16} color="red" />
+                          </TouchableOpacity>
+                        </View>
+                        
+                      ))}
+                    </View>
+                  )}
                   <View style={styles.addCommentButton}>
                       <View style={styles.galleryContainer}>
                           <TouchableOpacity onPress={() => {this.bs.current.snapTo(0); setGifFunction()}}>
@@ -620,13 +620,6 @@ AddImage: {
 StatusWrapper: {
   justifyContent: 'center',
   alignItems: 'center',
-},
-profilePhotoPostContainer: {
-  backgroundColor: "#e1e2e6",
-  width: 50,
-  height: 50,
-  borderRadius: 40,
-  marginRight: "2%",
 },
 shareText: {
   fontSize: 16,

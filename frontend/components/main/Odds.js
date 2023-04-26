@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Alert, ActivityIndicator, Image, TextInput, Dimensions, FlatList, TouchableOpacity, ScrollView } from 'react-native';
+import { Text, View, StyleSheet, Alert, ActivityIndicator, Image, TextInput, Dimensions, Linking, FlatList, TouchableOpacity, ScrollView } from 'react-native';
 
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -373,18 +373,23 @@ function Odds(props) {
             icon: formula1Icon
         },
         {
-            sport: 'UFC',
+            sport: 'PGA',
             id: '7',
+            icon: golfIcon
+        },
+        {
+            sport: 'UFC',
+            id: '8',
             icon: mmaIcon
         },
         {
             sport: 'Futures',
-            id: '8',
+            id: '9',
             icon: futureIcon
         },
         {
             sport: 'Fantasy',
-            id: '9',
+            id: '10',
             icon: fantasyIcon
         },
      
@@ -445,9 +450,19 @@ function Odds(props) {
 
       const openAdLink = () => {
 
-        analytics().logEvent('adClick', {user_name: props.currentUser.name});
+        analytics().logEvent('adClick', {user_name: props.currentUser.name, sponsorName: 'betalytics'});
             
         }
+
+        /*<View style={styles.adView}>
+        <BannerAd
+            unitId={adUnitId}
+            sizes={[BannerAdSize.FULL_BANNER]}
+            requestOptions={{
+                requestNonPersonalizedAdsOnly: true,
+            }}
+        />
+    </View> */
         
 
       const renderSportsListItem = ({ item }) => (
@@ -853,7 +868,7 @@ function Odds(props) {
             :
             sportGames == golfGames  ?
             <View style={styles.gameHeaderContainer}>
-                <Text style={styles.gameHeaderText}>US Masters Tournament Lines - Winner</Text>
+                <Text style={styles.gameHeaderText}>US Tournament Lines - Winner</Text>
             </View>
             :
             sportGames == props.formula1Races  ?
@@ -1195,16 +1210,19 @@ function Odds(props) {
 
             
             }
-            <View style={styles.adView}>
-                <BannerAd
-                    unitId={adUnitId}
-                    sizes={[BannerAdSize.FULL_BANNER]}
-                    requestOptions={{
-                        requestNonPersonalizedAdsOnly: true,
-                    }}
-                />
-                
+
+            <View  style={styles.adView}>
+                <TouchableOpacity
+                    style={{ width: "90%", height: 60, alignItems: 'center'}}
+                    onPress={() => { Linking.openURL('https://betalytics.com'); openAdLink()}} >
+                    <Image 
+                        source={require('../../assets/betalyticsBanner.png')}
+                        style={{   width: "100%", height: 60, resizeMode: 'stretch'  }}
+                    />
+                </TouchableOpacity>
             </View>
+                
+       
            
             
          
@@ -1441,8 +1459,7 @@ const styles = StyleSheet.create({
     adView: {
         justifyContent: "center",
         alignItems: 'center'
-
-    },
+      },
     gameDateContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',

@@ -64,6 +64,8 @@ function EditProfileScreen(props) {
             'Your profile has been updated successfully.'
         );
         })
+
+        getUser()
     }
 
     const uploadImage = async () => {
@@ -130,7 +132,7 @@ function EditProfileScreen(props) {
       
         getUser();
         
-    },[userData]);
+    },[]);
 
     useEffect(() => {
 

@@ -391,7 +391,7 @@ function Contest(props) {
                 <TouchableOpacity onPress={() => {countWebsiteClicks()}}>
                     <Image 
                         style={{ width: 130, height: 100, marginBottom: 5, marginRight: 10, }}
-                        source={require('../../assets/snackMagicAd.png')}
+                        source={require('../../assets/betalyticsBanner.png')}
                     />
                 </TouchableOpacity>
             </View>

@@ -901,9 +901,9 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
     }
   })
 
-  exports.getGolfGameData = functions.pubsub.schedule('every 5 minutes').onRun(async() => {
+  exports.getGolfGameData = functions.pubsub.schedule('every 60 minutes').onRun(async() => {
     try {
-      const response = await axios.get('https://api.the-odds-api.com/v4/sports/golf_masters_tournament_winner/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&Format=american&dateFormat=iso')
+      const response = await axios.get('https://api.the-odds-api.com/v4/sports/golf_pga_championship_winner/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&Format=american&dateFormat=iso')
         .then(result => {
           result.data.forEach(game => {
 
@@ -916,7 +916,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
                   playerName: game.bookmakers[0].markets[0].outcomes[i].name,
                   playerOdds: Math.round((game.bookmakers[0].markets[0].outcomes[i].price -1) * 100),
                   gameId: game.id,
-                  sport: 'US Masters Tournament Lines - Winner',
+                  sport: 'US Tournament Lines - Winner',
                   
                 }, { merge:true });
             }

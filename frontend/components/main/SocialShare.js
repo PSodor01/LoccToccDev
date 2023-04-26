@@ -74,7 +74,7 @@ function SocialShare(props) {
                     <FontAwesome5 style={styles.headerLogo} name="comment-dollar"  />
                 </View>
                 <View>
-                        {sport == 'US Masters Tournament Lines - Winner' || 
+                        {sport == 'US Tournament Lines - Winner' || 
                         sport == 'NFL - Suberbowl Champion' ||
                         sport == 'MLB - World Series Winner' ||
                         sport == 'NBA - Championship' ||
@@ -291,7 +291,20 @@ function SocialShare(props) {
                                         <Image resizeMode={"cover"} source={{uri: postImg}} style={styles.postImage}/> 
                                     </View>
                                         : null}
-                                {userTagList != null ? <Text style={{ color: '#0033cc', fontWeight: 'bold' }}>@{userTagList}</Text> : null}
+                                {userTagList ? 
+                                    <View>
+                                        {Array.isArray(userTagList) ? 
+                                        userTagList.map((user, index) => (
+                                            <Text key={index} style={{ color: '#0033cc', fontWeight: 'bold' }}>@{user}</Text>
+                                        )) 
+                                        :
+                                        userTagList.split(',').map((user, index) => (
+                                            <Text key={index} style={{ color: '#0033cc', fontWeight: 'bold' }}>@{user.trim()}</Text>
+                                        ))
+                                        }
+                                    </View>
+                                    : null
+                                    }
                             </View>
                             <View style={styles.postFooterContainer}>
                                 <View style={styles.likeContainer}>

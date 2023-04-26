@@ -7,6 +7,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 
 import { useNavigation } from '@react-navigation/native';
 import email from 'react-native-email'
+import { Avatar } from 'react-native-elements';
 
 import moment from 'moment';
 
@@ -581,6 +582,7 @@ function Profile(props) {
             })
 
         analytics().logEvent('deletePost', {user_name: props.currentUser.name});
+        fetchData()
     })
     }
 
@@ -611,10 +613,14 @@ function Profile(props) {
     return (
         <View style={styles.container}>
             <View style={{ alignItems: 'center' }}>
-                <Image 
-                    style={styles.profilePhotoContainer}
-                    source={{uri: user ? user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
-                />
+                <Avatar
+                        source={{ uri: user.userImg }}
+                        icon={{ name: 'person', type: 'ionicons', color: 'white' }}
+                        overlayContainerStyle={{ backgroundColor: '#95B9C7' }}
+                        style={{ width: 100,height: 100, borderRadius: 40, marginTop: 10, overflow: 'hidden', marginBottom: 10, }}
+                        rounded
+                        size="large"
+                    />
                 <Text style={styles.profileNameText}>{user.name}</Text>
             </View>
             <View style={{ marginLeft: "5%" }}>
@@ -719,9 +725,13 @@ function Profile(props) {
                     renderItem={({ item }) => (
                         <View style={styles.feedItem}>
                             <View style={styles.postLeftContainer}>
-                            <Image 
-                                style={styles.profilePhotoPostContainer}
-                                source={{uri: user ? user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                            <Avatar
+                                source={{ uri: user.userImg }}
+                                icon={{ name: 'person', type: 'ionicons', color: 'white' }}
+                                overlayContainerStyle={{ backgroundColor: '#95B9C7' }}
+                                style={{ width: 50, height: 50 }}
+                                rounded
+                                size="medium"
                             />
                             </View>
                             <View style={styles.postRightContainer}>
@@ -732,7 +742,20 @@ function Profile(props) {
                                 <View style={styles.postContentContainer}>
                                     {item.caption != null ? <Text style={styles.captionText}>{item.caption}</Text> : null}
                                     {item.downloadURL != "blank" ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
-                                    {item.userTagList != null ? <Text style={{ color: '#0033cc', fontWeight: 'bold' }}>@{item.userTagList}</Text> : null}
+                                    {item.userTagList ? 
+                                    <View>
+                                        {Array.isArray(item.userTagList) ? 
+                                        item.userTagList.map((user, index) => (
+                                            <Text key={index} style={{ color: '#0033cc', fontWeight: 'bold' }}>@{user}</Text>
+                                        )) 
+                                        :
+                                        item.userTagList.split(',').map((user, index) => (
+                                            <Text key={index} style={{ color: '#0033cc', fontWeight: 'bold' }}>@{user.trim()}</Text>
+                                        ))
+                                        }
+                                    </View>
+                                    : null
+                                    }
                                 </View>
                                 <View style={styles.postFooterContainer}>
                                 { item.liked == true ?
@@ -833,16 +856,6 @@ const styles = StyleSheet.create({
     },
     containerGallery: {
         flex: 1
-    },
-    profilePhotoContainer: {
-        backgroundColor: "#e1e2e6",
-        width: 100,
-        height: 100,
-        borderRadius: 40,
-        marginTop: 10,
-        overflow: 'hidden',
-        marginBottom: 10,
-
     },
     followingButton: {
         borderColor: "#e1e2e6",
@@ -960,12 +973,6 @@ const styles = StyleSheet.create({
         paddingBottom: 4,
         marginLeft: "2%",
         justifyContent: 'space-between'
-    },
-    profilePhotoPostContainer: {
-        backgroundColor: "#e1e2e6",
-        width: 50,
-        height: 50,
-        borderRadius: 40,
     },
     postFooterContainer: {
         flexDirection: 'row',

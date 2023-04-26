@@ -5,6 +5,8 @@ import { useNavigation } from '@react-navigation/native';
 
 import analytics from "@react-native-firebase/analytics";
 
+import { Avatar } from 'react-native-elements';
+
 import firebase from 'firebase'
 require("firebase/firestore")
 
@@ -39,6 +41,7 @@ function FollowerScreen(props) {
             }
             
             setFollowing(following)
+            console.log(following)
 
         }
             firebase.firestore()
@@ -85,9 +88,13 @@ function FollowerScreen(props) {
                     <View style={styles.feedItem}>
                         <TouchableOpacity style={styles.postLeftContainer}
                         onPress={() => props.navigation.navigate("Profile", {uid: item.follower})}>
-                            <Image 
-                                style={styles.profilePhotoPostContainer}
-                                source={{uri: item.user ? item.user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                            <Avatar
+                                source={{ uri: item.user ? item.user.userImg : null }}
+                                icon={{ name: 'person', type: 'ionicons', color: 'white' }}
+                                overlayContainerStyle={{ backgroundColor: '#95B9C7' }}
+                                style={{ width: 50, height: 50 }}
+                                rounded
+                                size="medium"
                             />
                             <Text style={styles.searchResultsText}>{item.user ? item.user.name : null}</Text>
                         </TouchableOpacity>
@@ -111,12 +118,6 @@ const styles = StyleSheet.create({
         padding: 5,
         alignSelf: 'center',
         marginLeft: "5%",
-    },
-    profilePhotoPostContainer: {
-        backgroundColor: "#e1e2e6",
-        width: 50,
-        height: 50,
-        borderRadius: 40,
     },
     feedItem:{
         padding:4,

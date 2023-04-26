@@ -64,16 +64,7 @@ function BlogHomeScreen(props) {
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={ItemView}
             />  
-           <View style={styles.adView}>
-                <BannerAd
-                    unitId={adUnitId}
-                    sizes={[BannerAdSize.FULL_BANNER]}
-                    requestOptions={{
-                        requestNonPersonalizedAdsOnly: true,
-                    }}
-                />
-                
-            </View>
+           
         </View>
             
             

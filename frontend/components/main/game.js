@@ -14,6 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import BottomSheet, { BottomSheetModal, BottomSheetModalProvider, BottomSheetFlatList } from "@gorhom/bottom-sheet";
 
 import email from 'react-native-email'
+import { Avatar } from 'react-native-elements';
 
 import analytics from "@react-native-firebase/analytics";
 import { BannerAdSize, TestIds, BannerAd } from 'react-native-google-mobile-ads';
@@ -43,6 +44,7 @@ function game(props) {
     const [isOpen, setIsOpen] = useState(false);
     const [combinedData, setCombinedData] = useState([]);
     const [fullscreen, setFullscreen] = useState(false);
+    const [selectedImage, setSelectedImage] = useState(null);
 
 
     const {gameId, gameDate, homeTeam, awayTeam, homeMoneyline, awayMoneyline, homeSpread, awaySpread, homeSpreadOdds, awaySpreadOdds, over, overOdds, under, underOdds, drawMoneyline, sport, fantasyTopic, awayTeamLogo, homeTeamLogo} = props.route.params;
@@ -114,8 +116,10 @@ function game(props) {
             setLoading(false)
     };
 
-    const handleImagePress = () => {
-        setFullscreen(!fullscreen);
+    const handleImagePress = (url) => {
+        setSelectedImage(url);
+        setFullscreen(true);
+        analytics().logEvent('fullSizeImage', {user_name: props.currentUser.name});
       };
 
     const storeLike = (postId, userId) => {
@@ -519,9 +523,10 @@ function game(props) {
 
     const openAdLink = () => {
 
-        analytics().logEvent('adClick', {user_name: props.currentUser.name, adPartner: 'Kutt'});
+        analytics().logEvent('adClick', {user_name: props.currentUser.name, sponsorName: 'betalytics'});
             
-    }
+        }
+
 
     const handleReportPostEmail = (name, caption) => {
 
@@ -874,9 +879,13 @@ function game(props) {
                 <View style={styles.feedItem}>
                     <TouchableOpacity
                     onPress={() => props.navigation.navigate("Profile", {uid: item.user.id})}>
-                    <Image 
-                        style={styles.profilePhotoCommentContainer}
-                        source={{uri: item.user ? item.user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                    <Avatar
+                        source={{ uri: item.user.userImg }}
+                        icon={{ name: 'person', type: 'ionicons', color: 'white' }}
+                        overlayContainerStyle={{ backgroundColor: '#95B9C7' }}
+                        style={{ width: 50, height: 50 }}
+                        rounded
+                        size="medium"
                     />
                 </TouchableOpacity>
                 <View style={styles.postRightContainer}>
@@ -889,21 +898,35 @@ function game(props) {
                         {item.caption != null ? <Text style={styles.captionText}>{item.caption}</Text> : null}
                         {item.downloadURL != "blank" ?
                             <View style={styles.postPictureContainer}>
-                                <TouchableOpacity onPress={handleImagePress}>
-                                    <Image
+                                <TouchableOpacity onPress={() => handleImagePress(item.downloadURL)}>
+                                <Image
                                     resizeMode="cover"
                                     source={{ uri: item.downloadURL }}
                                     style={styles.postImage}
-                                    />
+                                />
                                 </TouchableOpacity>
                                 <Modal visible={fullscreen} transparent={true}>
-                                    <TouchableOpacity style={styles.fullscreenContainer} onPress={handleImagePress}>
-                                        <Image resizeMode="contain" source={{ uri: item.downloadURL }} style={styles.fullscreenImage} />
-                                    </TouchableOpacity>
+                                <TouchableOpacity style={styles.fullscreenContainer} onPress={() => setFullscreen(false)}>
+                                    <Image resizeMode="contain" source={{ uri: selectedImage }} style={styles.fullscreenImage} />
+                                </TouchableOpacity>
                                 </Modal>
                             </View>
-                            : null}
-                        {item.userTagList != null ? <Text style={{ color: '#0033cc', fontWeight: 'bold' }}>@{item.userTagList}</Text> : null}
+                            : null
+                        }
+                            {item.userTagList ? 
+                                <View>
+                                    {Array.isArray(item.userTagList) ? 
+                                    item.userTagList.map((user, index) => (
+                                        <Text key={index} style={{ color: '#0033cc', fontWeight: 'bold' }}>@{user}</Text>
+                                    )) 
+                                    :
+                                    item.userTagList.split(',').map((user, index) => (
+                                        <Text key={index} style={{ color: '#0033cc', fontWeight: 'bold' }}>@{user.trim()}</Text>
+                                    ))
+                                    }
+                                </View>
+                                : null
+                            }
                     </View>
                     <View style={styles.postFooterContainer}>
                         { item.liked == true ?
@@ -1038,7 +1061,7 @@ function game(props) {
                 />
             : null}
 
-            {sport == 'US Masters Tournament Lines - Winner' || 
+            {sport == 'US Tournament Lines - Winner' || 
             sport == 'NFL - Suberbowl Champion' ||
             sport == 'MLB - World Series Winner' ||
             sport == 'NBA - Championship' ||
@@ -1126,7 +1149,6 @@ function game(props) {
                         </View>
                     </View>
                     
-
                     :
 
                     sport == 'Fantasy' ?
@@ -1134,10 +1156,9 @@ function game(props) {
                         <Text style={styles.gameHeaderText}>{sport} - {fantasyTopic}</Text>
                     </View>
                     
-
                     :
 
-                    sport == 'US Masters Tournament Lines - Winner' ?
+                    sport == 'US Tournament Lines - Winner' ?
                     listAllPlayers == false ?
                     <FlatList 
                         data = {golfGames.sort((a, b) => parseFloat(a.playerOdds) - parseFloat(b.playerOdds)).slice(0, 5)}
@@ -1145,7 +1166,6 @@ function game(props) {
                     />
 
                     :
-
                     
                     <FlatList 
                         data = {golfGames.sort((a, b) => parseFloat(a.playerOdds) - parseFloat(b.playerOdds))}
@@ -1435,16 +1455,7 @@ function game(props) {
             }
 
             
-            <View style={styles.adView}>
-                <BannerAd
-                    unitId={bannerAdUnitId}
-                    sizes={[BannerAdSize.FULL_BANNER]}
-                    requestOptions={{
-                        requestNonPersonalizedAdsOnly: true,
-                    }}
-                />
-                
-            </View>
+         
 
             <TouchableOpacity
                 activeOpacity={0.8}
@@ -1453,9 +1464,22 @@ function game(props) {
             >
                 <MaterialCommunityIcons name={"plus"} size={30} color="white" />
             </TouchableOpacity>
+
+            <View  style={styles.adView}>
+                <TouchableOpacity
+                    style={{ width: "90%", height: 60, alignItems: 'center', backgroundColor: "red"}}
+                    onPress={() => { Linking.openURL('https://betalytics.com'); openAdLink()}} >
+                    <Image 
+                        source={require('../../assets/betalyticsBanner.png')}
+                        style={{   width: "100%", height: 60, resizeMode: 'stretch'  }}
+                    />
+                </TouchableOpacity>
+            </View> 
             
         </View>
         </BottomSheetModalProvider>
+
+        
         )
 }
 

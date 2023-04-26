@@ -7,6 +7,8 @@ import email from 'react-native-email'
 import Icon from 'react-native-vector-icons/Ionicons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 
+import { Avatar } from 'react-native-elements';
+
 import moment from 'moment';
 
 import * as Device from 'expo-device';
@@ -138,9 +140,13 @@ function Comment(props, route) {
             <View style={styles.originalPostContainer}>
                 <TouchableOpacity
                     onPress={() => props.navigation.navigate("Profile", {uid: posterId})}>
-                    <Image 
-                        style={styles.profilePhotoPostContainer}
-                        source={{ uri: posterImg ? posterImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                    <Avatar
+                        source={{ uri: posterImg ? posterImg : null }}
+                        icon={{ name: 'person', type: 'ionicons', color: 'white' }}
+                        overlayContainerStyle={{ backgroundColor: '#95B9C7' }}
+                        style={{ width: 70, height: 70 }}
+                        rounded
+                        size="medium"
                     />
                 </TouchableOpacity>
                 <View style={styles.postRightContainer}>
@@ -190,9 +196,13 @@ function Comment(props, route) {
                             <View style={styles.feedItem}>
                                 <TouchableOpacity
                                 onPress={() => props.navigation.navigate("Profile", {uid: item.user.uid})}>
-                                <Image 
-                                    style={styles.profilePhotoCommentContainer}
-                                    source={{uri: item.user ? item.user.userImg : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'}}
+                                <Avatar
+                                    source={{ uri: item.user.userImg }}
+                                    icon={{ name: 'person', type: 'ionicons', color: 'white' }}
+                                    overlayContainerStyle={{ backgroundColor: '#95B9C7' }}
+                                    style={{ width: 50, height: 50 }}
+                                    rounded
+                                    size="medium"
                                 />
                             </TouchableOpacity>
                             <View style={styles.postRightContainer}>
@@ -203,7 +213,13 @@ function Comment(props, route) {
                                 <View style={styles.postContentContainer}>
                                     {item.text != "" ? <Text style={styles.captionText}>{item.text}</Text> : null}
                                     {item.downloadURL != "blank" ? <Image source={{uri: item.downloadURL}} style={styles.postImage}/> : null}
-                                    {item.userTagList != null ? <Text style={{ color: '#0033cc', fontWeight: 'bold' }}>@{item.userTagList}</Text> : null}
+                                    {item.userTagList != null ? 
+                                        <View>
+                                            {item.userTagList.map((user, index) => (
+                                                <Text key={index} style={{ color: '#0033cc', fontWeight: 'bold' }}>@{user}</Text>
+                                            ))}
+                                        </View>
+                                    : null}
                                 </View>
                                 <View style={styles.postFooterContainer}>
                                     <TouchableOpacity
@@ -223,17 +239,6 @@ function Comment(props, route) {
                     
                 )}
             />
-            <View style={styles.adView}>
-                <BannerAd
-                    unitId={adUnitId}
-                    sizes={[BannerAdSize.FULL_BANNER]}
-                    requestOptions={{
-                        requestNonPersonalizedAdsOnly: true,
-                    }}
-                />
-                
-            </View>
-          
         </View>
     )
 }
@@ -251,18 +256,6 @@ const styles = StyleSheet.create({
       flex: 1,
       backgroundColor: "#fff",
     },
-  profilePhotoPostContainer: {
-    width: 70,
-    height: 70,
-    borderRadius: 40,
-    backgroundColor: "#e1e2e6",
-  },
-  profilePhotoCommentContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 40,
-    backgroundColor: "#e1e2e6"
-  },
   originalPostContainer: {
     borderBottomWidth: 1,
     borderBottomColor: "#e1e2e6",
