@@ -4,12 +4,13 @@ import 'react-native-gesture-handler';
 import * as firebase from 'firebase'
 
 import * as Updates from 'expo-updates';
+import * as Notifications from 'expo-notifications';
 
-import React, { Component } from 'react';
-
+import React, { Component, useEffect, useState} from 'react';
 import { View, ActivityIndicator, StyleSheet, Text, TouchableOpacity, Alert, Image } from 'react-native'
 
 import { FontAwesome5 } from "@expo/vector-icons";
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 
 import 'expo-dev-client';
 
@@ -75,6 +76,7 @@ import Contest from './components/main/Contest'
 import BlogHomeScreen from './components/main/BlogHome'
 import BlogDetailsScreen from './components/main/BlogDetails'
 import BlogHome from './components/main/BlogHome';
+import HeaderRight from './components/buttons/HeaderRight'
 
 
 const Stack = createStackNavigator();
@@ -83,6 +85,7 @@ const MainStack = createStackNavigator();
 
 if (Text.defaultProps == null) Text.defaultProps ={};
 Text.defaultProps.allowFontScaling=false;
+
 
 const MainStackScreen = ({navigation, props}) => (
   <MainStack.Navigator 
@@ -114,14 +117,7 @@ const MainStackScreen = ({navigation, props}) => (
             <FontAwesome5 name="bars" size={24} color="#fff" />
           </TouchableOpacity>
         ),
-        headerRight: () => (
-          <TouchableOpacity 
-            style={{ alignItems: "flex-end", marginRight:16 }}
-            onPress={() => navigation.navigate('Notifications')}
-            >
-            <FontAwesome5 name="heart" size={24} color="#fff" />
-          </TouchableOpacity>
-        ),
+        headerRight: () => <HeaderRight navigation={navigation} />,
         
         
       }}
@@ -132,7 +128,26 @@ const MainStackScreen = ({navigation, props}) => (
         component={Feed}
        
           />
-      <MainStack.Screen name="Search" component={Search}/>
+      <MainStack.Screen name="Search" component={Search}
+         options={{
+          headerTitle: () => (
+            <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+                <Text style={styles.headerName}>locctocc </Text>
+                <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
+            </View>
+          ),
+          headerTitleAlign: "center",
+          headerLeft: () => (
+            <TouchableOpacity 
+            style={{ alignItems: "flex-end", marginLeft:16 }}
+            onPress={() => navigation.goBack()}
+            >
+            <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+          </TouchableOpacity>
+          ),
+          
+        }}
+      />
       <MainStack.Screen name="Notifications" component={NotificationsScreen}
          options={{
           headerTitle: () => (

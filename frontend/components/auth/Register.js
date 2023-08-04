@@ -26,6 +26,7 @@ const sendNotification = async (tokens, notification) => {
         sound: 'default',
         body: notification ? notification : '',
         badge: nextBadgeNumber,
+        priority: 'high', 
     };
     for (const token of tokens) {
         message.to = token;

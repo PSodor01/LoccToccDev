@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native'
 
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
 import { Avatar } from 'react-native-elements';
 
@@ -26,30 +27,29 @@ function Search(props) {
 
     
 
-    const ItemView = ({item}) => {
+    const ItemView = ({ item }) => {
         return (
-            <View>
-            {item.id == 'L3PlC2PXHYMYHsrdUtaS6tr7Ij13' || item.id == '74hAr9c5tYcERhqgyVbcwrPEr083' || item.id == 'RMcwiYPubdMzYX9uNcjwvVlXmMx1'?
-                null :
-
-                <View style={styles.feedItem}>
-                    <TouchableOpacity style={styles.postLeftContainer}
-                        onPress={() => props.navigation.navigate("Profile", {uid: item.id})}>
-                        <Avatar
-                            source={{ uri: item.userImg }}
-                            icon={{ name: 'person', type: 'ionicons', color: 'white' }}
-                            overlayContainerStyle={{ backgroundColor: '#95B9C7' }}
-                            style={{ width: 50, height: 50 }}
-                            rounded
-                            size="medium"
-                        />
-                        <Text style={styles.searchResultsText}>{item.name}</Text>
-                    </TouchableOpacity>
-                </View> }
-            </View>
-            
-        )
-    }
+          <View>
+            {item.id === 'L3PlC2PXHYMYHsrdUtaS6tr7Ij13' || item.id === '74hAr9c5tYcERhqgyVbcwrPEr083' || item.id === 'RMcwiYPubdMzYX9uNcjwvVlXmMx1' ? null : (
+              <View style={styles.feedItem}>
+                <TouchableOpacity
+                  style={styles.postLeftContainer}
+                  onPress={() => props.navigation.navigate('Profile', { uid: item.id })}
+                >
+                  <View style={[styles.avatarContainer, { backgroundColor: '#95B9C7' }]}>
+                    {item.userImg ? (
+                      <Image source={{ uri: item.userImg }} style={styles.avatarImage} />
+                    ) : (
+                      <Ionicons name="person" size={24} color="white" />
+                    )}
+                  </View>
+                  <Text style={styles.searchResultsText}>{item.name}</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        );
+      };
 
     const searchFilter = (text) => {
         if (text) {
@@ -174,6 +174,18 @@ const styles = StyleSheet.create({
     showAllButton: {
         marginRight: "2%",
     },
+    avatarContainer: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      avatarImage: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+      },
     adView: {
         alignItems: 'center',
         justifyContent: 'center',

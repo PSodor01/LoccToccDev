@@ -188,7 +188,7 @@ function Comment(props, route) {
             <FlatList
                 data={combinedData}
                 ListEmptyComponent={EmptyListMessage}
-                onRefresh={() => fetchData()}
+                onRefresh={() => fetchCombinedData()}
                 refreshing={loading}
                 renderItem={({ item }) => (
                     <View>
@@ -239,6 +239,16 @@ function Comment(props, route) {
                     
                 )}
             />
+            <View style={styles.adView}>
+                <BannerAd
+                    unitId={adUnitId}
+                    sizes={[BannerAdSize.FULL_BANNER]}
+                    requestOptions={{
+                        requestNonPersonalizedAdsOnly: true,
+                    }}
+                />
+                
+            </View>
         </View>
     )
 }

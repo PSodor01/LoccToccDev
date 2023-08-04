@@ -46,7 +46,7 @@ export default class ContactUsScreen extends React.Component {
         const to = ['support@locctocc.com'] // string or array of email addresses
         email(to, {
             // Optional additional arguments
-            subject: 'LoccTocc Support Ticket',
+            subject: 'Locctocc Support Ticket',
             body: ''
         }).catch(console.error)
     }
@@ -55,7 +55,7 @@ export default class ContactUsScreen extends React.Component {
         const to = ['feedback@locctocc.com'] // string or array of email addresses
         email(to, {
             // Optional additional arguments
-            subject: 'LoccTocc Feedback',
+            subject: 'Locctocc Feedback',
             body: ''
         }).catch(console.error)
     }
@@ -64,7 +64,7 @@ export default class ContactUsScreen extends React.Component {
         const to = ['partnerships@locctocc.com'] // string or array of email addresses
         email(to, {
             // Optional additional arguments
-            subject: 'LoccTocc Partners',
+            subject: 'Locctocc Partners',
             body: ''
         }).catch(console.error)
     }

@@ -172,6 +172,19 @@ function Feed(props) {
                 likesCount: firebase.firestore.FieldValue.increment(1)
             })
 
+        const likedName = props.currentUser.name
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .collection("notifications")
+            .add({
+                notificationType: "hammer",
+                creation: firebase.firestore.FieldValue.serverTimestamp(),
+                otherUserId: firebase.auth().currentUser.uid,
+                otherUsername: likedName,
+                notificationText: 'hammered your post',
+              })
+
     }
 
     const onDislikePress = (userId, postId) => {
@@ -214,6 +227,19 @@ function Feed(props) {
             .doc(firebase.auth().currentUser.uid)
             .set({})
 
+        const likedName = props.currentUser.name
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .collection("notifications")
+            .add({
+                notificationType: "fade",
+                creation: firebase.firestore.FieldValue.serverTimestamp(),
+                otherUserId: firebase.auth().currentUser.uid,
+                otherUsername: likedName,
+                notificationText: 'faded your post',
+                })
+
     }
 
     const onUnfadePress = (userId, postId) => {
@@ -247,6 +273,7 @@ function Feed(props) {
             sound: 'default',
             body: notification ? notification : '',
             badge: nextBadgeNumber,
+            priority: 'high', 
         };
         
         await fetch('https://exp.host/--/api/v2/push/send', {
@@ -314,7 +341,7 @@ function Feed(props) {
 
     const openAdLink = () => {
 
-        analytics().logEvent('adClick', {user_name: props.currentUser.name, adPartner: 'Kutt'});
+        analytics().logEvent('adClick', {user_name: props.currentUser.name, adPartner: 'Betalytics'});
             
     }
 
@@ -394,15 +421,16 @@ function Feed(props) {
                     : 
                     <View style={styles.feedItem}>
                         <TouchableOpacity
-                            onPress={() => props.navigation.navigate("Profile", {uid: item.user.id})}>
-                            <Avatar
-                                source={{ uri: item.user.userImg }}
-                                icon={{ name: 'person', type: 'ionicons', color: 'white' }}
-                                overlayContainerStyle={{ backgroundColor: '#95B9C7' }}
-                                style={{ width: 50, height: 50 }}
-                                rounded
-                                size="medium"
-                            />
+                            style={styles.postLeftContainer}
+                            onPress={() => props.navigation.navigate("Profile", {uid: item.user.id})}
+                        >
+                            <View style={[styles.avatarContainer, { backgroundColor: '#95B9C7' }]}>
+                            {item.user.userImg ? (
+                                <Image source={{ uri: item.user.userImg }} style={styles.avatarImage} />
+                            ) : (
+                                <Ionicons name="person" size={24} color="white" />
+                            )}
+                            </View>
                         </TouchableOpacity>
                         <View style={styles.postRightContainer}>
                             <View style={styles.postHeaderContainer}>
@@ -526,15 +554,16 @@ function Feed(props) {
                     <View
                          style={styles.feedItem}>
                         <TouchableOpacity
-                            onPress={() => props.navigation.navigate("Profile", {uid: item.user.id})}>
-                            <Avatar
-                                source={{ uri: item.user.userImg }}
-                                icon={{ name: 'person', type: 'ionicons', color: 'white' }}
-                                overlayContainerStyle={{ backgroundColor: '#95B9C7' }}
-                                style={{ width: 50, height: 50 }}
-                                rounded
-                                size="medium"
-                            />
+                            style={styles.postLeftContainer}
+                            onPress={() => props.navigation.navigate("Profile", {uid: item.user.id})}
+                        >
+                            <View style={[styles.avatarContainer, { backgroundColor: '#95B9C7' }]}>
+                            {item.user.userImg ? (
+                                <Image source={{ uri: item.user.userImg }} style={styles.avatarImage} />
+                            ) : (
+                                <Ionicons name="person" size={24} color="white" />
+                            )}
+                            </View>
                         </TouchableOpacity>
                         <View style={styles.postRightContainer}>
                             <View style={styles.postHeaderContainer}>
@@ -755,9 +784,18 @@ function Feed(props) {
                         <Ionicons name="arrow-up-circle" size={30} color="#009387" />
                     </TouchableOpacity>
                 )}
+                <BannerAd
+                    unitId={adUnitId}
+                    sizes={[BannerAdSize.FULL_BANNER]}
+                    requestOptions={{
+                        requestNonPersonalizedAdsOnly: true,
+                    }}
+                />
+                
                 
                 
             </View>
+            
         </View>
             
 
@@ -893,6 +931,21 @@ const styles = StyleSheet.create({
         fontSize: 16,
         paddingTop: 10,
     },
+    postLeftContainer: {
+        flexDirection: "row",
+    },
+    avatarContainer: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      avatarImage: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+      },
     adView: {
         alignItems: 'center',
         justifyContent: 'center',

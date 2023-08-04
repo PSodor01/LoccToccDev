@@ -167,6 +167,7 @@ function AddPostScreen(props) {
         sound: 'default',
         body: notification ? notification : '',
         badge: nextBadgeNumber,
+        priority: 'high', 
     };
     
     await fetch('https://exp.host/--/api/v2/push/send', {

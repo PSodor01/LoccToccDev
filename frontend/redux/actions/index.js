@@ -10,6 +10,7 @@ import { USER_STATE_CHANGE,
     NCAAF_GAMES_STATE_CHANGE, 
     MLB_GAMES_STATE_CHANGE,
     NBA_GAMES_STATE_CHANGE, 
+    WNBA_GAMES_STATE_CHANGE, 
     NCAAB_GAMES_STATE_CHANGE,
     EPL_GAMES_STATE_CHANGE,
     MMA_GAMES_STATE_CHANGE,
@@ -31,6 +32,7 @@ import { USER_STATE_CHANGE,
     import { SnapshotViewIOSComponent } from 'react-native'
     require('firebase/firestore')
 
+   
 
 export function clearData() {
     return ((dispatch) => {
@@ -146,22 +148,7 @@ export function fetchFades() {
     })
 }
 
-export function fetchAllUsers() {
-    return ((dispatch) => {
-        firebase.firestore()
-            .collection("users")
-            .onSnapshot((snapshot) => {
-                let allUsers = snapshot.docs.map(doc => {
-                    const data = doc.data();
-                    const id = doc.id;
-                    return { id, ...data }
-                })
-                dispatch({ type: ALL_USERS_STATE_CHANGE, allUsers });
-                for(let i = 0; i < allUsers.length; i++){
-                }
-            })
-    })
-}
+
 
 /*export function fetchAllPosts(uid) {
     var ourDate = new Date();
@@ -209,25 +196,42 @@ export function fetchUsersData(uid, getPosts) {
     })
 }
 
-export function fetchMLBGames() {
+export function fetchAllUsers() {
     return ((dispatch) => {
         firebase.firestore()
-            .collection("mlb")
-            .orderBy('gameDate', 'desc')
+            .collection("users")
             .onSnapshot((snapshot) => {
-                let mlbGames = snapshot.docs.map(doc => {
+                let allUsers = snapshot.docs.map(doc => {
                     const data = doc.data();
                     const id = doc.id;
                     return { id, ...data }
                 })
-                dispatch({ type: MLB_GAMES_STATE_CHANGE, mlbGames });
-                for(let i = 0; i < mlbGames.length; i++){
+                dispatch({ type: ALL_USERS_STATE_CHANGE, allUsers });
+                for(let i = 0; i < allUsers.length; i++){
                 }
             })
     })
 }
 
-/*export function fetchNFLGames() {
+export function fetchMLBGames() {
+    return (dispatch) => {
+      dispatch({ type: MLB_GAMES_STATE_CHANGE, mlbGames: [] }); // Clear previous games if any
+    
+      firebase.firestore()
+        .collection("mlb")
+        .orderBy('gameDate', 'desc')
+        .onSnapshot((snapshot) => {
+          let mlbGames = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            const id = doc.id;
+            return { id, ...data };
+          });
+          dispatch({ type: MLB_GAMES_STATE_CHANGE, mlbGames });
+        });
+    };
+  }
+
+export function fetchNFLGames() {
     return ((dispatch) => {
         firebase.firestore()
             .collection("nfl")
@@ -261,9 +265,9 @@ export function fetchNCAAFGames() {
                 }
             })
     })
-}*/
+}
 
-export function fetchNBAGames() {
+/*export function fetchNBAGames() {
     return ((dispatch) => {
         firebase.firestore()
             .collection("nba")
@@ -276,6 +280,24 @@ export function fetchNBAGames() {
                 })
                 dispatch({ type: NBA_GAMES_STATE_CHANGE, nbaGames });
                 for(let i = 0; i < nbaGames.length; i++){
+                }
+            })
+    })
+} */
+
+export function fetchWNBAGames() {
+    return ((dispatch) => {
+        firebase.firestore()
+            .collection("wnba")
+            .orderBy('gameDate', 'desc')
+            .onSnapshot((snapshot) => {
+                let wnbaGames = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    return { id, ...data }
+                })
+                dispatch({ type: WNBA_GAMES_STATE_CHANGE, wnbaGames });
+                for(let i = 0; i < wnbaGames.length; i++){
                 }
             })
     })
@@ -295,7 +317,7 @@ export function fetchNBAGames() {
                 dispatch({ type: NCAAB_GAMES_STATE_CHANGE, ncaabGames });
             })
     })
-} */
+} 
 
 export function fetchNHLGames() {
     return ((dispatch) => {
@@ -313,7 +335,7 @@ export function fetchNHLGames() {
                 }
             })
     })
-}
+} */
 
 export function fetchMMAGames() {
     return ((dispatch) => {

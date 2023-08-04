@@ -61,9 +61,7 @@ function SocialShare(props) {
       };
             
 
-    const testFunction = () => {
-        console.log(showInstagramStory)
-    }
+    
 
 
     return (

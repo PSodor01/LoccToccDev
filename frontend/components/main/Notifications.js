@@ -1,34 +1,119 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Linking, Image } from 'react-native'
+import { View, Text, TextInput, FlatList, Alert, TouchableOpacity, StyleSheet, Linking, Image } from 'react-native'
 
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 import analytics from "@react-native-firebase/analytics";
 import { BannerAdSize, TestIds, BannerAd } from 'react-native-google-mobile-ads';
 
 import * as Notifications from 'expo-notifications'
+import * as Device from 'expo-device';
 
 import moment from 'moment';
 
+import firebase from 'firebase'
+require("firebase/firestore")
+
 import { connect } from 'react-redux'
 
-function NotificationsScreen(props) {
+function NotificationsScreen({ route, ...props }) {
     const [notifications, setNotifications] = useState([]);
+    const [notificationValue, setNotificationValue] = useState();
+    const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-8519029912093094/8258310490';
+  
+  
+    useEffect(() => {
+      // Rest of the code
+  
+      // Reset badge count when leaving the Notifications screen
+      return () => {
+        Notifications.setBadgeCountAsync(0);
+      };
+    }, []);
 
-    const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-8519029912093094/8258310490'
+    useEffect(() => {
 
-    const resetBadgeCount = async () => {
+        firebase
+        .firestore()
+        .collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .get()
+        .then((snapshot) => {
+        if (snapshot.exists) {
+            let userData = snapshot.data();
+            if (userData.hasOwnProperty("token")) {
+                setNotificationValue(true);
+            } else {
+                setNotificationValue(false);
+            }
+        } else {
+                setNotificationValue(false);
+        }
+        });
 
-        await Notifications.setBadgeCountAsync(0);
+        analytics().logScreenView({ screen_name: 'Settings', screen_class: 'Settings',  user_name: props.currentUser.name})
         
+    }, [])
+
+    const notificationFunction = async () => {
+        let token;
+        if (Device.isDevice) {
+          const { status: existingStatus } = await Notifications.getPermissionsAsync();
+          let finalStatus = existingStatus;
+          if (existingStatus !== 'granted') {
+            const { status } = await Notifications.requestPermissionsAsync({
+              ios: {
+                allowAlert: true,
+                allowBadge: true,
+                allowSound: true,
+                allowAnnouncements: true,
+              },
+            });
+            finalStatus = status;
+          }
+          if (finalStatus !== 'granted') {
+            //alert('Failed to get push token for push notification!');
+            return;
+          }
+          token = (await Notifications.getExpoPushTokenAsync()).data;
+        } else {
+          alert('Must use physical device for Push Notifications');
+         
+        }
+      
+        if (token) {
+          const res = await firebase
+            .firestore()
+            .collection('users')
+            .doc(firebase.auth().currentUser.uid)
+            .set({ token }, { merge: true });
+      
+          Alert.alert('Success!', 'You will now receive push notifications from locctocc!');
+          setNotificationValue(true)
+        }
+      
+        if (Platform.OS === 'android') {
+          Notifications.setNotificationChannelAsync('default', {
+            name: 'default',
+            importance: Notifications.AndroidImportance.MAX,
+            vibrationPattern: [0, 250, 250, 250],
+            lightColor: '#FF231F7C',
+          });
+        }
+      
+        return token;
+      };
+
+    const toggleSwitch = () => {
+        notificationFunction();
+        analytics().logEvent('userTurnOnNotifications', {user_name: props.currentUser.name});
     }
     
 
     useEffect(() => {
 
-        resetBadgeCount()
-        
         analytics().logScreenView({ screen_name: 'Notifications', screen_class: 'Notifications',  user_name: props.currentUser.name})
 
         const hammerIcon = (<Ionicons name={"hammer"} size={28} color={"#AAA9AD"}/>);
@@ -115,7 +200,7 @@ function NotificationsScreen(props) {
         );
       };
 
-  
+   
 
     const openAdLink = () => {
 
@@ -125,6 +210,23 @@ function NotificationsScreen(props) {
     
     return (
         <View style={styles.textInputContainer}>
+            <View >
+            {notificationValue == true ? null :
+                <TouchableOpacity
+                    onPress={() => {toggleSwitch()}}
+                    style={{
+                        backgroundColor: '#1DA1F2', 
+                        paddingHorizontal: 16,
+                        paddingVertical: 10,
+                        borderRadius: 20,
+                        marginTop: 10,
+                        alignSelf: 'center', 
+                    }}>
+                    <Text style={{ color: 'white', fontWeight: 'bold' }}>Turn On Notifications</Text>
+                </TouchableOpacity>
+            }
+                
+            </View>
             <FlatList
                 data = {notifications}
                 ListEmptyComponent={EmptyListMessage}

@@ -1,13 +1,14 @@
 import { combineReducers } from 'redux'
 import { user } from './user'
 import { users } from './users'
-import { nflGames, ncaafGames, mlbGames, golfGames, ncaabGames, nbaGames, nhlGames, mmaGames, eplGames, futureGames, teamLogos, blogDetails, formula1Teams, formula1Races, formula1Drivers, formula1Rankings} from './games'
+import { nflGames, ncaafGames, mlbGames, golfGames, ncaabGames, nbaGames, wnbaGames, nhlGames, mmaGames, eplGames, futureGames, teamLogos, blogDetails, formula1Teams, formula1Races, formula1Drivers, formula1Rankings} from './games'
 
 const Reducers = combineReducers({
     userState: user,
     usersState: users,
     nflGamesState: nflGames,
     nbaGamesState: nbaGames,
+    wnbaGamesState: wnbaGames,
     nhlGamesState: nhlGames,
     ncaafGamesState: ncaafGames,
     mlbGamesState: mlbGames,

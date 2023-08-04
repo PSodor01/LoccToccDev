@@ -149,6 +149,7 @@ function NewCommentScreen(props, route) {
             sound: 'default',
             body: notification ? notification : '',
             badge: nextBadgeNumber,
+            priority: 'high', 
         };
         
         await fetch('https://exp.host/--/api/v2/push/send', {
@@ -267,8 +268,8 @@ function NewCommentScreen(props, route) {
         if (userTokenList) {
           const taggerName = props.currentUser.name;
           const notificationText = awayTeam
-            ? `(${userTagList.join(', ')}): ${taggerName} tagged you in a post on the ${awayTeam}/${homeTeam} game`
-            : `(${userTagList.join(', ')}): ${taggerName} tagged you in a post`;
+            ? `(${userTagList.join(', ')}): ${taggerName} tagged you in a comment on the ${awayTeam}/${homeTeam} game`
+            : `(${userTagList.join(', ')}): ${taggerName} tagged you in a comment`;
       
           userTokenList.forEach(token => {
             sendNotification(notificationText, token);
@@ -285,7 +286,7 @@ function NewCommentScreen(props, route) {
               creation: firebase.firestore.FieldValue.serverTimestamp(),
               otherUserId: firebase.auth().currentUser.uid,
               otherUsername: likedName,
-              notificationText: `tagged you in a post on the ${awayTeam}/${homeTeam} game`,
+              notificationText: `tagged you in a comment on the ${awayTeam}/${homeTeam} game`,
             });
           } else {
             const likedName = props.currentUser.name;
@@ -294,7 +295,7 @@ function NewCommentScreen(props, route) {
               creation: firebase.firestore.FieldValue.serverTimestamp(),
               otherUserId: firebase.auth().currentUser.uid,
               otherUsername: likedName,
-              notificationText: 'tagged you in a post',
+              notificationText: 'tagged you in a comment',
             });
           }
         });

@@ -20,27 +20,26 @@ const SettingsScreen = (props) => {
 
     useEffect(() => {
 
-        firebase.firestore()
+        firebase
+        .firestore()
         .collection("users")
         .doc(firebase.auth().currentUser.uid)
         .get()
         .then((snapshot) => {
-            if (snapshot.exists) {
-                let userData = snapshot.data();
-                let token = userData.token
-                if(token == 'blank') {
-                    setIsEnabled(false)
-                    setNotificationValue(false)
-                } else {
-                    setIsEnabled(true)
-                    setNotificationValue(true)
-                }
-            }
-            else {
-                setNotificationValue(false)
+        if (snapshot.exists) {
+            let userData = snapshot.data();
+            if (userData.hasOwnProperty("token")) {
+                setNotificationValue(true);
+                setIsEnabled(true)
+            } else {
+                setNotificationValue(false);
                 setIsEnabled(false)
             }
-        })
+        } else {
+                setNotificationValue(false);
+                setIsEnabled(false)
+        }
+        });
 
         analytics().logScreenView({ screen_name: 'Settings', screen_class: 'Settings',  user_name: props.currentUser.name})
         
@@ -63,50 +62,53 @@ const SettingsScreen = (props) => {
             setNotificationValue(true);
 
             let token;
-        if (Device.isDevice) {
-          const { status: existingStatus } = await Notifications.getPermissionsAsync();
-          let finalStatus = existingStatus;
-          if (existingStatus !== 'granted') {
-            const { status } = await Notifications.requestPermissionsAsync({
-                ios: {
+            if (Device.isDevice) {
+              const { status: existingStatus } = await Notifications.getPermissionsAsync();
+              let finalStatus = existingStatus;
+              if (existingStatus !== 'granted') {
+                const { status } = await Notifications.requestPermissionsAsync({
+                  ios: {
                     allowAlert: true,
                     allowBadge: true,
                     allowSound: true,
                     allowAnnouncements: true,
-                },
-            });
-            finalStatus = status;
-          }
-          if (finalStatus !== 'granted') {
-            //alert('Failed to get push token for push notification!');
-            return;
-          }
-          token = (await Notifications.getExpoPushTokenAsync()).data;
-        } else {
-          alert('Must use physical device for Push Notifications');
-        }
-
-        if (token) {
-            const res = await firebase.firestore()
-                .collection("users")
+                  },
+                });
+                finalStatus = status;
+              }
+              if (finalStatus !== 'granted') {
+                //alert('Failed to get push token for push notification!');
+                return;
+              }
+              token = (await Notifications.getExpoPushTokenAsync()).data;
+            } else {
+              alert('Must use physical device for Push Notifications');
+             
+            }
+          
+            if (token) {
+              const res = await firebase
+                .firestore()
+                .collection('users')
                 .doc(firebase.auth().currentUser.uid)
-                .set({token}, { merge:true });
+                .set({ token }, { merge: true });
+          
+              Alert.alert('Success!', 'You will now receive push notifications from locctocc!');
+              setNotificationValue(true)
+            }
+          
+            if (Platform.OS === 'android') {
+              Notifications.setNotificationChannelAsync('default', {
+                name: 'default',
+                importance: Notifications.AndroidImportance.MAX,
+                vibrationPattern: [0, 250, 250, 250],
+                lightColor: '#FF231F7C',
+              });
+            }
+          
+            return token;
         }
-        
-      
-        if (Platform.OS === 'android') {
-          Notifications.setNotificationChannelAsync('default', {
-            name: 'default',
-            importance: Notifications.AndroidImportance.MAX,
-            vibrationPattern: [0, 250, 250, 250],
-            lightColor: '#FF231F7C',
-          });
-        }
-      
-        return token;
-            
-        }
-    }
+          };
 
 
 

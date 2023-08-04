@@ -139,11 +139,48 @@ exports.testLike = functions.firestore.document('/likes/{userId}/userLikes/{post
         }
   
         await collectionRef.doc(game.id).set(updateData, { merge: true });
+
+        try {
+          const response2 = axios.get(`https://api.the-odds-api.com/v4/sports/baseball_mlb/events/${game.id}/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=batter_home_runs,batter_hits,batter_total_bases,batter_rbis,batter_runs_scored,batter_hits_runs_rbis,batter_stolen_bases,pitcher_strikeouts,pitcher_hits_allowed,pitcher_walks,pitcher_earned_runs,pitcher_outs&oddsFormat=american&dateFormat=iso`)
+          .then(result => {
+            result.data.bookmakers[0].markets.forEach(market => {
+              const propType = market.key;
+              market.outcomes.forEach(outcome => {
+  
+                if (outcome.name === 'Over') {
+                const writeResult = admin.firestore().collection("mlb").doc("props").collection('players').doc(outcome.description).set({
+                  gameId: result.data.id,
+                  playerPropName: outcome.description,
+                  [`${propType}Total`]: outcome.point,
+                  [`${propType}OverOdds`]: outcome.price,
+                }, { merge:true });
+              } 
+              else if (outcome.name === 'Under') {
+                const writeResult = admin.firestore().collection("mlb").doc("props").collection('players').doc(outcome.description).set({
+                  [`${propType}UnderOdds`]: outcome.price,
+                }, { merge:true });
+  
+              }
+  
+  
+              });
+            });
+          });
+        } catch (error) {
+          console.error(error);
+        }
+
       }
+
+      
+
     } catch (err) {
       console.error(err.message);
     }
-  });
+
+        
+
+  })
 
 exports.getMLBScoresData = functions.pubsub.schedule('every 10 minutes').onRun(async() => {
   try {
@@ -196,7 +233,7 @@ exports.getLogoData = functions.pubsub.schedule('every 2 minutes').timeZone('Ame
   }catch(err) {console.error(err.message)}
 })
 
-exports.getNFLGameData = functions.pubsub.schedule('every 2 minutes').onRun(async() => {
+exports.getNFLGameData = functions.pubsub.schedule('every 10 minutes').onRun(async() => {
   try {
     const response = await axios.get('https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso');
     const games = response.data;
@@ -275,7 +312,7 @@ exports.getNFLGameData = functions.pubsub.schedule('every 2 minutes').onRun(asyn
 
   })
 
-  exports.getNFLScoresData = functions.pubsub.schedule('every 2 minutes').onRun(async() => {
+  exports.getNFLScoresData = functions.pubsub.schedule('every 10 minutes').onRun(async() => {
     try {
       const response = await axios.get('https://api.the-odds-api.com/v4/sports/americanfootball_nfl/scores/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&dateFormat=iso')
       .then(result => {
@@ -297,7 +334,7 @@ exports.getNFLGameData = functions.pubsub.schedule('every 2 minutes').onRun(asyn
     }
   })
 
-exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(async() => {
+exports.getNCAAFGameData = functions.pubsub.schedule('every 10 minutes').onRun(async() => {
   try {
     const response = await axios.get('https://api.the-odds-api.com/v4/sports/americanfootball_ncaaf/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso');
     const games = response.data;
@@ -376,7 +413,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
 
   })
 
-  exports.getNCAAFScoresData = functions.pubsub.schedule('every 2 minutes').onRun(async() => {
+  exports.getNCAAFScoresData = functions.pubsub.schedule('every 10 minutes').onRun(async() => {
     try {
       const response = await axios.get('https://api.the-odds-api.com/v4/sports/americanfootball_ncaaf/scores/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&dateFormat=iso')
       .then(result => {
@@ -397,7 +434,8 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
       console.error(err.message);
     }
   })
-  exports.getNBAGameData = functions.pubsub.schedule('every 2 minutes').onRun(async() => {
+
+  exports.getNBAGameData = functions.pubsub.schedule('every 10 minutes').onRun(async() => {
     try {
       const response = await axios.get('https://api.the-odds-api.com/v4/sports/basketball_nba/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso');
       const games = response.data;
@@ -533,6 +571,114 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
     } catch(err) {
       console.error(err.message);
     }
+  })
+
+  exports.getWNBAScoresData = functions.pubsub.schedule('every 2 minutes').onRun(async() => {
+    try {
+      const response = await axios.get('https://api.the-odds-api.com/v4/sports/basketball_wnba/scores/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&dateFormat=iso')
+      .then(result => {
+        result.data.forEach(game => {
+          const [away, home] = game.scores;
+  
+          const writeResult = admin
+            .firestore()
+            .collection("wnba")
+            .doc(game.id)
+            .set({
+              awayScore: game.away_team === away.name ? away.score : home.score,
+              homeScore: game.away_team === away.name ? home.score : away.score,
+            }, { merge:true });
+        })
+      })
+    } catch(err) {
+      console.error(err.message);
+    }
+  })
+
+  exports.getWNBAGameData = functions.pubsub.schedule('every 20 minutes').onRun(async() => {
+    try {
+      const response = await axios.get('https://api.the-odds-api.com/v4/sports/basketball_wnba/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso');
+      const games = response.data;
+      const collectionRef = admin.firestore().collection('wnba');
+  
+      for (const game of games) {
+        const markets = {};
+        const updateData = {
+          gameId: game.id,
+          sport: game.sport_key,
+          gameDate: game.commence_time,
+          awayTeam: game.away_team,
+          homeTeam: game.home_team,
+          awayMoneyline: null,
+          homeMoneyline: null,
+          awaySpread: null,
+          homeSpread: null,
+          awaySpreadOdds: null,
+          homeSpreadOdds: null,
+          over: null,
+          under: null,
+          overOdds: null,
+          underOdds: null,
+        };
+  
+        for (const bookmaker of game.bookmakers) {
+          for (const market of bookmaker.markets) {
+            if (!markets[market.key]) {
+              markets[market.key] = [];
+            }
+            markets[market.key].push({ bookmaker: bookmaker, outcomes: market.outcomes });
+          }
+        }
+  
+        if (markets.h2h) {
+          const marketH2h = markets.h2h[0];
+          const awayIndex = marketH2h.outcomes.findIndex(o => o.name === game.away_team);
+          const homeIndex = 1 - awayIndex;
+          updateData.awayMoneyline = marketH2h.outcomes[awayIndex].price;
+          updateData.homeMoneyline = marketH2h.outcomes[homeIndex].price;
+        }
+  
+        if (markets.spreads) {
+          let marketSpread;
+          let awayIndex;
+          let homeIndex;
+          for (const market of markets.spreads) {
+            if (market.outcomes.findIndex(o => o.name === game.away_team) !== -1) {
+              marketSpread = market;
+              awayIndex = market.outcomes.findIndex(o => o.name === game.away_team);
+              homeIndex = 1 - awayIndex;
+              break;
+            }
+          }
+          if (marketSpread) {
+            updateData.awaySpread = marketSpread.outcomes[awayIndex].point;
+            updateData.homeSpread = marketSpread.outcomes[homeIndex].point;
+            updateData.awaySpreadOdds = marketSpread.outcomes[awayIndex].price;
+            updateData.homeSpreadOdds = marketSpread.outcomes[homeIndex].price;
+          }
+        }
+  
+        if (markets.totals) {
+          const marketTotal = markets.totals[0];
+          updateData.over = marketTotal.outcomes[0].point;
+          updateData.under = marketTotal.outcomes[1].point;
+          updateData.overOdds = marketTotal.outcomes[0].price;
+          updateData.underOdds = marketTotal.outcomes[1].price;
+        }
+  
+        await collectionRef.doc(game.id).set(updateData, { merge: true });
+
+
+      }
+
+      
+
+    } catch (err) {
+      console.error(err.message);
+    }
+
+        
+
   })
 
   exports.getNCAABGameData = functions.pubsub.schedule('every 2 minutes').onRun(async () => {
@@ -690,8 +836,8 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
       .then(result => {
         result.data.forEach(game => {
   
-          if (game.bookmakers.findIndex((item) => item.key === 'barstool') > -1) {
-            let i = game.bookmakers.findIndex((item) => item.key === 'barstool')
+          if (game.bookmakers.findIndex((item) => item.key === 'betmgm') > -1) {
+            let i = game.bookmakers.findIndex((item) => item.key === 'betmgm')
             if (game.away_team == game.bookmakers[0].markets[0].outcomes[0].name) {
 
             const writeResult = admin
@@ -768,7 +914,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
     }
   })
 
-  exports.getNHLGameData = functions.pubsub.schedule('every 2 minutes').onRun(async() => {
+  exports.getNHLGameData = functions.pubsub.schedule('every 10 minutes').onRun(async() => {
     try {
       const response = await axios.get('https://api.the-odds-api.com/v4/sports/icehockey_nhl/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso');
       const games = response.data;
@@ -903,7 +1049,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
 
   exports.getGolfGameData = functions.pubsub.schedule('every 60 minutes').onRun(async() => {
     try {
-      const response = await axios.get('https://api.the-odds-api.com/v4/sports/golf_pga_championship_winner/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&Format=american&dateFormat=iso')
+      const response = await axios.get('https://api.the-odds-api.com/v4/sports/golf_the_open_championship_winner/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&Format=american&dateFormat=iso')
         .then(result => {
           result.data.forEach(game => {
 
@@ -1028,29 +1174,6 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
           })
         })
     }catch(err) {console.error(err.message)}
-
-    try {
-      const response = await axios.get('https://api.the-odds-api.com/v4/sports/soccer_epl/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&Format=american&dateFormat=iso')
-        .then(result => {
-          result.data.forEach(game => {
-
-            for (let i = 0; i < game.bookmakers[0].markets[0].outcomes.length; i++){
-                const writeResult = admin
-                .firestore()
-                .collection('futures')
-                .doc(game.bookmakers[0].markets[0].outcomes[i].name)
-                .set({
-                  playerName: game.bookmakers[0].markets[0].outcomes[i].name,
-                  playerOdds: game.bookmakers[0].markets[0].outcomes[i].price > 2 ? Math.round((game.bookmakers[0].markets[0].outcomes[i].price -1)*100) : Math.round(-100/(game.bookmakers[0].markets[0].outcomes[i].price -1)),
-                  gameId: game.id,
-                  sport: 'FIFA World Cup Winner',
-                  
-                }, { merge:true });
-            }
-          })
-        })
-    }catch(err) {console.error(err.message)}
-
 
   
     })
@@ -1396,6 +1519,25 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
 
   })
 
+  
+  exports.deleteWNBAGameData = functions.pubsub.schedule('59 10 * * *').timeZone('America/New_York').onRun(async() => {
+    try {
+      const writeResult = admin
+          .firestore()
+          .collection('wnba')
+          .get()
+          .then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            doc.ref.delete({});
+          });
+        });
+
+      
+  }catch(err) {console.error(err.message)}
+
+  })
+
+
   exports.deleteNCAABGameData = functions.pubsub.schedule('59 10 * * *').timeZone('America/New_York').onRun(async() => {
     try {
       const writeResult = admin
@@ -1416,6 +1558,21 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 2 minutes').onRun(as
       const writeResult = admin
           .firestore()
           .collection('epl')
+          .get()
+          .then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            doc.ref.delete({});
+          });
+        });
+  }catch(err) {console.error(err.message)}
+
+  })
+
+  exports.deleteFuturesGameData = functions.pubsub.schedule('59 10 * * *').timeZone('America/New_York').onRun(async() => {
+    try {
+      const writeResult = admin
+          .firestore()
+          .collection('futures')
           .get()
           .then((querySnapshot) => {
           querySnapshot.forEach((doc) => {

@@ -5,14 +5,14 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
-import Entypo from 'react-native-vector-icons/Entypo'
+import Entypo from 'react-native-vector-icons/Entypo';
 
 import firebase from 'firebase'
 import "firebase/firestore";
 
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { fetchUser, fetchUserFollowing, fetchUserBlocking, fetchUserNotifications, fetchAllUsers, fetchLikes, fetchFades, fetchMLBGames, fetchMMAGames, fetchFutureGames, fetchBlogDetails, fetchTeamLogos, fetchNHLGames, fetchNBAGames, fetchGolfGames, fetchEPLGames, fetchFormula1Teams, fetchFormula1Races, fetchFormula1Drivers, fetchFormula1Rankings, fetchContestStatus, clearData } from '../redux/actions/index'
+import { fetchUser, fetchUserFollowing, fetchUserBlocking, fetchUserNotifications, fetchAllUsers, fetchLikes, fetchFades, fetchMLBGames, fetchMMAGames, fetchFutureGames, fetchBlogDetails, fetchTeamLogos, fetchWNBAGames, fetchGolfGames, fetchNFLGames, fetchNCAAFGames, fetchFormula1Teams, fetchFormula1Races, fetchFormula1Drivers, fetchFormula1Rankings, fetchContestStatus, clearData } from '../redux/actions/index'
 
 import FeedScreen from './main/Feed'
 import ProfileScreen from './main/Profile'
@@ -41,6 +41,11 @@ const getTabBarVisibility = (route) => {
 
 export class Main extends Component {
     componentDidMount() {
+
+        this.setState({ loading: true }, () => {
+            this.props.fetchMLBGames();
+          });
+          
         this.props.clearData();
         this.props.fetchUser();
         this.props.fetchUserFollowing();
@@ -50,7 +55,8 @@ export class Main extends Component {
         this.props.fetchFades();
         this.props.fetchAllUsers();
         this.props.fetchMLBGames();
-        this.props.fetchEPLGames();
+        this.props.fetchNFLGames();
+        this.props.fetchNCAAFGames();
         this.props.fetchGolfGames();
         this.props.fetchFutureGames();
         this.props.fetchTeamLogos();
@@ -59,8 +65,7 @@ export class Main extends Component {
         this.props.fetchFormula1Races();
         this.props.fetchFormula1Drivers();
         this.props.fetchFormula1Rankings();
-        this.props.fetchNHLGames();
-        this.props.fetchNBAGames();
+        this.props.fetchWNBAGames();
         this.props.fetchMMAGames();
         this.props.fetchContestStatus();
 
@@ -105,37 +110,26 @@ export class Main extends Component {
                     }}
                     />
                 <Tab.Screen 
+                name="Blog Home" 
+                component={BlogHomeScreen} 
+                navigation={this.props.navigation}
+                options={{
+                    tabBarLabel: 'Blog',
+                    tabBarColor: '#009387',
+                    tabBarIcon: ({ color, size }) => (
+                    <Entypo name="open-book" color={"#FFD700"} size={30}  style={{ marginBottom: 5 }}/>
+                    ),
+                    }} />
+                <Tab.Screen 
                     name="Contest" 
                     component={ContestScreen}
                     options={{
                         tabBarLabel: 'Leaders',
                         tabBarColor: '#009387',
                         tabBarIcon: ({ color, size }) => (
-                            <FontAwesome5 name="trophy" color={"#FFD700"} size={20} />
+                            <FontAwesome5 name="trophy" color={color} size={20} />
                         ),
                     }}/>
-                <Tab.Screen 
-                    name="Blog Home" 
-                    component={BlogHomeScreen} 
-                    navigation={this.props.navigation}
-                    options={{
-                        tabBarLabel: 'Blog',
-                        tabBarColor: '#009387',
-                        tabBarIcon: ({ color, size }) => (
-                            <Entypo name="open-book" color={color} size={26} />
-                        ),
-                }} />
-                <Tab.Screen 
-                    name="Search" 
-                    component={SearchScreen} 
-                    navigation={this.props.navigation}
-                    options={{
-                        tabBarLabel: 'Explore',
-                        tabBarColor: '#009387',
-                        tabBarIcon: ({ color, size }) => (
-                            <MaterialCommunityIcons name="magnify" color={color} size={26} />
-                        ),
-                    }} />
                 <Tab.Screen 
                     name="Profile" 
                     component={ProfileScreen} 
@@ -162,11 +156,11 @@ export class Main extends Component {
 
 const mapStateToProps = (store) => ({
     currentUser: store.userState.currentUser,
-    nbaGames: store.nbaGamesState.nbaGames,
-    nhlGames: store.nhlGamesState.nhlGames,
+    wnbaGames: store.wnbaGamesState.wnbaGames,
     mmaGames: store.mmaGamesState.mmaGames,
     mlbGames: store.mlbGamesState.mlbGames,
-    eplGames: store.eplGamesState.eplGames,
+    nflGames: store.nflGamesState.nflGames,
+    ncaafGames: store.ncaafGamesState.ncaafGames,
     golfGames: store.golfGamesState.golfGames,
     futureGames: store.futureGamesState.futureGames,
     teamLogos: store.teamLogosState.teamLogos,
@@ -178,6 +172,6 @@ const mapStateToProps = (store) => ({
    
 
 })
-const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUser, fetchUserFollowing, fetchUserNotifications, fetchAllUsers, fetchUserBlocking, fetchLikes, fetchFades, fetchMLBGames, fetchMMAGames, fetchFutureGames, fetchBlogDetails, fetchTeamLogos, fetchNBAGames, fetchNHLGames, fetchGolfGames, fetchEPLGames, fetchFormula1Teams, fetchFormula1Races, fetchFormula1Drivers, fetchFormula1Rankings,  fetchContestStatus, clearData }, dispatch);
+const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUser, fetchUserFollowing, fetchUserNotifications, fetchAllUsers, fetchUserBlocking, fetchLikes, fetchFades, fetchMLBGames, fetchMMAGames, fetchFutureGames, fetchBlogDetails, fetchTeamLogos, fetchWNBAGames, fetchGolfGames, fetchFormula1Teams, fetchFormula1Races, fetchFormula1Drivers, fetchNFLGames, fetchNCAAFGames, fetchFormula1Rankings,  fetchContestStatus, clearData }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchProps)(Main);

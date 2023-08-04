@@ -293,6 +293,7 @@ function Profile(props) {
             sound: 'default',
             body: notification ? notification : '',
             badge: nextBadgeNumber,
+            priority: 'high', 
         };
         
         await fetch('https://exp.host/--/api/v2/push/send', {
@@ -613,14 +614,13 @@ function Profile(props) {
     return (
         <View style={styles.container}>
             <View style={{ alignItems: 'center' }}>
-                <Avatar
-                        source={{ uri: user.userImg }}
-                        icon={{ name: 'person', type: 'ionicons', color: 'white' }}
-                        overlayContainerStyle={{ backgroundColor: '#95B9C7' }}
-                        style={{ width: 100,height: 100, borderRadius: 40, marginTop: 10, overflow: 'hidden', marginBottom: 10, }}
-                        rounded
-                        size="large"
-                    />
+                <View style={[styles.avatarContainer, { backgroundColor: '#95B9C7' }]}>
+                {user.userImg ? (
+                    <Image source={{ uri: user.userImg }} style={styles.avatarImage} />
+                ) : (
+                    <Ionicons name="person" size={24} color="white" />
+                )}
+                </View>
                 <Text style={styles.profileNameText}>{user.name}</Text>
             </View>
             <View style={{ marginLeft: "5%" }}>
@@ -725,14 +725,13 @@ function Profile(props) {
                     renderItem={({ item }) => (
                         <View style={styles.feedItem}>
                             <View style={styles.postLeftContainer}>
-                            <Avatar
-                                source={{ uri: user.userImg }}
-                                icon={{ name: 'person', type: 'ionicons', color: 'white' }}
-                                overlayContainerStyle={{ backgroundColor: '#95B9C7' }}
-                                style={{ width: 50, height: 50 }}
-                                rounded
-                                size="medium"
-                            />
+                                <View style={[styles.avatarListContainer, { backgroundColor: '#95B9C7' }]}>
+                                    {user.userImg ? (
+                                        <Image source={{ uri: user.userImg }} style={styles.avatarListImage} />
+                                    ) : (
+                                        <Ionicons name="person" size={24} color="white" />
+                                    )}
+                                    </View>
                             </View>
                             <View style={styles.postRightContainer}>
                                 <View style={styles.postHeaderContainer}>
@@ -1005,6 +1004,30 @@ const styles = StyleSheet.create({
         marginTop: 5,
         color: "grey",
         fontSize: 10,
+    },
+    avatarContainer: {
+        width: 100,
+        height: 100,
+        borderRadius: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+    avatarImage: {
+        width: 100,
+        height: 100,
+        borderRadius: 40,
+    },
+    avatarListContainer: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+    avatarListImage: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
     },
     
    

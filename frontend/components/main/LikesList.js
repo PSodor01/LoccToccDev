@@ -90,7 +90,7 @@ function LikesList(props) {
                         <TouchableOpacity style={styles.postLeftContainer}
                             onPress={() => props.navigation.navigate("Profile", {uid: item.id})}>
                             <Avatar
-                                source={{ uri: item.user.userImg }}
+                                source={{ uri: item.user ? item.user.userImg : null }}
                                 icon={{ name: 'person', type: 'ionicons', color: 'white' }}
                                 overlayContainerStyle={{ backgroundColor: '#95B9C7' }}
                                 style={{ width: 50, height: 50 }}

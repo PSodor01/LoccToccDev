@@ -185,6 +185,19 @@ function game(props) {
                 likesCount: firebase.firestore.FieldValue.increment(1)
             })
 
+        const likedName = props.currentUser.name
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .collection("notifications")
+            .add({
+                notificationType: "hammer",
+                creation: firebase.firestore.FieldValue.serverTimestamp(),
+                otherUserId: firebase.auth().currentUser.uid,
+                otherUsername: likedName,
+                notificationText: 'hammered your post on the ' + awayTeam + "/" + homeTeam + " game",
+              })
+
     }
 
     const onDislikePress = (userId, postId) => {
@@ -227,6 +240,19 @@ function game(props) {
             .doc(firebase.auth().currentUser.uid)
             .set({})
 
+        const likedName = props.currentUser.name
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .collection("notifications")
+            .add({
+                notificationType: "fade",
+                creation: firebase.firestore.FieldValue.serverTimestamp(),
+                otherUserId: firebase.auth().currentUser.uid,
+                otherUsername: likedName,
+                notificationText: 'faded your post on the ' + awayTeam + "/" + homeTeam + " game",
+              })
+
     }
 
     const onUnfadePress = (userId, postId) => {
@@ -260,6 +286,7 @@ function game(props) {
             sound: 'default',
             body: notification ? notification : '',
             badge: nextBadgeNumber,
+            priority: 'high', 
         };
         
         await fetch('https://exp.host/--/api/v2/push/send', {
@@ -669,6 +696,47 @@ function game(props) {
       
       };
 
+      const fetchMLBPropData = async (propName, propOverOdds, propUnderOdds) => {
+
+        analytics().logEvent('selectMLBProps', {user_name: props.currentUser.name});
+
+        const playerData = await firebase.firestore()
+          .collection("mlb")
+          .doc("props")
+          .collection("players")
+          .where('gameId', '==', gameId)
+          .get();
+      
+        const filteredPlayerTotal = playerData.docs
+          .map((doc) => ({ id: doc.id, ...doc.data() }))
+          .filter((player) => player.hasOwnProperty(propName))
+          .map((player) => ({ id: player.id, [propName]: player[propName] }));
+      
+        const filteredPlayerOverOdds = playerData.docs
+          .map((doc) => ({ id: doc.id, ...doc.data() }))
+          .filter((player) => player.hasOwnProperty(propOverOdds))
+          .map((player) => ({ id: player.id, [propOverOdds]: player[propOverOdds] }));
+      
+        const filteredPlayerUnderOdds = playerData.docs
+          .map((doc) => ({ id: doc.id, ...doc.data() }))
+          .filter((player) => player.hasOwnProperty(propUnderOdds))
+          .map((player) => ({ id: player.id, [propUnderOdds]: player[propUnderOdds] }));
+      
+        const filteredPlayer = filteredPlayerTotal.concat(filteredPlayerOverOdds, filteredPlayerUnderOdds)
+          .reduce((acc, curr) => {
+            const existingPlayer = acc.find(p => p.id === curr.id);
+            if (existingPlayer) {
+              Object.assign(existingPlayer, curr);
+            } else {
+              acc.push(curr);
+            }
+            return acc;
+          }, []);
+
+          setPlayerProps(filteredPlayer)
+      
+      };
+
       const setPropDataTypes = async (propName, propShortName, propOverOdds, propUnderOdds) => {
         setPropDescription(propName)
         setPropOver(propOverOdds)
@@ -732,6 +800,20 @@ function game(props) {
             <TouchableOpacity onPress={() => {
                 handlePresentModal();
                 fetchNHLPropData(item.propTitle, item.propOverOdds, item.propUnderOdds);
+                setPropDataTypes(item.propTitle, item.propName, item.propOverOdds, item.propUnderOdds);
+                }}>
+                <Text style={styles.playerPropListItemText}>{item.propName}</Text>
+            </TouchableOpacity>
+        </View>
+        
+        
+    );
+
+    const renderMLBPlayerPropListItem = ({ item }) => (
+        <View style={styles.playerPropListItemContainer}>
+            <TouchableOpacity onPress={() => {
+                handlePresentModal();
+                fetchMLBPropData(item.propTitle, item.propOverOdds, item.propUnderOdds);
                 setPropDataTypes(item.propTitle, item.propName, item.propOverOdds, item.propUnderOdds);
                 }}>
                 <Text style={styles.playerPropListItemText}>{item.propName}</Text>
@@ -850,6 +932,97 @@ function game(props) {
             propOverOdds: 'player_power_play_pointsOverOdds',
             propUnderOdds: 'player_power_play_pointsUnderOdds'
         },
+        
+      ];
+
+      const mlbPlayerPropList = [
+        {
+            id: '1',
+            propName: 'Home Runs',
+            propTitle: 'batter_home_runsTotal',
+            propOverOdds: 'batter_home_runsOverOdds',
+            propUnderOdds: 'batter_home_runsUnderOdds',
+        },
+        {
+            id: '2',
+            propName: 'Hits',
+            propTitle: 'batter_hitsTotal',
+            propOverOdds: 'batter_hitsOverOdds',
+            propUnderOdds: 'batter_hitsUnderOdds',
+        },
+        {
+            id: '3',
+            propName: 'Total Bases',
+            propTitle: 'batter_total_basesTotal',
+            propOverOdds: 'batter_total_basesOverOdds',
+            propUnderOdds: 'batter_total_basesUnderOdds',
+        },
+        {
+            id: '4',
+            propName: 'RBIs',
+            propTitle: 'batter_rbisTotal',
+            propOverOdds: 'batter_rbisOverOdds',
+            propUnderOdds: 'batter_rbisUnderOdds',
+        },
+        {
+            id: '5',
+            propName: 'Runs',
+            propTitle: 'batter_runs_scoredTotal',
+            propOverOdds: 'batter_runs_scoredOverOdds',
+            propUnderOdds: 'batter_runs_scoredUnderOdds',
+        },
+        {
+            id: '6',
+            propName: 'Hits/Runs/RBIs',
+            propTitle: 'batter_hits_runs_rbisTotal',
+            propOverOdds: 'batter_hits_runs_rbisOverOdds',
+            propUnderOdds: 'batter_hits_runs_rbisUnderOdds',
+        },
+        {
+            id: '7',
+            propName: 'Stolen Bases',
+            propTitle: 'batter_stolen_basesTotal',
+            propOverOdds: 'batter_stolen_basesOverOdds',
+            propUnderOdds: 'batter_stolen_basesUnderOdds',
+        },
+        {
+            id: '8',
+            propName: 'Strikeouts',
+            propTitle: 'pitcher_strikeoutsTotal',
+            propOverOdds: 'pitcher_strikeoutsOverOdds',
+            propUnderOdds: 'pitcher_strikeoutsUnderOdds',
+        },
+        {
+            id: '8',
+            propName: 'Hits Allowed',
+            propTitle: 'pitcher_hits_allowedTotal',
+            propOverOdds: 'pitcher_hits_allowedOverOdds',
+            propUnderOdds: 'pitcher_hits_allowedUnderOdds',
+        },
+        {
+            id: '9',
+            propName: 'Walks',
+            propTitle: 'pitcher_walksTotal',
+            propOverOdds: 'pitcher_walksOverOdds',
+            propUnderOdds: 'pitcher_walksUnderOdds',
+        },
+        {
+            id: '10',
+            propName: 'Earned Runs',
+            propTitle: 'pitcher_outs_runsTotal',
+            propOverOdds: 'pitcher_earned_runsOverOdds',
+            propUnderOdds: 'pitcher_earned_runsUnderOdds',
+        },
+        {
+            id: '11',
+            propName: 'Outs Recorded',
+            propTitle: 'pitcher_outsTotal',
+            propOverOdds: 'pitcher_outsOverOdds',
+            propUnderOdds: 'pitcher_outsUnderOdds',
+        },
+      
+
+        
         
       ];
 
@@ -1055,6 +1228,16 @@ function game(props) {
                 <FlatList
                     data={nhlPlayerPropList}
                     renderItem={renderNHLPlayerPropListItem}
+                    horizontal={true}
+                    keyExtractor={(item) => item.id}
+                    contentContainerStyle={{paddingHorizontal: 5,marginBottom:6, borderBottomColor: "#e1e2e6", borderBottomWidth: 1}}
+                />
+            : null}
+
+            {sport == 'baseball_mlb'  ? 
+                <FlatList
+                    data={mlbPlayerPropList}
+                    renderItem={renderMLBPlayerPropListItem}
                     horizontal={true}
                     keyExtractor={(item) => item.id}
                     contentContainerStyle={{paddingHorizontal: 5,marginBottom:6, borderBottomColor: "#e1e2e6", borderBottomWidth: 1}}
@@ -1465,16 +1648,17 @@ function game(props) {
                 <MaterialCommunityIcons name={"plus"} size={30} color="white" />
             </TouchableOpacity>
 
-            <View  style={styles.adView}>
-                <TouchableOpacity
-                    style={{ width: "90%", height: 60, alignItems: 'center', backgroundColor: "red"}}
-                    onPress={() => { Linking.openURL('https://betalytics.com'); openAdLink()}} >
-                    <Image 
-                        source={require('../../assets/betalyticsBanner.png')}
-                        style={{   width: "100%", height: 60, resizeMode: 'stretch'  }}
-                    />
-                </TouchableOpacity>
-            </View> 
+            
+            <View style={styles.adView}>
+                <BannerAd
+                    unitId={bannerAdUnitId}
+                    sizes={[BannerAdSize.FULL_BANNER]}
+                    requestOptions={{
+                        requestNonPersonalizedAdsOnly: true,
+                    }}
+                />
+                
+            </View>
             
         </View>
         </BottomSheetModalProvider>

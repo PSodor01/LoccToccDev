@@ -145,6 +145,16 @@ function BlogDetailsScreen(props) {
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={ItemView}
             />  
+            <View style={styles.adView}>
+                <BannerAd
+                    unitId={bannerAdUnitId}
+                    sizes={[BannerAdSize.FULL_BANNER]}
+                    requestOptions={{
+                        requestNonPersonalizedAdsOnly: true,
+                    }}
+                />
+                
+            </View>
            
         </View>
             
