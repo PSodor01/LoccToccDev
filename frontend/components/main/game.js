@@ -50,10 +50,7 @@ function game(props) {
     const {gameId, gameDate, homeTeam, awayTeam, homeMoneyline, awayMoneyline, homeSpread, awaySpread, homeSpreadOdds, awaySpreadOdds, over, overOdds, under, underOdds, drawMoneyline, sport, fantasyTopic, awayTeamLogo, homeTeamLogo} = props.route.params;
 
     const bannerAdUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-8519029912093094/8258310490'
-    const nativeAdUnitId = __DEV__ ? TestIds.NATIVE_AD : 'ca-app-pub-8519029912093094/2848035284';
 
-
-    
     useEffect(() => {
             analytics().logScreenView({ screen_name: 'game', screen_class: 'game', user_name: props.currentUser.name})
 
@@ -73,8 +70,6 @@ function game(props) {
         setFutureGames(props.futureGames)
         setFormula1Races(props.formula1Races)
     }, [])
-
-    
 
     const fetchCombinedData = async () => {
         const [users, gamePosts] = await Promise.all([

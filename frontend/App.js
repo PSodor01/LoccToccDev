@@ -75,7 +75,6 @@ import Standings from './components/main/Standings'
 import Contest from './components/main/Contest'
 import BlogHomeScreen from './components/main/BlogHome'
 import BlogDetailsScreen from './components/main/BlogDetails'
-import BlogHome from './components/main/BlogHome';
 import HeaderRight from './components/buttons/HeaderRight'
 
 
@@ -87,7 +86,7 @@ if (Text.defaultProps == null) Text.defaultProps ={};
 Text.defaultProps.allowFontScaling=false;
 
 
-const MainStackScreen = ({navigation, props}) => (
+const MainStackScreen = ({navigation}) => (
   <MainStack.Navigator 
       initialRouteName="Main"
       screenOptions={{
@@ -684,5 +683,3 @@ const styles = StyleSheet.create({
   
   
 })
-
-

@@ -20,15 +20,9 @@ import analytics from "@react-native-firebase/analytics";
 import { BannerAdSize, TestIds, BannerAd } from 'react-native-google-mobile-ads';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
 import { connect } from 'react-redux'
-
-
-import { fetchMLBGames, fetchEPLGames, fetchMMAGames, fetchFutureGames, fetchTeamLogos, fetchWNBAGames, fetchGolfGames, fetchNFLGames, fetchNCAAFGames, fetchFormula1Teams, fetchFormula1Races, fetchFormula1Drivers, fetchFormula1Rankings, } from '../../redux/actions/index.js';
-
-const {loading, mlbGames, eplGames, mmaGames, futureGames, teamLogos, wnbaGames, golfGames, nflGames, ncaafGames, formula1Teams, formula1Races, formula1Drivers, formula1Rankings
-  } = props; 
-
-
 
 function Odds(props) {
 
@@ -74,23 +68,6 @@ function Odds(props) {
         
     }, [])
 
-    useEffect(() => {
-        fetchMLBGames(), 
-        fetchEPLGames(), 
-        fetchMMAGames(), 
-        fetchFutureGames(), 
-        fetchTeamLogos(), 
-        fetchWNBAGames(), 
-        fetchGolfGames(), 
-        fetchNFLGames(), 
-        fetchNCAAFGames(), 
-        fetchFormula1Teams(), 
-        fetchFormula1Races(), 
-        fetchFormula1Drivers(), 
-        fetchFormula1Rankings()
-    
-      }, []);
-
     /*useEffect(() => {
 
         firebase.firestore()
@@ -130,23 +107,23 @@ function Odds(props) {
 
         } 
         else {
-            setSportGames(mlbGames)
+            setSportGames(props.mlbGames)
             setSport('MLB')
             setLoading(false)
         }
 
-    }, [ props.wnbaGames, mlbGames, props.nflGames, props.ncaafGames, props.mmaGames, props.futureGames, props.formula1Teams, props.formula1Races, props.formula1Drivers, props.formula1Rankings])
+    }, [ props.wnbaGames, props.mlbGames, props.nflGames, props.ncaafGames, props.mmaGames, props.futureGames, props.formula1Teams, props.formula1Races, props.formula1Drivers, props.formula1Rankings])
 
     
     const fetchData = async () => {
-        const games = [mlbGames, props.mmaGames, props.wnbaGames, props.nflGames, props.ncaafGames];
+        const games = [props.mlbGames, props.mmaGames, props.wnbaGames, props.nflGames, props.ncaafGames];
 
         const teamLogosById = {};
             for (const logo of props.teamLogos) {
                 teamLogosById[logo.id] = logo.teamLogo;
             }
 
-            for (const game of [ ...mlbGames, ...props.wnbaGames]) {
+            for (const game of [ ...props.mlbGames, ...props.wnbaGames]) {
                 game.homeTeamLogo = teamLogosById[game.homeTeam];
                 game.awayTeamLogo = teamLogosById[game.awayTeam];
             }
@@ -322,7 +299,7 @@ function Odds(props) {
         } else {
             if (sport == 'NCAAF') {setSportGames(props.ncaafGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))} 
             if (sport == 'NFL') {setSportGames(props.nflGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))} 
-            if (sport == 'MLB') {setSportGames(mlbGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))}
+            if (sport == 'MLB') {setSportGames(props.mlbGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))}
             if (sport == 'NCAAB') {setSportGames(props.ncaabGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))}
             if (sport == 'NBA') {setSportGames(props.nbaGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))}
             if (sport == 'WNBA') {setSportGames(props.nbaGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))}
@@ -364,7 +341,7 @@ function Odds(props) {
         if (sport == 'NHL') {setSportGames(props.nhlGames); analytics().logEvent('selectNHLGames', {user_name: props.currentUser.name}); setSport('NHL');}
         if (sport == 'NCAAF') {setSportGames(props.ncaafGames); analytics().logEvent('selectNCAAFGames', {user_name: props.currentUser.name}); setSport('NCAAF');}
         if (sport == 'EPL') {setSportGames(props.eplGames); analytics().logEvent('selectEPLGames', {user_name: props.currentUser.name}); setSport('EPL');}
-        if (sport == 'MLB') {setSportGames(mlbGames); analytics().logEvent('selectMLBGames', {user_name: props.currentUser.name}); setSport('MLB');}
+        if (sport == 'MLB') {setSportGames(props.mlbGames); analytics().logEvent('selectMLBGames', {user_name: props.currentUser.name}); setSport('MLB');}
         if (sport == 'NCAAB') {setSportGames(props.ncaabGames); analytics().logEvent('selectNCAABGames', {user_name: props.currentUser.name}); setSport('NCAAB');}
         if (sport == 'UFC') {setSportGames(props.mmaGames); analytics().logEvent('selectUFCGames', {user_name: props.currentUser.name}); setSport('UFC');}
         if (sport == 'PGA') {setSportGames(props.golfGames); analytics().logEvent('selectGolfGames', {user_name: props.currentUser.name}); setSport('PGA');}
@@ -842,13 +819,7 @@ function Odds(props) {
         )
     }
 
-    if (loading) {
-        return (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" />
-          </View>
-        );
-      }
+    
     
       return (
         <View style={styles.container}>
@@ -1655,45 +1626,23 @@ const styles = StyleSheet.create({
     
 })
 
+const mapStateToProps = (store) => ({
+    mlbGames: store.mlbGamesState.mlbGames,
+    nflGames: store.nflGamesState.nflGames,
+    ncaafGames: store.ncaafGamesState.ncaafGames,
+    wnbaGames: store.wnbaGamesState.wnbaGames,
+    mmaGames: store.mmaGamesState.mmaGames,
+    futureGames: store.futureGamesState.futureGames,
+    teamLogos: store.teamLogosState.teamLogos,
+    allUsers: store.userState.allUsers,
+    currentUser: store.userState.currentUser,
+    contestStatus: store.userState.contestStatus,
 
-const mapStateToProps = (state) => ({
-    loading: state.loading,
-    mlbGames: state.mlbGames,
-    eplGames: state.eplGames,
-    nflGames: state.nflGames,
-    ncaafGames: state.ncaafGames,
-    wnbaGames: state.wnbaGames,
-    mmaGames: state.mmaGames,
-    futureGames: state.futureGames,
-    teamLogos: state.teamLogos,
-    allUsers: state.allUsers,
-    currentUser: state.currentUser,
-    contestStatus: state.contestStatus,
+    formula1Teams: store.formula1TeamsState.formula1Teams,
+    formula1Races: store.formula1RacesState.formula1Races,
+    formula1Drivers: store.formula1DriversState.formula1Drivers,
+    formula1Rankings: store.formula1RankingsState.formula1Rankings,
 
-    formula1Teams: state.fromula1Teams,
-    formula1Races: state.formula1Races,
-    formula1Drivers: state.formula1Drivers,
-    formula1Rankings: state.formula1Rankings,
-  });
+})
 
-  const mapDispatchToProps = {
-    fetchMLBGames, 
-    fetchEPLGames, 
-    fetchMMAGames, 
-    fetchFutureGames, 
-    fetchTeamLogos, 
-    fetchWNBAGames, 
-    fetchGolfGames, 
-    fetchNFLGames, 
-    fetchNCAAFGames, 
-    fetchFormula1Teams, 
-    fetchFormula1Races, 
-    fetchFormula1Drivers, 
-    fetchFormula1Rankings
-  };
-
-
-
-export default connect(mapStateToProps, mapDispatchToProps)(Odds);
-
-
+export default connect(mapStateToProps)(Odds);
