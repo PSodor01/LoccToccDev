@@ -21,6 +21,10 @@ import { BannerAdSize, TestIds, BannerAd } from 'react-native-google-mobile-ads'
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { fetchMLBGames, fetchEPLGames, fetchMMAGames, fetchFutureGames, fetchTeamLogos, fetchWNBAGames, fetchGolfGames, fetchNFLGames, fetchNCAAFGames, fetchFormula1Teams, fetchFormula1Races, fetchFormula1Drivers, fetchFormula1Rankings, } from '../../redux/actions/index.js';
+
+/*const {loading, mlbGames, eplGames, mmaGames, futureGames, teamLogos, wnbaGames, golfGames, nflGames, ncaafGames, formula1Teams, formula1Races, formula1Drivers, formula1Rankings
+  } = props; */
 
 import { connect } from 'react-redux'
 
@@ -67,6 +71,23 @@ function Odds(props) {
         })
         
     }, [])
+
+    useEffect(() => {
+        fetchMLBGames(), 
+        fetchEPLGames(), 
+        fetchMMAGames(), 
+        fetchFutureGames(), 
+        fetchTeamLogos(), 
+        fetchWNBAGames(), 
+        fetchGolfGames(), 
+        fetchNFLGames(), 
+        fetchNCAAFGames(), 
+        fetchFormula1Teams(), 
+        fetchFormula1Races(), 
+        fetchFormula1Drivers(), 
+        fetchFormula1Rankings()
+    
+      }, []);
 
     /*useEffect(() => {
 
@@ -819,7 +840,13 @@ function Odds(props) {
         )
     }
 
-    
+    if (loading) {
+        return (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" />
+          </View>
+        );
+      }
     
       return (
         <View style={styles.container}>
@@ -1627,6 +1654,7 @@ const styles = StyleSheet.create({
 })
 
 const mapStateToProps = (store) => ({
+    loading: state.loading, // Use your actual state property that tracks loading
     mlbGames: store.mlbGamesState.mlbGames,
     nflGames: store.nflGamesState.nflGames,
     ncaafGames: store.ncaafGamesState.ncaafGames,
@@ -1645,6 +1673,24 @@ const mapStateToProps = (store) => ({
 
 })
 
-export default connect(mapStateToProps)(Odds);
+  const mapDispatchToProps = {
+    fetchMLBGames, 
+    fetchEPLGames, 
+    fetchMMAGames, 
+    fetchFutureGames, 
+    fetchTeamLogos, 
+    fetchWNBAGames, 
+    fetchGolfGames, 
+    fetchNFLGames, 
+    fetchNCAAFGames, 
+    fetchFormula1Teams, 
+    fetchFormula1Races, 
+    fetchFormula1Drivers, 
+    fetchFormula1Rankings
+  };
+
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(Odds);
 
 

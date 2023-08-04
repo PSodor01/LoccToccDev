@@ -231,6 +231,8 @@ export function fetchMLBGames() {
     };
   }
 
+  
+
 export function fetchNFLGames() {
     return ((dispatch) => {
         firebase.firestore()

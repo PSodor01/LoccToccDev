@@ -41,10 +41,7 @@ const initialState = {
 export const nflGames = (state = initialState, action) => {
     switch (action.type) {
         case NFL_GAMES_STATE_CHANGE:
-            return {
-                ...state,
-                nflGames: action.nflGames
-            }
+            return { ...state, loading: false, nflGames: action.nflGames };
         case CLEAR_DATA:
             return initialState
         default:
@@ -55,10 +52,7 @@ export const nflGames = (state = initialState, action) => {
 export const ncaafGames = (state = initialState, action) => {
     switch (action.type) {
         case NCAAF_GAMES_STATE_CHANGE:
-            return {
-                ...state,
-                ncaafGames: action.ncaafGames
-            }
+            return { ...state, loading: false, ncaafGames: action.ncaafGames };
         case CLEAR_DATA:
             return initialState
         default:
@@ -69,10 +63,7 @@ export const ncaafGames = (state = initialState, action) => {
 export const ncaabGames = (state = initialState, action) => {
     switch (action.type) {
         case NCAAB_GAMES_STATE_CHANGE:
-            return {
-                ...state,
-                ncaabGames: action.ncaabGames
-            }
+            return { ...state, loading: false, ncaabGames: action.ncaabGames };
         case CLEAR_DATA:
             return initialState
         default:
@@ -83,10 +74,7 @@ export const ncaabGames = (state = initialState, action) => {
 export const mlbGames = (state = initialState, action) => {
     switch (action.type) {
         case MLB_GAMES_STATE_CHANGE:
-            return {
-                ...state,
-                mlbGames: action.mlbGames
-            }
+            return { ...state, loading: false, mlbGames: action.mlbGames };
         case CLEAR_DATA:
             return initialState
         default:
@@ -97,10 +85,7 @@ export const mlbGames = (state = initialState, action) => {
 export const nbaGames = (state = initialState, action) => {
     switch (action.type) {
         case NBA_GAMES_STATE_CHANGE:
-            return {
-                ...state,
-                nbaGames: action.nbaGames
-            }
+            return { ...state, loading: false, nbaGames: action.nbaGames };
         case CLEAR_DATA:
             return initialState
         default:
@@ -111,10 +96,7 @@ export const nbaGames = (state = initialState, action) => {
 export const wnbaGames = (state = initialState, action) => {
     switch (action.type) {
         case WNBA_GAMES_STATE_CHANGE:
-            return {
-                ...state,
-                wnbaGames: action.wnbaGames
-            }
+            return { ...state, loading: false, wnbaGames: action.wnbaGames };
         case CLEAR_DATA:
             return initialState
         default:
@@ -125,10 +107,7 @@ export const wnbaGames = (state = initialState, action) => {
 export const nhlGames = (state = initialState, action) => {
     switch (action.type) {
         case NHL_GAMES_STATE_CHANGE:
-            return {
-                ...state,
-                nhlGames: action.nhlGames
-            }
+            return { ...state, loading: false, nhlGames: action.nhlGames };
         case CLEAR_DATA:
             return initialState
         default:
@@ -139,10 +118,7 @@ export const nhlGames = (state = initialState, action) => {
 export const futureGames = (state = initialState, action) => {
     switch (action.type) {
         case FUTURE_GAMES_STATE_CHANGE:
-            return {
-                ...state,
-                futureGames: action.futureGames
-            }
+            return { ...state, loading: false, futureGames: action.futureGames };
         case CLEAR_DATA:
             return initialState
         default:
@@ -153,10 +129,7 @@ export const futureGames = (state = initialState, action) => {
 export const teamLogos = (state = initialState, action) => {
     switch (action.type) {
         case TEAM_LOGOS_STATE_CHANGE:
-            return {
-                ...state,
-                teamLogos: action.teamLogos
-            }
+            return { ...state, loading: false, teamLogos: action.teamLogos };
         case CLEAR_DATA:
             return initialState
         default:
@@ -181,10 +154,7 @@ export const blogDetails = (state = initialState, action) => {
 export const golfGames = (state = initialState, action) => {
     switch (action.type) {
         case GOLF_GAMES_STATE_CHANGE:
-            return {
-                ...state,
-                golfGames: action.golfGames
-            }
+            return { ...state, loading: false, golfGames: action.golfGames };
         case CLEAR_DATA:
             return initialState
         default:
@@ -195,10 +165,7 @@ export const golfGames = (state = initialState, action) => {
 export const eplGames = (state = initialState, action) => {
     switch (action.type) {
         case EPL_GAMES_STATE_CHANGE:
-            return {
-                ...state,
-                eplGames: action.eplGames
-            }
+            return { ...state, loading: false, eplGames: action.eplGames };
         case CLEAR_DATA:
             return initialState
         default:
@@ -209,10 +176,7 @@ export const eplGames = (state = initialState, action) => {
 export const formula1Teams = (state = initialState, action) => {
     switch (action.type) {
         case FORMULA1_TEAMS_STATE_CHANGE:
-            return {
-                ...state,
-                formula1Teams: action.formula1Teams
-            }
+            return { ...state, loading: false, formula1Teams: action.fromula1Teams };
         case CLEAR_DATA:
             return initialState
         default:
@@ -223,10 +187,7 @@ export const formula1Teams = (state = initialState, action) => {
 export const formula1Races = (state = initialState, action) => {
     switch (action.type) {
         case FORMULA1_RACES_STATE_CHANGE:
-            return {
-                ...state,
-                formula1Races: action.formula1Races
-            }
+            return { ...state, loading: false, formula1Races: action.formula1Races };
         case CLEAR_DATA:
             return initialState
         default:
@@ -237,10 +198,7 @@ export const formula1Races = (state = initialState, action) => {
 export const formula1Drivers = (state = initialState, action) => {
     switch (action.type) {
         case FORMULA1_DRIVERS_STATE_CHANGE:
-            return {
-                ...state,
-                formula1Drivers: action.formula1Drivers
-            }
+            return { ...state, loading: false, formula1Drivers: action.formula1Drivers };
         case CLEAR_DATA:
             return initialState
         default:
@@ -251,10 +209,7 @@ export const formula1Drivers = (state = initialState, action) => {
 export const formula1Rankings = (state = initialState, action) => {
     switch (action.type) {
         case FORMULA1_RANKINGS_STATE_CHANGE:
-            return {
-                ...state,
-                formula1Rankings: action.formula1Rankings
-            }
+            return { ...state, loading: false, formula1Rankings: action.formula1Rankings };
         case CLEAR_DATA:
             return initialState
         default:
@@ -266,10 +221,7 @@ export const formula1Rankings = (state = initialState, action) => {
 export const mmaGames = (state = initialState, action) => {
     switch (action.type) {
         case MMA_GAMES_STATE_CHANGE:
-            return {
-                ...state,
-                mmaGames: action.mmaGames
-            }
+            return { ...state, loading: false, mmaGames: action.mmaGames };
         case CLEAR_DATA:
             return initialState
         default:
