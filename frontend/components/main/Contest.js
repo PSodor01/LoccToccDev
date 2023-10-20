@@ -31,8 +31,8 @@ function Contest(props) {
             setContestLive(false)
         }
 
-        const contestParticipants = props.allUsers.filter(user => user.loccMadness2023Score != null);
-        setAllUsers(contestParticipants.sort((a, b) => parseFloat(b.loccMadness2023Score) - parseFloat(a.loccMadness2023Score)).slice(0, 100))
+        const contestParticipants = props.allUsers.filter(user => user.alltimeLeaders2023 != null);
+        setAllUsers(contestParticipants.sort((a, b) => parseFloat(b.alltimeLeaders2023) - parseFloat(a.alltimeLeaders2023)).slice(0, 100))
 
         const myScore = props.allUsers.filter(user => user.name == props.currentUser.name);
         setMyScore(myScore)
@@ -44,8 +44,8 @@ function Contest(props) {
     const renderMyScore = ({item}) => {
         return (
             <View>
-            {item.loccMadness2023Score != null ?
-            <Text style={styles.subTitleText}>{item.loccMadness2023Score}</Text>
+            {item.alltimeLeaders2023 != null ?
+            <Text style={styles.subTitleText}>{item.alltimeLeaders2023}</Text>
             :
             <Text style={styles.subTitleText}>0</Text>
 
@@ -92,20 +92,13 @@ function Contest(props) {
         <View style={styles.panel}>
           <View >
             <View style={{alignItems: 'center'}}>
-                <Text style={styles.panelTitle}>Locc Madness</Text>
+                <Text style={styles.panelTitle}>Locctocc Leaderboard</Text>
                 <Text> </Text>
             </View>
-            <View style={{ alignItems: 'center'}}>
-                <Text style={styles.panelSubtitle}>Contest Rules</Text>
-                <Text></Text>
-            </View>
             <View style={{textAlign: 'justify'}}>
-                <Text>- Contest will run through the end of March Madness</Text>
                 <Text>- Post your locks and engage with other members of the community to participate</Text>
-                <Text>- Earn points by posting and collecting hammers, lose points for fades</Text>
-                <Text>- Winners will be announced on our IG at the end of the contest</Text>
-                <Text>- Prizes will be paid electronically (Venmo, Paypal, etc)</Text>
-                <Text>- Locctocc reserves the right to choose a new winner in the event of foul play</Text>
+                <Text>- Earn points by posting, collecting hammers, ang gaining followers!</Text>
+                <Text>- Lose points by getting/giving fades - don't make enemies!</Text>
             </View>
             <TouchableOpacity
                 style={styles.panelButton}
@@ -151,7 +144,7 @@ function Contest(props) {
                 containerStyle={leaderboardStyles.avatarContainer}
             />
             <Text style={leaderboardStyles.userName}>{item.name}</Text>
-            <Text style={leaderboardStyles.userScore}>{item.loccMadness2023Score}</Text>
+            <Text style={leaderboardStyles.userScore}>{item.alltimeLeaders2023}</Text>
           </TouchableOpacity>
         );
       };
@@ -219,163 +212,12 @@ function Contest(props) {
         color: '#FFF',
         },
       };
-
-
-
-    /*const testBannerID = 'ca-app-pub-3940256099942544/2934735716';
-    const productionBannerID = 'ca-app-pub-8519029912093094/1640242937';
-    // Is a real device and running in production.
-    const adBannerUnitID = Device.isDevice && !__DEV__ ? productionBannerID : testBannerID;
-
-    const testInterstitialID = 'ca-app-pub-3940256099942544/1033173712';
-    const productionInterstitialID = 'ca-app-pub-8519029912093094/2876269149';
-    // Is a real device and running in production.
-    const adInterstitialUnitID = Device.isDevice && !__DEV__ ? productionInterstitialID : testInterstitialID;
-
-    const interstitial = async () => {
-        await AdMobInterstitial.setAdUnitID(adInterstitialUnitID); // Test ID, Replace with your-admob-unit-id
-        try {
-            await AdMobInterstitial.requestAdAsync();
-            await AdMobInterstitial.showAdAsync();
-        } catch(error) {
-            console.log(error)
-        }
-    } */
-
-    /*<View style={styles.headerContainer}>
-        <View style={styles.titleContainer}>
-            <View>
-                <Image 
-                    style={{ width: 130, height: 100, marginBottom: 5, marginRight: 10, }}
-                    source={require('../../assets/locctocclogo.png')}
-                />
-            </View>
-            <View>
-                <View style={styles.titleContainer}>
-                    <Text style={styles.titleText}>CASH PRIZES: $200  </Text>
-                    <TouchableOpacity onPress={() => {this.bs.current.snapTo(0); countInfoClicks()}}
-                    >
-                        <FontAwesome5 name="info-circle" size={18} justifyContent='center' alignItems='center' color="#2e64e5"/>
-                    </TouchableOpacity>
-                </View>
-                <View style={styles.infoContainer}>
-                    <Text style={styles.subTitleText}>My Score: </Text>
-                    <FlatList
-                        data ={myScore}
-                        renderItem={renderMyScore}
-                    />
-                </View>
-                <View style={styles.infoContainer}>
-                    <Text style={styles.subTitleText}> </Text>
-                </View>
-                <View style={styles.infoContainer}>
-                    <Text style={styles.subTitleText}>Presented by:</Text>
-                </View>
-                <View style={styles.infoContainer}>
-                    <TouchableOpacity
-                        style={styles.linkText}>
-                            <Text style={styles.linkText}
-                        onPress={() => {
-                        countWebsiteClicks()
-                        Linking.openURL('https://tropicalbros.com');
-                        }}>
-                        www.TROPICALBROS.com</Text>
-                    </TouchableOpacity>
-                </View>
-                <View style={styles.infoContainer}>
-                    <TouchableOpacity
-                        style={styles.linkText}>
-                            <Text style={styles.linkText}
-                        onPress={() => {
-                        countInstagramClicks()
-                        Linking.openURL('https://www.instagram.com/tropical.bros/');
-                        }}>
-                        Follow!</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-        </View>
-        <View style={styles.brandTextContainer}>
-            <Text style={styles.brandText}>Enjoy Life in Style with Tropical Bros laid back lifestyle golf and beachwear. We deliver the highest quality products with the coolest designs at the most competitive prices.  Stay Tropical. </Text>
-        </View>
-    </View> 
-    
-    
-    <View style={styles.headerContainer}>
-                    <View>
-                        <View>
-                            <Text style={styles.titleText}>LOCC MADNESS Leaderboard </Text>
-                        </View>
-                        <View>
-                            <View style={styles.titleContainer}>
-                                <Text style={styles.subTitleText}>CASH PRIZES: $250  </Text>
-                                <TouchableOpacity onPress={() => {this.bs.current.snapTo(0); countInfoClicks()}}
-                                >
-                                    <FontAwesome5 name="info-circle" size={18} justifyContent='center' alignItems='center' color="#2e64e5"/>
-                                </TouchableOpacity>
-                            </View>
-                            <View style={styles.infoContainer}>
-                                <Text style={styles.infoText}>My Score: </Text>
-                                <FlatList
-                                    data ={myScore}
-                                    renderItem={renderMyScore}
-                                />
-                            </View>
-                            <View style={styles.infoContainer}>
-                                <Text style={styles.infoText}> </Text>
-                            </View>
-                            <View style={styles.infoContainer}>
-                                <Text style={styles.infoText}>Follow us for all the latest updates:</Text>
-                            </View>
-                            <View style={styles.titleContainer}>
-                                <View style={styles.infoContainer}>
-                                    <TouchableOpacity
-                                        style={styles.linkText}
-                                        onPress={() => {
-                                        countLocctoccInstagramClicks()
-                                        Linking.openURL('https://www.instagram.com/locctocc/');
-                                        }}>
-                                        <FontAwesome5 name="instagram" size={24} justifyContent='center' alignItems='center' color="#E1306C"/>
-                                    </TouchableOpacity>
-                                </View>
-                                <View style={styles.infoContainer}>
-                                    <TouchableOpacity
-                                        style={styles.linkText}
-                                        onPress={() => {
-                                        countLocctoccTwitterClicks()
-                                        Linking.openURL('https://twitter.com/LoccTocc');
-                                        }}>
-                                        <FontAwesome5 name="twitter" size={24} justifyContent='center' alignItems='center' color="#1DA1F2"/>
-                                    </TouchableOpacity>
-                                </View>
-                                <View style={styles.infoContainer}>
-                                    <TouchableOpacity
-                                        style={styles.linkText}
-                                        onPress={() => {
-                                        countLocctoccTiktokClicks()
-                                        Linking.openURL('https://www.tiktok.com/@locctocc');
-                                        }}>
-                                        <FontAwesome5 name="tiktok" size={24} justifyContent='center' alignItems='center' color="#000"/>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                        </View>
-                    </View>
-                </View>*/
-
-   /* <View style={styles.adView}>
-                <AdMobBanner
-                    bannerSize="banner"
-                    adUnitID={adUnitID} 
-                    servePersonalizedAds // true or false
-                />
-            </View> */
     
     return (
         <View style={styles.textInputContainer}>
             <BottomSheet 
                 ref={this.bs}
-                snapPoints={[475, -5]}
+                snapPoints={[275, -5]}
                 renderContent={this.renderInner}
                 renderHeader={this.renderHeader}
                 initialSnap={1}
@@ -388,16 +230,8 @@ function Contest(props) {
                     <View style={styles.headerContainer}>
         <View style={styles.titleContainer}>
             <View>
-                <TouchableOpacity onPress={() => {countWebsiteClicks()}}>
-                    <Image 
-                        style={{ width: 130, height: 100, marginBottom: 5, marginRight: 10, }}
-                        source={require('../../assets/betalyticsBanner.png')}
-                    />
-                </TouchableOpacity>
-            </View>
-            <View>
                 <View style={styles.titleContainer}>
-                    <Text style={styles.titleText}>CASH PRIZES: $200  </Text>
+                    <Text style={styles.titleText}>Locctocc Leaderboard  </Text>
                     <TouchableOpacity onPress={() => {this.bs.current.snapTo(0); countInfoClicks()}}
                     >
                         <FontAwesome5 name="info-circle" size={18} justifyContent='center' alignItems='center' color="#2e64e5"/>
@@ -410,20 +244,28 @@ function Contest(props) {
                         renderItem={renderMyScore}
                     />
                 </View>
-                <View style={styles.infoContainer}>
-                    <Text style={styles.subTitleText}> </Text>
-                </View>
-                <View style={styles.infoContainer}>
-                    <Text style={styles.subTitleText}>Presented by:</Text>
-                </View>
-                <View style={styles.infoContainer}>
-                    <TouchableOpacity
-                        style={styles.linkText}>
-                            <Text style={styles.linkText}
-                        onPress={() => {countWebsiteClicks()}}>
-                        Snack Magic</Text>
-                    </TouchableOpacity>
-                </View>
+                <View style={styles.titleContainer}>
+                        <View style={styles.infoContainer}>
+                            <TouchableOpacity
+                                style={styles.linkText}
+                                onPress={() => {
+                                countLocctoccInstagramClicks()
+                                Linking.openURL('https://www.instagram.com/locctocc/');
+                                }}>
+                                <FontAwesome5 name="instagram" size={24} justifyContent='center' alignItems='center' color="#E1306C"/>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.infoContainer}>
+                            <TouchableOpacity
+                                style={styles.linkText}
+                                onPress={() => {
+                                countLocctoccTwitterClicks()
+                                Linking.openURL('https://twitter.com/LoccTocc');
+                                }}>
+                                <FontAwesome5 name="twitter" size={24} justifyContent='center' alignItems='center' color="#1DA1F2"/>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
             </View>
         </View>
     </View>
@@ -518,9 +360,6 @@ const styles = StyleSheet.create({
     textInputContainer: {
         flex: 1,
         backgroundColor: "#B2DFDB",
-        alignItems: 'center',
-        justifyContent: 'center',
-
     },
     titleText: {
         fontSize: 18,
@@ -605,7 +444,6 @@ const styles = StyleSheet.create({
         color: 'white',
     },
     adView: {
-        width: "60%",
         alignItems: 'center',
         justifyContent: 'center',
     },

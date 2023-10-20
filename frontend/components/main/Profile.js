@@ -178,7 +178,8 @@ function Profile(props) {
             .collection("users")
             .doc(props.route.params.uid)
             .update({
-                followerCount: firebase.firestore.FieldValue.increment(1)
+                followerCount: firebase.firestore.FieldValue.increment(1),
+                alltimeLeaders2023: firebase.firestore.FieldValue.increment(20)
             })
 
     }
@@ -188,7 +189,8 @@ function Profile(props) {
             .collection("users")
             .doc(firebase.auth().currentUser.uid)
             .update({
-                followingCount: firebase.firestore.FieldValue.increment(1)
+                followingCount: firebase.firestore.FieldValue.increment(1),
+                alltimeLeaders2023: firebase.firestore.FieldValue.increment(20)
             })
 
     }
@@ -198,7 +200,8 @@ function Profile(props) {
             .collection("users")
             .doc(props.route.params.uid)
             .update({
-                followerCount: firebase.firestore.FieldValue.increment(-1)
+                followerCount: firebase.firestore.FieldValue.increment(-1),
+                alltimeLeaders2023: firebase.firestore.FieldValue.increment(-20)
             })
 
     }
@@ -208,7 +211,8 @@ function Profile(props) {
             .collection("users")
             .doc(firebase.auth().currentUser.uid)
             .update({
-                followingCount: firebase.firestore.FieldValue.increment(-1)
+                followingCount: firebase.firestore.FieldValue.increment(-1),
+                alltimeLeaders2023: firebase.firestore.FieldValue.increment(-20)
             })
 
     }
@@ -628,13 +632,13 @@ function Profile(props) {
                     <Text style={{ color: "grey" }}>Member since </Text>
                     <Text style={{ color: "grey" }}>{moment(user.createdAt.toDate()).format("MMM Do YYYY")}</Text>
                 </View>
-                <View style={{ flexDirection: 'row', paddingTop: 5, width: '85%'}}>
-                    <Text style={{ fontWeight: 'bold'}}>About me: </Text>
-                    <Text>{user.aboutMe}</Text>
+                <View style={{ flexDirection: 'row', paddingTop: 5, width: '95%'}}>
+                    <Text style={{ fontWeight: 'bold' }}>About me: </Text>
+                    <Text style={{ flex: 1 }}>{user.aboutMe}</Text>
                 </View>
-                <View style={{ flexDirection: 'row', paddingTop: 5, width: '85%'}}>
+                <View style={{ flexDirection: 'row', paddingTop: 5, width: '95%'}}>
                     <Text style={{ fontWeight: 'bold'}}>Location: </Text>
-                    <Text>{user.location}</Text>
+                    <Text style={{ flex: 1 }}>{user.location}</Text>
                 </View>
             </View>
             

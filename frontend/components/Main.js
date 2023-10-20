@@ -22,7 +22,8 @@ import { fetchUser,
     fetchFutureGames,
     fetchBlogDetails, 
     fetchTeamLogos, 
-    fetchWNBAGames,
+    fetchNBAGames,
+    fetchNHLGames,
     fetchGolfGames, 
     fetchNFLGames, 
     fetchNCAAFGames, 
@@ -64,7 +65,8 @@ function Main() {
     dispatch(fetchFormula1Races());
     dispatch(fetchFormula1Drivers());
     dispatch(fetchFormula1Rankings());
-    dispatch(fetchWNBAGames());
+    dispatch(fetchNBAGames());
+    dispatch(fetchNHLGames());
     dispatch(fetchMMAGames());
     dispatch(fetchContestStatus());
   }, []);

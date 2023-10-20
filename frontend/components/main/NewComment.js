@@ -96,6 +96,13 @@ function NewCommentScreen(props, route) {
                 setLoading(false)
                 props.navigation.goBack();
               })
+
+            firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                alltimeLeaders2023: firebase.firestore.FieldValue.increment(10)
+        })
           };
 
     const onCommentCount = () => {
@@ -106,6 +113,13 @@ function NewCommentScreen(props, route) {
         .doc(props.route.params.postId)
         .update({
             comments: firebase.firestore.FieldValue.increment(1)
+        })
+
+        firebase.firestore()
+            .collection("users")
+            .doc(props.route.params.uid)
+            .update({
+                alltimeLeaders2023: firebase.firestore.FieldValue.increment(10)
         })
 
         if (awayTeam  != undefined) {

@@ -118,6 +118,13 @@ function Feed(props) {
             .doc(postId)
             .set({})
 
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                alltimeLeaders2023: firebase.firestore.FieldValue.increment(5)
+        })
+
         analytics().logEvent('hammerPost', {user_name: props.currentUser.name});
     }
 
@@ -128,6 +135,13 @@ function Feed(props) {
             .collection("userLikes")
             .doc(postId)
             .delete({})
+
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                alltimeLeaders2023: firebase.firestore.FieldValue.increment(-5)
+        })
         
     }
 
@@ -139,6 +153,13 @@ function Feed(props) {
             .doc(postId)
             .set({})
 
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                alltimeLeaders2023: firebase.firestore.FieldValue.increment(-10)
+        })
+
         analytics().logEvent('fadePost', {user_name: props.currentUser.name});
     }
 
@@ -149,6 +170,13 @@ function Feed(props) {
             .collection("userFades")
             .doc(postId)
             .delete({})
+
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                alltimeLeaders2023: firebase.firestore.FieldValue.increment(10)
+        })
 
     }
 
@@ -171,6 +199,13 @@ function Feed(props) {
             .update({
                 likesCount: firebase.firestore.FieldValue.increment(1)
             })
+
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .update({
+                alltimeLeaders2023: firebase.firestore.FieldValue.increment(5)
+        })
 
         const likedName = props.currentUser.name
         firebase.firestore()
@@ -206,6 +241,13 @@ function Feed(props) {
             .doc(firebase.auth().currentUser.uid)
             .delete()
 
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .update({
+                alltimeLeaders2023: firebase.firestore.FieldValue.increment(-5)
+        })
+
     }
 
     const onFadePress = (userId, postId) => {
@@ -226,6 +268,13 @@ function Feed(props) {
             .collection("fades")
             .doc(firebase.auth().currentUser.uid)
             .set({})
+
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .update({
+                alltimeLeaders2023: firebase.firestore.FieldValue.increment(-10)
+        })
 
         const likedName = props.currentUser.name
         firebase.firestore()
@@ -260,6 +309,13 @@ function Feed(props) {
             .collection("fades")
             .doc(firebase.auth().currentUser.uid)
             .delete()
+
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .update({
+                alltimeLeaders2023: firebase.firestore.FieldValue.increment(-10)
+        })
 
     }
 

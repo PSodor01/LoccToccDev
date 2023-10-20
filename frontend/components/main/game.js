@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Text, View, StyleSheet, Alert, Linking, FlatList, TouchableOpacity, Image, Modal, ActivityIndicator } from 'react-native';
+import { Text, View, StyleSheet, Alert, Linking, FlatList, TouchableOpacity, Image, Modal, ActivityIndicator, Animated} from 'react-native';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -51,6 +51,9 @@ function game(props) {
 
     const bannerAdUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-8519029912093094/8258310490'
 
+    const AnimatedIonicons = Animated.createAnimatedComponent(Ionicons);
+    const scaleValue = new Animated.Value(1);
+
     useEffect(() => {
             analytics().logScreenView({ screen_name: 'game', screen_class: 'game', user_name: props.currentUser.name})
 
@@ -63,13 +66,11 @@ function game(props) {
         });
     
         return unsubscribe;
-      }, [props.navigation, props.blocking, props.liked, props.faded]);
+      }, [props.navigation]); 
 
-    useEffect(() => {
-        setGolfGames(props.golfGames)
-        setFutureGames(props.futureGames)
-        setFormula1Races(props.formula1Races)
-    }, [])
+      useEffect(() => {
+        fetchCombinedData()
+      }, [props.navigation, props.blocking, props.liked, props.faded]);
 
     const fetchCombinedData = async () => {
         const [users, gamePosts] = await Promise.all([
@@ -111,11 +112,13 @@ function game(props) {
             setLoading(false)
     };
 
-    const handleImagePress = (url) => {
-        setSelectedImage(url);
-        setFullscreen(true);
-        analytics().logEvent('fullSizeImage', {user_name: props.currentUser.name});
-      };
+    useEffect(() => {
+        setGolfGames(props.golfGames)
+        setFutureGames(props.futureGames)
+        setFormula1Races(props.formula1Races)
+    }, [])
+
+    
 
     const storeLike = (postId, userId) => {
         firebase.firestore()
@@ -124,6 +127,14 @@ function game(props) {
             .collection("userLikes")
             .doc(postId)
             .set({})
+
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                alltimeLeaders2023: firebase.firestore.FieldValue.increment(5)
+            })
+
 
         analytics().logEvent('hammerPost', {user_name: props.currentUser.name});
             
@@ -137,6 +148,16 @@ function game(props) {
             .doc(postId)
             .delete({})
 
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                alltimeLeaders2023: firebase.firestore.FieldValue.increment(-5)
+            })
+
+
+
+
     }
 
     const storeFade = (postId) => {
@@ -146,6 +167,13 @@ function game(props) {
             .collection("userFades")
             .doc(postId)
             .set({})
+
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                alltimeLeaders2023: firebase.firestore.FieldValue.increment(-10)
+            })
 
         analytics().logEvent('fadePost', {user_name: props.currentUser.name});
     }
@@ -158,11 +186,23 @@ function game(props) {
             .doc(postId)
             .delete({})
 
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update({
+                alltimeLeaders2023: firebase.firestore.FieldValue.increment(10)
+            })
+
     }
 
-    const onLikePress = (userId, postId) => {
+    const testFunction = () => {
+        console.log("yeah buddy")
 
-        firebase.firestore()
+    }
+
+    const onLikePress = async (userId, postId) => {
+        try {
+        await firebase.firestore()
             .collection("posts")
             .doc(userId)
             .collection("userPosts")
@@ -171,7 +211,7 @@ function game(props) {
             .doc(firebase.auth().currentUser.uid)
             .set({})
 
-        firebase.firestore()
+        await firebase.firestore()
             .collection("posts")
             .doc(userId)
             .collection("userPosts")
@@ -180,8 +220,15 @@ function game(props) {
                 likesCount: firebase.firestore.FieldValue.increment(1)
             })
 
+        await firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .update({
+                alltimeLeaders2023: firebase.firestore.FieldValue.increment(5)
+            })
+
         const likedName = props.currentUser.name
-        firebase.firestore()
+        await firebase.firestore()
             .collection("users")
             .doc(userId)
             .collection("notifications")
@@ -193,7 +240,16 @@ function game(props) {
                 notificationText: 'hammered your post on the ' + awayTeam + "/" + homeTeam + " game",
               })
 
-    }
+              Animated.sequence([
+                Animated.timing(scaleValue, { toValue: 1.2, duration: 100, useNativeDriver: true }), 
+                Animated.timing(scaleValue, { toValue: 1, duration: 100, useNativeDriver: true }), 
+              ]).start();
+            
+       
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     const onDislikePress = (userId, postId) => {
         firebase.firestore()
@@ -213,6 +269,13 @@ function game(props) {
             .collection("likes")
             .doc(firebase.auth().currentUser.uid)
             .delete()
+
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .update({
+                alltimeLeaders2023: firebase.firestore.FieldValue.increment(-5)
+        })
         
     }
 
@@ -234,6 +297,13 @@ function game(props) {
             .collection("fades")
             .doc(firebase.auth().currentUser.uid)
             .set({})
+
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .update({
+                alltimeLeaders2023: firebase.firestore.FieldValue.increment(-10)
+        })
 
         const likedName = props.currentUser.name
         firebase.firestore()
@@ -268,6 +338,13 @@ function game(props) {
             .collection("fades")
             .doc(firebase.auth().currentUser.uid)
             .delete()
+
+        firebase.firestore()
+            .collection("users")
+            .doc(userId)
+            .update({
+                alltimeLeaders2023: firebase.firestore.FieldValue.increment(10)
+        })
 
     }
 
@@ -354,6 +431,12 @@ function game(props) {
                 }
             })
     };
+    
+    const handleImagePress = (url) => {
+        setSelectedImage(url);
+        setFullscreen(true);
+        analytics().logEvent('fullSizeImage', {user_name: props.currentUser.name});
+      };
 
 
     const gameVote = () => {
@@ -650,6 +733,47 @@ function game(props) {
       
       };
 
+      const fetchNFLPropData = async (propName, propOverOdds, propUnderOdds) => {
+
+        analytics().logEvent('selectNFLProps', {user_name: props.currentUser.name});
+
+        const playerData = await firebase.firestore()
+          .collection("nfl")
+          .doc("props")
+          .collection("players")
+          .where('gameId', '==', gameId)
+          .get();
+      
+        const filteredPlayerTotal = playerData.docs
+          .map((doc) => ({ id: doc.id, ...doc.data() }))
+          .filter((player) => player.hasOwnProperty(propName))
+          .map((player) => ({ id: player.id, [propName]: player[propName] }));
+      
+        const filteredPlayerOverOdds = playerData.docs
+          .map((doc) => ({ id: doc.id, ...doc.data() }))
+          .filter((player) => player.hasOwnProperty(propOverOdds))
+          .map((player) => ({ id: player.id, [propOverOdds]: player[propOverOdds] }));
+      
+        const filteredPlayerUnderOdds = playerData.docs
+          .map((doc) => ({ id: doc.id, ...doc.data() }))
+          .filter((player) => player.hasOwnProperty(propUnderOdds))
+          .map((player) => ({ id: player.id, [propUnderOdds]: player[propUnderOdds] }));
+      
+        const filteredPlayer = filteredPlayerTotal.concat(filteredPlayerOverOdds, filteredPlayerUnderOdds)
+          .reduce((acc, curr) => {
+            const existingPlayer = acc.find(p => p.id === curr.id);
+            if (existingPlayer) {
+              Object.assign(existingPlayer, curr);
+            } else {
+              acc.push(curr);
+            }
+            return acc;
+          }, []);
+
+          setPlayerProps(filteredPlayer)
+      
+      };
+
       const fetchNHLPropData = async (propName, propOverOdds, propUnderOdds) => {
 
         analytics().logEvent('selectNHLProps', {user_name: props.currentUser.name});
@@ -790,6 +914,21 @@ function game(props) {
         
     );
 
+    const renderNFLPlayerPropListItem = ({ item }) => (
+        <View style={styles.playerPropListItemContainer}>
+            <TouchableOpacity onPress={() => {
+                handlePresentModal();
+                fetchNFLPropData(item.propTitle, item.propOverOdds, item.propUnderOdds);
+                setPropDataTypes(item.propTitle, item.propName, item.propOverOdds, item.propUnderOdds);
+                }}>
+                <Text style={styles.playerPropListItemText}>{item.propName}</Text>
+            </TouchableOpacity>
+        </View>
+        
+        
+    );
+
+
     const renderNHLPlayerPropListItem = ({ item }) => (
         <View style={styles.playerPropListItemContainer}>
             <TouchableOpacity onPress={() => {
@@ -890,6 +1029,93 @@ function game(props) {
           propUnderOdds: 'player_turnoversUnderOdds'
       },
     ];
+
+    const nflPlayerPropList = [
+        {
+            id: '1',
+            propName: 'Pass TD',
+            propTitle: 'player_pass_tdsTotal',
+            propOverOdds: 'player_pass_tdsOverOdds',
+            propUnderOdds: 'player_pass_tdsUnderOdds',
+        },
+        {
+            id: '2',
+            propName: 'Pass Yards',
+            propTitle: 'player_pass_ydsTotal',
+            propOverOdds: 'player_pass_ydsOverOdds',
+            propUnderOdds: 'player_pass_ydsUnderOdds'
+        },
+        {
+            id: '3',
+            propName: 'Completions',
+            propTitle: 'player_pass_completionsTotal',
+            propOverOdds: 'player_pass_completionsOverOdds',
+            propUnderOdds: 'player_pass_completionsUnderOdds'
+        },
+        {
+            id: '4',
+            propName: 'Attempts',
+            propTitle: 'player_pass_attemptsTotal',
+            propOverOdds: 'player_pass_attemptsOverOdds',
+            propUnderOdds: 'player_pass_attemptsUnderOdds'
+        },
+        {
+            id: '5',
+            propName: 'Interceptions',
+            propTitle: 'player_pass_interceptionsTotal',
+            propOverOdds: 'player_pass_interceptionsOverOdds',
+            propUnderOdds: 'player_pass_interceptionsUnderOdds'
+        },
+        {
+            id: '6',
+            propName: 'Longest Completion',
+            propTitle: 'player_pass_longest_completionTotal',
+            propOverOdds: 'player_pass_longest_completionOverOdds',
+            propUnderOdds: 'player_pass_longest_completionUnderOdds'
+        },
+        {
+            id: '7',
+            propName: 'Rush Yards',
+            propTitle: 'player_rush_ydsTotal',
+            propOverOdds: 'player_rush_ydsOverOdds',
+            propUnderOdds: 'player_rush_ydsUnderOdds'
+        },
+        {
+            id: '8',
+            propName: 'Rush Attempts',
+            propTitle: 'player_rush_attemptsTotal',
+            propOverOdds: 'player_rush_attemptsOverOdds',
+            propUnderOdds: 'player_rush_attemptsUnderOdds'
+        },
+        {
+            id: '9',
+            propName: 'Longest Rush',
+            propTitle: 'player_rush_longestTotal',
+            propOverOdds: 'player_rush_longestOverOdds',
+            propUnderOdds: 'player_rush_longestUnderOdds'
+        },
+        {
+            id: '10',
+            propName: 'Receptions',
+            propTitle: 'player_receptionsTotal',
+            propOverOdds: 'player_receptionsOverOdds',
+            propUnderOdds: 'player_receptionsUnderOdds'
+        },
+        {
+            id: '11',
+            propName: 'Rec Yards',
+            propTitle: 'player_reception_ydsTotal',
+            propOverOdds: 'player_reception_ydsOverOdds',
+            propUnderOdds: 'player_reception_ydsUnderOdds'
+        },
+        {
+            id: '12',
+            propName: 'Longest Rec',
+            propTitle: 'player_reception_longestTotal',
+            propOverOdds: 'player_reception_longestOverOdds',
+            propUnderOdds: 'player_reception_longestUnderOdds'
+        },
+      ];
 
     const nhlPlayerPropList = [
         {
@@ -1097,31 +1323,57 @@ function game(props) {
                             }
                     </View>
                     <View style={styles.postFooterContainer}>
-                        { item.liked == true ?
+                        {item.liked ? (
                         <View style={styles.likeContainer}>
                             <TouchableOpacity
-                                onPress={() => {onDislikePress(item.user.id, item.id); deleteLike(item.id)}} >
-                                <Ionicons name={"hammer"} size={20} color={"black"} />
+                            onPress={() => {
+                                onDislikePress(item.user.id, item.id);
+                                deleteLike(item.id);
+                            }}
+                            >
+                            <Animated.View
+                                style={{
+                                transform: [{ scale: scaleValue }],
+                                }}>
+                                <AnimatedIonicons
+                                name={"hammer"}
+                                size={20}
+                                color={item.liked ? "black" : "grey"}
+                                />
+                            </Animated.View>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 onPress={() => props.navigation.navigate('LikesList', {userId: item.creator, postId: item.id})} >
                                 <Text style={styles.likeNumber}>{item.likesCount}</Text>
                             </TouchableOpacity>
                         </View>
-                        
-                        :
-                        
+                        ) : (
                         <View style={styles.likeContainer}>
                             <TouchableOpacity
-                                onPress={() => {onLikePress(item.user.id, item.id); storeLike(item.id); sendNotificationForLike(item.user.id, item.user.name)}}> 
-                                <Ionicons name={"hammer-outline"}  size={20} color={"grey"}/>
+                            onPress={() => {
+                                onLikePress(item.user.id, item.id, item.awayTeam, item.homeTeam); // Pass awayTeam and homeTeam here
+                                storeLike(item.id);
+                                sendNotificationForLike(item.user.id, item.user.name);
+                            }}
+                            >
+                            <Animated.View
+                                style={{
+                                transform: [{ scale: scaleValue }],
+                                }}
+                            >
+                                <AnimatedIonicons
+                                name={"hammer-outline"}
+                                size={20}
+                                color={item.liked ? "black" : "grey"}
+                                />
+                            </Animated.View>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 onPress={() => props.navigation.navigate('LikesList', {userId: item.creator, postId: item.id})} >
                                 <Text style={styles.likeNumber}>{item.likesCount}</Text>
                             </TouchableOpacity>
                         </View>
-                        }
+                        )}
                         { item.faded == true ?
                         <View style={styles.likeContainer}>
                             <TouchableOpacity
@@ -1223,6 +1475,16 @@ function game(props) {
                 <FlatList
                     data={nhlPlayerPropList}
                     renderItem={renderNHLPlayerPropListItem}
+                    horizontal={true}
+                    keyExtractor={(item) => item.id}
+                    contentContainerStyle={{paddingHorizontal: 5,marginBottom:6, borderBottomColor: "#e1e2e6", borderBottomWidth: 1}}
+                />
+            : null}
+
+            {sport == 'americanfootball_nfl'  ? 
+                <FlatList
+                    data={nflPlayerPropList}
+                    renderItem={renderNFLPlayerPropListItem}
                     horizontal={true}
                     keyExtractor={(item) => item.id}
                     contentContainerStyle={{paddingHorizontal: 5,marginBottom:6, borderBottomColor: "#e1e2e6", borderBottomWidth: 1}}

@@ -267,7 +267,7 @@ export function fetchNCAAFGames() {
     })
 }
 
-/*export function fetchNBAGames() {
+export function fetchNBAGames() {
     return ((dispatch) => {
         firebase.firestore()
             .collection("nba")
@@ -283,9 +283,9 @@ export function fetchNCAAFGames() {
                 }
             })
     })
-} */
+} 
 
-export function fetchWNBAGames() {
+/*export function fetchWNBAGames() {
     return ((dispatch) => {
         firebase.firestore()
             .collection("wnba")
@@ -301,7 +301,7 @@ export function fetchWNBAGames() {
                 }
             })
     })
-}
+} */
 
 /*export function fetchNCAABGames() {
     return ((dispatch) => {
@@ -317,7 +317,7 @@ export function fetchWNBAGames() {
                 dispatch({ type: NCAAB_GAMES_STATE_CHANGE, ncaabGames });
             })
     })
-} 
+} */
 
 export function fetchNHLGames() {
     return ((dispatch) => {
@@ -335,7 +335,7 @@ export function fetchNHLGames() {
                 }
             })
     })
-} */
+} 
 
 export function fetchMMAGames() {
     return ((dispatch) => {

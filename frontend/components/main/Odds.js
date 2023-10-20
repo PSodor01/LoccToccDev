@@ -18,6 +18,8 @@ require("firebase/firebase-storage")
 
 import analytics from "@react-native-firebase/analytics";
 import { BannerAdSize, TestIds, BannerAd } from 'react-native-google-mobile-ads';
+import AnnouncementModal from '../buttons/announcement';
+import LatestBlogPreview from '../buttons/LatestBlogPreview';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -36,12 +38,18 @@ function Odds(props) {
     const [formula1Rankings, setFormula1Rankings] = useState([]);
     const [formula1RaceLive, setFormula1RaceLive] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [search, setSearch] = useState('');
     const [sport, setSport] = useState('');
     const [browse, setBrowse] = useState(false);
     const [trendingGames, setTrendingGames] = useState([]);
     const [notification, setNotification] = useState('');
     const [notificationCriteria, setNotificationCriteria] = useState(false);
+    const [searchText, setSearchText] = useState('');
+    const [filteredData, setFilteredData] = useState(sportGames);
+    const [isFirstLaunch, setIsFirstLaunch] = useState(null)
+    const [showAnnouncement, setShowAnnouncement] = useState(false);
+    const [blogPreview, setBlogPreview] = useState(true)
+
+    const { blogDetails } = props;
 
     const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-8519029912093094/8258310490'
 
@@ -68,7 +76,7 @@ function Odds(props) {
         
     }, [])
 
-    /*useEffect(() => {
+    useEffect(() => {
 
         firebase.firestore()
           .collection('users')
@@ -76,54 +84,64 @@ function Odds(props) {
           .get()
           .then((snapshot) => {
               if (snapshot.exists) {
-                  if (snapshot.data().loccMadness2023Score > -100000) {
+                  if (snapshot.data().alltimeLeaders2023 > -100000) {
                   } else{
                       firebase.firestore()
                       .collection("users")
                       .doc(firebase.auth().currentUser.uid)
-                      .set({loccMadness2023Score: 150}, { merge:true });
+                      .set({alltimeLeaders2023: 100}, { merge:true });
+
+                      setShowAnnouncement(true)
                   }
               }
           })
   
-      }, []) */
+      }, [])
 
       useEffect(() => {
-        AsyncStorage.getItem('launchCount').then(count => {
-          const launchCount = count ? parseInt(count) + 1 : 1;
-          AsyncStorage.setItem('launchCount', launchCount.toString());
-      
-          if (launchCount === 2 && StoreReview.hasAction()) {
-            StoreReview.requestReview();
-          }
+        AsyncStorage.getItem('alreadyLaunched').then(value => {
+            if(value == null ) {
+                AsyncStorage.setItem('alreadyLaunched', 'true');    
+                setIsFirstLaunch(true)
+                analytics().logEvent('firstLaunch', {user_name: props.currentUser.name});
+
+            } else {
+                setIsFirstLaunch(false);
+                if (StoreReview.hasAction()) {
+                        StoreReview.requestReview();
+                  }
+            }
         });
-      }, []);
+
+    }, []);
 
     useEffect(() => {
         fetchData()
         setLoading(true)
 
-        if ( sport == 'NFL' || sport == 'NCAAF' || sport == 'NCAAB' || sport == 'NHL' || sport =='WNBA' || sport == 'NCAAF' || sport == 'EPL' || sport == 'UFC' || sport == 'PGA' || sport == 'Futures' || sport == 'Formula 1' ||sport == 'Trending') {
+        const allowedSports = ['MLB', 'NCAAF', 'NCAAB', 'NHL', 'NBA', 'WNBA', 'NCAAF', 'EPL', 'UFC', 'PGA', 'Futures', 'Formula 1', 'Trending'];
 
-        } 
+        if (allowedSports.includes(sport)) {
+        
+        }
         else {
-            setSportGames(props.mlbGames)
-            setSport('MLB')
+            setSportGames(props.nflGames)
+            setSport('NFL')
             setLoading(false)
         }
 
-    }, [ props.wnbaGames, props.mlbGames, props.nflGames, props.ncaafGames, props.mmaGames, props.futureGames, props.formula1Teams, props.formula1Races, props.formula1Drivers, props.formula1Rankings])
+    }, [ props.nbaGames, props.nhlGames, props.mlbGames, props.nflGames, props.ncaafGames, props.mmaGames, props.futureGames, props.formula1Teams, props.formula1Races, props.formula1Drivers, props.formula1Rankings])
 
     
     const fetchData = async () => {
-        const games = [props.mlbGames, props.mmaGames, props.wnbaGames, props.nflGames, props.ncaafGames];
+        const games = [props.mlbGames, props.nbaGames, props.nhlGames, props.mmaGames, props.nflGames, props.ncaafGames];
 
         const teamLogosById = {};
             for (const logo of props.teamLogos) {
                 teamLogosById[logo.id] = logo.teamLogo;
             }
 
-            for (const game of [ ...props.mlbGames, ...props.wnbaGames]) {
+            for (const game of [ ...props.mlbGames, ...props.nflGames, ...props.ncaafGames,...props.nbaGames, ...props.nhlGames]) {
                 game.homeTeamLogo = teamLogosById[game.homeTeam];
                 game.awayTeamLogo = teamLogosById[game.awayTeam];
             }
@@ -212,7 +230,7 @@ function Odds(props) {
         return token;
     }
 
-    const sendNotification = async (notification, token) => {
+    const sendNotification = async (token) => {
 
         const currentBadgeNumber = await Notifications.getBadgeCountAsync();
         const nextBadgeNumber = currentBadgeNumber + 1;
@@ -220,6 +238,7 @@ function Odds(props) {
         const message = {
             to: token,
             sound: 'default',
+            title: 'locctocc',
             body: notification ? notification : '',
             badge: nextBadgeNumber,
             priority: 'high', 
@@ -235,85 +254,33 @@ function Odds(props) {
             body: JSON.stringify(message),
         });
 
-        // Update the badge number in the local notification center
-        await Notifications.setBadgeCountAsync(nextBadgeNumber);
+         // Update the badge number in the local notification center
+         await Notifications.setBadgeCountAsync(nextBadgeNumber);
 
+        
     }
 
     const sendNotificationToAllUsers = async () => {
-        Alert.alert(
-          'Confirmation',
-          'Are you sure you want to send a mass notification?',
-          [
-            {
-              text: 'Cancel',
-              style: 'cancel',
-              onPress: () => {
-                console.log('Notification canceled');
-                // Return early without sending the notification
-                return;
-              },
-            },
-            {
-              text: 'OK',
-              onPress: async () => {
-                const users = await firebase.firestore().collection("users").get();
+        const users = await firebase.firestore().collection("users").get();
+        users.docs.map((user) => sendNotification(user.data().token))
 
-                const sendNotificationsPromises = users.docs.map(async (user) => {
-                    const token = user.data().token;
-                    if (token) {
-                        console.log(user.id);
-                        await sendNotification(user.data().token);
-                    }
-                });
+        await analytics().logEvent('sendNotificationToAllUsers', {user_name: props.currentUser.name})
 
-                await Promise.all(sendNotificationsPromises);
 
-                await analytics().logEvent('sendNotificationToAllUsers', {user_name: props.currentUser.name,});
-        
-                Alert.alert('Notifications Sent', 'Mass notification has been sent successfully.');
-                
-            
-            },
-              
-            },
-          ],
-          { cancelable: false }
-        );
+
+    };
+
+      const handleSearch = (text) => {
+        setSearchText(text);
+        const newData = sportGames.filter((item) => {
+          const awayData = item.awayTeam ? item.awayTeam.toUpperCase() : '';
+          const homeData = item.homeTeam ? item.homeTeam.toUpperCase() : '';
+          const textData = text.toUpperCase();
+          return awayData.includes(textData) || homeData.includes(textData);
+        });
+        setFilteredData(newData);
       };
 
-    const searchNFLFilter = (text) => {
-        if (text) {
-            const newData = sportGames.filter((item) => {
-                const awayData = item.awayTeam ? item.awayTeam.toUpperCase() : ''.toUpperCase();
-                const homeData = item.homeTeam ? item.homeTeam.toUpperCase() : ''.toUpperCase();
-
-                const textData = text.toUpperCase();
-                return (awayData.indexOf(textData) > -1 ||
-                homeData.indexOf(textData) > -1)
-                
-            });
-            setSportGames(newData)
-            setSearch(text)
-
-        } else {
-            if (sport == 'NCAAF') {setSportGames(props.ncaafGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))} 
-            if (sport == 'NFL') {setSportGames(props.nflGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))} 
-            if (sport == 'MLB') {setSportGames(props.mlbGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))}
-            if (sport == 'NCAAB') {setSportGames(props.ncaabGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))}
-            if (sport == 'NBA') {setSportGames(props.nbaGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))}
-            if (sport == 'WNBA') {setSportGames(props.nbaGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))}
-            if (sport == 'NHL') {setSportGames(props.nhlGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))}
-            if (sport == 'MMA') {setSportGames(props.mmaGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate)))} 
-            if (sport == 'EPL') {setSportGames(props.eplGames)}
-            if (sport == 'PGA') {setSportGames(props.golfGames)}
-            if (sport == 'Futures') {setSportGames(props.futureGames)}
-            if (sport == 'Formula 1') {setSportGames(props.formula1Races)}
-            if(sport == 'Trending') {setSportGames(trendingGames)}
-            setSearch(text)
-        }
-        
-    }
 
     const browseFunction = () => {
 
@@ -322,6 +289,7 @@ function Odds(props) {
         } else {
             setBrowse(true)
             analytics().logEvent('searchGames', {user_name: props.currentUser.name});
+            setBlogPreview(false)
         }
     }
 
@@ -333,21 +301,36 @@ function Odds(props) {
         }
     }
 
+    const renderPeppers = (count) => {
+        const peppers = [];
+        if (count > 6) {
+          peppers.push(<FontAwesome5 key={1} name="pepper-hot" size={16} color="#B81D13" />);
+          peppers.push(<FontAwesome5 key={2} name="pepper-hot" size={16} color="#B81D13" />);
+          peppers.push(<FontAwesome5 key={3} name="pepper-hot" size={16} color="#B81D13" />);
+        } else if (count > 4) {
+          peppers.push(<FontAwesome5 key={1} name="pepper-hot" size={16} color="orange" />);
+          peppers.push(<FontAwesome5 key={2} name="pepper-hot" size={16} color="orange" />);
+        } else if (count > 0) {
+          peppers.push(<FontAwesome5 key={1} name="pepper-hot" size={16} color="#fed550" />);
+        }
+        return peppers;
+      };
+
     const setSportFunction = (sport) => {
-        if (sport == 'Trending') {setSportGames(trendingGames); analytics().logEvent('selectTrendingGames', { user_name: props.currentUser.name }); setSport('Trending');}
-        if (sport == 'NFL') {setSportGames(props.nflGames); analytics().logEvent('selectNFLGames', {user_name: props.currentUser.name}); setSport('NFL');}
-        if (sport == 'NBA') {setSportGames(props.nbaGames); analytics().logEvent('selectNBAGames', {user_name: props.currentUser.name}); setSport('NBA');}
-        if (sport == 'WNBA') {setSportGames(props.wnbaGames); analytics().logEvent('selectWNBAGames', {user_name: props.currentUser.name}); setSport('WNBA');}
-        if (sport == 'NHL') {setSportGames(props.nhlGames); analytics().logEvent('selectNHLGames', {user_name: props.currentUser.name}); setSport('NHL');}
-        if (sport == 'NCAAF') {setSportGames(props.ncaafGames); analytics().logEvent('selectNCAAFGames', {user_name: props.currentUser.name}); setSport('NCAAF');}
-        if (sport == 'EPL') {setSportGames(props.eplGames); analytics().logEvent('selectEPLGames', {user_name: props.currentUser.name}); setSport('EPL');}
-        if (sport == 'MLB') {setSportGames(props.mlbGames); analytics().logEvent('selectMLBGames', {user_name: props.currentUser.name}); setSport('MLB');}
-        if (sport == 'NCAAB') {setSportGames(props.ncaabGames); analytics().logEvent('selectNCAABGames', {user_name: props.currentUser.name}); setSport('NCAAB');}
-        if (sport == 'UFC') {setSportGames(props.mmaGames); analytics().logEvent('selectUFCGames', {user_name: props.currentUser.name}); setSport('UFC');}
-        if (sport == 'PGA') {setSportGames(props.golfGames); analytics().logEvent('selectGolfGames', {user_name: props.currentUser.name}); setSport('PGA');}
-        if (sport == 'Futures') {setSportGames(props.futureGames); analytics().logEvent('selectFuturesGames', {user_name: props.currentUser.name}); setSport('Futures');}
-        if (sport == 'Formula 1') {setSportGames(props.formula1Races); analytics().logEvent('selectFormula1Games', {user_name: props.currentUser.name}); setSport('Formula 1');}
-        if (sport == 'Fantasy') {setSportGames(fantasyGames); analytics().logEvent('selectFantasyGames', {user_name: props.currentUser.name}); setSport('Fantasy');}
+        if (sport == 'Trending') {setSportGames(trendingGames); analytics().logEvent('selectTrendingGames', { user_name: props.currentUser.name }); setSport('Trending'); setBlogPreview(false)}
+        if (sport == 'NFL') {setSportGames(props.nflGames); analytics().logEvent('selectNFLGames', {user_name: props.currentUser.name}); setSport('NFL'); setBlogPreview(false)}
+        if (sport == 'NBA') {setSportGames(props.nbaGames); analytics().logEvent('selectNBAGames', {user_name: props.currentUser.name}); setSport('NBA'); setBlogPreview(false)}
+        if (sport == 'WNBA') {setSportGames(props.wnbaGames); analytics().logEvent('selectWNBAGames', {user_name: props.currentUser.name}); setSport('WNBA'); setBlogPreview(false)}
+        if (sport == 'NHL') {setSportGames(props.nhlGames); analytics().logEvent('selectNHLGames', {user_name: props.currentUser.name}); setSport('NHL'); setBlogPreview(false)}
+        if (sport == 'NCAAF') {setSportGames(props.ncaafGames); analytics().logEvent('selectNCAAFGames', {user_name: props.currentUser.name}); setSport('NCAAF'); setBlogPreview(false)}
+        if (sport == 'EPL') {setSportGames(props.eplGames); analytics().logEvent('selectEPLGames', {user_name: props.currentUser.name}); setSport('EPL'); setBlogPreview(false)}
+        if (sport == 'MLB') {setSportGames(props.mlbGames); analytics().logEvent('selectMLBGames', {user_name: props.currentUser.name}); setSport('MLB'); setBlogPreview(false)}
+        if (sport == 'NCAAB') {setSportGames(props.ncaabGames); analytics().logEvent('selectNCAABGames', {user_name: props.currentUser.name}); setSport('NCAAB'); setBlogPreview(false)}
+        if (sport == 'UFC') {setSportGames(props.mmaGames); analytics().logEvent('selectUFCGames', {user_name: props.currentUser.name}); setSport('UFC'); setBlogPreview(false)}
+        if (sport == 'PGA') {setSportGames(props.golfGames); analytics().logEvent('selectGolfGames', {user_name: props.currentUser.name}); setSport('PGA'); setBlogPreview(false)}
+        if (sport == 'Futures') {setSportGames(props.futureGames); analytics().logEvent('selectFuturesGames', {user_name: props.currentUser.name}); setSport('Futures'); setBlogPreview(false)}
+        if (sport == 'Formula 1') {setSportGames(props.formula1Races); analytics().logEvent('selectFormula1Games', {user_name: props.currentUser.name}); setSport('Formula 1'); setBlogPreview(false)}
+        if (sport == 'Fantasy') {setSportGames(fantasyGames); analytics().logEvent('selectFantasyGames', {user_name: props.currentUser.name}); setSport('Fantasy'); setBlogPreview(false)}
     }
 
     const nbaIcon = (<Icon name="basketball-outline" color="#ee6730" size={16}/>);
@@ -373,34 +356,34 @@ function Odds(props) {
             icon: trendingIcon
         },
         {
-            sport: 'MLB',
-            id: '2',
-            icon: mlbIcon
-        },
-        {
             sport: 'NFL',
-            id: '3',
+            id: '2',
             icon: nflIcon
         },
         {
             sport: 'NCAAF',
-            id: '4',
+            id: '3',
             icon: ncaafIcon
         },
         {
-            sport: 'WNBA',
+            sport: 'MLB',
+            id: '4',
+            icon: mlbIcon
+        },
+        {
+            sport: 'NBA',
             id: '5',
-            icon: wnbaIcon
+            icon: nbaIcon
+        },
+        {
+            sport: 'NHL',
+            id: '6',
+            icon: nhlIcon
         },
         {
             sport: 'UFC',
-            id: '6',
+            id: '7',
             icon: mmaIcon
-        },
-        {
-            sport: 'Formula 1',
-            id:'7',
-            icon: formula1Icon
         },
         {
             sport: 'Futures',
@@ -483,34 +466,23 @@ function Odds(props) {
             }}
         />
     </View> */
-        
 
-      const renderSportsListItem = ({ item }) => (
-        <View>
-        {sport == item.sport ?
-            <View style={styles.sportContainerHighlight}>
-                <TouchableOpacity
-                    style={styles.sportButton}
-                    onPress={() => {setSportFunction(item.sport)}}>
-                    {item.sport != 'Trending' ? <Text>{item.sport}</Text> : null}
-                    {item.sport != 'Trending' ? <Text> {item.icon}</Text> : <Text>{item.icon}{item.icon}</Text> }
-                </TouchableOpacity>
-            </View>
-        :
-            <View style={styles.sportContainer}>
-                <TouchableOpacity
-                    style={styles.sportButton}
-                    onPress={() => {setSportFunction(item.sport)}}>
-                    {item.sport != 'Trending' ? <Text>{item.sport}</Text> : null}
-                    {item.sport != 'Trending' ? <Text> {item.icon}</Text> : <Text>{item.icon}{item.icon}</Text> }
-                </TouchableOpacity>
-            </View>
-        }
-            
-        </View>
-        
-        
-    );
+    const renderSportsListItem = ({ item }) => {
+        return (
+          <View style={item.sport === sport ? styles.sportContainerHighlight : styles.sportContainer}>
+            <TouchableOpacity
+              style={styles.sportButton}
+              onPress={() => {
+                setSportFunction(item.sport); 
+              }}
+            >
+              {item.sport !== 'Trending' && <Text>{item.sport}</Text>}
+              <Text> {item.icon}</Text>
+              {item.sport === 'Trending' && <Text>{item.icon}</Text>}
+            </TouchableOpacity>
+          </View>
+        );
+      };
 
     const renderItem = ({ item }) => {
         return (
@@ -519,55 +491,27 @@ function Odds(props) {
                     <TouchableOpacity
                         onPress={() => props.navigation.navigate('game', {gameId: item.gameId, gameDate: item.gameDate, homeTeam: item.homeTeam, awayTeam: item.awayTeam, homeSpread: item.homeSpread, awaySpread: item.awaySpread, homeSpreadOdds: item.homeSpreadOdds, awaySpreadOdds: item.awaySpreadOdds, awayMoneyline: item.awayMoneyline, homeMoneyline: item.homeMoneyline, over: item.over, overOdds: item.overOdds, under: item.under, underOdds: item.underOdds, sport: item.sport, homeScore: item.homeScore, awayScore: item.awayScore, awayTeamLogo: item.awayTeamLogo, homeTeamLogo: item.homeTeamLogo })}>
                         <View>
-                            {item.gamePostsCount > 6 ?
-                                <View style={styles.gameDateContainer}>
-                                    <Text style={styles.dateText}>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
-                                        
-                                    <View style={styles.pepperContainer}>
-                                        <FontAwesome5 name={"pepper-hot"} size={16} color={"#B81D13"}/>
-                                        <FontAwesome5 name={"pepper-hot"} size={16} color={"#B81D13"}/>
-                                        <FontAwesome5 name={"pepper-hot"} size={16} color={"#B81D13"}/>
-                                    </View>
+                            <View style={styles.gameDateContainer}>
+                                <Text style={styles.dateText}>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
+                                <View style={styles.pepperContainer}>
+                                    {renderPeppers(item.gamePostsCount)}
                                 </View>
-                                
-                            : 
-                            item.gamePostsCount > 4 ?
-                                <View style={styles.gameDateContainer}>
-                                    <Text style={styles.dateText}>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
-                                    
-                                    <View style={styles.pepperContainer}>
-                                        <FontAwesome5 name={"pepper-hot"} size={16} color={"orange"}/>
-                                        <FontAwesome5 name={"pepper-hot"} size={16} color={"orange"}/>
-                                    </View>
-                                </View>
-                            : 
-                            item.gamePostsCount > 0 ? 
-                                <View style={styles.gameDateContainer}>
-                                    <Text style={styles.dateText}>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
-                                    <View style={styles.pepperContainer}>
-                                        <FontAwesome5 name={"pepper-hot"} size={16} color={"#fed550"}/>
-                                    </View>
-                                </View>
-                            :
-                                <View style={styles.gameDateContainer}>
-                                    <Text style={styles.dateText}>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
-                                </View>
-                                }
+                            </View>
                             <View style={styles.awayGameInfoContainer}>
                                 <View style={styles.teamItem}>
                                     <View style={styles.teamNameItem}>
-                                    {item.sport == 'mma_mixed_martial_arts' ?
-                                    null
-                                    :
-                                    <Image  source={{ uri: item.awayTeamLogo }} style={styles.logoImage} />}
+                                        {item.sport == 'mma_mixed_martial_arts' ? null : (
+                                        <Image source={{ uri: item.awayTeamLogo }} style={styles.logoImage} />
+                                        )}
                                         <View>
-                                            <Text style={styles.teamText}>{item.awayTeam}</Text>
+                                        <Text style={styles.teamNameText}>{item.awayTeam}</Text>
                                         </View>
                                     </View>
                                     <View style={styles.teamScoreItem}>
-                                    {item.awayScore || item.homeScore ? <Text style={styles.scoreText}>{item.awayScore}</Text> : null}
+                                        {item.awayScore || item.homeScore ? (
+                                        <Text style={styles.scoreText}>{item.awayScore}</Text>
+                                        ) : null}
                                     </View>
-                                    
                                 </View>
                                 
                                 <View style={styles.moneylineItem}>
@@ -606,13 +550,12 @@ function Odds(props) {
                                         :
                                         <Image  source={{ uri: item.homeTeamLogo }} style={styles.logoImage} />}
                                         <View>
-                                            <Text style={styles.teamText}>{item.homeTeam}</Text>
+                                            <Text style={styles.teamNameText}>{item.homeTeam}</Text>
                                         </View>
                                     </View>
                                     <View style={styles.teamScoreItem}>
                                     {item.awayScore || item.homeScore ? <Text style={styles.scoreText}>{item.homeScore}</Text> : null}
                                     </View>
-                                    
                                 </View>
                                 <View style={styles.moneylineItem}>
                                     {item.homeMoneyline > 0 ? 
@@ -657,38 +600,12 @@ function Odds(props) {
                     <TouchableOpacity
                         onPress={() => props.navigation.navigate('game', {gameId: item.gameId, gameDate: item.gameDate, homeTeam: item.homeTeam, awayTeam: item.awayTeam, awayMoneyline: item.awayMoneyline, homeMoneyline: item.homeMoneyline, drawMoneyline: item.drawMoneyline, sport: item.sport, homeScore: item.homeScore, awayScore: item.awayScore })}>
                         <View>
-                            {item.gamePostsCount > 6 ?
-                                <View style={styles.gameDateContainer}>
-                                    <Text style={styles.dateText}>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
-                                    <View style={styles.pepperContainer}>
-                                        <FontAwesome5 name={"pepper-hot"} size={16} color={"#B81D13"}/>
-                                        <FontAwesome5 name={"pepper-hot"} size={16} color={"#B81D13"}/>
-                                        <FontAwesome5 name={"pepper-hot"} size={16} color={"#B81D13"}/>
-                                    </View>
+                            <View style={styles.gameDateContainer}>
+                                <Text style={styles.dateText}>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
+                                <View style={styles.pepperContainer}>
+                                    {renderPeppers(item.gamePostsCount)}
                                 </View>
-                                
-                            : 
-                            item.gamePostsCount > 4 ?
-                                <View style={styles.gameDateContainer}>
-                                    <Text style={styles.dateText}>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
-                                    <View style={styles.pepperContainer}>
-                                        <FontAwesome5 name={"pepper-hot"} size={16} color={"orange"}/>
-                                        <FontAwesome5 name={"pepper-hot"} size={16} color={"orange"}/>
-                                    </View>
-                                </View>
-                            : 
-                            item.gamePostsCount > 0 ? 
-                                <View style={styles.gameDateContainer}>
-                                    <Text style={styles.dateText}>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
-                                    <View style={styles.pepperContainer}>
-                                        <FontAwesome5 name={"pepper-hot"} size={16} color={"#fed550"}/>
-                                    </View>
-                                </View>
-                            :
-                                <View style={styles.gameDateContainer}>
-                                    <Text style={styles.dateText}>{moment(item.gameDate).format('MMMM Do, h:mma')}</Text>
-                                </View>
-                                }
+                            </View>
                             <View style={styles.eplAwayGameInfoContainer}>
                                 <View style={styles.teamItem}>
                                     <Text style={styles.teamText}>{item.awayTeam}</Text>
@@ -823,6 +740,10 @@ function Odds(props) {
     
       return (
         <View style={styles.container}>
+            <AnnouncementModal
+                showAnnouncement={showAnnouncement}
+                onClose={() => setShowAnnouncement(false)}
+            />
             {firebase.auth().currentUser.uid == 'U6u9pFuuwLVEn97z76a07WHK1V63' ?
             notificationCriteria == true ?
             <View style={styles.notificationContainer}>
@@ -873,9 +794,8 @@ function Odds(props) {
                     style={styles.textInput}
                     placeholder="Find your lock..."
                     clearButtonMode={'while-editing'}
-                    autoCorrect={false}
-                    value={search}
-                    onChangeText={(text) => searchNFLFilter(text)}
+                    value={searchText}
+                    onChangeText={handleSearch}
                 />
             </View>
                 
@@ -1217,16 +1137,21 @@ function Odds(props) {
 
             </ScrollView>
             :
+                
+            
+            <FlatList
+                data={searchText ? filteredData : sportGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate))}
+                style={styles.feed}
+                renderItem={renderItem}
 
-            <FlatList 
-            data={sportGames.sort((a, b) => a.gameDate.localeCompare(b.gameDate))}
-            style={styles.feed}
-            renderItem={renderItem}
-            ListEmptyComponent={() => (loading && <ActivityIndicator size="large" />)}
             />
+            
 
             }
-
+            {blogPreview == true ? 
+            <View style={styles.blogContainer}>
+                <LatestBlogPreview blogDetails={blogDetails} />
+            </View> : null }
             <View style={styles.adView}>
                 <BannerAd
                     unitId={adUnitId}
@@ -1260,6 +1185,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingTop: 6,
         backgroundColor: "#ffffff",
+    },
+    blogContainer: {
     },
     sportListContainer: {
         alignItems: 'center',
@@ -1358,14 +1285,17 @@ const styles = StyleSheet.create({
             flexDirection: 'row',
             alignItems: 'center',
             paddingRight: 2,
-            justifyContent: "space-between"
-
-        },
+            justifyContent: "space-between",
+          },
         teamNameItem: {
             backgroundColor: "#ffffff",
             flexDirection: 'row',
             paddingRight: 2,
             alignItems: 'center',
+            width: '80%'
+          },
+        teamNameText: {
+            flexWrap: 'wrap', // Allow the team name text to wrap
         },
         teamScoreItem: {
             alignItems: 'center',
@@ -1630,7 +1560,8 @@ const mapStateToProps = (store) => ({
     mlbGames: store.mlbGamesState.mlbGames,
     nflGames: store.nflGamesState.nflGames,
     ncaafGames: store.ncaafGamesState.ncaafGames,
-    wnbaGames: store.wnbaGamesState.wnbaGames,
+    nbaGames: store.nbaGamesState.nbaGames,
+    nhlGames: store.nhlGamesState.nhlGames,
     mmaGames: store.mmaGamesState.mmaGames,
     futureGames: store.futureGamesState.futureGames,
     teamLogos: store.teamLogosState.teamLogos,

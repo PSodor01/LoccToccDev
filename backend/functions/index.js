@@ -210,28 +210,65 @@ exports.getLogoData = functions.pubsub.schedule('every 2 minutes').timeZone('Ame
     redirect: 'follow',
     headers: {
       'x-rapidapi-key': '2354874cc8e479f89b4d769daf9de0df',
-      'x-rapidapi-host': 'v1.hockey.api-sports.io'
+      'x-rapidapi-host': 'v1.american-football.api-sports.io'
     },
   };
 
   try {
-    const response = await axios.get("https://v1.hockey.api-sports.io/teams?league=57&season=2022", options)
-    .then(result => {
-
-        for (let i = 0; i < result.data.response.length; i++){
-          const writeResult = admin
-            .firestore()
-            .collection("logos")
-            .doc(result.data.response[i].name)
-            .set({
-              teamLogo: result.data.response[i].logo,
-
-          }, { merge:true });           
+    for (let id = 30; id <= 32; id++) {
+      const response = await axios.get(`https://v1.american-football.api-sports.io/teams?id=${id}`, options);
+      const teamData = response.data.response[0];
+      if (teamData) {
+        const writeResult = await admin
+          .firestore()
+          .collection("logos")
+          .doc(teamData.name)
+          .set({
+            teamLogo: teamData.logo,
+          }, { merge: true });
+        console.log(`Team logo for ID ${id} fetched and stored.`);
+      } else {
+        console.log(`Team logo for ID ${id} not found.`);
       }
-           
-    })
-  }catch(err) {console.error(err.message)}
-})
+    }
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
+exports.getNCAALogoData = functions.pubsub.schedule('every 2 minutes').timeZone('America/New_York').onRun(async() => {
+  const rawDataUrl = 'https://gist.githubusercontent.com/saiemgilani/c6596f0e1c8b148daabc2b7f1e6f6add/raw/915d48a38d56a90a02d20856faf428408eeff131/logos';
+
+  const options = {
+    method: 'GET',
+    headers: {
+      'Accept': 'text/plain',
+    },
+  };
+
+  try {
+    const response = await axios.get(rawDataUrl, options);
+    const lines = response.data.split('\n');
+    
+    for (const line of lines) {
+      const [id, school, mascot, , , , , , , , , logo] = line.split(',');
+      if (id && school && mascot && logo) {
+        const teamName = `${school} ${mascot}`;
+        const writeResult = await admin
+          .firestore()
+          .collection("logos")
+          .doc(teamName)
+          .set({
+            teamLogo: logo,
+          }, { merge: true });
+        console.log(`Team logo for ${teamName} fetched and stored.`);
+      }
+    }
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
 
 exports.getNFLGameData = functions.pubsub.schedule('every 10 minutes').onRun(async() => {
   try {
@@ -305,12 +342,48 @@ exports.getNFLGameData = functions.pubsub.schedule('every 10 minutes').onRun(asy
       }
 
       await collectionRef.doc(game.id).set(updateData, { merge: true });
+      
+      try {
+        const response2 = axios.get(`https://api.the-odds-api.com/v4/sports/americanfootball_nfl/events/${game.id}/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=player_pass_tds,player_pass_completions,player_pass_attempts,player_pass_interceptions,player_pass_longest_completion,player_pass_longest_completion,player_rush_yds,player_rush_attempts,player_rush_longest,player_receptions,player_reception_yds,player_reception_longest&oddsFormat=american&dateFormat=iso`)
+        .then(result => {
+          result.data.bookmakers[0].markets.forEach(market => {
+            const propType = market.key;
+            market.outcomes.forEach(outcome => {
+
+              if (outcome.name === 'Over') {
+              const writeResult = admin.firestore().collection("nfl").doc("props").collection('players').doc(outcome.description).set({
+                gameId: result.data.id,
+                playerPropName: outcome.description,
+                [`${propType}Total`]: outcome.point,
+                [`${propType}OverOdds`]: outcome.price,
+              }, { merge:true });
+            } 
+            else if (outcome.name === 'Under') {
+              const writeResult = admin.firestore().collection("nfl").doc("props").collection('players').doc(outcome.description).set({
+                [`${propType}UnderOdds`]: outcome.price,
+              }, { merge:true });
+
+            }
+
+
+            });
+          });
+        });
+      } catch (error) {
+        console.error(error);
+      }
+
     }
+
+    
+
   } catch (err) {
     console.error(err.message);
   }
 
-  })
+      
+
+})
 
   exports.getNFLScoresData = functions.pubsub.schedule('every 10 minutes').onRun(async() => {
     try {
@@ -435,7 +508,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 10 minutes').onRun(a
     }
   })
 
-  exports.getNBAGameData = functions.pubsub.schedule('every 10 minutes').onRun(async() => {
+  exports.getNBAGameData = functions.pubsub.schedule('every 20 minutes').onRun(async() => {
     try {
       const response = await axios.get('https://api.the-odds-api.com/v4/sports/basketball_nba/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso');
       const games = response.data;
@@ -551,7 +624,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 10 minutes').onRun(a
 
   })
 
-  exports.getNBAScoresData = functions.pubsub.schedule('every 2 minutes').onRun(async() => {
+  exports.getNBAScoresData = functions.pubsub.schedule('every 20 minutes').onRun(async() => {
     try {
       const response = await axios.get('https://api.the-odds-api.com/v4/sports/basketball_nba/scores/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&dateFormat=iso')
       .then(result => {
@@ -914,7 +987,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 10 minutes').onRun(a
     }
   })
 
-  exports.getNHLGameData = functions.pubsub.schedule('every 10 minutes').onRun(async() => {
+  exports.getNHLGameData = functions.pubsub.schedule('every 20 minutes').onRun(async() => {
     try {
       const response = await axios.get('https://api.the-odds-api.com/v4/sports/icehockey_nhl/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso');
       const games = response.data;

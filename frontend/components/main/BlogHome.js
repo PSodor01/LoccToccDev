@@ -46,10 +46,10 @@ function BlogHomeScreen(props) {
                         <Image source={{ uri: item.blogImage }} style={styles.logoImage} />
                         <View style={styles.textContainer}>
                             <Text style={styles.title}>{item.blogTitle}</Text>
-                            {item.blogAuthor == "A Locctocc Original" ? 
-                            <Text style={styles.author}>{item.blogAuthor}</Text> 
-                            : <Text style={styles.author}>Written by: {item.blogAuthor}</Text>}
-                            <Text style={styles.date}>{moment(item.blogDate.toDate()).format("MMM Do, YYYY")}</Text>
+                            <Text style={styles.author}>{item.blogAuthor}</Text>
+                            <Text style={styles.date}>
+                            {moment(item.blogDate.toDate()).format("MMM Do, YYYY")}
+                            </Text>
                         </View>
                     </View>
                 </TouchableOpacity>
@@ -86,40 +86,42 @@ const styles = StyleSheet.create({
     textInputContainer: {
         flex: 1,
         backgroundColor: "#ffffff",
-    },
-    feedItem: {
+      },
+      feedItem: {
         padding: 10,
         marginVertical: 2,
         borderBottomWidth: 1,
         borderBottomColor: "#e1e2e6",
         alignItems: "center",
         width: "100%",
-    },
-    logoImage: {
+      },
+      logoImage: {
         resizeMode: "cover",
         width: "80%",
         aspectRatio: 1.5,
         borderRadius: 5,
         marginBottom: 10,
-    },
-    textContainer: {
+      },
+      textContainer: {
         flex: 1,
         alignItems: 'center',
-    },
-    title: {
+      },
+      title: {
         fontSize: 18,
         fontWeight: "bold",
         marginBottom: 5,
-    },
-    author: {
+        textAlign: 'center', // Center text horizontally
+
+      },
+      author: {
         fontSize: 16,
         fontWeight: "bold",
         marginBottom: 5,
-    },
-    date: {
+      },
+      date: {
         color: "grey",
         fontSize: 14,
-    },
+      },
     adView: {
         alignItems: "center",
         justifyContent: "center",
