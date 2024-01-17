@@ -1169,14 +1169,6 @@ function Odds(props) {
                 />
                 
             </View>
-                
-       
-           
-            
-         
-            
-            
-            
         </View>
     );
     
