@@ -6,7 +6,6 @@ import { USER_STATE_CHANGE,
     LIKES_STATE_CHANGE, 
     FADES_STATE_CHANGE, 
     USER_BLOCKING_STATE_CHANGE, 
-    CONTEST_STATUS_STATE_CHANGE, 
     CLEAR_DATA } from "../constants"
 
 const initialState = {
@@ -18,7 +17,6 @@ const initialState = {
     faded: [],
     allUsers: [],
     allPosts: [],
-    contestStatus:[],
 }
 
 export const user = (state = initialState, action) => {
@@ -63,11 +61,6 @@ export const user = (state = initialState, action) => {
             return {
                 ...state,
                 allPosts: action.allPosts
-            }
-        case CONTEST_STATUS_STATE_CHANGE:
-            return {
-                ...state,
-                contestStatus: action.contestStatus
             }
         case CLEAR_DATA:
             return initialState

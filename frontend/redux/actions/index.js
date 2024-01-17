@@ -28,39 +28,54 @@ import { USER_STATE_CHANGE,
     CLEAR_DATA
     } from '../constants/index'
     
-    import firebase from 'firebase'
-    import { SnapshotViewIOSComponent } from 'react-native'
-    require('firebase/firestore')
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 
-   
+const currentUser = auth().currentUser;
+
 
 export function clearData() {
     return ((dispatch) => {
         dispatch({type: CLEAR_DATA})
     })
 }
-
 export function fetchUser() {
-    return ((dispatch) => {
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .get()
-            .then((snapshot) => {
-                if (snapshot.exists) {
-                    dispatch({ type: USER_STATE_CHANGE, currentUser: snapshot.data() })
-                }
-                else {
-                }
-            })
-    })
-}
+    return (dispatch) => {
+      const unsubscribe = auth().onAuthStateChanged(async (user) => {
+        if (user) {
+          try {
+            const snapshot = await firestore()
+              .collection('users')
+              .doc(user.uid)
+              .get();
+  
+            if (snapshot.exists) {
+              dispatch({ type: USER_STATE_CHANGE, currentUser: snapshot.data() });
+            } else {
+              // Handle the case where the user document does not exist
+            }
+          } catch (error) {
+            console.error('Error fetching user:', error);
+            // Handle the error appropriately
+          }
+        } else {
+          // Handle the case where no user is signed in
+          console.log('No user signed in');
+        }
+  
+        // Clean up the listener when component unmounts
+        unsubscribe();
+      });
+    };
+  }
 
-export function fetchUserFollowing() {
+  export function fetchUserFollowing() {
+    const currentUser = auth().currentUser;
+
     return ((dispatch) => {
-        firebase.firestore()
+        firestore()
             .collection("following")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(currentUser.uid)
             .collection("userFollowing")
             .onSnapshot((snapshot) => {
                 let following = snapshot.docs.map(doc => {
@@ -75,11 +90,13 @@ export function fetchUserFollowing() {
     })
 }
 
-export function fetchUserBlocking() {
+  export function fetchUserBlocking() {
+    const currentUser = auth().currentUser;
+
     return ((dispatch) => {
-        firebase.firestore()
+       firestore()
             .collection("blocking")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(currentUser.uid)
             .collection("userBlocking")
             .onSnapshot((snapshot) => {
                 let blocking = snapshot.docs.map(doc => {
@@ -94,10 +111,12 @@ export function fetchUserBlocking() {
 }
 
 export function fetchUserNotifications() {
+    const currentUser = auth().currentUser;
+
     return ((dispatch) => {
-        firebase.firestore()
+        firestore()
             .collection("users")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(currentUser.uid)
             .collection("notifications")
             .orderBy('creation', 'desc')
             .onSnapshot((snapshot) => {
@@ -111,12 +130,13 @@ export function fetchUserNotifications() {
             })
     })
 }
-
 export function fetchLikes() {
+    const currentUser = auth().currentUser;
+
     return ((dispatch) => {
-        firebase.firestore()
+        firestore()
             .collection("likes")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(currentUser.uid)
             .collection("userLikes")
             .onSnapshot((snapshot) => {
                 let liked = snapshot.docs.map(doc => {
@@ -131,10 +151,12 @@ export function fetchLikes() {
 }
 
 export function fetchFades() {
+    const currentUser = auth().currentUser;
+
     return ((dispatch) => {
-        firebase.firestore()
+        firestore()
             .collection("fades")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(currentUser.uid)
             .collection("userFades")
             .onSnapshot((snapshot) => {
                 let faded = snapshot.docs.map(doc => {
@@ -148,36 +170,11 @@ export function fetchFades() {
     })
 }
 
-
-
-/*export function fetchAllPosts(uid) {
-    var ourDate = new Date();
-    var pastDate = ourDate.getDate() - 3;
-    ourDate.setDate(pastDate);
-    return ((dispatch) => {
-        firebase.firestore()
-            .collectionGroup("userPosts")
-            .where("creation", ">=", ourDate)
-            .orderBy('creation', 'desc')
-            .get()
-            .then((snapshot) => {
-                let allPosts = snapshot.docs.map(doc => {
-                    const data = doc.data();
-                    const id = doc.id;
-                    return { id, ...data }
-                })
-                dispatch({ type: ALL_POSTS_STATE_CHANGE, allPosts });
-                for(let i = 0; i < allPosts.length; i++){
-                }
-            })
-    })
-} */
-
 export function fetchUsersData(uid, getPosts) {
     return ((dispatch, getState) => {
         const found = getState().usersState.users.some(el => el.uid === uid);
         if (!found) {
-            firebase.firestore()
+            firestore()
                 .collection("users")
                 .doc(uid)
                 .get()
@@ -198,7 +195,7 @@ export function fetchUsersData(uid, getPosts) {
 
 export function fetchAllUsers() {
     return ((dispatch) => {
-        firebase.firestore()
+        firestore()
             .collection("users")
             .onSnapshot((snapshot) => {
                 let allUsers = snapshot.docs.map(doc => {
@@ -213,11 +210,11 @@ export function fetchAllUsers() {
     })
 }
 
-export function fetchMLBGames() {
+/*export function fetchMLBGames() {
     return (dispatch) => {
       dispatch({ type: MLB_GAMES_STATE_CHANGE, mlbGames: [] }); // Clear previous games if any
     
-      firebase.firestore()
+      firestore()
         .collection("mlb")
         .orderBy('gameDate', 'desc')
         .onSnapshot((snapshot) => {
@@ -230,10 +227,11 @@ export function fetchMLBGames() {
         });
     };
   }
+  */
 
 export function fetchNFLGames() {
     return ((dispatch) => {
-        firebase.firestore()
+        firestore()
             .collection("nfl")
             .orderBy('gameDate', 'desc')
             .onSnapshot((snapshot) => {
@@ -249,9 +247,9 @@ export function fetchNFLGames() {
     })
 }
 
-export function fetchNCAAFGames() {
+/*export function fetchNCAAFGames() {
     return ((dispatch) => {
-        firebase.firestore()
+        firestore()
             .collection("ncaaf")
             .orderBy('gameDate', 'desc')
             .onSnapshot((snapshot) => {
@@ -265,11 +263,11 @@ export function fetchNCAAFGames() {
                 }
             })
     })
-}
+} */
 
 export function fetchNBAGames() {
     return ((dispatch) => {
-        firebase.firestore()
+        firestore()
             .collection("nba")
             .orderBy('gameDate', 'desc')
             .onSnapshot((snapshot) => {
@@ -287,7 +285,7 @@ export function fetchNBAGames() {
 
 /*export function fetchWNBAGames() {
     return ((dispatch) => {
-        firebase.firestore()
+        firestore()
             .collection("wnba")
             .orderBy('gameDate', 'desc')
             .onSnapshot((snapshot) => {
@@ -303,9 +301,9 @@ export function fetchNBAGames() {
     })
 } */
 
-/*export function fetchNCAABGames() {
+export function fetchNCAABGames() {
     return ((dispatch) => {
-        firebase.firestore()
+        firestore()
             .collection("ncaab")
             .orderBy('gameDate', 'desc')
             .onSnapshot((snapshot) => {
@@ -317,11 +315,11 @@ export function fetchNBAGames() {
                 dispatch({ type: NCAAB_GAMES_STATE_CHANGE, ncaabGames });
             })
     })
-} */
+} 
 
 export function fetchNHLGames() {
     return ((dispatch) => {
-        firebase.firestore()
+        firestore()
             .collection("nhl")
             .orderBy('gameDate', 'desc')
             .onSnapshot((snapshot) => {
@@ -339,7 +337,7 @@ export function fetchNHLGames() {
 
 export function fetchMMAGames() {
     return ((dispatch) => {
-        firebase.firestore()
+        firestore()
             .collection("mma")
             .orderBy('gameDate', 'desc')
             .onSnapshot((snapshot) => {
@@ -357,7 +355,7 @@ export function fetchMMAGames() {
 
 export function fetchEPLGames() {
     return ((dispatch) => {
-        firebase.firestore()
+        firestore()
             .collection("epl")
             .orderBy('gameDate', 'desc')
             .onSnapshot((snapshot) => {
@@ -376,7 +374,7 @@ export function fetchEPLGames() {
 
 export function fetchGolfGames() {
     return ((dispatch) => {
-        firebase.firestore()
+        firestore()
             .collection("golf")
             .onSnapshot((snapshot) => {
                 let golfGames = snapshot.docs.map(doc => {
@@ -391,9 +389,9 @@ export function fetchGolfGames() {
     })
 } 
 
-export function fetchFutureGames() {
+/*export function fetchFutureGames() {
     return ((dispatch) => {
-        firebase.firestore()
+        firestore()
             .collection("futures")
             .onSnapshot((snapshot) => {
                 let futureGames = snapshot.docs.map(doc => {
@@ -404,11 +402,11 @@ export function fetchFutureGames() {
                 dispatch({ type: FUTURE_GAMES_STATE_CHANGE, futureGames });
             })
     })
-}
+} */
 
 export function fetchTeamLogos() {
     return ((dispatch) => {
-        firebase.firestore()
+        firestore()
             .collection("logos")
             .onSnapshot((snapshot) => {
                 let teamLogos = snapshot.docs.map(doc => {
@@ -423,8 +421,8 @@ export function fetchTeamLogos() {
 
 export function fetchBlogDetails() {
     return ((dispatch) => {
-        firebase.firestore()
-            .collection("blogs")
+        firestore()
+            .collectionGroup("userBlogs")
             .onSnapshot((snapshot) => {
                 let blogDetails = snapshot.docs.map(doc => {
                     const data = doc.data();
@@ -436,9 +434,9 @@ export function fetchBlogDetails() {
     })
 }
 
-export function fetchFormula1Teams() {
+/*export function fetchFormula1Teams() {
     return ((dispatch) => {
-        firebase.firestore()
+        firestore()
             .collection("formula1")
             .doc("info")
             .collection("teams")
@@ -456,7 +454,7 @@ export function fetchFormula1Teams() {
 }
 export function fetchFormula1Races() {
     return ((dispatch) => {
-        firebase.firestore()
+        firestore()
             .collection("formula1")
             .doc("info")
             .collection("races")
@@ -474,7 +472,7 @@ export function fetchFormula1Races() {
 }
 export function fetchFormula1Drivers() {
     return ((dispatch) => {
-        firebase.firestore()
+        firestore()
             .collection("formula1")
             .doc("info")
             .collection("drivers")
@@ -492,7 +490,7 @@ export function fetchFormula1Drivers() {
 }
 export function fetchFormula1Rankings() {
     return ((dispatch) => {
-        firebase.firestore()
+        firestore()
             .collection("formula1")
             .doc("info")
             .collection("races")
@@ -508,26 +506,7 @@ export function fetchFormula1Rankings() {
             })
     })
 } 
-
-export function fetchContestStatus() {
-    return ((dispatch) => {
-        firebase.firestore()
-            .collection("contest")
-            .doc('oKeXGH8M6mmdawUvxADp')
-            .get()
-            .then((snapshot) => {
-                if (snapshot.exists) {
-                    let contestStatus = snapshot.data();
-
-                    dispatch({ type: CONTEST_STATUS_STATE_CHANGE, contestStatus})
-                }
-                else {
-                }
-            })
-                
-    })
-}
-
+*/
 
 
 
