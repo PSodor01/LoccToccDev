@@ -1,5 +1,5 @@
-import firebase from 'firebase'
-import "firebase/firestore";
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 
 import React, { Component } from 'react'
 import { View, TouchableOpacity, Text, Linking, TextInput, StyleSheet, TouchableWithoutFeedback, Keyboard } from 'react-native'
@@ -49,26 +49,23 @@ const sendNotificationForSignUp = async (email, name) => {
 };
 
 export class Register extends Component {
-
     constructor(props) {
         super(props);
-
-            this.state = {
-                email: '',
-                password: '',
-                name: '',
-                createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
-                aboutMe: '',
-                location: '',
-                signUpCode: '',
-                userImg: null,
-                checked: false,
-                lastLogin: firebase.firestore.Timestamp.fromDate(new Date()),
-
-        }
-
-        this.onSignUp = this.onSignUp.bind(this)
-    }
+    
+        this.state = {
+          email: '',
+          password: '',
+          name: '',
+          aboutMe: '',
+          location: '',
+          userImg: null,
+          checked: false,
+          createdAt: firestore.Timestamp.fromDate(new Date()),
+          lastLogin: firestore.Timestamp.fromDate(new Date()),
+        };
+    
+        this.onSignUp = this.onSignUp.bind(this);
+      }
 
     state={
         visibility:false,
@@ -81,30 +78,32 @@ export class Register extends Component {
     }
   
     async onSignUp() {
-        const { email, password, name, aboutMe, location, signUpCode, userImg, createdAt, lastLogin } = this.state;
+        const { email, password, name, aboutMe, location, userImg, createdAt, lastLogin } = this.state;
         try {
-            await firebase.auth().createUserWithEmailAndPassword(email, password);
-            await firebase.firestore().collection("users")
-                .doc(firebase.auth().currentUser.uid)
-                .set({
-                    name,
-                    email,
-                    aboutMe,
-                    location,
-                    signUpCode,
-                    userImg,
-                    createdAt,
-                    lastLogin,
-                    followerCount: 0,
-                    followingCount: 0,
-                    postsCount: 0,
-                });
-            sendNotificationForSignUp(email, name);
+          const authResult = await auth().createUserWithEmailAndPassword(email, password);
+      
+          await firestore().collection("users")
+            .doc(authResult.user.uid) // Use .uid instead of .id
+            .set({
+              name,
+              email,
+              aboutMe,
+              location,
+              userImg,
+              createdAt,
+              lastLogin,
+              followerCount: 0,
+              followingCount: 0,
+              postsCount: 0,
+            });
+      
+      
+          sendNotificationForSignUp(email, name);
         } catch (error) {
-            alert(error.message);
-            console.log(error.message);
+          alert(error.message);
+          console.log(error.message);
         }
-    }
+      }
 
     render() {
 
@@ -149,16 +148,6 @@ export class Register extends Component {
                             secureTextEntry={true}
                             onChangeText={(password) => this.setState({ password })}
                         />
-                        <TextInput  
-                            style={styles.textInput}
-                            placeholder="Sign Up Code?"
-                            placeholderTextColor= "navy"
-                            maxLength={15}
-                            autoCorrect={false}
-                            secureTextEntry={false}
-                            onChangeText={(signUpCode) => this.setState({ signUpCode })}
-                        />
-                        
                         
                         <View style={styles.agreementContainer}>
                             <CheckBox 

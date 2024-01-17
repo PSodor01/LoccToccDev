@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { StyleSheet, View, Text, Image, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native'
+import { StyleSheet, View, Text, Image, FlatList, TouchableOpacity, Alert, Linking } from 'react-native'
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import Foundation from 'react-native-vector-icons/Foundation'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 
 import { useNavigation } from '@react-navigation/native';
 import email from 'react-native-email'
@@ -13,10 +16,12 @@ import moment from 'moment';
 
 import * as Notifications from 'expo-notifications';
 
-import firebase from 'firebase'
-require("firebase/firestore")
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 
 import analytics from "@react-native-firebase/analytics";
+
+import DrawerModal from '../buttons/DrawerModal'
 
 import { connect } from 'react-redux'
 
@@ -26,10 +31,29 @@ function Profile(props) {
     const [following, setFollowing] = useState(false);
     const [blocking, setBlocking] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [isModalVisible, setModalVisible] = useState(false);
+
+
+    const getFieldName = () => {
+        const currentYear = new Date().getFullYear();
+        const currentMonth = new Date().getMonth() + 1; // Months are zero-indexed, so we add 1
+        return `alltimeLeaders_${currentYear}_${currentMonth}`;
+      };
+
+    const showModal = () => {
+        setModalVisible(true);
+        analytics().logEvent('openCustomDrawer', {user_name: props.currentUser.name});
+    };
+
+    const hideModal = () => {
+        setModalVisible(false);
+    };
+
+    const isCurrentUserProfile = props.route.params.uid === auth().currentUser.uid;
+    
     
     useEffect(() => {
 
-        console.log(props.route.params.uid)
         fetchData()
 
         analytics().logScreenView({ screen_name: 'Profile', screen_class: 'Profile',  user_name: props.currentUser.name})
@@ -61,13 +85,14 @@ function Profile(props) {
 
         }   
     
-        if (props.route.params.uid === firebase.auth().currentUser.uid) {
+        if (props.route.params.uid === auth().currentUser.uid) {
             setUser(currentUser);
-            firebase.firestore()
+            firestore()
                 .collection("posts")
-                .doc(firebase.auth().currentUser.uid)
+                .doc(auth().currentUser.uid)
                 .collection("userPosts")
                 .orderBy("creation", "desc")
+                .limit(20)
                 .get()
                 .then((snapshot) => {
                     let posts = snapshot.docs.map(doc => {
@@ -87,7 +112,7 @@ function Profile(props) {
             setLoading(false);
         }
         else {
-            firebase.firestore()
+            firestore()
                 .collection("users")
                 .doc(props.route.params.uid)
                 .get()
@@ -100,11 +125,12 @@ function Profile(props) {
                         console.log('does not exist')
                     }
                 })
-            firebase.firestore()
+            firestore()
                 .collection("posts")
                 .doc(props.route.params.uid)
                 .collection("userPosts")
                 .orderBy("creation", "desc")
+                .limit(20)
                 .get()
                 .then((snapshot) => {
                     let posts = snapshot.docs.map(doc => {
@@ -136,36 +162,36 @@ function Profile(props) {
     }
 
     const onFollow = () => {
-        const userFollowing =  firebase.firestore()
+        const userFollowing =  firestore()
             .collection("following")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .collection("userFollowing")
             .doc(props.route.params.uid)
             .set({
                 id: props.route.params.uid,
-                follower: firebase.auth().currentUser.uid,
+                follower: auth().currentUser.uid,
             })
 
         analytics().logEvent('followUser', {user_name: props.currentUser.name});
 
         const followName = props.currentUser.name
-        firebase.firestore()
+        firestore()
             .collection("users")
             .doc(props.route.params.uid)
             .collection("notifications")
             .add({
                 notificationType: "follow",
-                creation: firebase.firestore.FieldValue.serverTimestamp(),
-                otherUserId: firebase.auth().currentUser.uid,
+                creation: firestore.FieldValue.serverTimestamp(),
+                otherUserId: auth().currentUser.uid,
                 otherUsername: followName,
                 notificationText: 'started following you',
               })
     }
 
     const onUnfollow = () => {
-        firebase.firestore()
+        firestore()
             .collection("following")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .collection("userFollowing")
             .doc(props.route.params.uid)
             .delete()
@@ -174,53 +200,73 @@ function Profile(props) {
     }
 
     const increaseFollowerCount = () => {
-        firebase.firestore()
+        const fieldName = getFieldName();
+
+        const updateObject = {};
+        updateObject[fieldName] = firestore.FieldValue.increment(20);
+
+        firestore()
             .collection("users")
             .doc(props.route.params.uid)
             .update({
-                followerCount: firebase.firestore.FieldValue.increment(1),
-                alltimeLeaders2023: firebase.firestore.FieldValue.increment(20)
+                followerCount: firestore.FieldValue.increment(1),
+                [fieldName]: firestore.FieldValue.increment(20)
             })
 
     }
 
     const increaseFollowingCount = () => {
-        firebase.firestore()
+        const fieldName = getFieldName();
+
+        const updateObject = {};
+        updateObject[fieldName] = firestore.FieldValue.increment(20);
+
+        firestore()
             .collection("users")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .update({
-                followingCount: firebase.firestore.FieldValue.increment(1),
-                alltimeLeaders2023: firebase.firestore.FieldValue.increment(20)
+                followingCount: firestore.FieldValue.increment(1),
+                [fieldName]: firestore.FieldValue.increment(20)
             })
 
     }
 
     const decreaseFollowerCount = () => {
-        firebase.firestore()
+        const fieldName = getFieldName();
+
+        const updateObject = {};
+        updateObject[fieldName] = firestore.FieldValue.increment(-20);
+
+        firestore()
             .collection("users")
             .doc(props.route.params.uid)
             .update({
-                followerCount: firebase.firestore.FieldValue.increment(-1),
-                alltimeLeaders2023: firebase.firestore.FieldValue.increment(-20)
+                followerCount: firestore.FieldValue.increment(-1),
+                [fieldName]: firestore.FieldValue.increment(-20)
             })
 
     }
 
     const decreaseFollowingCount = () => {
-        firebase.firestore()
+        const fieldName = getFieldName();
+
+        const updateObject = {};
+        updateObject[fieldName] = firestore.FieldValue.increment(-20);
+
+        firestore()
             .collection("users")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .update({
-                followingCount: firebase.firestore.FieldValue.increment(-1),
-                alltimeLeaders2023: firebase.firestore.FieldValue.increment(-20)
+                followingCount: firestore.FieldValue.increment(-1),
+                [fieldName]: firestore.FieldValue.increment(-20)
             })
 
     }
 
     const blockUser = () => {
-        const userBlocking =  firebase.firestore()
+        const userBlocking =  firestore()
             .collection("blocking")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .collection("userBlocking")
             .doc(props.route.params.uid)
             .set({})
@@ -234,9 +280,9 @@ function Profile(props) {
     }
 
     const unBlockUser = () => {
-        firebase.firestore()
+        firestore()
             .collection("blocking")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .collection("userBlocking")
             .doc(props.route.params.uid)
             .delete()
@@ -316,7 +362,7 @@ function Profile(props) {
     }
     
     const sendNotificationForFollow = async () => {
-        const users = await  firebase.firestore()
+        const users = await  firestore()
             .collection("users")
             .doc(props.route.params.uid)
             .get()
@@ -339,7 +385,7 @@ function Profile(props) {
     };
 
     const sendNotificationForLike = async () => {
-        const users = await  firebase.firestore()
+        const users = await  firestore()
             .collection("users")
             .doc(props.route.params.uid)
             .get()
@@ -363,7 +409,7 @@ function Profile(props) {
     };
 
     const sendNotificationForFade = async () => {
-        const users = await  firebase.firestore()
+        const users = await  firestore()
             .collection("users")
             .doc(props.route.params.uid)
             .get()
@@ -386,9 +432,9 @@ function Profile(props) {
     };
 
     const storeLike = (postId) => {
-        firebase.firestore()
+        firestore()
             .collection("likes")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .collection("userLikes")
             .doc(postId)
             .set({})
@@ -397,9 +443,9 @@ function Profile(props) {
     }
 
     const deleteLike = (postId) => {
-        firebase.firestore()
+        firestore()
             .collection("likes")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .collection("userLikes")
             .doc(postId)
             .delete({})
@@ -407,9 +453,9 @@ function Profile(props) {
     }
 
     const storeFade = (postId) => {
-        firebase.firestore()
+        firestore()
             .collection("fades")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .collection("userFades")
             .doc(postId)
             .set({})
@@ -418,9 +464,9 @@ function Profile(props) {
     }
 
     const deleteFade = (postId) => {
-        firebase.firestore()
+        firestore()
             .collection("fades")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .collection("userFades")
             .doc(postId)
             .delete({})
@@ -429,66 +475,66 @@ function Profile(props) {
 
     const onLikePress = (postId) => {
 
-        firebase.firestore()
+        firestore()
             .collection("posts")
             .doc(props.route.params.uid)
             .collection("userPosts")
             .doc(postId)
             .collection("likes")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .set({})
 
-            firebase.firestore()
+            firestore()
             .collection("posts")
             .doc(props.route.params.uid)
             .collection("userPosts")
             .doc(postId)
             .update({
-                likesCount: firebase.firestore.FieldValue.increment(1)
+                likesCount: firestore.FieldValue.increment(1)
             })
 
         const likedName = props.currentUser.name
-        firebase.firestore()
+        firestore()
             .collection("users")
             .doc(props.route.params.uid)
             .collection("notifications")
             .add({
                 notificationType: "hammer",
-                creation: firebase.firestore.FieldValue.serverTimestamp(),
-                otherUserId: firebase.auth().currentUser.uid,
+                creation: firestore.FieldValue.serverTimestamp(),
+                otherUserId: auth().currentUser.uid,
                 otherUsername: likedName,
                 notificationText: 'hammered your post',
               })
     }
 
     const onDislikePress = (postId) => {
-        firebase.firestore()
+        firestore()
             .collection("posts")
             .doc(props.route.params.uid)
             .collection("userPosts")
             .doc(postId)
             .update({
-                likesCount: firebase.firestore.FieldValue.increment(-1)
+                likesCount: firestore.FieldValue.increment(-1)
             })
 
-            firebase.firestore()
+            firestore()
             .collection("posts")
             .doc(props.route.params.uid)
             .collection("userPosts")
             .doc(postId)
             .collection("likes")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .delete()
 
         const likedName = props.currentUser.name
-        firebase.firestore()
+        firestore()
             .collection("users")
             .doc(props.route.params.uid)
             .collection("notifications")
             .add({
                 notificationType: "fade",
-                creation: firebase.firestore.FieldValue.serverTimestamp(),
-                otherUserId: firebase.auth().currentUser.uid,
+                creation: firestore.FieldValue.serverTimestamp(),
+                otherUserId: auth().currentUser.uid,
                 otherUsername: likedName,
                 notificationText: 'faded your post',
                 })
@@ -496,42 +542,42 @@ function Profile(props) {
     }
 
     const onFadePress = (postId) => {
-        firebase.firestore()
+        firestore()
             .collection("posts")
             .doc(props.route.params.uid)
             .collection("userPosts")
             .doc(postId)
             .update({
-                fadesCount: firebase.firestore.FieldValue.increment(1)
+                fadesCount: firestore.FieldValue.increment(1)
             })
 
-            firebase.firestore()
+            firestore()
             .collection("posts")
             .doc(props.route.params.uid)
             .collection("userPosts")
             .doc(postId)
             .collection("fades")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .set({})
     }
 
     const onUnfadePress = (postId) => {
-        firebase.firestore()
+        firestore()
             .collection("posts")
             .doc(props.route.params.uid)
             .collection("userPosts")
             .doc(postId)
             .update({
-                fadesCount: firebase.firestore.FieldValue.increment(-1)
+                fadesCount: firestore.FieldValue.increment(-1)
             })
 
-            firebase.firestore()
+            firestore()
             .collection("posts")
             .doc(props.route.params.uid)
             .collection("userPosts")
             .doc(postId)
             .collection("fades")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .delete()
     }
 
@@ -567,7 +613,7 @@ function Profile(props) {
     }
 
     const deletePost = (id) => {
-        firebase.firestore()
+        firestore()
             .collection("posts")
             .doc(props.route.params.uid)
             .collection("userPosts")
@@ -579,11 +625,11 @@ function Profile(props) {
                   'Your post has been deleted!',
                 );
 
-            firebase.firestore()
+            firestore()
             .collection("users")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .update({
-                postsCount: firebase.firestore.FieldValue.increment(-1)
+                postsCount: firestore.FieldValue.increment(-1)
             })
 
         analytics().logEvent('deletePost', {user_name: props.currentUser.name});
@@ -617,82 +663,198 @@ function Profile(props) {
 
     return (
         <View style={styles.container}>
-            <View style={{ alignItems: 'center' }}>
+            <View style={styles.profileHeader}>
                 <View style={[styles.avatarContainer, { backgroundColor: '#95B9C7' }]}>
                 {user.userImg ? (
                     <Image source={{ uri: user.userImg }} style={styles.avatarImage} />
                 ) : (
-                    <Ionicons name="person" size={24} color="white" />
+                    <Ionicons name="person" size={50} color="white" />
                 )}
                 </View>
-                <Text style={styles.profileNameText}>{user.name}</Text>
+                <View>
+                    <Text style={styles.profileNameText}>{user.name}</Text>
+                    {isCurrentUserProfile && (
+                            <TouchableOpacity
+                            onPress={() => {
+                            showModal();
+                            }}
+                            style={styles.followButton}
+                        >
+                            <Text style={styles.follow}> My Stuff </Text>
+                        </TouchableOpacity>
+                        )}
+                        <DrawerModal isVisible={isModalVisible} onClose={hideModal} navigation={props.navigation} />
+                    
+                    {props.route.params.uid !== auth().currentUser.uid ? (
+                    <View style={styles.followBlockContainer}>
+                        {following ? (
+                        <TouchableOpacity
+                            onPress={() => {
+                            onUnfollow();
+                            decreaseFollowerCount();
+                            decreaseFollowingCount();
+                            }}
+                            title="Following"
+                            style={styles.followingButton}
+                        >
+                            <Text style={styles.following}> Following </Text>
+                        </TouchableOpacity>
+                        ) : blocking ? null : (
+                        <TouchableOpacity
+                            onPress={() => {
+                            onFollow();
+                            increaseFollowerCount();
+                            increaseFollowingCount();
+                            sendNotificationForFollow();
+                            }}
+                            title="Follow"
+                            style={styles.followButton}
+                        >
+                            <Text style={styles.follow}> Follow </Text>
+                        </TouchableOpacity>
+                        )}
+
+                        {following && blocking !== true ? (
+                        <TouchableOpacity
+                            style={styles.blockUserButton}
+                            onPress={() => {
+                            blockAndUnfollowHandler();
+                            }}
+                        >
+                            <Text style={{ color: 'red' }}>Block</Text>
+                        </TouchableOpacity>
+                        ) : blocking ? (
+                        <TouchableOpacity
+                            style={styles.unBlockUserButton}
+                            onPress={() => {
+                            unBlockUserHandler();
+                            }}
+                        >
+                            <Text style={{ color: 'green' }}>Unblock</Text>
+                        </TouchableOpacity>
+                        ) : (
+                        <TouchableOpacity
+                            style={styles.blockUserButton}
+                            onPress={() => {
+                            blockUser();
+                            }}
+                        >
+                            <Text style={{ color: 'red' }}>Block</Text>
+                        </TouchableOpacity>
+                        )}
+                    </View>
+                    ) : (
+                    <View style={styles.middleButtonContainer}></View>
+                    )}
+                        
+                    <View style={{ flexDirection: 'row', paddingTop: 5, paddingBottom: 5,  width: '95%'}}>
+                        {user.instagramLink && (
+                        <TouchableOpacity
+                            style={{ marginHorizontal: '5%'}}
+                            onPress={() => {
+                            if (user.instagramLink.startsWith('https://')) {
+                                // If the URL starts with 'https://', open it as is
+                                Linking.openURL(user.instagramLink);
+                            } else {
+                                // If the URL doesn't start with 'https://', prepend 'https://' and then open it
+                                Linking.openURL(`https://${user.instagramLink}`);
+                            }
+                            }}
+                        >
+                            <FontAwesome5 name="instagram" size={24} color="#E1306C" />
+                        </TouchableOpacity>
+                        )}
+                        {user.twitterLink && (
+                        <TouchableOpacity
+                            style={{ marginHorizontal: '5%' }}
+                            onPress={() => {
+                            if (user.twitterLink.startsWith('https://')) {
+                                // If the URL starts with 'https://', open it as is
+                                Linking.openURL(user.twitterLink);
+                            } else {
+                                // If the URL doesn't start with 'https://', prepend 'https://' and then open it
+                                Linking.openURL(`https://${user.twitterLink}`);
+                            }
+                            }}
+                        >
+                            <FontAwesome5 name="twitter" size={24} color="#1DA1F2" />
+                        </TouchableOpacity>
+                        )}
+                        {user.discordLink && (
+                        <TouchableOpacity
+                            style={{ marginHorizontal: '5%'}}
+                            onPress={() => {
+                            if (user.discordLink.startsWith('https://')) {
+                                // If the URL starts with 'https://', open it as is
+                                Linking.openURL(user.discordLink);
+                            } else {
+                                // If the URL doesn't start with 'https://', prepend 'https://' and then open it
+                                Linking.openURL(`https://${user.discordLink}`);
+                            }
+                            }}
+                        >
+                            <MaterialCommunityIcons name="discord" size={24} color="#7289d9" />
+                        </TouchableOpacity>
+                        )}
+                        {user.telegramLink && (
+                        <TouchableOpacity
+                            style={{ marginHorizontal: '5%'}}
+                            onPress={() => {
+                            if (user.telegramLink.startsWith('https://')) {
+                                // If the URL starts with 'https://', open it as is
+                                Linking.openURL(user.telegramLink);
+                            } else {
+                                // If the URL doesn't start with 'https://', prepend 'https://' and then open it
+                                Linking.openURL(`https://${user.telegramLink}`);
+                            }
+                            }}
+                        >
+                            <FontAwesome name="telegram" size={24} color="#7289d9" />
+                        </TouchableOpacity>
+                        )}
+                        {user.websiteLink && (
+                        <TouchableOpacity
+                            style={{ marginHorizontal: '5%'}}
+                            onPress={() => {
+                            if (user.websiteLink.startsWith('https://')) {
+                                // If the URL starts with 'https://', open it as is
+                                Linking.openURL(user.websiteLink);
+                            } else {
+                                // If the URL doesn't start with 'https://', prepend 'https://' and then open it
+                                Linking.openURL(`https://${user.websiteLink}`);
+                            }
+                            }}
+                        >
+                            <MaterialCommunityIcons name="web" size={24} color="black" />
+                        </TouchableOpacity>
+                        )}
+                    </View>
+                </View>
+                
             </View>
+
+            
+            
             <View style={{ marginLeft: "5%" }}>
                 <View style={{ flexDirection: 'row', paddingTop: 5}}>
                     <Text style={{ color: "grey" }}>Member since </Text>
-                    <Text style={{ color: "grey" }}>{moment(user.createdAt.toDate()).format("MMM Do YYYY")}</Text>
+                    <Text style={{ color: "grey" }}>{user.createdAt?.toDate() ? moment(user.createdAt.toDate()).format("MMM Do YYYY") : null}</Text>
                 </View>
+                {user.aboutMe && (
                 <View style={{ flexDirection: 'row', paddingTop: 5, width: '95%'}}>
                     <Text style={{ fontWeight: 'bold' }}>About me: </Text>
                     <Text style={{ flex: 1 }}>{user.aboutMe}</Text>
                 </View>
+                )}
+                {user.location && (
                 <View style={{ flexDirection: 'row', paddingTop: 5, width: '95%'}}>
                     <Text style={{ fontWeight: 'bold'}}>Location: </Text>
                     <Text style={{ flex: 1 }}>{user.location}</Text>
                 </View>
+                )}
+                
             </View>
             
-
-            <View style={{ paddingTop: "2%" }}>
-                {props.route.params.uid !== firebase.auth().currentUser.uid ? (
-                    <View style={{ flexDirection:'row', alignItems: 'center', justifyContent: 'center'}}>
-                        {following ? (
-                            <TouchableOpacity
-                                onPress={() => {onUnfollow(); decreaseFollowerCount(); decreaseFollowingCount();}}
-                                title="Following"
-                                style={styles.followingButton}>
-                                    <Text style={styles.following}> Following </Text>
-                            </TouchableOpacity>
-                        ) : blocking ? (
-                            null
-                        ) :
-                            (
-                                <TouchableOpacity
-                                    onPress={() => {onFollow(); increaseFollowerCount(); increaseFollowingCount(); sendNotificationForFollow();}}
-                                    title="Follow"
-                                    style={styles.followButton}>
-                                        <Text style={styles.follow}> Follow </Text>
-                                </TouchableOpacity>
-                                
-                            )}
-                        {following && blocking != true ? (
-                            <TouchableOpacity
-                                style={styles.blockUserButton}
-                                onPress={() => {blockAndUnfollowHandler()}}>
-                                <Text style={{ color: "red"}}>Block</Text>
-                            </TouchableOpacity>  
-                        ) : blocking ? (
-                            <TouchableOpacity
-                                style={styles.unBlockUserButton}
-                                onPress={() => {unBlockUserHandler();}}>
-                                <Text style={{ color: "green"}}>Unblock</Text>
-                            </TouchableOpacity>
-                        ) :
-                            ( <TouchableOpacity
-                                style={styles.blockUserButton}
-                                onPress={() => {blockUser();}}>
-                                <Text style={{ color: "red"}}>Block</Text>
-                            </TouchableOpacity>
-                        )}
-                            
-                            
-                    </View>
-                ) :
-                    <View style={styles.middleButtonContainer}>
-                    
-                    </View>
-                    }
-            </View>
             <View style={styles.profileStatsContainer}>
                 <View style={styles.profileStatsBox}>
                     <Text style={styles.followNumber}>{user ? user.postsCount : 0}</Text>
@@ -822,7 +984,7 @@ function Profile(props) {
                                         onPress={reportPostHandler}>
                                         <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
                                     </TouchableOpacity>
-                                        {props.route.params.uid !== firebase.auth().currentUser.uid ? 
+                                        {props.route.params.uid !== auth().currentUser.uid ? 
                                         null
                                         : <TouchableOpacity
                                             style={styles.flagContainer}
@@ -866,9 +1028,9 @@ const styles = StyleSheet.create({
         borderRadius: 6,
         paddingVertical: 8,
         paddingHorizontal: 12,
-        width: "30%",
         alignSelf: "center",
         marginBottom: "1%",
+        marginRight: '2%'
     },
     followButton: {
         borderColor: "#0033cc",
@@ -876,9 +1038,9 @@ const styles = StyleSheet.create({
         borderRadius: 6,
         paddingVertical: 8,
         paddingHorizontal: 12,
-        width: "30%",
         alignSelf: "center",
         marginBottom: "1%",
+        marginRight: '2%'
     },
     blockUserButton: {
         borderColor: "red",
@@ -886,7 +1048,6 @@ const styles = StyleSheet.create({
         borderRadius: 6,
         paddingVertical: 8,
         paddingHorizontal: 12,
-        width: "30%",
         alignSelf: 'center',
         alignItems: "center",
         marginBottom: "1%",
@@ -939,7 +1100,6 @@ const styles = StyleSheet.create({
     },
     middleButtonContainer: {
         flexDirection: 'row',
-        justifyContent: 'center',
     },
     feedItem:{
         padding:6,
@@ -1015,6 +1175,7 @@ const styles = StyleSheet.create({
         borderRadius: 40,
         justifyContent: 'center',
         alignItems: 'center',
+        marginRight: '5%',
       },
     avatarImage: {
         width: 100,
@@ -1032,6 +1193,15 @@ const styles = StyleSheet.create({
         width: 50,
         height: 50,
         borderRadius: 25,
+    },
+    profileHeader: {
+        flexDirection: 'row',
+        paddingTop: '2%',
+        marginLeft: '5%',
+      },
+    followBlockContainer: {
+        flexDirection: 'row',
+        marginTop: '5%'
     },
     
    

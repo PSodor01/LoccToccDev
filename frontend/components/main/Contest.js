@@ -1,57 +1,60 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Image, Linking, Alert } from 'react-native'
 
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 
-import Animated from 'react-native-reanimated';
-import BottomSheet from 'reanimated-bottom-sheet';
 import { Avatar } from 'react-native-elements';
+
+import BottomSheet, { BottomSheetModal, BottomSheetModalProvider, BottomSheetFlatList } from "@gorhom/bottom-sheet";
 
 import analytics from "@react-native-firebase/analytics";
 import { BannerAdSize, TestIds, BannerAd } from 'react-native-google-mobile-ads';
-
-
-import firebase from 'firebase'
-require("firebase/firestore")
-require("firebase/firebase-storage")
 
 import { connect } from 'react-redux'
 
 function Contest(props) {
     const [allUsers, setAllUsers] = useState([]);
     const [myScore, setMyScore] = useState([]);
-    const [contestLive, setContestLive] = useState();
-    const [showInterstitial, setShowInterstitial] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
+        const fieldName = getFieldName(); // Use the helper function to get the dynamic field name
+    
+        const contestParticipants = props.allUsers.filter(user => user[fieldName] != null);
+        setAllUsers(contestParticipants.sort((a, b) => parseFloat(b[fieldName]) - parseFloat(a[fieldName])).slice(0, 99));
+    
+        const myScore = props.allUsers.filter(user => user.name === props.currentUser.name);
+        setMyScore(myScore);
+    
+        analytics().logScreenView({
+          screen_name: 'Contest',
+          screen_class: 'Contest',
+          user_name: props.currentUser.name,
+        });
+    
+      }, [props.allUsers, props.currentUser]);
+    
+      const getFieldName = () => {
+        const currentYear = new Date().getFullYear();
+        const currentMonth = new Date().getMonth() + 1; // Months are zero-indexed, so we add 1
+        return `alltimeLeaders_${currentYear}_${currentMonth}`;
+      };
 
-        if (props.contestStatus.contestLive == true) {
-            setContestLive(true)
-        } else {
-            setContestLive(false)
-        }
-
-        const contestParticipants = props.allUsers.filter(user => user.alltimeLeaders2023 != null);
-        setAllUsers(contestParticipants.sort((a, b) => parseFloat(b.alltimeLeaders2023) - parseFloat(a.alltimeLeaders2023)).slice(0, 100))
-
-        const myScore = props.allUsers.filter(user => user.name == props.currentUser.name);
-        setMyScore(myScore)
-
-        analytics().logScreenView({ screen_name: 'Contest', screen_class: 'Contest',  user_name: props.currentUser.name})
-
-    }, [props.allUsers, props.currentUser, props.contestStatus])
-
-    const renderMyScore = ({item}) => {
-        return (
-            <View>
-            {item.alltimeLeaders2023 != null ?
-            <Text style={styles.subTitleText}>{item.alltimeLeaders2023}</Text>
-            :
+      const getFormattedDate = () => {
+        const currentYear = new Date().getFullYear();
+        const currentMonth = new Date().toLocaleString('default', { month: 'short' }); // Get short month name
+        return `${currentMonth} ${currentYear}`;
+      };
+    
+      const renderMyScore = ({ item }) => (
+        <View>
+          {item[getFieldName()] != null ? (
+            <Text style={styles.subTitleText}>{item[getFieldName()]}</Text>
+          ) : (
             <Text style={styles.subTitleText}>0</Text>
-
-            }
-            </View>
-    )}
+          )}
+        </View>
+      );
     
 
     const countInfoClicks = () => {
@@ -88,38 +91,14 @@ function Contest(props) {
      
     }
 
-    renderInner = () => (
-        <View style={styles.panel}>
-          <View >
-            <View style={{alignItems: 'center'}}>
-                <Text style={styles.panelTitle}>Locctocc Leaderboard</Text>
-                <Text> </Text>
-            </View>
-            <View style={{textAlign: 'justify'}}>
-                <Text>- Post your locks and engage with other members of the community to participate</Text>
-                <Text>- Earn points by posting, collecting hammers, ang gaining followers!</Text>
-                <Text>- Lose points by getting/giving fades - don't make enemies!</Text>
-            </View>
-            <TouchableOpacity
-                style={styles.panelButton}
-                onPress={() => this.bs.current.snapTo(1)}>
-                <Text style={styles.panelButtonTitle}>Let's do it!</Text>
-            </TouchableOpacity>
-          </View>
-          
-        </View>
-      );
-    
-      renderHeader = () => (
-        <View style={styles.header}>
-          <View style={styles.panelHeader}>
-            <View style={styles.panelHandle} />
-          </View>
-        </View>
-      );
+    const bottomSheetModalRef = useRef(null)
 
-    bs = React.createRef();
-    fall = new Animated.Value(1);
+    const snapPoints = ["40%", "95%"]
+
+    function handlePresentModal() {
+        bottomSheetModalRef.current?.present();
+        setIsOpen(true);
+    }
 
     const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-8519029912093094/8258310490'
     
@@ -144,7 +123,7 @@ function Contest(props) {
                 containerStyle={leaderboardStyles.avatarContainer}
             />
             <Text style={leaderboardStyles.userName}>{item.name}</Text>
-            <Text style={leaderboardStyles.userScore}>{item.alltimeLeaders2023}</Text>
+            <Text style={leaderboardStyles.userScore}>{item[getFieldName()] || '0'}</Text>
           </TouchableOpacity>
         );
       };
@@ -214,130 +193,80 @@ function Contest(props) {
       };
     
     return (
-        <View style={styles.textInputContainer}>
-            <BottomSheet 
-                ref={this.bs}
-                snapPoints={[275, -5]}
-                renderContent={this.renderInner}
-                renderHeader={this.renderHeader}
-                initialSnap={1}
-                callbackNode={this.fall}
-                enabledGestureInteraction={true}       
-            />
-            <Animated.View style={{ flex:1, opacity: Animated.add(0.1, Animated.multiply(this.fall, 1.0)),}}>
-                
-                {contestLive == true ?
-                    <View style={styles.headerContainer}>
-        <View style={styles.titleContainer}>
-            <View>
-                <View style={styles.titleContainer}>
-                    <Text style={styles.titleText}>Locctocc Leaderboard  </Text>
-                    <TouchableOpacity onPress={() => {this.bs.current.snapTo(0); countInfoClicks()}}
-                    >
-                        <FontAwesome5 name="info-circle" size={18} justifyContent='center' alignItems='center' color="#2e64e5"/>
-                    </TouchableOpacity>
-                </View>
-                <View style={styles.infoContainer}>
-                    <Text style={styles.subTitleText}>My Score: </Text>
-                    <FlatList
-                        data ={myScore}
-                        renderItem={renderMyScore}
-                    />
-                </View>
-                <View style={styles.titleContainer}>
-                        <View style={styles.infoContainer}>
-                            <TouchableOpacity
-                                style={styles.linkText}
-                                onPress={() => {
-                                countLocctoccInstagramClicks()
-                                Linking.openURL('https://www.instagram.com/locctocc/');
-                                }}>
-                                <FontAwesome5 name="instagram" size={24} justifyContent='center' alignItems='center' color="#E1306C"/>
-                            </TouchableOpacity>
-                        </View>
-                        <View style={styles.infoContainer}>
-                            <TouchableOpacity
-                                style={styles.linkText}
-                                onPress={() => {
-                                countLocctoccTwitterClicks()
-                                Linking.openURL('https://twitter.com/LoccTocc');
-                                }}>
-                                <FontAwesome5 name="twitter" size={24} justifyContent='center' alignItems='center' color="#1DA1F2"/>
-                            </TouchableOpacity>
+        <BottomSheetModalProvider>
+            <BottomSheetModal
+                    ref={bottomSheetModalRef}
+                    index={0}
+                    snapPoints={snapPoints}
+                    backgroundStyle={{ borderRadius: 50, backgroundColor: "#E8E8E8"}}
+                    onDismiss={() => setIsOpen(false)}
+                >
+                    <View style={styles.panel}>
+                        <View style={styles.panelContent}>
+                            <Text style={styles.panelTitle}>Locctocc Leaderboard</Text>
+                            <View style={styles.panelDescription}>
+                                <Text style={styles.descriptionText}>
+                                    - Post your locks and engage with other members of the community to participate
+                                </Text>
+                                <Text style={styles.descriptionText}>
+                                    - Earn points by posting, collecting hammers, and gaining followers!
+                                </Text>
+                                <Text style={styles.descriptionText}>
+                                    - Lose points by getting/giving fades - don't make enemies!
+                                </Text>
+                            </View>
                         </View>
                     </View>
-            </View>
-        </View>
-    </View>
-                
-                :
-                <View style={styles.headerContainer}>
+            </BottomSheetModal>
+        <View style={styles.textInputContainer}>
+        <View style={styles.headerContainer}>
+            <View style={styles.titleContainer}>
+                <View>
                     <View style={styles.titleContainer}>
-                        <View>
-                            <View style={styles.titleContainer}>
-                                <Text style={styles.titleText}>Locctocc Cash Contests  </Text>
-                                <TouchableOpacity onPress={() => {this.bs.current.snapTo(0); countInfoClicks()}}>
-                                    <FontAwesome5 name="info-circle" size={18} justifyContent='center' alignItems='center' color="#2e64e5"/>
+                        <Text style={styles.titleText}>Locctocc Leaderboard - {getFormattedDate()} </Text>
+                        <TouchableOpacity onPress={() => {handlePresentModal(); countInfoClicks()}}
+                        >
+                            <FontAwesome5 name="info-circle" size={18} justifyContent='center' alignItems='center' color="#2e64e5"/>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={styles.infoContainer}>
+                        <Text style={styles.subTitleText}>My Score: </Text>
+                        <FlatList
+                            data ={myScore}
+                            renderItem={renderMyScore}
+                        />
+                    </View>
+                    <View style={styles.titleContainer}>
+                            <View style={styles.infoContainer}>
+                                <TouchableOpacity
+                                    style={styles.linkText}
+                                    onPress={() => {
+                                    countLocctoccInstagramClicks()
+                                    Linking.openURL('https://www.instagram.com/locctocc/');
+                                    }}>
+                                    <FontAwesome5 name="instagram" size={24} justifyContent='center' alignItems='center' color="#E1306C"/>
                                 </TouchableOpacity>
                             </View>
                             <View style={styles.infoContainer}>
-                                <Text style={styles.infoText}>New contests coming soon! Check back here and follow us on social media for updates!</Text>
-                            </View>
-                            <View style={styles.infoContainer}>
-                                <Text style={styles.infoText}> </Text>
-                            </View>
-                            <View style={styles.titleContainer}>
-                                <View style={styles.infoContainer}>
-                                    <TouchableOpacity
-                                        style={styles.linkText}
-                                        onPress={() => {
-                                        countLocctoccInstagramClicks()
-                                        Linking.openURL('https://www.instagram.com/locctocc/');
-                                        }}>
-                                        <FontAwesome5 name="instagram" size={24} justifyContent='center' alignItems='center' color="#E1306C"/>
-                                    </TouchableOpacity>
-                                </View>
-                                <View style={styles.infoContainer}>
-                                    <TouchableOpacity
-                                        style={styles.linkText}
-                                        onPress={() => {
-                                        countLocctoccTwitterClicks()
-                                        Linking.openURL('https://twitter.com/LoccTocc');
-                                        }}>
-                                        <FontAwesome5 name="twitter" size={24} justifyContent='center' alignItems='center' color="#1DA1F2"/>
-                                    </TouchableOpacity>
-                                </View>
-                                <View style={styles.infoContainer}>
-                                    <TouchableOpacity
-                                        style={styles.linkText}
-                                        onPress={() => {
-                                        countLocctoccTiktokClicks()
-                                        Linking.openURL('https://www.tiktok.com/@locctocc');
-                                        }}>
-                                        <FontAwesome5 name="tiktok" size={24} justifyContent='center' alignItems='center' color="#000"/>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                            
-                            <View style={styles.infoContainer}>
-                                <Text style={styles.infoText}>Previous contest leaderboard:</Text>
+                                <TouchableOpacity
+                                    style={styles.linkText}
+                                    onPress={() => {
+                                    countLocctoccTwitterClicks()
+                                    Linking.openURL('https://twitter.com/LoccTocc');
+                                    }}>
+                                    <FontAwesome5 name="twitter" size={24} justifyContent='center' alignItems='center' color="#1DA1F2"/>
+                                </TouchableOpacity>
                             </View>
                         </View>
-                    </View>
                 </View>
-                
-                }
-                
+            </View>
+    </View>
                 <FlatList
                 data = {allUsers}
                 renderItem={renderItem}
                 keyExtractor={(item, index) => index.toString()}
                 
             /> 
-                
-                
-                
-            </Animated.View>
             <View style={styles.adView}>
                 <BannerAd
                     unitId={adUnitId}
@@ -349,10 +278,10 @@ function Contest(props) {
                 
             </View>
         </View>
-        
-            
+        </BottomSheetModalProvider>
             
     )
+    
 };
 
 const styles = StyleSheet.create({
@@ -396,76 +325,47 @@ const styles = StyleSheet.create({
     },
     panel: {
         padding: 20,
-        backgroundColor: '#FFFFFF',
-        paddingTop: 20,
+        backgroundColor: '#E8E8E8',
         width: '100%',
         alignItems: 'center',
-    },
-    header: {
-        backgroundColor: '#FFFFFF',
-        shadowColor: '#333333',
-        shadowOffset: {width: -1, height: -3},
-        shadowRadius: 2,
-        shadowOpacity: 0.4,
-        paddingTop: 20,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
     },
-    panelHeader: {
+    panelContent: {
         alignItems: 'center',
-    },
-    panelHandle: {
-        width: 40,
-        height: 8,
-        borderRadius: 4,
-        backgroundColor: '#00000040',
-        marginBottom: 10,
     },
     panelTitle: {
-        fontSize: 27,
-        height: 35,
-    },
-    panelSubtitle: {
-        fontSize: 20,
-        color: 'gray',
-        height: 30,
+        fontSize: 18,
+        fontWeight: 'bold',
         marginBottom: 10,
     },
-    panelButton: {
-        padding: 13,
-        borderRadius: 10,
-        backgroundColor: '#2e64e5',
-        alignItems: 'center',
-        marginVertical: 7,
+    panelDescription: {
+        marginTop: 10,
     },
-    panelButtonTitle: {
-        fontSize: 17,
-        fontWeight: 'bold',
-        color: 'white',
+    descriptionText: {
+        textAlign: 'justify',
+        marginBottom: 5,
+        fontSize: 16,
+        lineHeight: 22,
+        color: '#555555',
     },
     adView: {
         alignItems: 'center',
         justifyContent: 'center',
     },
-    brandText: {
-        fontSize: 11,
-        textAlign: 'justify'
-    },
     linkText: {
         color: 'blue',
         fontSize: 14,
     },
-    brandTextContainer: {
-        justifyContent: 'center',
-        width: "95%"
-    },
+   
+    
+  
     
 })
 
 const mapStateToProps = (store) => ({
     allUsers: store.userState.allUsers,
     currentUser: store.userState.currentUser,
-    contestStatus: store.userState.contestStatus,
 })
 
 export default connect(mapStateToProps)(Contest);

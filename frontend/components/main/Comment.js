@@ -16,8 +16,8 @@ import * as Device from 'expo-device';
 import analytics from "@react-native-firebase/analytics";
 import { BannerAdSize, TestIds, BannerAd } from 'react-native-google-mobile-ads';
 
-import firebase from 'firebase'
-require("firebase/firestore")
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -50,8 +50,8 @@ function Comment(props, route) {
     const fetchCombinedData = async () => {
         setLoading(true);
         const [users, comments] = await Promise.all([
-            firebase.firestore().collection("users").get(),
-            firebase.firestore().collection("posts").doc(props.route.params.uid).collection('userPosts').doc(props.route.params.postId).collection('comments').orderBy("creation", "asc").get(),
+            firestore().collection("users").get(),
+            firestore().collection("posts").doc(props.route.params.uid).collection('userPosts').doc(props.route.params.postId).collection('comments').orderBy("creation", "asc").get(),
         ]);
         
         const usersData = users.docs.map((doc) => ({ id: doc.id, ...doc.data() }));

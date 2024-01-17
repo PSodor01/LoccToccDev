@@ -12,9 +12,8 @@ import * as StoreReview from 'expo-store-review';
 
 import moment from 'moment'
 
-import firebase from 'firebase'
-require("firebase/firestore")
-require("firebase/firebase-storage")
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 
 import analytics from "@react-native-firebase/analytics";
 import { BannerAdSize, TestIds, BannerAd } from 'react-native-google-mobile-ads';
@@ -53,51 +52,67 @@ function Odds(props) {
 
     const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-8519029912093094/8258310490'
 
+    const user = auth().currentUser;
+
     useEffect(() => {
 
         (() => registerForPushNotificationsAsync())()
 
-        analytics().setUserId(firebase.auth().currentUser.uid);
         analytics().logScreenView({ screen_name: 'Odds', screen_class: 'Odds',  user_name: props.currentUser.name})
 
-        firebase.firestore()
-        .collection('users')
-        .doc(firebase.auth().currentUser.uid)
-        .get()
-        .then((snapshot) => {
-            if (snapshot.exists) {
-                firebase.firestore()
-                .collection("users")
-                .doc(firebase.auth().currentUser.uid)
-                .set({lastLogin: firebase.firestore.Timestamp.fromDate(new Date()),}, 
-                    { merge:true });
-            }
-        })
+        if (user) {
+            firestore()
+              .collection('users')
+              .doc(user.uid)
+              .get()
+              .then((snapshot) => {
+                if (snapshot.exists) {
+                  firestore()
+                    .collection('users')
+                    .doc(user.uid)
+                    .set(
+                      {
+                        lastLogin: firestore.Timestamp.fromDate(new Date()),
+                      },
+                      { merge: true }
+                    );
+                }
+              });
+          }
         
     }, [])
 
     useEffect(() => {
+        const currentUserUid = user.uid;
 
-        firebase.firestore()
+        if (currentUserUid === 'o5iJPFfAF3h9A5TSLqB0AkjK8QA2') {
+            return;
+          }
+
+
+        const currentYear = new Date().getFullYear();
+        const currentMonth = new Date().getMonth() + 1; // Months are zero-indexed, so we add 1
+    
+        const fieldName = `alltimeLeaders_${currentYear}_${currentMonth}`;
+
+        firestore()
           .collection('users')
-          .doc(firebase.auth().currentUser.uid)
+          .doc(currentUserUid)
           .get()
           .then((snapshot) => {
-              if (snapshot.exists) {
-                  if (snapshot.data().alltimeLeaders2023 > -100000) {
-                  } else{
-                      firebase.firestore()
-                      .collection("users")
-                      .doc(firebase.auth().currentUser.uid)
-                      .set({alltimeLeaders2023: 100}, { merge:true });
-
-                      setShowAnnouncement(true)
-                  }
+            if (snapshot.exists) {
+              const userDoc = firestore().collection("users").doc(currentUserUid);
+              const userData = snapshot.data();
+    
+              if (!userData[fieldName]) {
+                userDoc.set({ [fieldName]: 100 }, { merge: true });
+                /*setShowAnnouncement(true); */
               }
-          })
-  
-      }, [])
+            }
+          });
+      }, []);
 
+      
       useEffect(() => {
         AsyncStorage.getItem('alreadyLaunched').then(value => {
             if(value == null ) {
@@ -130,24 +145,24 @@ function Odds(props) {
             setLoading(false)
         }
 
-    }, [ props.nbaGames, props.nhlGames, props.mlbGames, props.nflGames, props.ncaafGames, props.mmaGames, props.futureGames, props.formula1Teams, props.formula1Races, props.formula1Drivers, props.formula1Rankings])
+    }, [ props.nbaGames, props.nhlGames, props.eplGames, props.nflGames, props.ncaabGames, props.mmaGames])
 
     
     const fetchData = async () => {
-        const games = [props.mlbGames, props.nbaGames, props.nhlGames, props.mmaGames, props.nflGames, props.ncaafGames];
+        const games = [, props.nbaGames, props.nhlGames, props.mmaGames, props.nflGames, props.ncaabGames, props.eplGames];
 
         const teamLogosById = {};
             for (const logo of props.teamLogos) {
                 teamLogosById[logo.id] = logo.teamLogo;
             }
 
-            for (const game of [ ...props.mlbGames, ...props.nflGames, ...props.ncaafGames,...props.nbaGames, ...props.nhlGames]) {
+            for (const game of [ ...props.nflGames,...props.nbaGames, ...props.nhlGames, ...props.ncaabGames, ...props.eplGames]) {
                 game.homeTeamLogo = teamLogosById[game.homeTeam];
                 game.awayTeamLogo = teamLogosById[game.awayTeam];
             }
         
         const fetchGamePostsCount = async (game) => {
-          return firebase.firestore()
+          return firestore()
             .collection("votes")
             .doc(game.gameId)
             .collection("gameVotes")
@@ -173,14 +188,14 @@ function Odds(props) {
       
         const trendingGames = games.flat().sort((a, b) => a.gameDate.localeCompare(b.gameDate));
         setTrendingGames(trendingGames);
-        setFutureGames(props.futureGames)
+        /*setFutureGames(props.futureGames)
         setFormula1Teams(props.formula1Teams)
         setFormula1Races(props.formula1Races)
         setFormula1Drivers(props.formula1Drivers)
         setFormula1Rankings(props.formula1Rankings)
         setGolfGames(props.golfGames)
         
-        if (props.formula1Rankings.length > 2 ) {setFormula1RaceLive(true)}
+        if (props.formula1Rankings.length > 2 ) {setFormula1RaceLive(true)}*/
 
         setLoading(false);
       }
@@ -211,9 +226,9 @@ function Odds(props) {
         }
 
         if (token) {
-            const res = await firebase.firestore()
+            const res = await firestore()
                 .collection("users")
-                .doc(firebase.auth().currentUser.uid)
+                .doc(user.uid)
                 .set({token}, { merge:true });
         }
         
@@ -261,7 +276,7 @@ function Odds(props) {
     }
 
     const sendNotificationToAllUsers = async () => {
-        const users = await firebase.firestore().collection("users").get();
+        const users = await firestore().collection("users").get();
         users.docs.map((user) => sendNotification(user.data().token))
 
         await analytics().logEvent('sendNotificationToAllUsers', {user_name: props.currentUser.name})
@@ -361,40 +376,32 @@ function Odds(props) {
             icon: nflIcon
         },
         {
-            sport: 'NCAAF',
-            id: '3',
-            icon: ncaafIcon
-        },
-        {
-            sport: 'MLB',
-            id: '4',
-            icon: mlbIcon
-        },
-        {
             sport: 'NBA',
-            id: '5',
+            id: '3',
             icon: nbaIcon
         },
         {
+            sport: 'NCAAB',
+            id: '4',
+            icon: ncaabIcon
+        },
+        {
             sport: 'NHL',
-            id: '6',
+            id: '5',
             icon: nhlIcon
         },
         {
             sport: 'UFC',
-            id: '7',
+            id: '6',
             icon: mmaIcon
         },
         {
-            sport: 'Futures',
-            id: '8',
-            icon: futureIcon
+            sport: 'EPL',
+            id: '7',
+            icon: eplIcon
         },
-        {
-            sport: 'Fantasy',
-            id: '9',
-            icon: fantasyIcon
-        },
+        
+       
      
       ];
 
@@ -744,7 +751,7 @@ function Odds(props) {
                 showAnnouncement={showAnnouncement}
                 onClose={() => setShowAnnouncement(false)}
             />
-            {firebase.auth().currentUser.uid == 'U6u9pFuuwLVEn97z76a07WHK1V63' ?
+            {user.uid == 'U6u9pFuuwLVEn97z76a07WHK1V63' ?
             notificationCriteria == true ?
             <View style={styles.notificationContainer}>
                 <TextInput
@@ -1557,22 +1564,16 @@ const styles = StyleSheet.create({
 })
 
 const mapStateToProps = (store) => ({
-    mlbGames: store.mlbGamesState.mlbGames,
+    eplGames: store.eplGamesState.eplGames,
     nflGames: store.nflGamesState.nflGames,
-    ncaafGames: store.ncaafGamesState.ncaafGames,
     nbaGames: store.nbaGamesState.nbaGames,
     nhlGames: store.nhlGamesState.nhlGames,
+    ncaabGames: store.ncaabGamesState.ncaabGames,
     mmaGames: store.mmaGamesState.mmaGames,
-    futureGames: store.futureGamesState.futureGames,
     teamLogos: store.teamLogosState.teamLogos,
     allUsers: store.userState.allUsers,
     currentUser: store.userState.currentUser,
-    contestStatus: store.userState.contestStatus,
 
-    formula1Teams: store.formula1TeamsState.formula1Teams,
-    formula1Races: store.formula1RacesState.formula1Races,
-    formula1Drivers: store.formula1DriversState.formula1Drivers,
-    formula1Rankings: store.formula1RankingsState.formula1Rankings,
 
 })
 

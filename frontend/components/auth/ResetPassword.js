@@ -3,28 +3,23 @@ import { StyleSheet, ActivityIndicator, View, Text, Alert, Button, TextInput, To
 
 import { FontAwesome5 } from "@expo/vector-icons";
 
-import firebase from 'firebase'
-import "firebase/firestore";
+import auth from '@react-native-firebase/auth';
 
 export default function ResetPasswordScreen({ navigation }) {
 
     const [email, setEmail] = useState('');
     const [showLoading, setShowLoading] = useState(false);
 
-    const reset = async() => {
-        setShowLoading(true);
+    const reset = async () => {
         try {
-            await firebase.auth().sendPasswordResetEmail(email);
-            setShowLoading(false);
-        } catch (e) {
-            setShowLoading(false);
-            Alert.alert(
-                e.message
-            );
+          await auth().sendPasswordResetEmail(email);
+          // You may want to provide feedback to the user here, such as showing a success message.
+          Alert.alert('Password reset email sent successfully');
+        } catch (error) {
+          // Handle errors, and show an alert with the error message.
+          Alert.alert(error.message);
         }
-    };
-
-
+      };
 
     return (
         <View style={styles.container}>
@@ -78,7 +73,6 @@ const styles = StyleSheet.create({
     mainContainer: {
         justifyContent: 'center',
         alignItems: 'center',
-        flex: 1
     },
     formContainer: {
         height: 400,

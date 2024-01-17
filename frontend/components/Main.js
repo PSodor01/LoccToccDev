@@ -6,8 +6,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Entypo from 'react-native-vector-icons/Entypo';
 
-import firebase from 'firebase';
-import "firebase/firestore";
+import auth from '@react-native-firebase/auth';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUser, 
@@ -17,26 +16,19 @@ import { fetchUser,
     fetchAllUsers, 
     fetchLikes,
     fetchFades,
-    fetchMLBGames, 
+    fetchEPLGames, 
     fetchMMAGames,
-    fetchFutureGames,
     fetchBlogDetails, 
     fetchTeamLogos, 
     fetchNBAGames,
     fetchNHLGames,
-    fetchGolfGames, 
+    fetchNCAABGames,
     fetchNFLGames, 
-    fetchNCAAFGames, 
-    fetchFormula1Teams, 
-    fetchFormula1Races,
-    fetchFormula1Drivers, 
-    fetchFormula1Rankings,
-    fetchContestStatus, 
     clearData } from '../redux/actions/index';
 
 import FeedScreen from './main/Feed';
 import ProfileScreen from './main/Profile';
-import BlogHomeScreen from './main/BlogHome';
+import BlogsHomeScreen from './main/BlogsHome';
 import Odds from './main/Odds';
 import ContestScreen from './main/Contest';
 
@@ -46,29 +38,34 @@ function Main() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(clearData());
-    dispatch(fetchUser());
-    dispatch(fetchUserFollowing());
-    dispatch(fetchUserBlocking());
-    dispatch(fetchUserNotifications());
-    dispatch(fetchLikes());
-    dispatch(fetchFades());
-    dispatch(fetchAllUsers());
-    dispatch(fetchMLBGames());
-    dispatch(fetchNFLGames());
-    dispatch(fetchNCAAFGames());
-    dispatch(fetchGolfGames());
-    dispatch(fetchFutureGames());
-    dispatch(fetchTeamLogos());
-    dispatch(fetchBlogDetails());
-    dispatch(fetchFormula1Teams());
-    dispatch(fetchFormula1Races());
-    dispatch(fetchFormula1Drivers());
-    dispatch(fetchFormula1Rankings());
-    dispatch(fetchNBAGames());
-    dispatch(fetchNHLGames());
-    dispatch(fetchMMAGames());
-    dispatch(fetchContestStatus());
+    const unsubscribe = auth().onAuthStateChanged(user => {
+      dispatch(clearData());
+  
+      if (user) {
+        // User is signed in
+        dispatch(fetchUser());
+        dispatch(fetchUserFollowing());
+        dispatch(fetchUserBlocking());
+        dispatch(fetchUserNotifications());
+        dispatch(fetchLikes());
+        dispatch(fetchFades());
+        dispatch(fetchAllUsers());
+        dispatch(fetchEPLGames());
+        dispatch(fetchNFLGames());
+        dispatch(fetchTeamLogos());
+        dispatch(fetchBlogDetails());
+        dispatch(fetchNBAGames());
+        dispatch(fetchNHLGames());
+        dispatch(fetchNCAABGames());
+        dispatch(fetchMMAGames());
+      } else {
+        // User is signed out
+        // ... other dispatch actions related to a signed-out user
+      }
+    });
+  
+    // Cleanup the listener when the component unmounts
+    return () => unsubscribe();
   }, []);
 
   return (
@@ -78,7 +75,7 @@ function Main() {
       tabBarColor='#009387'
       screenOptions={{
         tabBarStyle: { backgroundColor: "#009387" },
-        tabBarShowLabel: false,
+        tabBarShowLabel: true,
         headerShown: false,
         tabBarInactiveTintColor: "#CACFD2",
         tabBarActiveTintColor: "#fff"
@@ -107,13 +104,13 @@ function Main() {
         }}
       />
       <Tab.Screen 
-        name="Blog Home" 
-        component={BlogHomeScreen} 
+        name="Blogs Home" 
+        component={BlogsHomeScreen} 
         options={{
           tabBarLabel: 'Blog',
           tabBarColor: '#009387',
           tabBarIcon: ({ color, size }) => (
-            <Entypo name="open-book" color={"#FFD700"} size={30}  style={{ marginBottom: 5 }}/>
+            <Entypo name="open-book" color={color} size={30} />
           ),
         }}
       />
@@ -134,7 +131,10 @@ function Main() {
         listeners={({ navigation }) => ({
           tabPress: event => {
             event.preventDefault();
-            navigation.navigate("Profile", {uid: firebase.auth().currentUser.uid})
+            const currentUser = auth().currentUser;
+            if (currentUser) {
+              navigation.navigate('Profile', { uid: currentUser.uid });
+            }
           }})}
         options={{
           tabBarLabel: 'Profile',

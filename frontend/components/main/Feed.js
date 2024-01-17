@@ -6,15 +6,14 @@ import Foundation from 'react-native-vector-icons/Foundation'
 
 import { useNavigation } from '@react-navigation/native';
 import email from 'react-native-email';
-import { Avatar } from 'react-native-elements';
 import { captureRef } from 'react-native-view-shot';
 
 import moment from 'moment';
 
 import * as Notifications from 'expo-notifications';
 
-import firebase from 'firebase'
-require("firebase/firestore")
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 
 import analytics from "@react-native-firebase/analytics";
 import { BannerAdSize, TestIds, BannerAd } from 'react-native-google-mobile-ads';
@@ -35,6 +34,12 @@ function Feed(props) {
 
     const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-8519029912093094/8258310490'
 
+    const getFieldName = () => {
+        const currentYear = new Date().getFullYear();
+        const currentMonth = new Date().getMonth() + 1; // Months are zero-indexed, so we add 1
+        return `alltimeLeaders_${currentYear}_${currentMonth}`;
+      };
+
      useEffect(() => {
         
         fetchData()
@@ -46,8 +51,8 @@ function Feed(props) {
 
     const fetchCombinedData = async () => {
         const [users, gamePosts] = await Promise.all([
-            firebase.firestore().collection("users").get(),
-            firebase.firestore().collectionGroup("userPosts").orderBy('creation', 'desc').limit(limit).get()
+            firestore().collection("users").get(),
+            firestore().collectionGroup("userPosts").orderBy('creation', 'desc').limit(limit).get()
         ]);
     
         const usersData = users.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
@@ -110,212 +115,239 @@ function Feed(props) {
       };
       
     
-    const storeLike = (postId, userId) => {
-        firebase.firestore()
+      const storeLike = (postId, userId) => {      
+        const fieldName = getFieldName();
+
+        firestore()
             .collection("likes")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .collection("userLikes")
             .doc(postId)
             .set({})
 
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                alltimeLeaders2023: firebase.firestore.FieldValue.increment(5)
-        })
-
+        if (userId !== auth().currentUser.uid) {
+            const updateObject = {};
+            updateObject[fieldName] = firestore.FieldValue.increment(5);   
+            firestore()
+                .collection("users")
+                .doc(auth().currentUser.uid)
+                .update(updateObject);
+        }
         analytics().logEvent('hammerPost', {user_name: props.currentUser.name});
     }
 
     const deleteLike = (postId, userId) => {
-        firebase.firestore()
+        const fieldName = getFieldName();
+
+        firestore()
             .collection("likes")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .collection("userLikes")
             .doc(postId)
             .delete({})
 
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                alltimeLeaders2023: firebase.firestore.FieldValue.increment(-5)
-        })
-        
+        if (userId !== auth().currentUser.uid) {
+            const updateObject = {};
+            updateObject[fieldName] = firestore.FieldValue.increment(-5); 
+
+            firestore()
+                .collection("users")
+                .doc(auth().currentUser.uid)
+                .update(updateObject);
+            }
     }
 
-    const storeFade = (postId) => {
-        firebase.firestore()
+    const storeFade = (postId, userId) => {
+        const fieldName = getFieldName();
+
+        firestore()
             .collection("fades")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .collection("userFades")
             .doc(postId)
             .set({})
 
-        firebase.firestore()
+        if (userId !== auth().currentUser.uid) {
+            const updateObject = {};
+            updateObject[fieldName] = firestore.FieldValue.increment(-10); 
+
+            firestore()
             .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                alltimeLeaders2023: firebase.firestore.FieldValue.increment(-10)
-        })
+            .doc(auth().currentUser.uid)
+            .update(updateObject);
+
+        }
 
         analytics().logEvent('fadePost', {user_name: props.currentUser.name});
     }
 
-    const deleteFade = (postId) => {
-        firebase.firestore()
+    const deleteFade = (postId, userId) => {
+        const fieldName = getFieldName();
+
+        firestore()
             .collection("fades")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .collection("userFades")
             .doc(postId)
             .delete({})
 
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                alltimeLeaders2023: firebase.firestore.FieldValue.increment(10)
-        })
+    if (userId !== auth().currentUser.uid) {
+        const updateObject = {};
+        updateObject[fieldName] = firestore.FieldValue.increment(10);
 
+        firestore()
+            .collection("users")
+            .doc(auth().currentUser.uid)
+            .update(updateObject);
+        }
     }
 
-    const onLikePress = (userId, postId) => {
+    const onLikePress = async (userId, postId) => {
+        const fieldName = getFieldName();
 
-        firebase.firestore()
+        try {
+        await firestore()
             .collection("posts")
             .doc(userId)
             .collection("userPosts")
             .doc(postId)
             .collection("likes")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .set({})
 
-        firebase.firestore()
+        await firestore()
             .collection("posts")
             .doc(userId)
             .collection("userPosts")
             .doc(postId)
             .update({
-                likesCount: firebase.firestore.FieldValue.increment(1)
+                likesCount: firestore.FieldValue.increment(1)
             })
 
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                alltimeLeaders2023: firebase.firestore.FieldValue.increment(5)
-        })
+        if (userId !== auth().currentUser.uid) {
+            const updateObject = {};
+            updateObject[fieldName] = firestore.FieldValue.increment(5);
 
-        const likedName = props.currentUser.name
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .collection("notifications")
-            .add({
-                notificationType: "hammer",
-                creation: firebase.firestore.FieldValue.serverTimestamp(),
-                otherUserId: firebase.auth().currentUser.uid,
-                otherUsername: likedName,
-                notificationText: 'hammered your post',
-              })
-
-    }
+            await firestore()
+                .collection("users")
+                .doc(userId)
+                .update(updateObject);
+            }
+       
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     const onDislikePress = (userId, postId) => {
-        firebase.firestore()
+        const fieldName = getFieldName();
+
+        firestore()
             .collection("posts")
             .doc(userId)
             .collection("userPosts")
             .doc(postId)
             .update({
-                likesCount: firebase.firestore.FieldValue.increment(-1)
+                likesCount: firestore.FieldValue.increment(-1)
             })
 
-        firebase.firestore()
+        firestore()
             .collection("posts")
             .doc(userId)
             .collection("userPosts")
             .doc(postId)
             .collection("likes")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .delete()
 
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                alltimeLeaders2023: firebase.firestore.FieldValue.increment(-5)
-        })
+        if (userId !== auth().currentUser.uid) {
+            const updateObject = {};
+            updateObject[fieldName] = firestore.FieldValue.increment(-5);
 
+            firestore()
+                .collection("users")
+                .doc(userId)
+                .update(updateObject);
+        }
+        
     }
 
     const onFadePress = (userId, postId) => {
-        firebase.firestore()
+        const fieldName = getFieldName();
+
+        firestore()
             .collection("posts")
             .doc(userId)
             .collection("userPosts")
             .doc(postId)
             .update({
-                fadesCount: firebase.firestore.FieldValue.increment(1)
+                fadesCount: firestore.FieldValue.increment(1)
             })
 
-        firebase.firestore()
+        firestore()
             .collection("posts")
             .doc(userId)
             .collection("userPosts")
             .doc(postId)
             .collection("fades")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .set({})
 
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                alltimeLeaders2023: firebase.firestore.FieldValue.increment(-10)
-        })
+        if (userId !== auth().currentUser.uid) {
+            const updateObject = {};
+            updateObject[fieldName] = firestore.FieldValue.increment(-10);
+            
+            firestore()
+                .collection("users")
+                .doc(userId)
+                .update(updateObject);
+        }
 
         const likedName = props.currentUser.name
-        firebase.firestore()
+        firestore()
             .collection("users")
             .doc(userId)
             .collection("notifications")
             .add({
                 notificationType: "fade",
-                creation: firebase.firestore.FieldValue.serverTimestamp(),
-                otherUserId: firebase.auth().currentUser.uid,
+                creation: firestore.FieldValue.serverTimestamp(),
+                otherUserId: auth().currentUser.uid,
                 otherUsername: likedName,
-                notificationText: 'faded your post',
-                })
+                notificationText: 'faded your post on the ' + awayTeam + "/" + homeTeam + " game",
+              })
 
     }
 
     const onUnfadePress = (userId, postId) => {
-        firebase.firestore()
+        const fieldName = getFieldName();
+
+        firestore()
             .collection("posts")
             .doc(userId)
             .collection("userPosts")
             .doc(postId)
             .update({
-                fadesCount: firebase.firestore.FieldValue.increment(-1)
+                fadesCount: firestore.FieldValue.increment(-1)
             })
 
-        firebase.firestore()
+        firestore()
             .collection("posts")
             .doc(userId)
             .collection("userPosts")
             .doc(postId)
             .collection("fades")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .delete()
 
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                alltimeLeaders2023: firebase.firestore.FieldValue.increment(-10)
-        })
+        if (userId !== auth().currentUser.uid) {
+            const updateObject = {};
+            updateObject[fieldName] = firestore.FieldValue.increment(10);
+
+            firestore()
+                .collection("users")
+                .doc(userId)
+                .update(updateObject);
+        }
 
     }
 
@@ -349,7 +381,7 @@ function Feed(props) {
 
     const sendNotificationForLike = async (uid, name) => {
         const users = await 
-        firebase.firestore()
+        firestore()
             .collection("users")
             .doc(uid)
             .get()
@@ -373,7 +405,7 @@ function Feed(props) {
 
     const sendNotificationForFade = async (uid, name) => {
         const users = await 
-        firebase.firestore()
+        firestore()
             .collection("users")
             .doc(uid)
             .get()
@@ -470,7 +502,7 @@ function Feed(props) {
         return (
             <View>
                 <View >
-                { item.blocked == true || item.creator == firebase.auth().currentUser.uid ?
+                { item.blocked == true || item.creator == auth().currentUser.uid ?
 
                     null
                         
@@ -1034,7 +1066,6 @@ const mapStateToProps = (store) => ({
     liked: store.userState.liked,
     faded: store.userState.faded,
     users: store.usersState.users,
-    contestStatus: store.userState.contestStatus,
 
 })
 

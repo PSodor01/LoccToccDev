@@ -19,8 +19,8 @@ import { Avatar } from 'react-native-elements';
 import analytics from "@react-native-firebase/analytics";
 import { BannerAdSize, TestIds, BannerAd } from 'react-native-google-mobile-ads';
 
-import firebase from 'firebase'
-require("firebase/firestore")
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 
 import { connect } from 'react-redux'
 
@@ -54,6 +54,12 @@ function game(props) {
     const AnimatedIonicons = Animated.createAnimatedComponent(Ionicons);
     const scaleValue = new Animated.Value(1);
 
+    const getFieldName = () => {
+        const currentYear = new Date().getFullYear();
+        const currentMonth = new Date().getMonth() + 1; // Months are zero-indexed, so we add 1
+        return `alltimeLeaders_${currentYear}_${currentMonth}`;
+      };
+
     useEffect(() => {
             analytics().logScreenView({ screen_name: 'game', screen_class: 'game', user_name: props.currentUser.name})
 
@@ -74,8 +80,8 @@ function game(props) {
 
     const fetchCombinedData = async () => {
         const [users, gamePosts] = await Promise.all([
-            firebase.firestore().collection("users").get(),
-            firebase.firestore().collectionGroup("userPosts").where('gameId', '==', gameId).orderBy('creation', 'desc').get()
+            firestore().collection("users").get(),
+            firestore().collectionGroup("userPosts").where('gameId', '==', gameId).orderBy('creation', 'desc').get()
         ]);
 
         const usersData = users.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
@@ -118,124 +124,134 @@ function game(props) {
         setFormula1Races(props.formula1Races)
     }, [])
 
-    
+    const storeLike = (postId, userId) => {      
+        const fieldName = getFieldName();
 
-    const storeLike = (postId, userId) => {
-        firebase.firestore()
+        firestore()
             .collection("likes")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .collection("userLikes")
             .doc(postId)
             .set({})
 
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                alltimeLeaders2023: firebase.firestore.FieldValue.increment(5)
-            })
-
-
+        if (userId !== auth().currentUser.uid) {
+            const updateObject = {};
+            updateObject[fieldName] = firestore.FieldValue.increment(5);   
+            firestore()
+                .collection("users")
+                .doc(auth().currentUser.uid)
+                .update(updateObject);
+        }
         analytics().logEvent('hammerPost', {user_name: props.currentUser.name});
-            
     }
 
     const deleteLike = (postId, userId) => {
-        firebase.firestore()
+        const fieldName = getFieldName();
+
+        firestore()
             .collection("likes")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .collection("userLikes")
             .doc(postId)
             .delete({})
 
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                alltimeLeaders2023: firebase.firestore.FieldValue.increment(-5)
-            })
+        if (userId !== auth().currentUser.uid) {
+            const updateObject = {};
+            updateObject[fieldName] = firestore.FieldValue.increment(-5); 
 
-
-
-
+            firestore()
+                .collection("users")
+                .doc(auth().currentUser.uid)
+                .update(updateObject);
+            }
     }
 
-    const storeFade = (postId) => {
-        firebase.firestore()
+    const storeFade = (postId, userId) => {
+        const fieldName = getFieldName();
+
+        firestore()
             .collection("fades")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .collection("userFades")
             .doc(postId)
             .set({})
 
-        firebase.firestore()
+        if (userId !== auth().currentUser.uid) {
+            const updateObject = {};
+            updateObject[fieldName] = firestore.FieldValue.increment(-10); 
+
+            firestore()
             .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                alltimeLeaders2023: firebase.firestore.FieldValue.increment(-10)
-            })
+            .doc(auth().currentUser.uid)
+            .update(updateObject);
+
+        }
 
         analytics().logEvent('fadePost', {user_name: props.currentUser.name});
     }
 
-    const deleteFade = (postId) => {
-        firebase.firestore()
+    const deleteFade = (postId, userId) => {
+        const fieldName = getFieldName();
+
+        firestore()
             .collection("fades")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .collection("userFades")
             .doc(postId)
             .delete({})
 
-        firebase.firestore()
+    if (userId !== auth().currentUser.uid) {
+        const updateObject = {};
+        updateObject[fieldName] = firestore.FieldValue.increment(10);
+
+        firestore()
             .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .update({
-                alltimeLeaders2023: firebase.firestore.FieldValue.increment(10)
-            })
-
-    }
-
-    const testFunction = () => {
-        console.log("yeah buddy")
-
+            .doc(auth().currentUser.uid)
+            .update(updateObject);
+        }
     }
 
     const onLikePress = async (userId, postId) => {
+        const fieldName = getFieldName();
+
         try {
-        await firebase.firestore()
+        await firestore()
             .collection("posts")
             .doc(userId)
             .collection("userPosts")
             .doc(postId)
             .collection("likes")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .set({})
 
-        await firebase.firestore()
+        await firestore()
             .collection("posts")
             .doc(userId)
             .collection("userPosts")
             .doc(postId)
             .update({
-                likesCount: firebase.firestore.FieldValue.increment(1)
+                likesCount: firestore.FieldValue.increment(1)
             })
 
-        await firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                alltimeLeaders2023: firebase.firestore.FieldValue.increment(5)
-            })
+        if (userId !== auth().currentUser.uid) {
+            const updateObject = {};
+            updateObject[fieldName] = firestore.FieldValue.increment(5);
+
+            await firestore()
+                .collection("users")
+                .doc(userId)
+                .update(updateObject);
+            }
 
         const likedName = props.currentUser.name
-        await firebase.firestore()
+        await firestore()
             .collection("users")
             .doc(userId)
             .collection("notifications")
             .add({
                 notificationType: "hammer",
-                creation: firebase.firestore.FieldValue.serverTimestamp(),
-                otherUserId: firebase.auth().currentUser.uid,
+                creation: firestore.FieldValue.serverTimestamp(),
+                otherUserId: auth().currentUser.uid,
                 otherUsername: likedName,
                 notificationText: 'hammered your post on the ' + awayTeam + "/" + homeTeam + " game",
               })
@@ -252,68 +268,78 @@ function game(props) {
     };
 
     const onDislikePress = (userId, postId) => {
-        firebase.firestore()
+        const fieldName = getFieldName();
+
+        firestore()
             .collection("posts")
             .doc(userId)
             .collection("userPosts")
             .doc(postId)
             .update({
-                likesCount: firebase.firestore.FieldValue.increment(-1)
+                likesCount: firestore.FieldValue.increment(-1)
             })
 
-        firebase.firestore()
+        firestore()
             .collection("posts")
             .doc(userId)
             .collection("userPosts")
             .doc(postId)
             .collection("likes")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .delete()
 
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                alltimeLeaders2023: firebase.firestore.FieldValue.increment(-5)
-        })
+        if (userId !== auth().currentUser.uid) {
+            const updateObject = {};
+            updateObject[fieldName] = firestore.FieldValue.increment(-5);
+
+            firestore()
+                .collection("users")
+                .doc(userId)
+                .update(updateObject);
+        }
         
     }
 
     const onFadePress = (userId, postId) => {
-        firebase.firestore()
+        const fieldName = getFieldName();
+
+        firestore()
             .collection("posts")
             .doc(userId)
             .collection("userPosts")
             .doc(postId)
             .update({
-                fadesCount: firebase.firestore.FieldValue.increment(1)
+                fadesCount: firestore.FieldValue.increment(1)
             })
 
-        firebase.firestore()
+        firestore()
             .collection("posts")
             .doc(userId)
             .collection("userPosts")
             .doc(postId)
             .collection("fades")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .set({})
 
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                alltimeLeaders2023: firebase.firestore.FieldValue.increment(-10)
-        })
+        if (userId !== auth().currentUser.uid) {
+            const updateObject = {};
+            updateObject[fieldName] = firestore.FieldValue.increment(-10);
+            
+            firestore()
+                .collection("users")
+                .doc(userId)
+                .update(updateObject);
+        }
 
         const likedName = props.currentUser.name
-        firebase.firestore()
+        firestore()
             .collection("users")
             .doc(userId)
             .collection("notifications")
             .add({
                 notificationType: "fade",
-                creation: firebase.firestore.FieldValue.serverTimestamp(),
-                otherUserId: firebase.auth().currentUser.uid,
+                creation: firestore.FieldValue.serverTimestamp(),
+                otherUserId: auth().currentUser.uid,
                 otherUsername: likedName,
                 notificationText: 'faded your post on the ' + awayTeam + "/" + homeTeam + " game",
               })
@@ -321,30 +347,35 @@ function game(props) {
     }
 
     const onUnfadePress = (userId, postId) => {
-        firebase.firestore()
+        const fieldName = getFieldName();
+
+        firestore()
             .collection("posts")
             .doc(userId)
             .collection("userPosts")
             .doc(postId)
             .update({
-                fadesCount: firebase.firestore.FieldValue.increment(-1)
+                fadesCount: firestore.FieldValue.increment(-1)
             })
 
-        firebase.firestore()
+        firestore()
             .collection("posts")
             .doc(userId)
             .collection("userPosts")
             .doc(postId)
             .collection("fades")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .delete()
 
-        firebase.firestore()
-            .collection("users")
-            .doc(userId)
-            .update({
-                alltimeLeaders2023: firebase.firestore.FieldValue.increment(10)
-        })
+        if (userId !== auth().currentUser.uid) {
+            const updateObject = {};
+            updateObject[fieldName] = firestore.FieldValue.increment(10);
+
+            firestore()
+                .collection("users")
+                .doc(userId)
+                .update(updateObject);
+        }
 
     }
 
@@ -378,8 +409,8 @@ function game(props) {
 
     const sendNotificationForLike = async (uid, name) => {
         
-        const users = await firebase
-            .firestore()
+        const users = await 
+            firestore()
             .collection("users")
             .doc(uid)
             .get()
@@ -406,8 +437,8 @@ function game(props) {
         };
 
     const sendNotificationForFade = async (uid, name) => {
-        const users = await firebase
-            .firestore()
+        const users = await
+            firestore()
             .collection("users")
             .doc(uid)
             .get()
@@ -443,7 +474,7 @@ function game(props) {
 
         analytics().logEvent('gameVote', {user_name: props.currentUser.name});
 
-        firebase.firestore()
+        firestore()
             .collection("votes")
             .doc(gameId)
             .collection("gameVotes")
@@ -451,37 +482,37 @@ function game(props) {
             .get()
             .then((snapshot) => {
                 if (snapshot.exists) {
-                    firebase.firestore()
+                    firestore()
                     .collection("votes")
                     .doc(gameId)
                     .collection("gameVotes")
-                    .doc(firebase.auth().currentUser.uid)
+                    .doc(auth().currentUser.uid)
                     .get()
                     .then((snapshot) => {
                         if (snapshot.exists) {
                         }
                         else {
 
-                            firebase.firestore()
+                            firestore()
                             .collection("votes")
                             .doc(gameId)
                             .collection("gameVotes")
-                            .doc(firebase.auth().currentUser.uid)
+                            .doc(auth().currentUser.uid)
                             .set({})
 
                         }
                     })
                 }
                 else {
-                    firebase.firestore()
+                    firestore()
                     .collection("votes")
                     .doc(gameId)
                     .collection("gameVotes")
-                    .doc(firebase.auth().currentUser.uid)
+                    .doc(auth().currentUser.uid)
                     .set({})
                     
                     const gameVotes = 
-                        firebase.firestore()
+                        firestore()
                         .collection("votes")
                         .doc(gameId)
                         .collection("gameVotes")
@@ -501,11 +532,11 @@ function game(props) {
     }
 
     const increaseAwayCount = () => {
-        firebase.firestore()
+        firestore()
             .collection("votes")
             .doc(gameId)
             .collection("gameVotes")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .get()
             .then((snapshot) => {
                 if (snapshot.exists) {
@@ -513,13 +544,13 @@ function game(props) {
                 }
                 else {
 
-                    firebase.firestore()
+                    firestore()
                     .collection("votes")
                     .doc(gameId)
                     .collection("gameVotes")
                     .doc('info')
                     .update({
-                        awayCount: firebase.firestore.FieldValue.increment(1)
+                        awayCount: firestore.FieldValue.increment(1)
                     })
 
                 }
@@ -527,11 +558,11 @@ function game(props) {
     }
 
     const increaseHomeCount = () => {
-        firebase.firestore()
+        firestore()
             .collection("votes")
             .doc(gameId)
             .collection("gameVotes")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .get()
             .then((snapshot) => {
                 if (snapshot.exists) {
@@ -539,13 +570,13 @@ function game(props) {
                 }
                 else {
 
-                    firebase.firestore()
+                    firestore()
                     .collection("votes")
                     .doc(gameId)
                     .collection("gameVotes")
                     .doc('info')
                     .update({
-                        homeCount: firebase.firestore.FieldValue.increment(1)
+                        homeCount: firestore.FieldValue.increment(1)
                     })
 
                 }
@@ -553,11 +584,11 @@ function game(props) {
     }
 
     const increaseDrawCount = () => {
-        firebase.firestore()
+        firestore()
             .collection("votes")
             .doc(gameId)
             .collection("gameVotes")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .get()
             .then((snapshot) => {
                 if (snapshot.exists) {
@@ -565,13 +596,13 @@ function game(props) {
                 }
                 else {
 
-                    firebase.firestore()
+                    firestore()
                     .collection("votes")
                     .doc(gameId)
                     .collection("gameVotes")
                     .doc('info')
                     .update({
-                        drawCount: firebase.firestore.FieldValue.increment(1)
+                        drawCount: firestore.FieldValue.increment(1)
                     })
 
                 }
@@ -579,7 +610,7 @@ function game(props) {
     }
 
     const setVoteCount = () => {
-        firebase.firestore()
+        firestore()
         .collection("votes")
         .doc(gameId)
         .collection("gameVotes")
@@ -696,7 +727,7 @@ function game(props) {
 
         analytics().logEvent('selectNBAProps', {user_name: props.currentUser.name});
 
-        const playerData = await firebase.firestore()
+        const playerData = await firestore()
           .collection("nba")
           .doc("props")
           .collection("players")
@@ -737,7 +768,7 @@ function game(props) {
 
         analytics().logEvent('selectNFLProps', {user_name: props.currentUser.name});
 
-        const playerData = await firebase.firestore()
+        const playerData = await firestore()
           .collection("nfl")
           .doc("props")
           .collection("players")
@@ -778,7 +809,7 @@ function game(props) {
 
         analytics().logEvent('selectNHLProps', {user_name: props.currentUser.name});
 
-        const playerData = await firebase.firestore()
+        const playerData = await firestore()
           .collection("nhl")
           .doc("props")
           .collection("players")
@@ -819,7 +850,7 @@ function game(props) {
 
         analytics().logEvent('selectMLBProps', {user_name: props.currentUser.name});
 
-        const playerData = await firebase.firestore()
+        const playerData = await firestore()
           .collection("mlb")
           .doc("props")
           .collection("players")
@@ -1328,7 +1359,7 @@ function game(props) {
                             <TouchableOpacity
                             onPress={() => {
                                 onDislikePress(item.user.id, item.id);
-                                deleteLike(item.id);
+                                deleteLike(item.id, item.user.id);
                             }}
                             >
                             <Animated.View
@@ -1352,7 +1383,7 @@ function game(props) {
                             <TouchableOpacity
                             onPress={() => {
                                 onLikePress(item.user.id, item.id, item.awayTeam, item.homeTeam); // Pass awayTeam and homeTeam here
-                                storeLike(item.id);
+                                storeLike(item.id, item.user.id);
                                 sendNotificationForLike(item.user.id, item.user.name);
                             }}
                             >
@@ -1377,7 +1408,7 @@ function game(props) {
                         { item.faded == true ?
                         <View style={styles.likeContainer}>
                             <TouchableOpacity
-                                onPress={() => {onUnfadePress(item.user.id, item.id); deleteFade(item.id)}} >
+                                onPress={() => {onUnfadePress(item.user.id, item.id); deleteFade(item.id, item.user.id)}} >
                                 <Foundation name={"skull"} size={20} color={"black"} />
                             </TouchableOpacity>
                             <TouchableOpacity
@@ -1390,7 +1421,7 @@ function game(props) {
                         
                         <View style={styles.likeContainer}>
                             <TouchableOpacity
-                                onPress={() => {onFadePress(item.user.id, item.id); storeFade(item.id), sendNotificationForFade(item.user.id, item.user.name)}}> 
+                                onPress={() => {onFadePress(item.user.id, item.id); storeFade(item.id, item.user.id), sendNotificationForFade(item.user.id, item.user.name)}}> 
                                 <Foundation name={"skull"}  size={20} color={"#B3B6B7"}/>
                             </TouchableOpacity>
                             <TouchableOpacity

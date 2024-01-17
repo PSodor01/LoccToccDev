@@ -9,8 +9,8 @@ import { Avatar } from 'react-native-elements';
 
 import analytics from "@react-native-firebase/analytics";
 
-import firebase from 'firebase'
-require("firebase/firestore")
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -47,7 +47,7 @@ function LikesList(props) {
 
             
         }
-        firebase.firestore()
+        firestore()
             .collection("posts")
             .doc(userId)
             .collection("userPosts")

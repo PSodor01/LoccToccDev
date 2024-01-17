@@ -6,8 +6,7 @@ import Fontisto from 'react-native-vector-icons/Fontisto';
 
 import email from 'react-native-email'
 
-import firebase from 'firebase'
-import "firebase/firestore";
+import auth from '@react-native-firebase/auth';
 
 const DismissKeyboard = ({ children }) => (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -20,26 +19,29 @@ export class Login extends Component {
     
     constructor(props) {
         super(props);
-
+    
         this.state = {
-            email: '',
-            password: '',
-        }
-
-        this.onSignUp = this.onSignUp.bind(this)
-    }
-
-    onSignUp() {
+          email: '',
+          password: '',
+        };
+    
+        this.onSignUp = this.onSignUp.bind(this);
+      }
+    
+      onSignUp() {
         const { email, password } = this.state;
-        firebase.auth().signInWithEmailAndPassword(email, password)
-            .then((result) => {
-            })
-            .catch(error => {   
-                alert(error.message);
-             })
-           }catch(err){
-              alert(err);
-    }
+    
+        auth()
+          .signInWithEmailAndPassword(email, password)
+          .then((userCredential) => {
+            // Handle successful sign-in if needed
+            console.log('User signed in:', userCredential.user);
+          })
+          .catch((error) => {
+            // Handle sign-in errors
+            alert(error.message);
+          });
+      }
 
     handleSupportEmail = () => {
         const to = ['support@locctocc.com'] // string or array of email addresses

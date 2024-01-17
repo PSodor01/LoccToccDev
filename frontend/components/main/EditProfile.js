@@ -1,8 +1,8 @@
-import React, {useEffect, useContext, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import { Text, View, StyleSheet, ActivityIndicator, TouchableOpacity, TextInput, Image, Alert, ImageBackground } from 'react-native';
 
-import Animated from 'react-native-reanimated';
-import BottomSheet from 'reanimated-bottom-sheet';
+import BottomSheet, { BottomSheetModal, BottomSheetModalProvider, BottomSheetFlatList } from "@gorhom/bottom-sheet";
+
 import * as ImagePicker from 'expo-image-picker';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -10,8 +10,9 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import analytics from "@react-native-firebase/analytics";
 
-import firebase from 'firebase'
-require("firebase/firestore")
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
+import storage from '@react-native-firebase/storage';
 
 import { connect } from 'react-redux'
 
@@ -23,110 +24,150 @@ function EditProfileScreen(props) {
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [transferred, setTransferred] = useState(0);
+    const [instagramCheck, setInstagramCheck] = useState(true);
+    const [isOpen, setIsOpen] = useState(false);
     
-    const getUser = async() => {
-        const currentUser = await firebase.firestore()
-        .collection('users')
-        .doc(firebase.auth().currentUser.uid)
-        .get()
-        .then((documentSnapshot) => {
-        if( documentSnapshot.exists ) {
-            console.log('User Data', documentSnapshot.data());
-            setUserData(documentSnapshot.data());
+    const getUser = async () => {
+      try {
+        const currentUser = await firestore()
+          .collection('users')
+          .doc(auth().currentUser.uid)
+          .get();
+  
+        if (currentUser.exists) {
+          console.log('User Data', currentUser.data());
+          setUserData(currentUser.data());
         }
-        })
+      } catch (error) {
+        // Handle errors, such as permissions issues or network problems.
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    const bottomSheetModalRef = useRef(null)
+
+    const snapPoints = ["60%", "95%"]
+
+    function handlePresentModal() {
+        bottomSheetModalRef.current?.present();
+        setIsOpen(true);
     }
 
-    const handleUpdate = async() => {
+    const handleUpdate = async () => {
+      analytics().logEvent('submitEditProfile', { user_name: props.currentUser.name });
+    
+      let imgUrl = await uploadImage();
+    
+      if (imgUrl === null && userData.userImg) {
+        imgUrl = userData.userImg;
+      }
+    
+      const userRef = firestore().collection('users').doc(auth().currentUser.uid);
+    
+      const updateData = {
+        name: userData.name,
+        email: userData.email,
+        aboutMe: userData.aboutMe,
+        location: userData.location,
+        userImg: imgUrl,
+      };
+    
+      if (userData.instagramLink) {
+        updateData.instagramLink = userData.instagramLink;
+      } else {
+        updateData.instagramLink = firestore.FieldValue.delete();
+      }
+    
+      if (userData.twitterLink) {
+        updateData.twitterLink = userData.twitterLink;
+      } else {
+        updateData.twitterLink = firestore.FieldValue.delete();
+      }
+    
+      if (userData.discordLink) {
+        updateData.discordLink = userData.discordLink;
+      } else {
+        updateData.discordLink = firestore.FieldValue.delete();
+      }
 
-      analytics().logEvent('submitEditProfile', { user_name: props.currentUser.name});
-
-        let imgUrl = await uploadImage();
-
-        if( imgUrl == null && userData.userImg ) {
-            imgUrl = userData.userImg;
-        }
-
-        firebase.firestore()
-        .collection('users')
-        .doc(firebase.auth().currentUser.uid)
-        .update({
-          name: userData.name,
-          email: userData.email,
-          aboutMe: userData.aboutMe,
-          location: userData.location,
-          userImg: imgUrl,
-        })
+      if (userData.telegramLink) {
+        updateData.telegramLink = userData.telegramLink;
+      } else {
+        updateData.telegramLink = firestore.FieldValue.delete();
+      }
+    
+      if (userData.websiteLink) {
+        updateData.websiteLink = userData.websiteLink;
+      } else {
+        updateData.websiteLink = firestore.FieldValue.delete();
+      }
+    
+      userRef.update(updateData)
         .then(() => {
-        console.log('User Updated!');
-        Alert.alert(
+          console.log('User Updated!');
+          Alert.alert(
             'Profile Updated!',
             'Your profile has been updated successfully.'
-        );
+          );
         })
-
-        getUser()
-    }
-
-    const uploadImage = async () => {
-        if( image == null ) {
-          return null;
-        }
-        const uploadUri = image;
-        let filename = uploadUri.substring(uploadUri.lastIndexOf('/') + 1);
-
-        const childPath = `post/${firebase.auth().currentUser.uid}/${Math.random().toString(36)}`;
-    
-        // Add timestamp to File Name
-        const extension = filename.split('.').pop(); 
-        const name = filename.split('.').slice(0, -1).join('.');
-        filename = name + Date.now() + '.' + extension;
-    
-        setLoading(true);
-        setTransferred(0);
-
-        const response = await fetch(uploadUri);
-        const blob = await response.blob();
-
-        const task = firebase
-            .storage()
-            .ref()
-            .child(childPath)
-            .put(blob);
-
-       
-        // Set transferred state
-        task.on('state_changed', (taskSnapshot) => {
-          console.log(
-            `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
-          );
-    
-          setTransferred(
-            Math.round(taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) *
-              100,
-          );
+        .catch((error) => {
+          console.error('Error updating user: ', error);
+          Alert.alert('Update Failed', 'There was an issue updating your profile. Please try again later.');
         });
     
-        try {
-          await task;
-    
-          const url = await task.snapshot.ref.getDownloadURL();
-    
-          setLoading(false);
-          setImage(null);
-    
-          // Alert.alert(
-          //   'Image uploaded!',
-          //   'Your image has been uploaded to the Firebase Cloud Storage Successfully!',
-          // );
-          return url;
-    
-        } catch (e) {
-          console.log(e);
-          return null;
-        }
-    
-      };
+      getUser();
+    };
+
+    const uploadImage = async () => {
+      if (image == null) {
+        return null;
+      }
+
+      const uploadUri = image;
+      let filename = uploadUri.substring(uploadUri.lastIndexOf('/') + 1);
+
+      const childPath = `post/${auth().currentUser.uid}/${Math.random().toString(36)}`;
+
+      // Add timestamp to File Name
+      const extension = filename.split('.').pop();
+      const name = filename.split('.').slice(0, -1).join('.');
+      filename = name + Date.now() + '.' + extension;
+
+      setLoading(true);
+      setTransferred(0);
+
+      const reference = storage().ref(childPath);
+      const task = reference.putFile(uploadUri);
+
+      // Set transferred state
+      task.on('state_changed', (taskSnapshot) => {
+        console.log(
+          `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
+        );
+
+        setTransferred(
+          Math.round((taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) * 100),
+        );
+      });
+
+      try {
+        await task;
+
+        const url = await reference.getDownloadURL();
+
+        setLoading(false);
+        setImage(null);
+
+        // Alert.alert(
+        //   'Image uploaded!',
+        //   'Your image has been uploaded to the Firebase Cloud Storage Successfully!',
+        // );
+        return url;
+      } catch (e) {
+        console.log(e);
+        return null;
+      }
+    };
 
     useEffect(() => {
       
@@ -163,95 +204,70 @@ function EditProfileScreen(props) {
         });
         console.log(result);
     
-        if (!result.cancelled) {
+        if (!result.canceled) {
           setImage(result.uri);
-          this.bs.current.snapTo(1);
+          
         }
       };
-    
-    renderInner = () => (
-        <View style={styles.panel}>
-          <View style={{alignItems: 'center'}}>
-            <Text style={styles.panelTitle}>Upload Photo</Text>
-            <Text style={styles.panelSubtitle}>Choose Your Profile Picture</Text>
-          </View>
-          <TouchableOpacity
-            style={styles.panelButton}
-            onPress={pickImage}>
-            <Text style={styles.panelButtonTitle}>Choose From Library</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.panelButton}
-            onPress={() => this.bs.current.snapTo(1)}>
-            <Text style={styles.panelButtonTitle}>Cancel</Text>
-          </TouchableOpacity>
-        </View>
-      );
-    
-      renderHeader = () => (
-        <View style={styles.header}>
-          <View style={styles.panelHeader}>
-            <View style={styles.panelHandle} />
-          </View>
-        </View>
-      );
 
-    bs = React.createRef();
-    fall = new Animated.Value(1);
+    const isInstagramURL = (input) => {
+      // Regular expression to match Instagram URLs
+      const instagramURLPattern = /^(https?:\/\/)?(www\.)?instagram\.com\/[a-zA-Z0-9_\.]+\/?$/;
+  
+      return instagramURLPattern.test(input);
+    };
+  
+    const handleInstagramLinkChange = (txt) => {
+      if (isInstagramURL(txt)) {
+        setInstagramCheck(true);
+        setUserData({ ...userData, instagramLink: txt });
+      } else {
+        setInstagramCheck(false)
+      }
+    };
+    
+  
 
     return (
+      <BottomSheetModalProvider>
+            <BottomSheetModal
+                    ref={bottomSheetModalRef}
+                    index={0}
+                    snapPoints={snapPoints}
+                    backgroundStyle={{ borderRadius: 50, backgroundColor: "#E8E8E8"}}
+                    onDismiss={() => setIsOpen(false)}
+                >
+                    <View style={styles.panel}>
+                      <View style={{alignItems: 'center'}}>
+                        <Text style={styles.panelTitle}>Upload Photo</Text>
+                        <Text style={styles.panelSubtitle}>Choose Your Profile Picture</Text>
+                      </View>
+                      <TouchableOpacity
+                        style={styles.panelButton}
+                        onPress={pickImage}>
+                        <Text style={styles.panelButtonTitle}>Choose From Library</Text>
+                      </TouchableOpacity>
+                    </View>
+            </BottomSheetModal>
         <View style={styles.container}>
-            <BottomSheet 
-                ref={this.bs}
-                snapPoints={[330, -5]}
-                renderContent={this.renderInner}
-                renderHeader={this.renderHeader}
-                initialSnap={1}
-                callbackNode={this.fall}
-                enabledGestureInteraction={true}       
-            />
-            <Animated.View style={{margin: 20, 
-            opacity: Animated.add(0.1, Animated.multiply(this.fall, 1.0)),
-            }}>
                 <View style={{alignItems: 'center'}}>
-                <TouchableOpacity onPress={() => this.bs.current.snapTo(0)}>
+                <TouchableOpacity onPress={() => {handlePresentModal()}}>
                     <View
-                    style={{
-                        height: 100,
-                        width: 100,
-                        borderRadius: 15,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                    }}>
+                    style={{height: 100, width: 100, borderRadius: 15, justifyContent: 'center', alignItems: 'center',}}>
                         <ImageBackground
                             source={{
-                            uri: image
-                                ? image
-                                : userData
-                                ? userData.userImg ||
+                            uri: image ? image : userData ? userData.userImg ||
                                 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7'
-                                : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7',
-                            }}
+                                : 'https://images.app.goo.gl/7nJRbdq4wXyVLFKV7',}}
                             style={styles.profilePhotoContainer}
                             imageStyle={{borderRadius: 15}}>
                             <View
-                            style={{
-                                flex: 1,
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                            }}>
+                            style={{flex: 1, justifyContent: 'center', alignItems: 'center',}}>
                             <MaterialCommunityIcons
                                 name="camera"
                                 size={35}
                                 color="#fff"
-                                style={{
-                                    opacity: 0.7,
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    borderWidth: 1,
-                                    borderColor: '#fff',
-                                    borderRadius: 10,
-                                }}
+                                style={{opacity: 0.7, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#fff', borderRadius: 10,}}
                             />
                             </View>
                         </ImageBackground>
@@ -303,6 +319,69 @@ function EditProfileScreen(props) {
                         style={styles.textInput}
                     />
                 </View>
+
+                <View style={styles.action}>
+                    <FontAwesome name="twitter" size={20} />
+                    <TextInput
+                      placeholder="X"
+                      placeholderTextColor="navy"
+                      value={userData ? userData.twitterLink : ''}
+                      onChangeText={(txt) => setUserData({ ...userData, twitterLink: txt })}
+                      style={styles.textInput}
+                      autoCorrect={false}             // Disable autocorrect
+                      autoCapitalize="none"          // Disable auto-capitalization
+                    />
+                </View>
+                <View style={styles.action}>
+                  <FontAwesome name="instagram" size={20} />
+                  <TextInput 
+                        placeholder="Instagram"
+                        placeholderTextColor= "navy"
+                        value={userData ? userData.instagramLink : ''}
+                        onChangeText={(txt) => setUserData({...userData, instagramLink: txt})}
+                        style={styles.textInput}
+                        autoCorrect={false}             // Disable autocorrect
+                        autoCapitalize="none"          // Disable auto-capitalization
+                    />
+                </View>
+                <View style={styles.action}>
+                    <MaterialCommunityIcons name="discord" size={20} />
+                    <TextInput 
+                        placeholder="Discord"
+                        placeholderTextColor= "navy"
+                        value={userData ? userData.discordLink : ''}
+                        onChangeText={(txt) => setUserData({...userData, discordLink: txt})}
+                        style={styles.textInput}
+                        autoCorrect={false}             // Disable autocorrect
+                        autoCapitalize="none"          // Disable auto-capitalization
+                    />
+                </View>
+                <View style={styles.action}>
+                    <FontAwesome name="telegram" size={20} />
+                    <TextInput 
+                        placeholder="Telegram"
+                        placeholderTextColor= "navy"
+                        value={userData ? userData.telegramLink : ''}
+                        onChangeText={(txt) => setUserData({...userData, telegramLink: txt})}
+                        style={styles.textInput}
+                        autoCorrect={false}             // Disable autocorrect
+                        autoCapitalize="none"          // Disable auto-capitalization
+                    />
+                </View>
+                <View style={styles.action}>
+                    <MaterialCommunityIcons name="web" size={20} />
+                    <TextInput 
+                        placeholder="Website"
+                        placeholderTextColor= "navy"
+                        value={userData ? userData.websiteLink : ''}
+                        onChangeText={(txt) => setUserData({...userData, websiteLink: txt})}
+                        style={styles.textInput}
+                        autoCorrect={false}             // Disable autocorrect
+                        autoCapitalize="none"          // Disable auto-capitalization
+                    />
+                </View>
+
+
                 <TouchableOpacity style={styles.commandButton} onPress={handleUpdate}>
                     <Text style={styles.panelButtonTitle}>Submit</Text>
                 </TouchableOpacity>
@@ -314,8 +393,8 @@ function EditProfileScreen(props) {
                   <View></View>
                   
                 )}
-            </Animated.View>
         </View>
+        </BottomSheetModalProvider>
     )
 }
     
@@ -333,7 +412,6 @@ const styles = StyleSheet.create({
     },
     panel: {
       padding: 20,
-      backgroundColor: '#FFFFFF',
       paddingTop: 20,
       width: '100%',
     },

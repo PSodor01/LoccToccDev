@@ -13,8 +13,8 @@ import * as Device from 'expo-device';
 
 import moment from 'moment';
 
-import firebase from 'firebase'
-require("firebase/firestore")
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 
 import { connect } from 'react-redux'
 
@@ -35,10 +35,10 @@ function NotificationsScreen({ route, ...props }) {
 
     useEffect(() => {
 
-        firebase
-        .firestore()
+        
+        firestore()
         .collection("users")
-        .doc(firebase.auth().currentUser.uid)
+        .doc(auth().currentUser.uid)
         .get()
         .then((snapshot) => {
         if (snapshot.exists) {
@@ -84,10 +84,10 @@ function NotificationsScreen({ route, ...props }) {
         }
       
         if (token) {
-          const res = await firebase
-            .firestore()
+          const res = await 
+            firestore()
             .collection('users')
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .set({ token }, { merge: true });
       
           Alert.alert('Success!', 'You will now receive push notifications from locctocc!');
@@ -233,6 +233,17 @@ function NotificationsScreen({ route, ...props }) {
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={ItemView}
             />  
+            <View style={styles.adView}>
+                <BannerAd
+                    unitId={adUnitId}
+                    sizes={[BannerAdSize.FULL_BANNER]}
+                    requestOptions={{
+                        requestNonPersonalizedAdsOnly: true,
+                    }}
+                />
+                
+            </View>
+           
         </View>
         
             
@@ -281,8 +292,8 @@ const styles = StyleSheet.create({
         marginHorizontal: "5%",
     },
     adView: {
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: "center",
+        justifyContent: "center",
     },
     
 })

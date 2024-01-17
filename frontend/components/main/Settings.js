@@ -8,8 +8,8 @@ import * as Device from 'expo-device';
 
 import analytics from "@react-native-firebase/analytics";
 
-import firebase from 'firebase'
-require("firebase/firestore")
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 
 import { connect } from 'react-redux'
 
@@ -19,40 +19,50 @@ const SettingsScreen = (props) => {
     const [notificationValue, setNotificationValue] = useState();
 
     useEffect(() => {
-
-        firebase
-        .firestore()
-        .collection("users")
-        .doc(firebase.auth().currentUser.uid)
-        .get()
-        .then((snapshot) => {
-        if (snapshot.exists) {
-            let userData = snapshot.data();
-            if (userData.hasOwnProperty("token")) {
+        const fetchUserData = async () => {
+          try {
+            const snapshot = await firestore()
+              .collection('users')
+              .doc(auth().currentUser.uid)
+              .get();
+    
+            if (snapshot.exists) {
+              let userData = snapshot.data();
+              if (userData && userData.token) {
                 setNotificationValue(true);
-                setIsEnabled(true)
+                setIsEnabled(true);
+              } else {
+                setNotificationValue(false);
+                setIsEnabled(false);
+              }
             } else {
-                setNotificationValue(false);
-                setIsEnabled(false)
+              setNotificationValue(false);
+              setIsEnabled(false);
             }
-        } else {
-                setNotificationValue(false);
-                setIsEnabled(false)
-        }
+          } catch (error) {
+            // Handle errors, such as permissions issues or network problems.
+            console.error('Error fetching user data:', error);
+          }
+        };
+    
+        fetchUserData();
+    
+        // Log screen view using analytics
+        analytics().logScreenView({
+          screen_name: 'Settings',
+          screen_class: 'Settings',
+          user_name: props.currentUser.name,
         });
-
-        analytics().logScreenView({ screen_name: 'Settings', screen_class: 'Settings',  user_name: props.currentUser.name})
-        
-    }, [])
+      }, [props.currentUser.name]);
 
     const notificationFunction = async () => {
         if (notificationValue == true) {
 
             setNotificationValue(false)
 
-            firebase.firestore()
+            firestore()
             .collection("users")
-            .doc(firebase.auth().currentUser.uid)
+            .doc(auth().currentUser.uid)
             .update({
                 token: null
             })
@@ -87,10 +97,10 @@ const SettingsScreen = (props) => {
             }
           
             if (token) {
-              const res = await firebase
-                .firestore()
+              const res = await 
+                firestore()
                 .collection('users')
-                .doc(firebase.auth().currentUser.uid)
+                .doc(auth().currentUser.uid)
                 .set({ token }, { merge: true });
           
               Alert.alert('Success!', 'You will now receive push notifications from locctocc!');
@@ -120,7 +130,7 @@ const SettingsScreen = (props) => {
        
 
     const deleteAccount = () => {
-        firebase.auth().currentUser?.delete();
+        auth().currentUser?.delete();
 
         analytics().logEvent('deleteAccount', {user_name: props.currentUser.name});
             

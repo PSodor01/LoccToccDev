@@ -16,6 +16,8 @@ function BlogHomeScreen(props) {
 
     const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-8519029912093094/8258310490'
 
+    //ca-app-pub-8519029912093094/1769291941
+
    
     
 

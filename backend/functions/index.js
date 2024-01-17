@@ -754,7 +754,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 10 minutes').onRun(a
 
   })
 
-  exports.getNCAABGameData = functions.pubsub.schedule('every 2 minutes').onRun(async () => {
+  exports.getNCAABGameData = functions.pubsub.schedule('every 10 minutes').onRun(async () => {
     try {
       const response = await axios.get('https://api.the-odds-api.com/v4/sports/basketball_ncaab/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso');
       const games = response.data;
@@ -865,7 +865,7 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 10 minutes').onRun(a
 
   })
 
-  exports.getNCAABScoresData = functions.pubsub.schedule('every 2 minutes').onRun(async() => {
+  exports.getNCAABScoresData = functions.pubsub.schedule('every 10 minutes').onRun(async() => {
     try {
       const response = await axios.get('https://api.the-odds-api.com/v4/sports/basketball_ncaab/scores/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&dateFormat=iso')
       .then(result => {
@@ -879,22 +879,6 @@ exports.getNCAAFGameData = functions.pubsub.schedule('every 10 minutes').onRun(a
             .set({
               awayScore: game.away_team === away.name ? away.score : home.score,
               homeScore: game.away_team === away.name ? home.score : away.score,
-
-              gameId: game.id,
-              sport: game.sport_key,
-              gameDate: game.commence_time,
-              awayTeam: game.away_team,
-              homeTeam: game.home_team,
-              awayMoneyline: game.bookmakers[i].markets[0].outcomes[0].price,
-              homeMoneyline: game.bookmakers[i].markets[0].outcomes[1].price,
-              awaySpread: game.bookmakers[i].markets[1].outcomes[0].point,
-              homeSpread: game.bookmakers[i].markets[1].outcomes[1].point,
-              awaySpreadOdds: game.bookmakers[i].markets[1].outcomes[0].price,
-              homeSpreadOdds: game.bookmakers[i].markets[1].outcomes[1].price,
-              over: game.bookmakers[i].markets[2].outcomes[0].point,
-              under: game.bookmakers[i].markets[2].outcomes[1].point,
-              overOdds: game.bookmakers[i].markets[2].outcomes[0].price,
-              underOdds: game.bookmakers[i].markets[2].outcomes[1].price,
             }, { merge:true });
         })
       })

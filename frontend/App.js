@@ -1,12 +1,13 @@
 
 import 'react-native-gesture-handler';
 
-import * as firebase from 'firebase'
+import { getApps, initializeApp } from '@react-native-firebase/app';
+import auth from '@react-native-firebase/auth';
 
 import * as Updates from 'expo-updates';
 import * as Notifications from 'expo-notifications';
 
-import React, { Component, useEffect, useState} from 'react';
+import React, { Component } from 'react';
 import { View, ActivityIndicator, StyleSheet, Text, TouchableOpacity, Alert, Image } from 'react-native'
 
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -33,16 +34,37 @@ const firebaseConfig = {
   measurementId: "G-4YXWQRXEF1"
 };
 
-if (firebase.apps.length === 0) {
-  firebase.initializeApp(firebaseConfig)
+if (getApps().length === 0) {
+  initializeApp(firebaseConfig);
 }
 
+/*
+<Provider store={store}>
+          <NavigationContainer>
+            <Drawer.Navigator drawerContent={props => <DrawerContent {...props} />}>
+              <Drawer.Screen name="Main" component={MainStackScreen} options={{headerShown: false}} />
+            </Drawer.Navigator>
+          </NavigationContainer>
+        </Provider>
+        */
+/* 
+      <MainStack.Screen name="HouseGuidelines" component={HouseGuidelinesScreen}
+        options={{
+            headerTitle: "Community Guidelines",
+            headerTitleAlign: "center",
+            headerLeft: () => (
+              <TouchableOpacity 
+              style={{ alignItems: "flex-end", marginLeft:16 }}
+              onPress={() => navigation.goBack()}
+              >
+              <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+            </TouchableOpacity>
+            )
+          }} />
+       */
 
-import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { createDrawerNavigator } from '@react-navigation/drawer';
-
-import { DrawerContent } from './components/Drawer'
+import { NavigationContainer } from '@react-navigation/native';
 
 import LandingScreen from './components/auth/Landing'
 import RegisterScreen from './components/auth/Register'
@@ -60,9 +82,7 @@ import Search from './components/main/Search'
 import Profile from './components/main/Profile'
 import AboutUsScreen from './components/main/AboutUs'
 import LegalDocsScreen from './components/main/LegalDocs'
-import HouseGuidelinesScreen from './components/main/HouseGuidelines'
 import ContactUsScreen from './components/main/ContactUs'
-import PartnersScreen from './components/main/Partners'
 import SettingsScreen from './components/main/Settings'
 import FollowingScreen from './components/main/FollowingScreen'
 import FollowerScreen from './components/main/FollowerScreen'
@@ -75,15 +95,16 @@ import Standings from './components/main/Standings'
 import Contest from './components/main/Contest'
 import BlogHomeScreen from './components/main/BlogHome'
 import BlogDetailsScreen from './components/main/BlogDetails'
+import BlogContentScreen from './components/main/BlogContent';
 import HeaderRight from './components/buttons/HeaderRight'
+import BlogWrite from './components/main/BlogWrite';
 
-
-const Stack = createStackNavigator();
-const Drawer = createDrawerNavigator();
-const MainStack = createStackNavigator();
 
 if (Text.defaultProps == null) Text.defaultProps ={};
 Text.defaultProps.allowFontScaling=false;
+
+const Stack = createStackNavigator();
+const MainStack = createStackNavigator();
 
 
 const MainStackScreen = ({navigation}) => (
@@ -99,34 +120,125 @@ const MainStackScreen = ({navigation}) => (
         }
       }}
       >
-    <MainStack.Screen name="Main" component={MainScreen} 
-      options={{
-        headerTitle: () => (
-          <View style={{ flexDirection: 'row', justifyContent: 'center'}}>
-              <Text style={styles.headerName}>locctocc </Text>
-              <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
-          </View>
-        ),
-        headerTitleAlign: "center",
-        headerLeft: () => (
-          <TouchableOpacity 
-            style={{ alignItems: "flex-end", marginLeft:16 }}
-            onPress={() => navigation.openDrawer()}
-            >
-            <FontAwesome5 name="bars" size={24} color="#fff" />
-          </TouchableOpacity>
-        ),
-        headerRight: () => <HeaderRight navigation={navigation} />,
-        
-        
-      }}
+      <MainStack.Screen
+          name="Main"
+          component={MainScreen}
+          options={({ navigation }) => ({
+            headerTitle: () => (
+              <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                <Text style={styles.headerName}>locctocc </Text>
+                <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
+              </View>
+            ),
+            headerTitleAlign: 'center',
+            headerRight: () => <HeaderRight navigation={navigation} />,
+          })}
         />
-
-      <MainStack.Screen 
-        name="Feed" 
-        component={Feed}
-       
+      <MainStack.Screen name="Odds" component={Odds}/>
+      <MainStack.Screen name="game" component={game}
+        options={{
+          headerTitle: () => (
+            <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+                <Text style={styles.headerName}>locctocc </Text>
+                <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
+            </View>
+          ),
+          headerTitleAlign: "center",
+          headerLeft: () => (
+            <TouchableOpacity 
+            style={{ alignItems: "flex-end", marginLeft:16 }}
+            onPress={() => navigation.goBack()}
+            >
+            <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+          </TouchableOpacity>
+          ),
+          
+        }}
           />
+      <MainStack.Screen name="Feed" component={Feed}/>
+      <MainStack.Screen name="Contest" component={Contest}/>
+      <MainStack.Screen name="BlogHome" component={BlogHomeScreen}/>
+      <MainStack.Screen name="BlogWrite" component={BlogWrite}
+        options={{
+          headerTitle: () => (
+            <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+                <Text style={styles.headerName}>locctocc </Text>
+                <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
+            </View>
+          ),
+          headerTitleAlign: "center",
+          headerLeft: () => (
+            <TouchableOpacity 
+            style={{ alignItems: "flex-end", marginLeft:16 }}
+            onPress={() => navigation.goBack()}
+            >
+            <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+          </TouchableOpacity>
+          ),
+          
+        }}
+          />
+      <MainStack.Screen name="BlogDetails" component={BlogDetailsScreen}
+        options={{
+          headerTitle: () => (
+            <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+                <Text style={styles.headerName}>locctocc </Text>
+                <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
+            </View>
+          ),
+          headerTitleAlign: "center",
+          headerLeft: () => (
+            <TouchableOpacity 
+            style={{ alignItems: "flex-end", marginLeft:16 }}
+            onPress={() => navigation.goBack()}
+            >
+            <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+          </TouchableOpacity>
+          ),
+          
+        }}
+          />
+
+      <MainStack.Screen name="BlogContent" component={BlogContentScreen}
+        options={{
+          headerTitle: () => (
+            <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+                <Text style={styles.headerName}>locctocc </Text>
+                <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
+            </View>
+          ),
+          headerTitleAlign: "center",
+          headerLeft: () => (
+            <TouchableOpacity 
+            style={{ alignItems: "flex-end", marginLeft:16 }}
+            onPress={() => navigation.goBack()}
+            >
+            <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+          </TouchableOpacity>
+          ),
+          
+        }}
+          />
+      <MainStack.Screen name="Profile" component={Profile}
+        options={{
+          headerTitle: () => (
+            <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+                <Text style={styles.headerName}>locctocc </Text>
+                <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
+            </View>
+          ),
+          headerTitleAlign: "center",
+          headerLeft: () => (
+            <TouchableOpacity 
+            style={{ alignItems: "flex-end", marginLeft:16 }}
+            onPress={() => navigation.goBack()}
+            >
+            <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+          </TouchableOpacity>
+          ),
+          
+        }} />
+
       <MainStack.Screen name="Search" component={Search}
          options={{
           headerTitle: () => (
@@ -167,49 +279,8 @@ const MainStackScreen = ({navigation}) => (
           
         }}
       />
-      <MainStack.Screen name="Contest" component={Contest}/>
-      <MainStack.Screen name="BlogHome" component={BlogHomeScreen}/>
-      <MainStack.Screen name="BlogDetails" component={BlogDetailsScreen}
-        options={{
-          headerTitle: () => (
-            <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
-                <Text style={styles.headerName}>locctocc </Text>
-                <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
-            </View>
-          ),
-          headerTitleAlign: "center",
-          headerLeft: () => (
-            <TouchableOpacity 
-            style={{ alignItems: "flex-end", marginLeft:16 }}
-            onPress={() => navigation.goBack()}
-            >
-            <FontAwesome5 name="chevron-left" size={24} color="#fff" />
-          </TouchableOpacity>
-          ),
-          
-        }}
-          />
-      <MainStack.Screen name="Profile" component={Profile}
-        options={{
-          headerTitle: () => (
-            <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
-                <Text style={styles.headerName}>locctocc </Text>
-                <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
-            </View>
-          ),
-          headerTitleAlign: "center",
-          headerLeft: () => (
-            <TouchableOpacity 
-            style={{ alignItems: "flex-end", marginLeft:16 }}
-            onPress={() => navigation.goBack()}
-            >
-            <FontAwesome5 name="chevron-left" size={24} color="#fff" />
-          </TouchableOpacity>
-          ),
-          
-        }} />
-      <MainStack.Screen name="Comment" component={CommentScreen} 
-        options={{
+      <MainStack.Screen name="About Us" component={AboutUsScreen}
+         options={{
           headerTitle: () => (
             <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
                 <Text style={styles.headerName}>locctocc </Text>
@@ -228,10 +299,12 @@ const MainStackScreen = ({navigation}) => (
           
         }}
       />
-      <MainStack.Screen name="SocialShare" component={SocialShare} 
+      <MainStack.Screen name="Comment" component={CommentScreen} 
         options={{
           headerTitle: () => (
             <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+                <Text style={styles.headerName}>locctocc </Text>
+                <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
             </View>
           ),
           headerTitleAlign: "center",
@@ -286,140 +359,6 @@ const MainStackScreen = ({navigation}) => (
           
         }}
       />
-      <MainStack.Screen name="EditProfile" component={EditProfileScreen} 
-        options={{
-          headerTitle: "Edit Profile",
-          headerTitleAlign: "center",
-          headerLeft: () => (
-              <TouchableOpacity 
-              style={{ alignItems: "flex-end", marginLeft:16 }}
-              onPress={() => navigation.goBack()}
-              >
-              <FontAwesome5 name="chevron-left" size={24} color="#fff" />
-            </TouchableOpacity>
-            )
-          }} />
-      <MainStack.Screen name="HouseGuidelines" component={HouseGuidelinesScreen}
-        options={{
-            headerTitle: "Community Guidelines",
-            headerTitleAlign: "center",
-            headerLeft: () => (
-              <TouchableOpacity 
-              style={{ alignItems: "flex-end", marginLeft:16 }}
-              onPress={() => navigation.goBack()}
-              >
-              <FontAwesome5 name="chevron-left" size={24} color="#fff" />
-            </TouchableOpacity>
-            )
-          }} />
-      <MainStack.Screen name="ContactUs" component={ContactUsScreen}
-        options={{
-            headerTitle: "Contact Us",
-            headerTitleAlign: "center",
-            headerLeft: () => (
-              <TouchableOpacity 
-              style={{ alignItems: "flex-end", marginLeft:16 }}
-              onPress={() => navigation.goBack()}
-              >
-              <FontAwesome5 name="chevron-left" size={24} color="#fff" />
-            </TouchableOpacity>
-            )
-          }} />
-        <MainStack.Screen name="Settings" component={SettingsScreen}
-        options={{
-            headerTitle: "Settings",
-            headerTitleAlign: "center",
-            headerLeft: () => (
-              <TouchableOpacity 
-              style={{ alignItems: "flex-end", marginLeft:16 }}
-              onPress={() => navigation.goBack()}
-              >
-              <FontAwesome5 name="chevron-left" size={24} color="#fff" />
-            </TouchableOpacity>
-            )
-          }} />
-      <MainStack.Screen name="Partners" component={PartnersScreen}
-        options={{
-            headerTitle: "Our Partners",
-            headerTitleAlign: "center",
-            headerLeft: () => (
-              <TouchableOpacity 
-              style={{ alignItems: "flex-end", marginLeft:16 }}
-              onPress={() => navigation.goBack()}
-              >
-              <FontAwesome5 name="chevron-left" size={24} color="#fff" />
-            </TouchableOpacity>
-            )
-          }} />
-      <MainStack.Screen name="AboutUs" component={AboutUsScreen}
-        options={{
-          headerTitle: "About Us",
-          headerTitleAlign: "center",
-          headerLeft: () => (
-              <TouchableOpacity 
-              style={{ alignItems: "flex-end", marginLeft:16 }}
-              onPress={() => navigation.goBack()}
-              >
-              <FontAwesome5 name="chevron-left" size={24} color="#fff" />
-            </TouchableOpacity>
-            ),
-            }} 
-            />
-      <MainStack.Screen name="LegalDocs" component={LegalDocsScreen}
-        options={{
-          headerTitle: "Privacy",
-          headerTitleAlign: "center",
-          headerLeft: () => (
-              <TouchableOpacity 
-              style={{  alignItems: "flex-end", marginLeft:16 }}
-              onPress={() => navigation.goBack()}
-              >
-              <FontAwesome5 name="chevron-left" size={24} color="#fff" />
-            </TouchableOpacity>
-            ),
-            }} 
-            />
-      <MainStack.Screen name="Odds" component={Odds}
-        options={{
-          headerTitle: () => (
-            <View style={{ flexDirection: 'row', alignItems: 'space-between', justifyContent: 'center'}}>
-                <Text style={styles.headerName}>locctocc </Text>
-                <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
-            </View>
-            
-          ),
-          headerTitleAlign: "center",
-          headerLeft: () => (
-            <TouchableOpacity 
-            style={{ alignItems: "flex-end", marginLeft:16 }}
-            onPress={() => navigation.goBack()}
-            >
-            <FontAwesome5 name="chevron-left" size={24} color="#fff" />
-          </TouchableOpacity>
-          ),
-          
-        }}
-       />
-      <MainStack.Screen name="game" component={game}
-        options={{
-          headerTitle: () => (
-            <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
-                <Text style={styles.headerName}>locctocc </Text>
-                <FontAwesome5 name="comment-dollar" color="#fff" size={26} />
-            </View>
-          ),
-          headerTitleAlign: "center",
-          headerLeft: () => (
-            <TouchableOpacity 
-            style={{ alignItems: "flex-end", marginLeft:16 }}
-            onPress={() => navigation.goBack()}
-            >
-            <FontAwesome5 name="chevron-left" size={24} color="#fff" />
-          </TouchableOpacity>
-          ),
-          
-        }}
-          />
       <MainStack.Screen name="TeamDetails" component={TeamDetails}
         options={{
           headerTitle: () => (
@@ -540,62 +479,130 @@ const MainStackScreen = ({navigation}) => (
             
           }}
         />
+        <MainStack.Screen name="SocialShare" component={SocialShare} 
+          options={{
+            headerTitle: () => (
+              <View style={{ flexDirection: 'row', alignItems: 'space-between'}}>
+              </View>
+            ),
+            headerTitleAlign: "center",
+            headerLeft: () => (
+              <TouchableOpacity 
+              style={{ alignItems: "flex-end", marginLeft:16 }}
+              onPress={() => navigation.goBack()}
+              >
+              <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+            </TouchableOpacity>
+            ),
+            
+          }}
+      />
+      <MainStack.Screen name="EditProfile" component={EditProfileScreen} 
+        options={{
+          headerTitle: "Edit Profile",
+          headerTitleAlign: "center",
+          headerLeft: () => (
+              <TouchableOpacity 
+              style={{ alignItems: "flex-end", marginLeft:16 }}
+              onPress={() => navigation.goBack()}
+              >
+              <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+            </TouchableOpacity>
+            )
+          }} />
+      <MainStack.Screen name="Settings" component={SettingsScreen}
+        options={{
+            headerTitle: "Settings",
+            headerTitleAlign: "center",
+            headerLeft: () => (
+              <TouchableOpacity 
+              style={{ alignItems: "flex-end", marginLeft:16 }}
+              onPress={() => navigation.goBack()}
+              >
+              <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+            </TouchableOpacity>
+            )
+          }} />
+
+      <MainStack.Screen name="ContactUs" component={ContactUsScreen}
+        options={{
+            headerTitle: "Contact Us",
+            headerTitleAlign: "center",
+            headerLeft: () => (
+              <TouchableOpacity 
+              style={{ alignItems: "flex-end", marginLeft:16 }}
+              onPress={() => navigation.goBack()}
+              >
+              <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+            </TouchableOpacity>
+            )
+          }} />
+        
+      <MainStack.Screen name="LegalDocs" component={LegalDocsScreen}
+        options={{
+          headerTitle: "Privacy",
+          headerTitleAlign: "center",
+          headerLeft: () => (
+              <TouchableOpacity 
+              style={{  alignItems: "flex-end", marginLeft:16 }}
+              onPress={() => navigation.goBack()}
+              >
+              <FontAwesome5 name="chevron-left" size={24} color="#fff" />
+            </TouchableOpacity>
+            ),
+            }} 
+            /> 
   </MainStack.Navigator>
 )
 
+
 export class App extends Component {
-  constructor(props, navigation) {
-    super()
+  constructor(props) {
+    super(props);
+
     this.state = {
+      loggedIn: false,
       loaded: false,
-    }
+    };
 
   }
 
   async componentDidMount() {
     if (!__DEV__) {
-    try {
-      const update = await Updates.checkForUpdateAsync();
-      if (update.isAvailable) {
-        await Updates.fetchUpdateAsync();
-        // Prompt the user to reload the app to apply the update
-        await Updates.reloadAsync();
+      try {
+        const update = await Updates.checkForUpdateAsync();
+        if (update.isAvailable) {
+          await Updates.fetchUpdateAsync();
+          // Prompt the user to reload the app to apply the update
+          await Updates.reloadAsync();
+        }
+      } catch (e) {
+        console.log(e);
       }
-    } catch (e) {
-      console.log(e);
     }
-  }
-  this.setState({
-    loaded: true,
-  })
-  }
-
-  componentDidMount() {
-
-    firebase.auth().onAuthStateChanged((user) => {
+  
+    // Subscribe to authentication state changes
+    const unsubscribe = auth().onAuthStateChanged((user) => {
       if (!user) {
         this.setState({
           loggedIn: false,
           loaded: true,
-        })
+        });
       } else {
         this.setState({
           loggedIn: true,
           loaded: true,
-        })
+        });
       }
-    })
-  }
-
-
-
- 
-
+    });
   
-    
+    // Clean up the subscription when the component unmounts
+    return () => unsubscribe();
+  }
 
   render() {
     const { loggedIn, loaded } = this.state;
+
     if (!loaded) {
       return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center'  }}>
@@ -627,28 +634,20 @@ export class App extends Component {
       );
     }
 
-    /*if (!loggedIn) {
-      return (
-          <NavigationContainer>
-            <Stack.Navigator initialRouteName="Onboarding">
-              <Stack.Screen name="Onboarding" component={OnboardingScreen}
-                options={{ headerShown: false }}
-              />
-            </Stack.Navigator>
-          </NavigationContainer>
-        
-      );
-    }*/
-
     return (
-        <Provider store={store}>
-          <NavigationContainer>
-            <Drawer.Navigator drawerContent={props => <DrawerContent {...props} />}>
-              <Drawer.Screen name="Main" component={MainStackScreen} options={{headerShown: false}} />
-            </Drawer.Navigator>
-          </NavigationContainer>
-        </Provider>
+      <Provider store={store}>
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName="Main">
+            <Stack.Screen name="Main" component={MainStackScreen} options={{ headerShown: false }}/>
+          </Stack.Navigator>
+        </NavigationContainer>
+    </Provider>
+    
     )
+
+    
+
+    
   }
 }
 

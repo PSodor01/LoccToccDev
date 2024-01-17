@@ -7,8 +7,8 @@ import analytics from "@react-native-firebase/analytics";
 
 import { Avatar } from 'react-native-elements';
 
-import firebase from 'firebase'
-require("firebase/firestore")
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -44,7 +44,7 @@ function FollowerScreen(props) {
             console.log(following)
 
         }
-            firebase.firestore()
+            firestore()
             .collectionGroup("userFollowing")
             .where('id', '==', userId)
             .get()

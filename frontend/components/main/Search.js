@@ -4,8 +4,6 @@ import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Image } 
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
-import { Avatar } from 'react-native-elements';
-
 import analytics from "@react-native-firebase/analytics";
 
 import moment from 'moment';
