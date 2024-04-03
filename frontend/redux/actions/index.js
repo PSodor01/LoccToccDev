@@ -210,7 +210,7 @@ export function fetchAllUsers() {
     })
 }
 
-/*export function fetchMLBGames() {
+export function fetchMLBGames() {
     return (dispatch) => {
       dispatch({ type: MLB_GAMES_STATE_CHANGE, mlbGames: [] }); // Clear previous games if any
     
@@ -227,7 +227,7 @@ export function fetchAllUsers() {
         });
     };
   }
-  */
+  
 
 export function fetchNFLGames() {
     return ((dispatch) => {
