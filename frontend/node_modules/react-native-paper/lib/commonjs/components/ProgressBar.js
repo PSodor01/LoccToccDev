@@ -38,11 +38,13 @@ const ProgressBar = _ref => {
   let {
     color,
     indeterminate,
-    style,
     progress = 0,
     visible = true,
     theme: themeOverrides,
     animatedValue,
+    style,
+    fillStyle,
+    testID = 'progress-bar',
     ...rest
   } = _ref;
   const isWeb = _reactNative.Platform.OS === 'web';
@@ -152,13 +154,15 @@ const ProgressBar = _ref => {
       max: 100,
       now: progress * 100
     },
-    style: isWeb && styles.webContainer
+    style: isWeb && styles.webContainer,
+    testID: testID
   }), /*#__PURE__*/React.createElement(_reactNative.Animated.View, {
     style: [styles.container, {
       backgroundColor: trackTintColor,
       opacity: fade
     }, style]
   }, width ? /*#__PURE__*/React.createElement(_reactNative.Animated.View, {
+    testID: `${testID}-fill`,
     style: [styles.progressBar, {
       width,
       backgroundColor: tintColor,
@@ -180,7 +184,7 @@ const ProgressBar = _ref => {
           outputRange: [0.0001, 1]
         })
       }]
-    }]
+    }, fillStyle]
   }) : null));
 };
 const styles = _reactNative.StyleSheet.create({

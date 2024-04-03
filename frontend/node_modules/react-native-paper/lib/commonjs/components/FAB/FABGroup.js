@@ -207,7 +207,11 @@ const FABGroup = _ref => {
       style: [styles.item, {
         marginHorizontal
       }],
-      pointerEvents: open ? 'box-none' : 'none'
+      pointerEvents: open ? 'box-none' : 'none',
+      accessibilityRole: "button",
+      importantForAccessibility: "yes",
+      accessible: true,
+      accessibilityLabel: accessibilityLabel
     }, it.label && /*#__PURE__*/React.createElement(_reactNative.View, null, /*#__PURE__*/React.createElement(_Card.default, {
       mode: isV3 ? 'contained' : 'elevated',
       onPress: e => {
@@ -215,8 +219,8 @@ const FABGroup = _ref => {
         close();
       },
       accessibilityHint: it.accessibilityHint,
-      accessibilityLabel: accessibilityLabel,
-      accessibilityRole: "button",
+      importantForAccessibility: "no-hide-descendants",
+      accessibilityElementsHidden: true,
       style: [styles.containerStyle, {
         transform: [isV3 ? {
           translateY: labelTranslations[i]
@@ -227,6 +231,8 @@ const FABGroup = _ref => {
       }, isV3 && styles.v3ContainerStyle, it.containerStyle]
     }, /*#__PURE__*/React.createElement(_Text.default, {
       variant: "titleMedium",
+      importantForAccessibility: "no-hide-descendants",
+      accessibilityElementsHidden: true,
       style: [labelTextStyle, it.labelStyle],
       maxFontSizeMultiplier: it.labelMaxFontSizeMultiplier
     }, it.label))), /*#__PURE__*/React.createElement(_FAB.default, {
@@ -244,13 +250,13 @@ const FABGroup = _ref => {
           translateY: translations[i]
         }]
       }, it.style],
+      accessibilityElementsHidden: true,
       theme: theme,
       onPress: e => {
         it.onPress(e);
         close();
       },
-      accessibilityLabel: accessibilityLabel,
-      accessibilityRole: "button",
+      importantForAccessibility: "no-hide-descendants",
       testID: it.testID,
       visible: open,
       rippleColor: it.rippleColor

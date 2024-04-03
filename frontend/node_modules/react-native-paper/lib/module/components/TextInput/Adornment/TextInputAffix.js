@@ -1,5 +1,5 @@
 import React from 'react';
-import { Animated, StyleSheet, Text } from 'react-native';
+import { Animated, Pressable, StyleSheet, Text } from 'react-native';
 import { AdornmentSide } from './enums';
 import { getTextColor } from './utils';
 import { useInternalTheme } from '../../../core/theming';
@@ -70,7 +70,9 @@ const TextInputAffix = _ref2 => {
     text,
     textStyle: labelStyle,
     theme: themeOverrides,
-    onLayout: onTextLayout
+    onLayout: onTextLayout,
+    onPress,
+    accessibilityLabel = text
   } = _ref2;
   const theme = useInternalTheme(themeOverrides);
   const {
@@ -96,7 +98,7 @@ const TextInputAffix = _ref2 => {
     theme,
     disabled
   });
-  return /*#__PURE__*/React.createElement(Animated.View, {
+  const affix = /*#__PURE__*/React.createElement(Animated.View, {
     style: [styles.container, style, {
       opacity: (visible === null || visible === void 0 ? void 0 : visible.interpolate({
         inputRange: [0, 1],
@@ -113,6 +115,15 @@ const TextInputAffix = _ref2 => {
     onLayout: onTextLayout,
     testID: `${testID}-text`
   }, text));
+  if (onPress) {
+    return /*#__PURE__*/React.createElement(Pressable, {
+      onPress: onPress,
+      accessibilityRole: "button",
+      accessibilityLabel: accessibilityLabel,
+      style: styles.container
+    }, affix);
+  }
+  return affix;
 };
 TextInputAffix.displayName = 'TextInput.Affix';
 const styles = StyleSheet.create({

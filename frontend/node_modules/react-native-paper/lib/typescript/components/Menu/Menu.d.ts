@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Animated, LayoutRectangle, ScrollViewProps, StyleProp, ViewStyle } from 'react-native';
-import type { $Omit, InternalTheme } from '../../types';
+import type { $Omit, InternalTheme, MD3Elevation } from '../../types';
+import { ElevationLevels } from '../../types';
 export declare type Props = {
     /**
      * Whether the Menu is currently visible.
@@ -43,6 +44,11 @@ export declare type Props = {
     contentStyle?: Animated.WithAnimatedValue<StyleProp<ViewStyle>>;
     style?: StyleProp<ViewStyle>;
     /**
+     * Elevation level of the menu's content. Shadow styles are calculated based on this value. Default `backgroundColor` is taken from the corresponding `theme.colors.elevation` property. By default equals `2`.
+     * @supported Available in v5.x with theme version 3
+     */
+    elevation?: MD3Elevation;
+    /**
      * @optional
      */
     theme: InternalTheme;
@@ -66,6 +72,7 @@ declare type State = {
     scaleAnimation: Animated.ValueXY;
     windowLayout: Layout;
 };
+export declare const ELEVATION_LEVELS_MAP: ElevationLevels[];
 /**
  * Menus display a list of choices on temporary elevated surfaces. Their placement varies based on the element that opens them.
  *
@@ -114,7 +121,7 @@ declare type State = {
  */
 declare class Menu extends React.Component<Props, State> {
     static Item: {
-        ({ leadingIcon, trailingIcon, dense, title, disabled, onPress, style, contentStyle, titleStyle, rippleColor: customRippleColor, testID, accessibilityLabel, accessibilityState, theme: themeOverrides, titleMaxFontSizeMultiplier, }: import("./MenuItem").Props): React.JSX.Element;
+        ({ leadingIcon, trailingIcon, dense, title, disabled, background, onPress, style, contentStyle, titleStyle, rippleColor: customRippleColor, testID, accessibilityLabel, accessibilityState, theme: themeOverrides, titleMaxFontSizeMultiplier, }: import("./MenuItem").Props): React.JSX.Element;
         displayName: string;
     };
     static defaultProps: {
@@ -170,7 +177,7 @@ declare class Menu extends React.Component<Props, State> {
     private keyboardDidHide;
     render(): React.JSX.Element;
 }
-declare const _default: React.ComponentType<Pick<Props, "style" | "children" | "anchor" | "visible" | "testID" | "keyboardShouldPersistTaps" | "contentStyle" | "anchorPosition" | "statusBarHeight" | "onDismiss" | "overlayAccessibilityLabel"> & {
+declare const _default: React.ComponentType<Pick<Props, "style" | "children" | "anchor" | "visible" | "elevation" | "testID" | "contentStyle" | "keyboardShouldPersistTaps" | "anchorPosition" | "statusBarHeight" | "onDismiss" | "overlayAccessibilityLabel"> & {
     theme?: import("@callstack/react-theme-provider").$DeepPartial<unknown> | undefined;
 }> & import("@callstack/react-theme-provider/typings/hoist-non-react-statics").NonReactStatics<React.ComponentType<Props> & typeof Menu, {}>;
 export default _default;

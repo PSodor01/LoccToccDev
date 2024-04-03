@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ColorValue, GestureResponderEvent, StyleProp, TextStyle, ViewStyle } from 'react-native';
+import { ColorValue, GestureResponderEvent, PressableAndroidRippleConfig, StyleProp, TextStyle, ViewStyle } from 'react-native';
 import type { ThemeProp } from 'src/types';
 import type { IconSource } from '../Icon';
 export declare type Props = {
@@ -29,6 +29,11 @@ export declare type Props = {
      * Whether the button is disabled.
      */
     disabled?: boolean;
+    /**
+     * Type of background drawabale to display the feedback (Android).
+     * https://reactnative.dev/docs/pressable#rippleconfig
+     */
+    background?: PressableAndroidRippleConfig;
     /**
      * Accessibility label for the `SegmentedButtonItem`. This is read by the screen reader when the user taps the button.
      */
@@ -75,7 +80,7 @@ export declare type Props = {
      */
     theme?: ThemeProp;
 };
-declare const SegmentedButtonItem: ({ checked, accessibilityLabel, disabled, style, labelStyle, showSelectedCheck, checkedColor, uncheckedColor, rippleColor: customRippleColor, icon, testID, label, onPress, segment, density, theme: themeOverrides, labelMaxFontSizeMultiplier, }: Props) => React.JSX.Element;
+declare const SegmentedButtonItem: ({ checked, accessibilityLabel, disabled, style, labelStyle, showSelectedCheck, checkedColor, uncheckedColor, rippleColor: customRippleColor, background, icon, testID, label, onPress, segment, density, theme: themeOverrides, labelMaxFontSizeMultiplier, }: Props) => React.JSX.Element;
 export default SegmentedButtonItem;
 export { SegmentedButtonItem as SegmentedButton };
 //# sourceMappingURL=SegmentedButtonItem.d.ts.map

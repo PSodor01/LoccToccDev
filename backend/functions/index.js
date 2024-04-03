@@ -67,7 +67,7 @@ exports.testLike = functions.firestore.document('/likes/{userId}/userLikes/{post
   })
 
 
-  exports.getMLBGameData = functions.pubsub.schedule('every 10 minutes').onRun(async () => {
+  exports.getMLBGameData = functions.pubsub.schedule('every 20 minutes').onRun(async () => {
     try {
       const response = await axios.get('https://api.the-odds-api.com/v4/sports/baseball_mlb/odds/?apiKey=0f4aac73c624d8228321aa92f6c34b83&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso');
       const games = response.data;

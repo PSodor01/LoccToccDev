@@ -17,6 +17,7 @@ const SegmentedButtonItem = _ref => {
     checkedColor,
     uncheckedColor,
     rippleColor: customRippleColor,
+    background,
     icon,
     testID,
     label,
@@ -116,6 +117,7 @@ const SegmentedButtonItem = _ref => {
     rippleColor: rippleColor,
     testID: testID,
     style: rippleStyle,
+    background: background,
     theme: theme
   }, /*#__PURE__*/React.createElement(View, {
     style: [styles.content, {

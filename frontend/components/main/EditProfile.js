@@ -474,7 +474,7 @@ const styles = StyleSheet.create({
     },
     textInput: {
       flex: 1,
-      marginTop: Platform.OS === 'ios' ? 0 : -12,
+      marginTop: 10,
       paddingLeft: 10,
       color: '#333333',
     },

@@ -31,6 +31,7 @@ const CheckboxItem = _ref => {
     status,
     label,
     onPress,
+    onLongPress,
     labelStyle,
     theme: themeOverrides,
     testID,
@@ -41,6 +42,7 @@ const CheckboxItem = _ref => {
     labelVariant = 'bodyLarge',
     labelMaxFontSizeMultiplier = 1.5,
     rippleColor,
+    background,
     ...props
   } = _ref;
   const theme = useInternalTheme(themeOverrides);
@@ -74,10 +76,12 @@ const CheckboxItem = _ref => {
       disabled
     },
     onPress: onPress,
+    onLongPress: onLongPress,
     testID: testID,
     disabled: disabled,
     rippleColor: rippleColor,
-    theme: theme
+    theme: theme,
+    background: background
   }, /*#__PURE__*/React.createElement(View, {
     style: [styles.container, style],
     pointerEvents: "none",

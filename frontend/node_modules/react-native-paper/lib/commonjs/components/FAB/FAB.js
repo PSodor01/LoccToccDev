@@ -52,6 +52,7 @@ const FAB = (0, _forwardRef.forwardRef)((_ref, ref) => {
   let {
     icon,
     label,
+    background,
     accessibilityLabel = label,
     accessibilityState,
     animated = true,
@@ -158,6 +159,7 @@ const FAB = (0, _forwardRef.forwardRef)((_ref, ref) => {
     elevation: md3Elevation
   }), /*#__PURE__*/React.createElement(_TouchableRipple.default, _extends({
     borderless: true,
+    background: background,
     onPress: onPress,
     onLongPress: onLongPress,
     delayLongPress: delayLongPress,

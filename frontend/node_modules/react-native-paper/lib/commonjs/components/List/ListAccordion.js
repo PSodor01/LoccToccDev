@@ -69,6 +69,7 @@ const ListAccordion = _ref => {
     style,
     id,
     testID,
+    background,
     onPress,
     onLongPress,
     delayLongPress,
@@ -132,6 +133,7 @@ const ListAccordion = _ref => {
     accessibilityLabel: accessibilityLabel,
     testID: testID,
     theme: theme,
+    background: background,
     borderless: true
   }, /*#__PURE__*/React.createElement(_reactNative.View, {
     style: theme.isV3 ? styles.rowV3 : styles.row,

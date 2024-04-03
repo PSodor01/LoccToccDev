@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { GestureResponderEvent, StyleProp, TextStyle, ViewStyle } from 'react-native';
+import { GestureResponderEvent, StyleProp, TextStyle, View, ViewStyle } from 'react-native';
 import { Style } from './utils';
 import type { $RemoveChildren, EllipsizeProp, ThemeProp } from '../../types';
 import TouchableRipple from '../TouchableRipple/TouchableRipple';
@@ -51,6 +51,10 @@ export declare type Props = $RemoveChildren<typeof TouchableRipple> & {
      */
     style?: StyleProp<ViewStyle>;
     /**
+     * Style that is passed to the container wrapping title and descripton.
+     */
+    contentStyle?: StyleProp<ViewStyle>;
+    /**
      * Style that is passed to Title element.
      */
     titleStyle?: StyleProp<TextStyle>;
@@ -88,31 +92,11 @@ export declare type Props = $RemoveChildren<typeof TouchableRipple> & {
      * Specifies the largest possible scale a description font can reach.
      */
     descriptionMaxFontSizeMultiplier?: number;
+    /**
+     * TestID used for testing purposes
+     */
+    testID?: string;
 };
-/**
- * A component to show tiles inside a List.
- *
- * ## Usage
- * ```js
- * import * as React from 'react';
- * import { List } from 'react-native-paper';
- *
- * const MyComponent = () => (
- *   <List.Item
- *     title="First Item"
- *     description="Item description"
- *     left={props => <List.Icon {...props} icon="folder" />}
- *   />
- * );
- *
- * export default MyComponent;
- * ```
- *
- * @extends TouchableRipple props https://callstack.github.io/react-native-paper/docs/components/TouchableRipple
- */
-declare const ListItem: {
-    ({ left, right, title, description, onPress, theme: themeOverrides, style, titleStyle, titleNumberOfLines, descriptionNumberOfLines, titleEllipsizeMode, descriptionEllipsizeMode, descriptionStyle, descriptionMaxFontSizeMultiplier, titleMaxFontSizeMultiplier, ...rest }: Props): React.JSX.Element;
-    displayName: string;
-};
-export default ListItem;
+declare const Component: import("../../utils/forwardRef").ForwardRefComponent<View, Props>;
+export default Component;
 //# sourceMappingURL=ListItem.d.ts.map

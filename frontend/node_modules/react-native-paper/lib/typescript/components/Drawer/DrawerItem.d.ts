@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ColorValue, GestureResponderEvent, StyleProp, View, ViewStyle } from 'react-native';
+import { ColorValue, GestureResponderEvent, PressableAndroidRippleConfig, StyleProp, View, ViewStyle } from 'react-native';
 import type { ThemeProp } from '../../types';
 import { IconSource } from '../Icon';
 export declare type Props = React.ComponentPropsWithRef<typeof View> & {
@@ -23,6 +23,11 @@ export declare type Props = React.ComponentPropsWithRef<typeof View> & {
      * Function to execute on press.
      */
     onPress?: (e: GestureResponderEvent) => void;
+    /**
+     * Type of background drawabale to display the feedback (Android).
+     * https://reactnative.dev/docs/pressable#rippleconfig
+     */
+    background?: PressableAndroidRippleConfig;
     /**
      * Accessibility label for the button. This is read by the screen reader when the user taps the button.
      */
@@ -67,7 +72,7 @@ export declare type Props = React.ComponentPropsWithRef<typeof View> & {
  * ```
  */
 declare const DrawerItem: {
-    ({ icon, label, active, disabled, theme: themeOverrides, rippleColor: customRippleColor, style, onPress, accessibilityLabel, right, labelMaxFontSizeMultiplier, ...rest }: Props): React.JSX.Element;
+    ({ icon, label, active, disabled, theme: themeOverrides, rippleColor: customRippleColor, style, onPress, background, accessibilityLabel, right, labelMaxFontSizeMultiplier, ...rest }: Props): React.JSX.Element;
     displayName: string;
 };
 export default DrawerItem;

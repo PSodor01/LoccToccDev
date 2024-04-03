@@ -67,7 +67,7 @@ const TextInputFlat = _ref => {
     ...viewStyle
   } = StyleSheet.flatten(style) || {};
   const fontSize = fontSizeStyle || MAXIMIZED_LABEL_FONT_SIZE;
-  const lineHeight = lineHeightStyle || fontSize * 1.2;
+  const lineHeight = lineHeightStyle || (Platform.OS === 'web' ? fontSize * 1.2 : undefined);
   const isPaddingHorizontalPassed = paddingHorizontal !== undefined && typeof paddingHorizontal === 'number';
   const adornmentConfig = getAdornmentConfig({
     left,

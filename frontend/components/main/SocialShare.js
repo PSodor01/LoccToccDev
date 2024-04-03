@@ -321,7 +321,7 @@ function SocialShare(props) {
                                         <Ionicons name={"share-outline"} size={20} color={"grey"} />
                                 </View>
                                 <View style={styles.likeContainer}>
-                                        <Icon name={"ios-flag"} size={20} color={"grey"} />
+                                        <Icon name={"flag"} size={20} color={"grey"} />
                                 </View>
                             </View>
                         </View>

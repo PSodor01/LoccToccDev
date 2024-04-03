@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 var React = _interopRequireWildcard(require("react"));
 var _reactNative = require("react-native");
+var _reactNativeSafeAreaContext = require("react-native-safe-area-context");
 var _DialogActions = _interopRequireDefault(require("./DialogActions"));
 var _DialogContent = _interopRequireDefault(require("./DialogContent"));
 var _DialogIcon = _interopRequireDefault(require("./DialogIcon"));
@@ -70,6 +71,10 @@ const Dialog = _ref => {
     theme: themeOverrides,
     testID
   } = _ref;
+  const {
+    right,
+    left
+  } = (0, _reactNativeSafeAreaContext.useSafeAreaInsets)();
   const theme = (0, _theming.useInternalTheme)(themeOverrides);
   const {
     isV3,
@@ -88,7 +93,8 @@ const Dialog = _ref => {
     visible: visible,
     contentContainerStyle: [{
       borderRadius,
-      backgroundColor
+      backgroundColor,
+      marginHorizontal: Math.max(left, right, 26)
     }, styles.container, style],
     theme: theme,
     testID: testID
@@ -134,7 +140,6 @@ const styles = _reactNative.StyleSheet.create({
      * dialog (44 pixel from the top and bottom) it won't be dismissed.
      */
     marginVertical: _reactNative.Platform.OS === 'android' ? 44 : 0,
-    marginHorizontal: 26,
     elevation: DIALOG_ELEVATION,
     justifyContent: 'flex-start'
   }

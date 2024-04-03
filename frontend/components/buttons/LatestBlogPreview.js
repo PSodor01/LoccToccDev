@@ -10,6 +10,7 @@ import analytics from "@react-native-firebase/analytics";
 
 import { connect } from 'react-redux'
 
+
 const LatestBlogPreview = (props) => {
     const [blogDetails, setBlogDetails] = useState([]);
     const [blogPreview, setBlogPreview] = useState()
@@ -17,19 +18,18 @@ const LatestBlogPreview = (props) => {
     const navigation = useNavigation();
 
     useEffect(() => {
+
       fetchBlogs()
       setBlogPreview(true)
 
     }, [props.blogDetails]);
 
-    
-  
     const fetchBlogs = () => {
       try {
         const featuredBlogs = props.blogDetails.filter((blog) => blog.aFeaturedBlog === true)
           .map((blog) => {
              const matchingUser = props.allUsers.find(user => user.id === blog.authorId);
-    
+   
           return {
             id: blog.id, // Assuming the ID is available in the blog details
             ...blog,
@@ -37,16 +37,14 @@ const LatestBlogPreview = (props) => {
             authorPicture: matchingUser ? matchingUser.userImg : '',
           };
         });
-    
+   
         setBlogDetails(featuredBlogs);
-        console.log()
-
-        
+       
       } catch (error) {
         console.error('Error fetching blogs:', error);
       }
     };
-  
+ 
     if (blogDetails.length === 0) {
       // Handle the case when there are no blog details available
       return null;
@@ -56,49 +54,86 @@ const LatestBlogPreview = (props) => {
   const featuredBlog = blogDetails[0];
 
   const storeBlogClickHome = (blogTitle) => {
-
     analytics().logEvent('blogClickHome', {user_name: props.currentUser.name, blogName: blogTitle});
-        
 }
 
 return blogDetails && blogPreview ? (
   <View style={styles.container}>
-    <Text style={styles.featuredTitle}>Featured Blog</Text>
-    <View style={styles.blogItem}>
+    <View>
+      <Text style={styles.featuredTitle}>Featured Blog</Text>
       <TouchableOpacity
-        onPress={() => {
-          storeBlogClickHome();
-          navigation.navigate('BlogContent', {
-            blogId: featuredBlog.id,
-            authorId: featuredBlog.authorId,
-            authorName: featuredBlog.authorName,
-          });
-        }}>
+          onPress={() => {
+            setBlogPreview(false);
+          }}
+          style={styles.closeButton}
+        >
+          <Ionicons name="close-circle" size={24} color="red" />
+        </TouchableOpacity>
+    </View>
+      <View style={styles.xContainer}>
+        <TouchableOpacity
+          onPress={() => {
+            storeBlogClickHome();
+            navigation.navigate('BlogContent', {
+              blogId: featuredBlog.id,
+              authorId: featuredBlog.authorId,
+              authorName: featuredBlog.authorName,
+            });
+          }}
+        >
+        {featuredBlog.blogCoverPhoto ? (
+          // Render blog item with cover photo
+          <View style={styles.coverPhotoContainer}>
+            <Image source={{ uri: featuredBlog.blogCoverPhoto }} style={styles.coverPhoto} />
+            <View style={styles.textContainer}>
+              <Text style={styles.blogTitle}>{featuredBlog.blogTitle}</Text>
+              <Text style={styles.authorId}></Text>
+              <View style={styles.authorRow}>
+                {featuredBlog.authorPicture ? (
+                  <Image source={{ uri: featuredBlog.authorPicture }} style={styles.authorImage} />
+                ) : (
+                  <View style={[styles.avatarContainer, { backgroundColor: '#95B9C7' }]}>
+                    <Ionicons name="person" size={15} color="white" />
+                  </View>
+                )}
+                <Text style={styles.authorId}>{featuredBlog.authorName}</Text>
+              </View>
+              <Text style={styles.blogDateText}>
+                {featuredBlog.createdAt ? moment(featuredBlog.createdAt.toDate()).format("MMM Do, YYYY") : ''}
+              </Text>
+            </View>
+          </View>
+      ) : (
+        // Render blog item without cover photo (same as before)
         <View style={styles.authorContainer}>
           {featuredBlog.authorPicture ? (
-            <Image source={{ uri: featuredBlog.authorPicture }} style={styles.authorImage} />
+            <Image source={{ uri: featuredBlog.authorPicture }} style={styles.authorImageOld} />
           ) : (
-            <View style={[styles.avatarContainer, { backgroundColor: '#95B9C7' }]}>
+            <View style={[styles.avatarContainerOld, { backgroundColor: '#95B9C7' }]}>
               <Ionicons name="person" size={30} color="white" />
             </View>
           )}
           <View style={styles.textContainer}>
             <Text style={styles.blogTitle}>{featuredBlog.blogTitle}</Text>
-            <Text style={styles.authorId}>Author: {featuredBlog.authorName}</Text>
+            <Text style={styles.authorId}>{featuredBlog.authorName}</Text>
             <Text style={styles.blogDateText}>
-              {featuredBlog.createdAt ? moment(featuredBlog.createdAt.toDate()).format('MMM Do, YYYY') : ''}
+              {featuredBlog.createdAt ? moment(featuredBlog.createdAt.toDate()).format("MMM Do, YYYY") : ''}
             </Text>
           </View>
         </View>
+      )}
       </TouchableOpacity>
     </View>
   </View>
 ) : null;
 };
 
+
+
+
 const styles = StyleSheet.create({
 container: {
-  paddingHorizontal: 16,
+  paddingHorizontal: 5,
   paddingBottom: 16,
   borderBottomWidth: 1,
   borderBottomColor: 'lightgray',
@@ -111,8 +146,6 @@ featuredTitle: {
   marginTop: 5,
   marginBottom: 5,
   fontStyle: 'italic',
-},
-blogItem: {
 },
 blogTitle: {
   fontSize: 18,
@@ -131,16 +164,30 @@ authorContainer: {
   flexDirection: 'row',
   alignItems: 'center',
 },
-authorImage: {
+authorImageOld: {
   width: 60,
   height: 60,
-  borderRadius: 30,
+  borderRadius: 30, // Make it a circle
   marginRight: 10,
 },
 textContainer: {
-  flex: 1,
+  flex: 1, // Take the remaining space
 },
 avatarContainer: {
+  width: 30,
+  height: 30,
+  borderRadius: 40,
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginRight: '5%',
+},
+authorImage: {
+  width: 30,
+  height: 30,
+  borderRadius: 30, // Make it a circle
+  marginRight: 10,
+},
+avatarContainerOld: {
   width: 60,
   height: 60,
   borderRadius: 40,
@@ -148,7 +195,42 @@ avatarContainer: {
   alignItems: 'center',
   marginRight: '5%',
 },
+coverPhotoContainer: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  paddingHorizontal: 16,
+  paddingVertical: 8,
+},
+coverPhoto: {
+  width: 130, // Adjust the width as needed
+  height: 130, // Adjust the height as needed
+  marginRight: 16,
+  borderRadius: 8,
+},
+authorRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+},
+xContainer: {
+  position: 'relative',
+},
+closeButton: {
+  position: 'absolute',
+  top: 10,
+  right: 10,
+  zIndex: 1,
+},
+
+
+
+
 });
+
+
+
+
+
+
 
 
 const mapStateToProps = (store) => ({
@@ -157,5 +239,7 @@ const mapStateToProps = (store) => ({
     allUsers: store.userState.allUsers,
 })
 
-export default connect(mapStateToProps)(LatestBlogPreview);
 
+
+
+export default connect(mapStateToProps)(LatestBlogPreview);

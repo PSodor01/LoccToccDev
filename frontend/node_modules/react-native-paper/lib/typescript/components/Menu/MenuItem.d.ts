@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AccessibilityState, ColorValue, GestureResponderEvent, StyleProp, TextStyle, ViewStyle } from 'react-native';
+import { AccessibilityState, ColorValue, GestureResponderEvent, PressableAndroidRippleConfig, StyleProp, TextStyle, ViewStyle } from 'react-native';
 import type { ThemeProp } from '../../types';
 import { IconSource } from '../Icon';
 export declare type Props = {
@@ -29,6 +29,11 @@ export declare type Props = {
      * Sets min height with densed layout.
      */
     dense?: boolean;
+    /**
+     * Type of background drawabale to display the feedback (Android).
+     * https://reactnative.dev/docs/pressable#rippleconfig
+     */
+    background?: PressableAndroidRippleConfig;
     /**
      * Function to execute on press.
      */
@@ -87,7 +92,7 @@ export declare type Props = {
  * ```
  */
 declare const MenuItem: {
-    ({ leadingIcon, trailingIcon, dense, title, disabled, onPress, style, contentStyle, titleStyle, rippleColor: customRippleColor, testID, accessibilityLabel, accessibilityState, theme: themeOverrides, titleMaxFontSizeMultiplier, }: Props): React.JSX.Element;
+    ({ leadingIcon, trailingIcon, dense, title, disabled, background, onPress, style, contentStyle, titleStyle, rippleColor: customRippleColor, testID, accessibilityLabel, accessibilityState, theme: themeOverrides, titleMaxFontSizeMultiplier, }: Props): React.JSX.Element;
     displayName: string;
 };
 export default MenuItem;

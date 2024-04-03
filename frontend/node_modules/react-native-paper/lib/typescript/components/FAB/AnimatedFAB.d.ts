@@ -1,5 +1,5 @@
 import * as React from 'react';
-import type { AccessibilityState, ColorValue } from 'react-native';
+import type { AccessibilityState, ColorValue, PressableAndroidRippleConfig } from 'react-native';
 import { Animated, GestureResponderEvent, StyleProp, ViewStyle } from 'react-native';
 import type { $Omit, $RemoveChildren, ThemeProp } from '../../types';
 import type { IconSource } from '../Icon';
@@ -19,6 +19,11 @@ export declare type Props = $Omit<$RemoveChildren<typeof Surface>, 'mode'> & {
      * Make the label text uppercased.
      */
     uppercase?: boolean;
+    /**
+     * Type of background drawabale to display the feedback (Android).
+     * https://reactnative.dev/docs/pressable#rippleconfig
+     */
+    background?: PressableAndroidRippleConfig;
     /**
      * Accessibility label for the FAB. This is read by the screen reader when the user taps the FAB.
      * Uses `label` by default if specified.
@@ -164,6 +169,6 @@ export declare type Props = $Omit<$RemoveChildren<typeof Surface>, 'mode'> & {
  * });
  * ```
  */
-declare const AnimatedFAB: ({ icon, label, accessibilityLabel, accessibilityState, color: customColor, rippleColor: customRippleColor, disabled, onPress, onLongPress, delayLongPress, theme: themeOverrides, style, visible, uppercase: uppercaseProp, testID, animateFrom, extended, iconMode, variant, labelMaxFontSizeMultiplier, ...rest }: Props) => React.JSX.Element;
+declare const AnimatedFAB: ({ icon, label, background, accessibilityLabel, accessibilityState, color: customColor, rippleColor: customRippleColor, disabled, onPress, onLongPress, delayLongPress, theme: themeOverrides, style, visible, uppercase: uppercaseProp, testID, animateFrom, extended, iconMode, variant, labelMaxFontSizeMultiplier, ...rest }: Props) => React.JSX.Element;
 export default AnimatedFAB;
 //# sourceMappingURL=AnimatedFAB.d.ts.map

@@ -1450,7 +1450,7 @@ function game(props) {
                         <TouchableOpacity
                             style={styles.flagContainer}
                             onPress={() => reportPostHandler({name: item.user.name, caption: item.caption})}>
-                            <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
+                            <Icon name={"flag"} size={20} color={"grey"} marginRight={10} />
                         </TouchableOpacity>
                     </View>
                 </View>

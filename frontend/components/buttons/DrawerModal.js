@@ -63,7 +63,7 @@ const DrawerModal = ({ isVisible, onClose, navigation }) => {
             </TouchableOpacity>
             <TouchableOpacity style={styles.linkButton} onPress={() => { navigation.navigate('ContactUs'); onClose(); }}>
                 <Feather name="phone-call" color="black" size={24} />
-                <Text style={styles.linkText}>Contact Us</Text>
+                <Text style={styles.linkText}>Reach Out</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.linkButton} onPress={onShare}>
                 <Feather name="share" color="black" size={24} />

@@ -5,13 +5,11 @@ import { getApps, initializeApp } from '@react-native-firebase/app';
 import auth from '@react-native-firebase/auth';
 
 import * as Updates from 'expo-updates';
-import * as Notifications from 'expo-notifications';
 
 import React, { Component } from 'react';
 import { View, ActivityIndicator, StyleSheet, Text, TouchableOpacity, Alert, Image } from 'react-native'
 
 import { FontAwesome5 } from "@expo/vector-icons";
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 
 import 'expo-dev-client';
 
@@ -37,31 +35,6 @@ const firebaseConfig = {
 if (getApps().length === 0) {
   initializeApp(firebaseConfig);
 }
-
-/*
-<Provider store={store}>
-          <NavigationContainer>
-            <Drawer.Navigator drawerContent={props => <DrawerContent {...props} />}>
-              <Drawer.Screen name="Main" component={MainStackScreen} options={{headerShown: false}} />
-            </Drawer.Navigator>
-          </NavigationContainer>
-        </Provider>
-        */
-/* 
-      <MainStack.Screen name="HouseGuidelines" component={HouseGuidelinesScreen}
-        options={{
-            headerTitle: "Community Guidelines",
-            headerTitleAlign: "center",
-            headerLeft: () => (
-              <TouchableOpacity 
-              style={{ alignItems: "flex-end", marginLeft:16 }}
-              onPress={() => navigation.goBack()}
-              >
-              <FontAwesome5 name="chevron-left" size={24} color="#fff" />
-            </TouchableOpacity>
-            )
-          }} />
-       */
 
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
@@ -573,7 +546,6 @@ export class App extends Component {
         const update = await Updates.checkForUpdateAsync();
         if (update.isAvailable) {
           await Updates.fetchUpdateAsync();
-          // Prompt the user to reload the app to apply the update
           await Updates.reloadAsync();
         }
       } catch (e) {
@@ -608,7 +580,7 @@ export class App extends Component {
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center'  }}>
           <View>
           </View>
-          <ActivityIndicator/>
+          <ActivityIndicator size="large" color="red" />
         </View>
         
       )
@@ -644,10 +616,6 @@ export class App extends Component {
     </Provider>
     
     )
-
-    
-
-    
   }
 }
 

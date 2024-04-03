@@ -39,6 +39,8 @@ export declare type Props = $RemoveChildren<typeof TouchableRipple> & {
  * Radio buttons allow the selection a single option from a set.
  * This component follows platform guidelines for Android, but can be used
  * on any platform.
+ *
+ * @extends TouchableRipple props https://callstack.github.io/react-native-paper/docs/components/TouchableRipple
  */
 declare const RadioButtonAndroid: {
     ({ disabled, onPress, theme: themeOverrides, value, status, testID, ...rest }: Props): React.JSX.Element;

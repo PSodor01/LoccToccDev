@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleProp, View, ViewStyle } from 'react-native';
+import { Animated, StyleProp, View, ViewStyle } from 'react-native';
 import type { ThemeProp } from '../types';
 export declare type Props = React.ComponentPropsWithRef<typeof View> & {
     /**
@@ -24,11 +24,19 @@ export declare type Props = React.ComponentPropsWithRef<typeof View> & {
      * Whether to show the ProgressBar (true, the default) or hide it (false).
      */
     visible?: boolean;
+    /**
+     * Style of filled part of the ProgresBar.
+     */
+    fillStyle?: Animated.WithAnimatedValue<StyleProp<ViewStyle>>;
     style?: StyleProp<ViewStyle>;
     /**
      * @optional
      */
     theme?: ThemeProp;
+    /**
+     * testID to be used on tests.
+     */
+    testID?: string;
 };
 /**
  * Progress bar is an indicator used to present progress of some activity in the app.
@@ -45,6 +53,6 @@ export declare type Props = React.ComponentPropsWithRef<typeof View> & {
  * export default MyComponent;
  * ```
  */
-declare const ProgressBar: ({ color, indeterminate, style, progress, visible, theme: themeOverrides, animatedValue, ...rest }: Props) => React.JSX.Element;
+declare const ProgressBar: ({ color, indeterminate, progress, visible, theme: themeOverrides, animatedValue, style, fillStyle, testID, ...rest }: Props) => React.JSX.Element;
 export default ProgressBar;
 //# sourceMappingURL=ProgressBar.d.ts.map

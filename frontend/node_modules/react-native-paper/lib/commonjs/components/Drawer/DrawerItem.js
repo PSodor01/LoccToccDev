@@ -43,6 +43,7 @@ const DrawerItem = _ref => {
     rippleColor: customRippleColor,
     style,
     onPress,
+    background,
     accessibilityLabel,
     right,
     labelMaxFontSizeMultiplier,
@@ -62,6 +63,7 @@ const DrawerItem = _ref => {
   return /*#__PURE__*/React.createElement(_reactNative.View, rest, /*#__PURE__*/React.createElement(_TouchableRipple.default, {
     borderless: true,
     disabled: disabled,
+    background: background,
     onPress: onPress,
     style: [styles.container, {
       backgroundColor,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Animated, LayoutChangeEvent, StyleProp, TextStyle } from 'react-native';
+import { Animated, GestureResponderEvent, LayoutChangeEvent, StyleProp, TextStyle } from 'react-native';
 import { AdornmentSide } from './enums';
 import type { ThemeProp } from '../../../types';
 export declare type Props = {
@@ -8,6 +8,14 @@ export declare type Props = {
      */
     text: string;
     onLayout?: (event: LayoutChangeEvent) => void;
+    /**
+     * Function to execute on press.
+     */
+    onPress?: (e: GestureResponderEvent) => void;
+    /**
+     * Accessibility label for the affix. This is read by the screen reader when the user taps the affix.
+     */
+    accessibilityLabel?: string;
     /**
      * Style that is passed to the Text element.
      */
@@ -57,7 +65,7 @@ declare const AffixAdornment: React.FunctionComponent<{
  * ```
  */
 declare const TextInputAffix: {
-    ({ text, textStyle: labelStyle, theme: themeOverrides, onLayout: onTextLayout, }: Props): React.JSX.Element;
+    ({ text, textStyle: labelStyle, theme: themeOverrides, onLayout: onTextLayout, onPress, accessibilityLabel, }: Props): React.JSX.Element;
     displayName: string;
 };
 export default TextInputAffix;

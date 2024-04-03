@@ -43,6 +43,7 @@ export declare type RenderProps = {
     onFocus?: (args: any) => void;
     onBlur?: (args: any) => void;
     underlineColorAndroid?: string;
+    onLayout?: (args: any) => void;
     style: any;
     multiline?: boolean;
     numberOfLines?: number;

@@ -2,6 +2,7 @@ import * as React from 'react';
 import {
   ColorValue,
   GestureResponderEvent,
+  PressableAndroidRippleConfig,
   StyleProp,
   StyleSheet,
   TextStyle,
@@ -33,9 +34,18 @@ export type Props = {
    */
   disabled?: boolean;
   /**
+   * Type of background drawabale to display the feedback (Android).
+   * https://reactnative.dev/docs/pressable#rippleconfig
+   */
+  background?: PressableAndroidRippleConfig;
+  /**
    * Function to execute on press.
    */
   onPress?: (e: GestureResponderEvent) => void;
+  /**
+   * Function to execute on long press.
+   */
+  onLongPress?: (e: GestureResponderEvent) => void;
   /**
    * Accessibility label for the touchable. This is read by the screen reader when the user taps the touchable.
    */
@@ -132,12 +142,14 @@ const RadioButtonItem = ({
   style,
   labelStyle,
   onPress,
+  onLongPress,
   disabled,
   color,
   uncheckedColor,
   rippleColor,
   status,
   theme: themeOverrides,
+  background,
   accessibilityLabel = label,
   testID,
   mode,
@@ -195,6 +207,7 @@ const RadioButtonItem = ({
                 event,
               })
             }
+            onLongPress={onLongPress}
             accessibilityLabel={accessibilityLabel}
             accessibilityRole="radio"
             accessibilityState={{
@@ -203,6 +216,7 @@ const RadioButtonItem = ({
             }}
             testID={testID}
             disabled={disabled}
+            background={background}
             theme={theme}
             rippleColor={rippleColor}
           >

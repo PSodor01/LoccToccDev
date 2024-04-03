@@ -11,6 +11,8 @@ import TouchableRipple from '../TouchableRipple/TouchableRipple';
  * Radio buttons allow the selection a single option from a set.
  * This component follows platform guidelines for iOS, but can be used
  * on any platform.
+ *
+ * @extends TouchableRipple props https://callstack.github.io/react-native-paper/docs/components/TouchableRipple
  */
 const RadioButtonIOS = _ref => {
   let {

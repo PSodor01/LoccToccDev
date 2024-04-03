@@ -77,7 +77,9 @@ const TextInputAffix = _ref2 => {
     text,
     textStyle: labelStyle,
     theme: themeOverrides,
-    onLayout: onTextLayout
+    onLayout: onTextLayout,
+    onPress,
+    accessibilityLabel = text
   } = _ref2;
   const theme = (0, _theming.useInternalTheme)(themeOverrides);
   const {
@@ -103,7 +105,7 @@ const TextInputAffix = _ref2 => {
     theme,
     disabled
   });
-  return /*#__PURE__*/_react.default.createElement(_reactNative.Animated.View, {
+  const affix = /*#__PURE__*/_react.default.createElement(_reactNative.Animated.View, {
     style: [styles.container, style, {
       opacity: (visible === null || visible === void 0 ? void 0 : visible.interpolate({
         inputRange: [0, 1],
@@ -120,6 +122,15 @@ const TextInputAffix = _ref2 => {
     onLayout: onTextLayout,
     testID: `${testID}-text`
   }, text));
+  if (onPress) {
+    return /*#__PURE__*/_react.default.createElement(_reactNative.Pressable, {
+      onPress: onPress,
+      accessibilityRole: "button",
+      accessibilityLabel: accessibilityLabel,
+      style: styles.container
+    }, affix);
+  }
+  return affix;
 };
 exports.TextInputAffix = TextInputAffix;
 TextInputAffix.displayName = 'TextInput.Affix';

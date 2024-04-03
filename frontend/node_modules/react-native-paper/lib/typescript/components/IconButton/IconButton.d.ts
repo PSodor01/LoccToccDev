@@ -62,6 +62,10 @@ export declare type Props = $RemoveChildren<typeof TouchableRipple> & {
      * @optional
      */
     theme?: ThemeProp;
+    /**
+     * Whether to show a loading indicator.
+     */
+    loading?: boolean;
 };
 /**
  * An icon button is a button which displays only an icon without a label.

@@ -299,7 +299,7 @@ const v3LargeSize = {
 const getCustomFabSize = (customSize, roundness) => ({
   height: customSize,
   width: customSize,
-  borderRadius: customSize / roundness
+  borderRadius: roundness === 0 ? 0 : customSize / roundness
 });
 const getFabStyle = _ref9 => {
   let {

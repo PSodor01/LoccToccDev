@@ -982,7 +982,7 @@ function Profile(props) {
                                     <TouchableOpacity
                                         style={styles.flagContainer}
                                         onPress={reportPostHandler}>
-                                        <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
+                                        <Icon name={"flag"} size={20} color={"grey"} marginRight={10} />
                                     </TouchableOpacity>
                                         {props.route.params.uid !== auth().currentUser.uid ? 
                                         null

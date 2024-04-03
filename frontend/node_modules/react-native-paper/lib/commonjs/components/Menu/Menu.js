@@ -3,12 +3,13 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.default = exports.ELEVATION_LEVELS_MAP = void 0;
 var React = _interopRequireWildcard(require("react"));
 var _reactNative = require("react-native");
 var _MenuItem = _interopRequireDefault(require("./MenuItem"));
 var _constants = require("../../constants");
 var _theming = require("../../core/theming");
+var _types = require("../../types");
 var _addEventListener = require("../../utils/addEventListener");
 var _BackHandler = require("../../utils/BackHandler/BackHandler");
 var _Portal = _interopRequireDefault(require("../Portal/Portal"));
@@ -24,6 +25,8 @@ const ANIMATION_DURATION = 250;
 // From the 'Standard easing' section of https://material.io/design/motion/speed.html#easing
 const EASING = _reactNative.Easing.bezier(0.4, 0, 0.2, 1);
 const WINDOW_LAYOUT = _reactNative.Dimensions.get('window');
+const DEFAULT_ELEVATION = 2;
+const ELEVATION_LEVELS_MAP = Object.values(_types.ElevationLevels);
 
 /**
  * Menus display a list of choices on temporary elevated surfaces. Their placement varies based on the element that opens them.
@@ -71,6 +74,7 @@ const WINDOW_LAYOUT = _reactNative.Dimensions.get('window');
  * `Modal` contents within a `PaperProvider` in order for the menu to show. This
  * wrapping is not necessary if you use Paper's `Modal` instead.
  */
+exports.ELEVATION_LEVELS_MAP = ELEVATION_LEVELS_MAP;
 class Menu extends React.Component {
   // @component ./MenuItem.tsx
   static Item = _MenuItem.default;
@@ -312,6 +316,7 @@ class Menu extends React.Component {
       anchorPosition,
       contentStyle,
       style,
+      elevation = DEFAULT_ELEVATION,
       children,
       theme,
       statusBarHeight,
@@ -493,10 +498,10 @@ class Menu extends React.Component {
     }, /*#__PURE__*/React.createElement(_Surface.default, _extends({
       pointerEvents: pointerEvents,
       style: [styles.shadowMenuContainer, shadowMenuContainerStyle, theme.isV3 && {
-        backgroundColor: theme.colors.elevation.level2
+        backgroundColor: theme.colors.elevation[ELEVATION_LEVELS_MAP[elevation]]
       }, contentStyle]
     }, theme.isV3 && {
-      elevation: 2
+      elevation
     }, {
       testID: `${testID}-surface`,
       theme: theme

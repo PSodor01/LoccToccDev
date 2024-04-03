@@ -9,6 +9,7 @@ var _reactNative = require("react-native");
 var _utils = require("./utils");
 var _theming = require("../../core/theming");
 var _forwardRef = require("../../utils/forwardRef");
+var _ActivityIndicator = _interopRequireDefault(require("../ActivityIndicator"));
 var _CrossFadeIcon = _interopRequireDefault(require("../CrossFadeIcon"));
 var _Icon = _interopRequireDefault(require("../Icon"));
 var _Surface = _interopRequireDefault(require("../Surface"));
@@ -56,6 +57,7 @@ const IconButton = (0, _forwardRef.forwardRef)((_ref, ref) => {
     style,
     theme: themeOverrides,
     testID = 'icon-button',
+    loading = false,
     ...rest
   } = _ref;
   const theme = (0, _theming.useInternalTheme)(themeOverrides);
@@ -127,7 +129,10 @@ const IconButton = (0, _forwardRef.forwardRef)((_ref, ref) => {
       right: 6
     },
     testID: testID
-  }, rest), /*#__PURE__*/React.createElement(IconComponent, {
+  }, rest), loading ? /*#__PURE__*/React.createElement(_ActivityIndicator.default, {
+    size: size,
+    color: iconColor
+  }) : /*#__PURE__*/React.createElement(IconComponent, {
     color: iconColor,
     source: icon,
     size: size

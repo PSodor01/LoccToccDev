@@ -302,20 +302,6 @@ function Feed(props) {
                 .doc(userId)
                 .update(updateObject);
         }
-
-        const likedName = props.currentUser.name
-        firestore()
-            .collection("users")
-            .doc(userId)
-            .collection("notifications")
-            .add({
-                notificationType: "fade",
-                creation: firestore.FieldValue.serverTimestamp(),
-                otherUserId: auth().currentUser.uid,
-                otherUsername: likedName,
-                notificationText: 'faded your post on the ' + awayTeam + "/" + homeTeam + " game",
-              })
-
     }
 
     const onUnfadePress = (userId, postId) => {
@@ -620,7 +606,7 @@ function Feed(props) {
                     <TouchableOpacity
                         style={styles.flagContainer}
                         onPress={() => reportPostHandler({name: item.user.name, caption: item.caption})}>
-                        <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
+                        <Icon name={"flag"} size={20} color={"grey"} marginRight={10} />
                     </TouchableOpacity>
                 </View>
                         </View> 
@@ -753,7 +739,7 @@ function Feed(props) {
                     <TouchableOpacity
                         style={styles.flagContainer}
                         onPress={() => reportPostHandler({name: item.user.name, caption: item.caption})}>
-                        <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
+                        <Icon name={"flag"} size={20} color={"grey"} marginRight={10} />
                     </TouchableOpacity>
                 </View>
                         </View> 

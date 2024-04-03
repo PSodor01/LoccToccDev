@@ -225,7 +225,7 @@ function Comment(props, route) {
                                     <TouchableOpacity
                                         style={styles.flagContainer}
                                         onPress={reportPostHandler}>
-                                        <Icon name={"ios-flag"} size={20} color={"grey"} marginRight={10} />
+                                        <Icon name={"flag"} size={20} color={"grey"} marginRight={10} />
                                     </TouchableOpacity>
                                 </View>
                             </View>

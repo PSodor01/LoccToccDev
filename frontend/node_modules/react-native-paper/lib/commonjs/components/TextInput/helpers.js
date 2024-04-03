@@ -245,19 +245,14 @@ const getInputTextColor = _ref8 => {
   let {
     theme,
     textColor,
-    disabled,
-    mode
+    disabled
   } = _ref8;
-  const isFlat = mode === 'flat';
   if (textColor) {
     return textColor;
   }
   if (theme.isV3) {
     if (disabled) {
       return theme.colors.onSurfaceDisabled;
-    }
-    if (isFlat) {
-      return theme.colors.onSurfaceVariant;
     }
     return theme.colors.onSurface;
   }
@@ -351,7 +346,7 @@ const getFlatUnderlineColor = _ref13 => {
     if (disabled) {
       return theme.colors.onSurfaceDisabled;
     }
-    return theme.colors.onSurface;
+    return theme.colors.onSurfaceVariant;
   }
   if (disabled) {
     return 'transparent';
@@ -408,8 +403,7 @@ const getFlatInputColors = _ref15 => {
   return {
     inputTextColor: getInputTextColor({
       ...baseFlatColorProps,
-      textColor,
-      mode: 'flat'
+      textColor
     }),
     activeColor,
     underlineColorCustom: getFlatUnderlineColor({
@@ -449,8 +443,7 @@ const getOutlinedInputColors = _ref16 => {
   return {
     inputTextColor: getInputTextColor({
       ...baseOutlinedColorProps,
-      textColor,
-      mode: 'outlined'
+      textColor
     }),
     activeColor,
     outlineColor: getOutlinedOutlineInputColor({

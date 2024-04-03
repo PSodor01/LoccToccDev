@@ -15,6 +15,7 @@ import color from 'color';
 import { Style, getLeftStyles, getRightStyles } from './utils';
 import { useInternalTheme } from '../../core/theming';
 import type { $RemoveChildren, EllipsizeProp, ThemeProp } from '../../types';
+import { forwardRef } from '../../utils/forwardRef';
 import TouchableRipple from '../TouchableRipple/TouchableRipple';
 import Text from '../Typography/Text';
 
@@ -66,6 +67,10 @@ export type Props = $RemoveChildren<typeof TouchableRipple> & {
    */
   style?: StyleProp<ViewStyle>;
   /**
+   * Style that is passed to the container wrapping title and descripton.
+   */
+  contentStyle?: StyleProp<ViewStyle>;
+  /**
    * Style that is passed to Title element.
    */
   titleStyle?: StyleProp<TextStyle>;
@@ -103,6 +108,10 @@ export type Props = $RemoveChildren<typeof TouchableRipple> & {
    * Specifies the largest possible scale a description font can reach.
    */
   descriptionMaxFontSizeMultiplier?: number;
+  /**
+   * TestID used for testing purposes
+   */
+  testID?: string;
 };
 
 /**
@@ -126,24 +135,29 @@ export type Props = $RemoveChildren<typeof TouchableRipple> & {
  *
  * @extends TouchableRipple props https://callstack.github.io/react-native-paper/docs/components/TouchableRipple
  */
-const ListItem = ({
-  left,
-  right,
-  title,
-  description,
-  onPress,
-  theme: themeOverrides,
-  style,
-  titleStyle,
-  titleNumberOfLines = 1,
-  descriptionNumberOfLines = 2,
-  titleEllipsizeMode,
-  descriptionEllipsizeMode,
-  descriptionStyle,
-  descriptionMaxFontSizeMultiplier,
-  titleMaxFontSizeMultiplier,
-  ...rest
-}: Props) => {
+const ListItem = (
+  {
+    left,
+    right,
+    title,
+    description,
+    onPress,
+    theme: themeOverrides,
+    style,
+    contentStyle,
+    titleStyle,
+    titleNumberOfLines = 1,
+    descriptionNumberOfLines = 2,
+    titleEllipsizeMode,
+    descriptionEllipsizeMode,
+    descriptionStyle,
+    descriptionMaxFontSizeMultiplier,
+    titleMaxFontSizeMultiplier,
+    testID,
+    ...rest
+  }: Props,
+  ref: React.ForwardedRef<View>
+) => {
   const theme = useInternalTheme(themeOverrides);
   const [alignToTop, setAlignToTop] = React.useState(false);
 
@@ -218,9 +232,11 @@ const ListItem = ({
   return (
     <TouchableRipple
       {...rest}
+      ref={ref}
       style={[theme.isV3 ? styles.containerV3 : styles.container, style]}
       onPress={onPress}
       theme={theme}
+      testID={testID}
     >
       <View style={theme.isV3 ? styles.rowV3 : styles.row}>
         {left
@@ -230,7 +246,12 @@ const ListItem = ({
             })
           : null}
         <View
-          style={[theme.isV3 ? styles.itemV3 : styles.item, styles.content]}
+          style={[
+            theme.isV3 ? styles.itemV3 : styles.item,
+            styles.content,
+            contentStyle,
+          ]}
+          testID={`${testID}-content`}
         >
           {renderTitle()}
 
@@ -249,7 +270,8 @@ const ListItem = ({
   );
 };
 
-ListItem.displayName = 'List.Item';
+const Component = forwardRef(ListItem);
+Component.displayName = 'List.Item';
 
 const styles = StyleSheet.create({
   container: {
@@ -288,4 +310,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ListItem;
+export default Component;

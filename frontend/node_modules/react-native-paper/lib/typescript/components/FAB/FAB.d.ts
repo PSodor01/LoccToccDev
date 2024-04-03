@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AccessibilityState, Animated, ColorValue, GestureResponderEvent, StyleProp, View, ViewStyle } from 'react-native';
+import { AccessibilityState, Animated, ColorValue, GestureResponderEvent, PressableAndroidRippleConfig, StyleProp, View, ViewStyle } from 'react-native';
 import type { $Omit, $RemoveChildren, ThemeProp } from '../../types';
 import { IconSource } from '../Icon';
 import Surface from '../Surface';
@@ -25,6 +25,11 @@ export declare type Props = $Omit<$RemoveChildren<typeof Surface>, 'mode'> & {
      * Make the label text uppercased.
      */
     uppercase?: boolean;
+    /**
+     * Type of background drawabale to display the feedback (Android).
+     * https://reactnative.dev/docs/pressable#rippleconfig
+     */
+    background?: PressableAndroidRippleConfig;
     /**
      * Accessibility label for the FAB. This is read by the screen reader when the user taps the FAB.
      * Uses `label` by default if specified.

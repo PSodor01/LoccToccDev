@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import color from 'color';
 import { getLeftStyles, getRightStyles } from './utils';
 import { useInternalTheme } from '../../core/theming';
+import { forwardRef } from '../../utils/forwardRef';
 import TouchableRipple from '../TouchableRipple/TouchableRipple';
 import Text from '../Typography/Text';
 /**
@@ -27,7 +28,7 @@ import Text from '../Typography/Text';
  *
  * @extends TouchableRipple props https://callstack.github.io/react-native-paper/docs/components/TouchableRipple
  */
-const ListItem = _ref => {
+const ListItem = (_ref, ref) => {
   let {
     left,
     right,
@@ -36,6 +37,7 @@ const ListItem = _ref => {
     onPress,
     theme: themeOverrides,
     style,
+    contentStyle,
     titleStyle,
     titleNumberOfLines = 1,
     descriptionNumberOfLines = 2,
@@ -44,6 +46,7 @@ const ListItem = _ref => {
     descriptionStyle,
     descriptionMaxFontSizeMultiplier,
     titleMaxFontSizeMultiplier,
+    testID,
     ...rest
   } = _ref;
   const theme = useInternalTheme(themeOverrides);
@@ -93,22 +96,26 @@ const ListItem = _ref => {
   };
   const descriptionColor = theme.isV3 ? theme.colors.onSurfaceVariant : color(theme.colors.text).alpha(0.54).rgb().string();
   return /*#__PURE__*/React.createElement(TouchableRipple, _extends({}, rest, {
+    ref: ref,
     style: [theme.isV3 ? styles.containerV3 : styles.container, style],
     onPress: onPress,
-    theme: theme
+    theme: theme,
+    testID: testID
   }), /*#__PURE__*/React.createElement(View, {
     style: theme.isV3 ? styles.rowV3 : styles.row
   }, left ? left({
     color: descriptionColor,
     style: getLeftStyles(alignToTop, description, theme.isV3)
   }) : null, /*#__PURE__*/React.createElement(View, {
-    style: [theme.isV3 ? styles.itemV3 : styles.item, styles.content]
+    style: [theme.isV3 ? styles.itemV3 : styles.item, styles.content, contentStyle],
+    testID: `${testID}-content`
   }, renderTitle(), description ? renderDescription(descriptionColor, description) : null), right ? right({
     color: descriptionColor,
     style: getRightStyles(alignToTop, description, theme.isV3)
   }) : null));
 };
-ListItem.displayName = 'List.Item';
+const Component = forwardRef(ListItem);
+Component.displayName = 'List.Item';
 const styles = StyleSheet.create({
   container: {
     padding: 8
@@ -145,5 +152,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   }
 });
-export default ListItem;
+export default Component;
 //# sourceMappingURL=ListItem.js.map

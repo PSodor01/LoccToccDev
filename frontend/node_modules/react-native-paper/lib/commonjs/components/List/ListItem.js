@@ -9,6 +9,7 @@ var _reactNative = require("react-native");
 var _color = _interopRequireDefault(require("color"));
 var _utils = require("./utils");
 var _theming = require("../../core/theming");
+var _forwardRef = require("../../utils/forwardRef");
 var _TouchableRipple = _interopRequireDefault(require("../TouchableRipple/TouchableRipple"));
 var _Text = _interopRequireDefault(require("../Typography/Text"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -36,7 +37,7 @@ function _extends() { _extends = Object.assign ? Object.assign.bind() : function
  *
  * @extends TouchableRipple props https://callstack.github.io/react-native-paper/docs/components/TouchableRipple
  */
-const ListItem = _ref => {
+const ListItem = (_ref, ref) => {
   let {
     left,
     right,
@@ -45,6 +46,7 @@ const ListItem = _ref => {
     onPress,
     theme: themeOverrides,
     style,
+    contentStyle,
     titleStyle,
     titleNumberOfLines = 1,
     descriptionNumberOfLines = 2,
@@ -53,6 +55,7 @@ const ListItem = _ref => {
     descriptionStyle,
     descriptionMaxFontSizeMultiplier,
     titleMaxFontSizeMultiplier,
+    testID,
     ...rest
   } = _ref;
   const theme = (0, _theming.useInternalTheme)(themeOverrides);
@@ -102,22 +105,26 @@ const ListItem = _ref => {
   };
   const descriptionColor = theme.isV3 ? theme.colors.onSurfaceVariant : (0, _color.default)(theme.colors.text).alpha(0.54).rgb().string();
   return /*#__PURE__*/React.createElement(_TouchableRipple.default, _extends({}, rest, {
+    ref: ref,
     style: [theme.isV3 ? styles.containerV3 : styles.container, style],
     onPress: onPress,
-    theme: theme
+    theme: theme,
+    testID: testID
   }), /*#__PURE__*/React.createElement(_reactNative.View, {
     style: theme.isV3 ? styles.rowV3 : styles.row
   }, left ? left({
     color: descriptionColor,
     style: (0, _utils.getLeftStyles)(alignToTop, description, theme.isV3)
   }) : null, /*#__PURE__*/React.createElement(_reactNative.View, {
-    style: [theme.isV3 ? styles.itemV3 : styles.item, styles.content]
+    style: [theme.isV3 ? styles.itemV3 : styles.item, styles.content, contentStyle],
+    testID: `${testID}-content`
   }, renderTitle(), description ? renderDescription(descriptionColor, description) : null), right ? right({
     color: descriptionColor,
     style: (0, _utils.getRightStyles)(alignToTop, description, theme.isV3)
   }) : null));
 };
-ListItem.displayName = 'List.Item';
+const Component = (0, _forwardRef.forwardRef)(ListItem);
+Component.displayName = 'List.Item';
 const styles = _reactNative.StyleSheet.create({
   container: {
     padding: 8
@@ -154,6 +161,6 @@ const styles = _reactNative.StyleSheet.create({
     justifyContent: 'center'
   }
 });
-var _default = ListItem;
+var _default = Component;
 exports.default = _default;
 //# sourceMappingURL=ListItem.js.map

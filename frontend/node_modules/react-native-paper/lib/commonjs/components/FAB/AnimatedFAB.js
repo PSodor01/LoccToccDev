@@ -100,6 +100,7 @@ const AnimatedFAB = _ref => {
   let {
     icon,
     label,
+    background,
     accessibilityLabel = label,
     accessibilityState,
     color: customColor,
@@ -289,6 +290,7 @@ const AnimatedFAB = _ref => {
     }, combinedStyles.innerWrapper]
   }, /*#__PURE__*/React.createElement(_TouchableRipple.default, {
     borderless: true,
+    background: background,
     onPress: onPress,
     onLongPress: onLongPress,
     delayLongPress: delayLongPress,

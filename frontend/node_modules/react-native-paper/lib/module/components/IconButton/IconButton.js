@@ -4,6 +4,7 @@ import { StyleSheet } from 'react-native';
 import { getIconButtonColor } from './utils';
 import { useInternalTheme } from '../../core/theming';
 import { forwardRef } from '../../utils/forwardRef';
+import ActivityIndicator from '../ActivityIndicator';
 import CrossFadeIcon from '../CrossFadeIcon';
 import Icon from '../Icon';
 import Surface from '../Surface';
@@ -47,6 +48,7 @@ const IconButton = forwardRef((_ref, ref) => {
     style,
     theme: themeOverrides,
     testID = 'icon-button',
+    loading = false,
     ...rest
   } = _ref;
   const theme = useInternalTheme(themeOverrides);
@@ -118,7 +120,10 @@ const IconButton = forwardRef((_ref, ref) => {
       right: 6
     },
     testID: testID
-  }, rest), /*#__PURE__*/React.createElement(IconComponent, {
+  }, rest), loading ? /*#__PURE__*/React.createElement(ActivityIndicator, {
+    size: size,
+    color: iconColor
+  }) : /*#__PURE__*/React.createElement(IconComponent, {
     color: iconColor,
     source: icon,
     size: size

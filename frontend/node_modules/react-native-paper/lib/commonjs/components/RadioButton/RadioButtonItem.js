@@ -46,12 +46,14 @@ const RadioButtonItem = _ref => {
     style,
     labelStyle,
     onPress,
+    onLongPress,
     disabled,
     color,
     uncheckedColor,
     rippleColor,
     status,
     theme: themeOverrides,
+    background,
     accessibilityLabel = label,
     testID,
     mode,
@@ -97,6 +99,7 @@ const RadioButtonItem = _ref => {
         value,
         event
       }),
+      onLongPress: onLongPress,
       accessibilityLabel: accessibilityLabel,
       accessibilityRole: "radio",
       accessibilityState: {
@@ -105,6 +108,7 @@ const RadioButtonItem = _ref => {
       },
       testID: testID,
       disabled: disabled,
+      background: background,
       theme: theme,
       rippleColor: rippleColor
     }, /*#__PURE__*/React.createElement(_reactNative.View, {

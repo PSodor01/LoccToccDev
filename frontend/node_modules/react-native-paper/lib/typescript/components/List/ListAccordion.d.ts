@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ColorValue, GestureResponderEvent, StyleProp, TextStyle, ViewProps, ViewStyle } from 'react-native';
+import { ColorValue, GestureResponderEvent, StyleProp, TextStyle, ViewProps, ViewStyle, PressableAndroidRippleConfig } from 'react-native';
 import type { Style } from './utils';
 import type { ThemeProp } from '../../types';
 export declare type Props = {
@@ -50,6 +50,11 @@ export declare type Props = {
      * @optional
      */
     theme?: ThemeProp;
+    /**
+     * Type of background drawabale to display the feedback (Android).
+     * https://reactnative.dev/docs/pressable#rippleconfig
+     */
+    background?: PressableAndroidRippleConfig;
     /**
      * Style that is passed to the wrapping TouchableRipple element.
      */
@@ -139,7 +144,7 @@ export declare type Props = {
  * ```
  */
 declare const ListAccordion: {
-    ({ left, right, title, description, children, theme: themeOverrides, titleStyle, descriptionStyle, titleNumberOfLines, descriptionNumberOfLines, rippleColor: customRippleColor, style, id, testID, onPress, onLongPress, delayLongPress, expanded: expandedProp, accessibilityLabel, pointerEvents, titleMaxFontSizeMultiplier, descriptionMaxFontSizeMultiplier, }: Props): React.JSX.Element;
+    ({ left, right, title, description, children, theme: themeOverrides, titleStyle, descriptionStyle, titleNumberOfLines, descriptionNumberOfLines, rippleColor: customRippleColor, style, id, testID, background, onPress, onLongPress, delayLongPress, expanded: expandedProp, accessibilityLabel, pointerEvents, titleMaxFontSizeMultiplier, descriptionMaxFontSizeMultiplier, }: Props): React.JSX.Element;
     displayName: string;
 };
 export default ListAccordion;

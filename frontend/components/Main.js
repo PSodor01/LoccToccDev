@@ -22,6 +22,7 @@ import { fetchUser,
     fetchTeamLogos, 
     fetchNBAGames,
     fetchNHLGames,
+    fetchMLBGames,
     fetchNCAABGames,
     fetchNFLGames, 
     clearData } from '../redux/actions/index';
@@ -56,6 +57,7 @@ function Main() {
         dispatch(fetchBlogDetails());
         dispatch(fetchNBAGames());
         dispatch(fetchNHLGames());
+        dispatch(fetchMLBGames());
         dispatch(fetchNCAABGames());
         dispatch(fetchMMAGames());
       } else {

@@ -4,6 +4,7 @@ import { Animated, Dimensions, Easing, findNodeHandle, I18nManager, Keyboard, Pl
 import MenuItem from './MenuItem';
 import { APPROX_STATUSBAR_HEIGHT } from '../../constants';
 import { withInternalTheme } from '../../core/theming';
+import { ElevationLevels } from '../../types';
 import { addEventListener } from '../../utils/addEventListener';
 import { BackHandler } from '../../utils/BackHandler/BackHandler';
 import Portal from '../Portal/Portal';
@@ -15,6 +16,8 @@ const ANIMATION_DURATION = 250;
 // From the 'Standard easing' section of https://material.io/design/motion/speed.html#easing
 const EASING = Easing.bezier(0.4, 0, 0.2, 1);
 const WINDOW_LAYOUT = Dimensions.get('window');
+const DEFAULT_ELEVATION = 2;
+export const ELEVATION_LEVELS_MAP = Object.values(ElevationLevels);
 
 /**
  * Menus display a list of choices on temporary elevated surfaces. Their placement varies based on the element that opens them.
@@ -303,6 +306,7 @@ class Menu extends React.Component {
       anchorPosition,
       contentStyle,
       style,
+      elevation = DEFAULT_ELEVATION,
       children,
       theme,
       statusBarHeight,
@@ -484,10 +488,10 @@ class Menu extends React.Component {
     }, /*#__PURE__*/React.createElement(Surface, _extends({
       pointerEvents: pointerEvents,
       style: [styles.shadowMenuContainer, shadowMenuContainerStyle, theme.isV3 && {
-        backgroundColor: theme.colors.elevation.level2
+        backgroundColor: theme.colors.elevation[ELEVATION_LEVELS_MAP[elevation]]
       }, contentStyle]
     }, theme.isV3 && {
-      elevation: 2
+      elevation
     }, {
       testID: `${testID}-surface`,
       theme: theme
